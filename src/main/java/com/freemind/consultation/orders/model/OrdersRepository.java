@@ -1,10 +1,9 @@
 package com.freemind.consultation.orders.model;
 
-public class Order {
+public class OrdersRepository {
 
-	public Order() {
+	public OrdersRepository() {
 		// TODO Auto-generated constructor stub
-		System.out.println("=====");
 	}
 
 }
