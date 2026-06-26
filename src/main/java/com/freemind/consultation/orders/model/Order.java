@@ -1,8 +1,8 @@
 package com.freemind.consultation.orders.model;
 
-public class OrderVO {
+public class Order {
 
-	public OrderVO() {
+	public Order() {
 		// TODO Auto-generated constructor stub
 	}
 
