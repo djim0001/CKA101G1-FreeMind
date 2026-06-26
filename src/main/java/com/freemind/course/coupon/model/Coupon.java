@@ -19,7 +19,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "coupons")
-public class CouponVO {
+public class Coupon {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "coupon_id")
@@ -41,17 +41,17 @@ public class CouponVO {
 	private BigDecimal discount;
 	@Column(name = "discount_limit")
 	private Integer discountLimit;
-	public Set<MemberCouponVO> getMemberCouponVOs() {
-		return memberCouponVOs;
+	public Set<MemberCoupon> getMemberCoupons() {
+		return memberCoupons;
 	}
 
-	public void setMemberCouponVOs(Set<MemberCouponVO> memberCouponVOs) {
-		this.memberCouponVOs = memberCouponVOs;
+	public void setMemberCoupons(Set<MemberCoupon> memberCoupons) {
+		this.memberCoupons = memberCoupons;
 	}
 
-	@OneToMany(mappedBy = "couponVO", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL)
 	@OrderBy("coupon_id asc")
-	private Set<MemberCouponVO> memberCouponVOs;
+	private Set<MemberCoupon> memberCoupons;
 
 	public Integer getCouponId() {
 		return couponId;

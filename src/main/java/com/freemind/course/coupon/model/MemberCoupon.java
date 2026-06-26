@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "member_coupons")
-public class MemberCouponVO {
+public class MemberCoupon {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class MemberCouponVO {
 	private Integer couponSerialNo;
 	@ManyToOne
 	@JoinColumn(name = "coupon_id", referencedColumnName = "coupon_id")
-	private CouponVO couponVO;
+	private Coupon coupon;
 	@Column(name = "member_id")
 	private Integer memberId;
 	@Column(name = "coupon_status")
@@ -38,11 +38,11 @@ public class MemberCouponVO {
 	public void setCouponSerialNo(Integer couponSerialNo) {
 		this.couponSerialNo = couponSerialNo;
 	}
-	public CouponVO getCouponVO() {
-		return couponVO;
+	public Coupon getCoupon() {
+		return coupon;
 	}
-	public void setCouponVO(CouponVO couponVO) {
-		this.couponVO = couponVO;
+	public void setCoupon(Coupon coupon) {
+		this.coupon = coupon;
 	}
 	public Integer getMemberId() {
 		return memberId;

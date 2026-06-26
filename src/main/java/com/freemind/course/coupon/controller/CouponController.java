@@ -17,7 +17,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.servlet.ModelAndView;
 
 import com.freemind.course.coupon.model.CouponService;
-import com.freemind.course.coupon.model.CouponVO;
+import com.freemind.course.coupon.model.Coupon;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -37,62 +37,62 @@ public class CouponController {
 		Integer currentPage = (empPageQty == null) ? 1 : Integer.parseInt(empPageQty);
 		model.addAttribute("empPageQty", currentPage);
 
-		CouponVO couponVO = new CouponVO();
-		model.addAttribute("couponVO", couponVO);
+		Coupon coupon = new Coupon();
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/selectCoupon";
 	}
 
 	@GetMapping("addCoupon")
 	public String addCoupon(ModelMap model) {
-		CouponVO couponVO = new CouponVO();
-		model.addAttribute("couponVO", couponVO);
+		Coupon coupon = new Coupon();
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/addCoupon";
 	}
 	@PostMapping("select_one_coupon")
 	public String listOneCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
-		CouponVO couponVO = couponSvc.getOneCoupon(Integer.valueOf(couponId));
-		model.addAttribute("couponVO", couponVO);
+		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/listOneCoupon";
 	}
 	
 	@PostMapping("insert")
-	public String insert(@Valid CouponVO couponVO, BindingResult result, ModelMap model){
+	public String insert(@Valid Coupon coupon, BindingResult result, ModelMap model){
 		
 		if(result.hasErrors()) {
 			return "back-end/course/coupon/addCoupon";
 		}
 		
-		couponSvc.addCoupon(couponVO);
-		model.addAttribute("couponVO", couponVO);
+		couponSvc.addCoupon(coupon);
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/listOneCoupon";
 	}
 	
 	@PostMapping("update_coupon")
 	public String updateCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
 		
-		CouponVO couponVO = couponSvc.getOneCoupon(Integer.valueOf(couponId));
+		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
 		
-		model.addAttribute("couponVO", couponVO);
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/updateCoupon";
 	}
 	
 	@PostMapping("update")
-	public String update(@Valid CouponVO couponVO, BindingResult result, ModelMap model) {
+	public String update(@Valid Coupon coupon, BindingResult result, ModelMap model) {
 		
 		if(result.hasErrors()) {
 			return "back-end/course/coupon/updateCoupon";
 		}
-		couponSvc.updateCoupon(couponVO);
+		couponSvc.updateCoupon(coupon);
 		
 		model.addAttribute("success", "修改成功");
-		couponVO = couponSvc.getOneCoupon(Integer.valueOf(couponVO.getCouponId()));
-		model.addAttribute("couponVO", couponVO);
+		coupon = couponSvc.getOneCoupon(Integer.valueOf(coupon.getCouponId()));
+		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/listOneCoupon";
 	}	
 	
 	@ModelAttribute("couponListAll")
-	public List<CouponVO> couponListAll(){
-		List<CouponVO> couponListAll = couponSvc.getAll();
+	public List<Coupon> couponListAll(){
+		List<Coupon> couponListAll = couponSvc.getAll();
 		return couponListAll;
 	}
 	

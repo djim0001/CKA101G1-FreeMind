@@ -14,12 +14,12 @@
 	<h3>
 		<span>查詢結果 :</span>
 	</h3>
-		<span>優惠券編號:</span><span th:text="${couponVO.couponId}"></span><br/>
-		<span>優惠券名稱:</span><span th:text="${couponVO.couponName}"></span><br/>
-		<span>優惠券效期:</span><span th:text="${couponVO.DiscountDuration}"></span><br/>
-		<span>消費觸發門檻:</span><span th:text="${couponVO.triggerThreshold != null ? couponVO.triggerThreshold : 0}">0</span><br/>
-		<span>優惠券折扣:</span><span th:text="${couponVO.Discount}"></span><br/>
-		<span>折扣上限:</span><span th:text="${couponVO.DiscountLimit != null ? couponVO.DiscountLimit : 0}">0</span><br/>
+		<span>優惠券編號:</span><span th:text="${coupon.couponId}"></span><br/>
+		<span>優惠券名稱:</span><span th:text="${coupon.couponName}"></span><br/>
+		<span>優惠券效期:</span><span th:text="${coupon.DiscountDuration}"></span><br/>
+		<span>消費觸發門檻:</span><span th:text="${coupon.triggerThreshold != null ? coupon.triggerThreshold : 0}">0</span><br/>
+		<span>優惠券折扣:</span><span th:text="${coupon.Discount}"></span><br/>
+		<span>折扣上限:</span><span th:text="${coupon.DiscountLimit != null ? coupon.DiscountLimit : 0}">0</span><br/>
 
 </body>
 </html>
