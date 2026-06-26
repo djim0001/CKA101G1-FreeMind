@@ -17,25 +17,25 @@ public class CouponService {
 	@Autowired
 	private SessionFactory sessionFactory;
 	
-	public void addCoupon(CouponVO couponVO) {
-		repository.save(couponVO);
+	public void addCoupon(Coupon coupon) {
+		repository.save(coupon);
 	}
 	
-	public void updateCoupon(CouponVO couponVO) {
-		repository.save(couponVO);
+	public void updateCoupon(Coupon coupon) {
+		repository.save(coupon);
 	}
 	
-	public CouponVO getOneCoupon(Integer couponId) {
+	public Coupon getOneCoupon(Integer couponId) {
 		// 代表回傳直可能為Optional.empty() => 不是 null -- Jpa 用法 --
-		Optional<CouponVO> optional = repository.findById(couponId);
+		Optional<Coupon> optional = repository.findById(couponId);
 		return optional.orElse(null);
 	}
 	
-	public List<CouponVO> getAll(){
+	public List<Coupon> getAll(){
 		return repository.findAll();
 	}
 	
-	public List<CouponVO> getAll(Map<String, String[]> map){
+	public List<Coupon> getAll(Map<String, String[]> map){
 		return repository.findAll();
 	}
 	

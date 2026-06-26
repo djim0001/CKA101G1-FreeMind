@@ -19,8 +19,8 @@
 	<br>
 	<form method="post" th:action="@{select_one_coupon}">
 		選擇優惠券: <select name="couponId">
-			<option th:each="couponVO : ${couponListAll}"
-				th:value="${couponVO.couponId}" th:text="${couponVO.couponName}" />
+			<option th:each="coupon : ${couponListAll}"
+				th:value="${coupon.couponId}" th:text="${coupon.couponName}" />
 		</select> <input type="submit" value="送出">
 	</form>
 	<br>
@@ -40,15 +40,15 @@
 			</tr>
 		</thead>
 		<tbody>
-			<th:block th:each="couponVO : ${couponListAll}">
+			<th:block th:each="coupon : ${couponListAll}">
 				<tr>
-					<td th:text="${couponVO.couponName}"></td>
-					<td th:text="${couponVO.discountDuration}"></td>
+					<td th:text="${coupon.couponName}"></td>
+					<td th:text="${coupon.discountDuration}"></td>
 					<td
-						th:text="${couponVO.triggerThreshold != null ? couponVO.triggerThreshold : 0}"></td>
-					<td th:text="${couponVO.discount}"></td>
+						th:text="${coupon.triggerThreshold != null ? coupon.triggerThreshold : 0}"></td>
+					<td th:text="${coupon.discount}"></td>
 					<td
-						th:text="${couponVO.discountLimit != null ? couponVO.discountLimit : 0}">
+						th:text="${coupon.discountLimit != null ? coupon.discountLimit : 0}">
 					</td>
 				</tr>
 			</th:block>
