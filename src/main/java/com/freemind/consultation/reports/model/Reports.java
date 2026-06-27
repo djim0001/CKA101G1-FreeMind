@@ -97,5 +97,4 @@ public class Reports {
 		public void setReportNote(String reportNote) {
 			this.reportNote = reportNote;
 		}
-		
 }
