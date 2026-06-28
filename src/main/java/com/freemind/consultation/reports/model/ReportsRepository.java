@@ -1,9 +1,9 @@
 package com.freemind.consultation.reports.model;
 
-public class ReportsRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-	public ReportsRepository() {
-		// TODO Auto-generated constructor stub
-	}
+public interface ReportsRepository extends JpaRepository<Reports, Integer>{
+		
+	
 
 }
