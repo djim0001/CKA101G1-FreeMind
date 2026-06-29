@@ -3,23 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <title>新增優惠券</title>
+<style>
+span.error{
+	font-size: 12px;
+	color: red;
+}
+</style>
 </head>
 <body>
 	<a th:href="@{/coupon/selectCoupon}">返回優惠券</a>
 
 	<h3>
-		<b>新增優惠券11</b>
+		<b>新增優惠券</b>
 	</h3>
-	<form th:action="@{insert}" method="post" th:object="${coupon}">
+	<p><font color="red">*</font>表示必填</p>
+	<p th:text=${errorMessage}></p>
+	<form th:action="@{insertCoupon}" method="post" th:object="${coupon}">
 
 		<div>
-			<label>優惠券名稱:</label> 
+			<label>優惠券名稱:<font color="red">*</font></label> 
 			<input type="text" th:field="*{couponName}"/><br /> 
 			<span th:if="${#fields.hasErrors('couponName')}" th:errors="*{couponName}"
 				class="error" id="couponName.errors"></span>
 		</div>
 		<div>
-			<label>優惠效期:</label> 
+			<label>優惠效期:<font color="red">*</font></label> 
 			<input type="text" th:field="*{discountDuration}"/><br /> 
 			<span th:if="${#fields.hasErrors('discountDuration')}" th:errors="*{discountDuration}"
 				class="error" id="discountDuration.errors"></span>
@@ -31,7 +39,7 @@
 				class="error" id="triggerThreshold.errors"></span>
 		</div>
 		<div>
-			<label>優惠券折扣:</label> 
+			<label>優惠券折扣:<font color="red">*</font></label> 
 			<input type="text" th:field="*{discount}"/><br /> 
 			<span th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}"
 				class="error" id="discount.errors"></span>

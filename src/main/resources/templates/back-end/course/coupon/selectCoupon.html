@@ -25,9 +25,9 @@
 	</form>
 	<br>
 
-<!-- 	<p th:if="${empPageQty > 0}"> -->
-	現在頁數:<b th:text=${empPageQty}>0</b>
-<!-- 	</p> -->
+	<p th:if="${session.couponPageQty > 0}">
+	現在頁數:<b th:text=|${currentPage}/${session.couponPageQty}|>0</b>
+	</p>
 	<table>
 		<thead>
 			<tr>
@@ -40,7 +40,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<th:block th:each="coupon : ${couponListAll}">
+			<th:block th:each="coupon : ${couponListAllPages}">
 				<tr>
 					<td th:text="${coupon.couponName}"></td>
 					<td th:text="${coupon.discountDuration}"></td>
@@ -55,6 +55,18 @@
 		</tbody>
 
 	</table>
+	<span th:if="${currentPage > 1}">
+		<a th:href="@{/coupon/selectCoupon(page=1)}">至第一頁</a>&nbsp;
+	</span>
+	<span th:if="${currentPage-1 != 0}">
+		<a th:href="@{/coupon/selectCoupon(page=${currentPage-1})}">上一頁</a>&nbsp;
+	</span>
+	<span th:if="${currentPage+1 <= session.couponPageQty}">
+		<a th:href="@{/coupon/selectCoupon(page=${currentPage+1})}">下一頁</a>&nbsp;
+	</span>
+	<span th:if="${currentPage != session.couponPageQty}">
+		<a th:href="@{/coupon/selectCoupon(page=${session.couponPageQty})}">至最後一頁</a>&nbsp;
+	</span>
 
 
 
