@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>課程分類目錄</title>
+<style>
+span.error{
+	font-size: 12px;
+	color: red;
+}
+</style>
+</head>
+<body>
+	<h1>課程分類</h1>
+	<h3>
+		<a th:href="@{/course_index}">課程商城</a>
+	</h3>
+	<h3>
+		<b>新增課程分類</b>
+	</h3>
+	<p>
+		<font color="red">*</font>表示必填
+	</p>
+	<form th:action="@{insertCourseCategories}" method="post"
+		th:object="${courseCategories}">
+		<div>
+			<label>課程分類名稱:<font color="red">*</font></label> <input type="text"
+				th:field="*{courseCatName}" /><br /> <span
+				th:if="${#fields.hasErrors('courseCatName')}"
+				th:errors="*{courseCatName}" class="error" id="courseCatName.errors"></span>
+		</div>
+		<div>
+			<button type="submit" id="submit">送出新增</button>
+		</div>
+	</form>
+	<br>
+	<table>
+		<thead>
+			<tr>
+				<th>課程分類一覽:</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="courseCategories : ${courseCategoriesListAll}">
+				<tr>
+					<td th:text="${courseCategories.courseCatName}"></td>
+				</tr>
+			</th:block>
+		</tbody>
+
+	</table>
+</body>
+</html>
