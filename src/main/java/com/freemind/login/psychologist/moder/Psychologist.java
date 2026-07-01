@@ -1,6 +1,9 @@
 package com.freemind.login.psychologist.moder;
 
 import java.sql.Timestamp;
+import java.util.Set;
+
+import com.freemind.course.course.model.Course;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -139,20 +142,20 @@ public class Psychologist implements java.io.Serializable{
 //	public Set<ConsultationSlots> getConsultationSlots() {
 //		return consultationSlots;
 //	}
-//
-//	
-//	//課程
-//	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
-//	private set<Courses> courses;
 //	public void setConsultationSlots(Set<ConsultationSlots> consultationSlots) {
 //		this.consultationSlots = consultationSlots;
 //	}
 //
-//	public set<Courses> getCourses() {
+//	
+//	//課程
+//	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
+//	private Set<Course> courses;
+//
+//	public Set<Course> getCourses() {
 //		return courses;
 //	}
 //
-//	public void setCourses(set<Courses> courses) {
+//	public void setCourse(Set<Course> courses) {
 //		this.courses = courses;
 //	}
 //

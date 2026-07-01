@@ -51,6 +51,7 @@ public class Coupon {
 	@OneToMany(mappedBy = "coupon", cascade = CascadeType.ALL)
 	@OrderBy("coupon_id asc")
 	private Set<MemberCoupon> memberCoupons;
+	
 
 	public Integer getCouponId() {
 		return couponId;
