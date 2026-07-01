@@ -1,7 +1,6 @@
 /*
  *  1. 萬用複合查詢-可由客戶端隨意增減任何想查詢的欄位
- *  2. 為了避免影響效能:
- *        所以動態產生萬用SQL的部份,本範例無意採用MetaData的方式,也只針對個別的Table自行視需要而個別製作之
+ *  
  * */
 
 package com.freemind.login.admin.util;
