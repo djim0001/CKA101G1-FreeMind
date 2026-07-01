@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>管理員列表</title>
+</head>
+<body>
+	<h3>管理員列表</h3>
+
+	<p style="color:green;" th:if="${success != null}" th:text="${success}"></p>
+
+	<a th:href="@{/admin/addAdmin}">add</a>
+	<a th:href="@{/admin/select_page}">select_page</a>
+
+<!-- 	<h4>複合查詢</h4> -->
+<!-- 	<form method="post" th:action="@{/admin/listAdmins_ByCompositeQuery}"> -->
+<!-- 		編號: <input type="text" name="adminId"><br> -->
+<!-- 		帳號: <input type="text" name="adminAccount"><br> -->
+<!-- 		姓名: <input type="text" name="name"><br> -->
+<!-- 		手機號碼: <input type="text" name="phoneNumber"><br> -->
+<!-- 		帳號狀態: -->
+<!-- 		<select name="accountStatus"> -->
+<!-- 			<option value="">不指定</option> -->
+<!-- 			<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option> -->
+<!-- 		</select><br> -->
+<!-- 		入職日期: <input type="datetime-local" name="hiredate"><br> -->
+<!-- 		<input type="submit" value="查詢"> -->
+<!-- 	</form> -->
+
+	<table border="1">
+		<tr>
+			<th>編號</th><th>帳號</th><th>密碼</th><th>狀態</th><th>姓名</th><th>手機</th><th>入職日期</th><th>操作</th>
+		</tr>
+		<tr th:each="adminVO : ${adminListData}">
+			<td th:text="${adminVO.adminId}"></td>
+			<td th:text="${adminVO.adminAccount}"></td>
+			<td th:text="${adminVO.adminPassword}"></td>
+			<td th:text="${accountStatusMap.get(adminVO.accountStatus)}"></td>
+			<td th:text="${adminVO.name}"></td>
+			<td th:text="${adminVO.phoneNumber}"></td>
+			<td th:text="${adminVO.hiredate}"></td>
+			<td>
+				<form method="post" th:action="@{/admin/getOne_For_Update}" style="display:inline;">
+					<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
+					<input type="submit" value="修改">
+				</form>
+				<form method="post" th:action="@{/admin/delete}" style="display:inline;">
+					<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
+					<input type="submit" value="刪除">
+				</form>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
