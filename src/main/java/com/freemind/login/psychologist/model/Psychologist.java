@@ -1,8 +1,9 @@
-package com.freemind.login.psychologist.moder;
+package com.freemind.login.psychologist.model;
 
 import java.sql.Timestamp;
 import java.util.Set;
 
+import com.freemind.article.entity.Article;
 import com.freemind.course.course.model.Course;
 
 import jakarta.persistence.CascadeType;
@@ -178,18 +179,18 @@ public class Psychologist implements java.io.Serializable{
 //	}
 //
 //	
-//	//文章
-//	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
-//	
-//	private Set<Article> articles;
-//	
-//	public Set<Article> getArticles() {
-//		return articles;
-//	}
-//
-//	public void setArticles(Set<Article> articles) {
-//		this.articles = articles;
-//	}
+	//文章
+	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+	
+	private Set<Article> articles;
+	
+	public Set<Article> getArticles() {
+		return articles;
+	}
+
+	public void setArticles(Set<Article> articles) {
+		this.articles = articles;
+	}
 
 	
 

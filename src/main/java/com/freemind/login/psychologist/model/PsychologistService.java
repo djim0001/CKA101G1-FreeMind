@@ -1,4 +1,4 @@
-package com.freemind.login.psychologist.moder;
+package com.freemind.login.psychologist.model;
 
 import java.util.List;
 import java.util.Optional;
