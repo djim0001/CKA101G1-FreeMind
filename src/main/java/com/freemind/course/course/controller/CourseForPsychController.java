@@ -1,6 +1,5 @@
 package com.freemind.course.course.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,19 +26,24 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.login.psychologist.moder.Psychologist;
+import com.freemind.login.psychologist.moder.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/course")
-public class CourseController {
+public class CourseForPsychController {
 
 	@Autowired
 	CourseService courseSvc;
 
 	@Autowired
 	CourseCategoriesService courseCategoriesSvc;
+	
+	@Autowired
+	PsychologistService psychologistService;
 	
 	@Value("${course.video.upload-path}")
 	private String videoUploadPath;
@@ -49,11 +53,12 @@ public class CourseController {
 		return courseCategoriesSvc.getAllCourseCategories();
 	}
 
-	// psych_function
+	
 	@PostMapping("set_psychId_session")
 	public String setPsychIdSession(@RequestParam(name = "psychIdSession") Integer psychIdSession, ModelMap model,
 			HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
+		
 		return "redirect:/course/psychSelectCourse";
 	}
 
@@ -64,10 +69,12 @@ public class CourseController {
 			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
 			HttpSession session) {
 
+		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
 		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
 		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("psychologist", psychologist);
 		if (psychId != null) {
-			Page<Course> courseListAllPages = courseSvc.getCoursesBypsychId(psychId, currentPage - 1, "courseId");
+			Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
 			model.addAttribute("courseListAllPages", courseListAllPages);
 		}
 //		if(session.getAttribute(pageQty) == null) 
@@ -83,40 +90,47 @@ public class CourseController {
 			model.addAttribute("pError", "請先登入心理師編號");
 			return "front-end/course/course/psychSelectCourse";
 		}
-		course.setPsychId(psychId);
+		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
 		model.addAttribute("course", course);
 		return "front-end/course/course/psychAddCourse";
 	}
 
-	@PostMapping("insertCourse")
-	public String insertCourse (
+	@PostMapping("insertOrUpdateCourse")
+	public String insertOrUpdateCourse (
 			@RequestParam(name="video", required = false) MultipartFile video,
 			@RequestParam(name="videoPre", required = false) MultipartFile videoPre,
 			@Valid Course course, BindingResult result, 
 			@SessionAttribute(name = "psychId") Integer psychId,
 			ModelMap model) throws IOException{
-		course.setPsychId(psychId);
 		if (result.hasErrors()) {
 			return "front-end/course/course/psychAddCourse";
 		}
-		// 確認影片是否上傳
-		System.out.println("確認影片");
-		if (video == null || video.isEmpty()) {
+			// 確認影片是否上傳
+		if ((video == null || video.isEmpty()) && course.getCourseId() == null) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
 			return "front-end/course/course/psychAddCourse";
 		}
-		System.out.println("確認影片2");
-		if (videoPre == null || videoPre.isEmpty()) {
+		if ((videoPre == null || videoPre.isEmpty()) && course.getCourseId() == null) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
 			return "front-end/course/course/psychAddCourse";
 		}
 		// 將課程路徑存入
-		System.out.println("新增課程路徑");
-		course.setVideoSrc(uploadVideo(video));
-		course.setVideoSrcPre(uploadVideo(videoPre));
+		if (video != null && !video.isEmpty())
+			course.setVideoSrc(uploadVideo(video));
+		else {
+			String videoSrc = course.getVideoSrc();
+			course.setVideoSrc(videoSrc);
+		}
+		if(videoPre != null&& !videoPre.isEmpty())
+			course.setVideoSrcPre(uploadVideo(videoPre));
+		else {
+			String videoSrcPre = course.getVideoSrcPre();
+			course.setVideoSrcPre(videoSrcPre);
+		}
 		// 新增課程
-		System.out.println("新增課程");
-		courseSvc.addCourse(course);
+//		course.setPsychId(psychId);
+		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 
 		return "front-end/course/course/psychListOneCourse";
@@ -129,10 +143,21 @@ public class CourseController {
 		model.addAttribute("course", course);
 		return "front-end/course/course/psychListOneCourse";
 	}
-
-	// admin_function
-
-	// member_function
+	@PostMapping("psychUpdateCourse")
+	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		model.addAttribute("course", course);
+		return "front-end/course/course/psychAddCourse";
+	}
+	@PostMapping("psychSubmitCourse")
+	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		course.setCourseStatus((byte)1);
+		courseSvc.updateCourse(course);
+		model.addAttribute("course", course);
+		return "front-end/course/course/psychListOneCourse";
+	}
+	
 	
 	// util
 	public String uploadVideo(MultipartFile video) throws IOException{

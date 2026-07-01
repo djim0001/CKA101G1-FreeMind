@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -149,18 +150,18 @@ public class Psychologist implements java.io.Serializable{
 //	}
 //
 //	
-//	//課程
-//	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
-//	
-//	private Set<Course> courses;
-//
-//	public Set<Course> getCourses() {
-//		return courses;
-//	}
-//
-//	public void setCourse(Set<Course> courses) {
-//		this.courses = courses;
-//	}
+	//課程
+	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
+	@OrderBy("psych_id asc")
+	private Set<Course> courses;
+
+	public Set<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourse(Set<Course> courses) {
+		this.courses = courses;
+	}
 //
 //	
 //	//課程撥款紀錄
