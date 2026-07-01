@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>查詢管理員</title>
+</head>
+<body>
+	<h3>依編號查詢管理員</h3>
+
+	<p style="color:red;" th:if="${errorMessage != null}" th:utext="${errorMessage}"></p>
+
+	<form method="post" th:action="@{/admin/getOne_For_Display}">
+		管理員編號: <input type="text" name="adminId">
+		<input type="submit" value="查詢">
+	</form>
+
+	<div th:if="${adminVO != null}">
+		<h4>查詢結果</h4>
+		<table border="1">
+			<tr><th>編號</th><td th:text="${adminVO.adminId}"></td></tr>
+			<tr><th>帳號</th><td th:text="${adminVO.adminAccount}"></td></tr>
+			<tr><th>帳號狀態</th><td th:text="${accountStatusMap.get(adminVO.accountStatus)}"></td></tr>
+			<tr><th>姓名</th><td th:text="${adminVO.name}"></td></tr>
+			<tr><th>手機號碼</th><td th:text="${adminVO.phoneNumber}"></td></tr>
+			<tr><th>入職日期</th><td th:text="${adminVO.hiredate}"></td></tr>
+		</table>
+	</div>
+	
+	<h4>複合查詢</h4>
+	<form method="post" th:action="@{/admin/listAdmins_ByCompositeQuery}">
+		編號: <input type="text" name="adminId"><br>
+		帳號: <input type="text" name="adminAccount"><br>
+		姓名: <input type="text" name="name"><br>
+		手機號碼: <input type="text" name="phoneNumber"><br>
+		帳號狀態:
+		<select name="accountStatus">
+			<option value="">不指定</option>
+			<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+		</select><br>
+		入職日期: <input type="datetime-local" name="hiredate"><br>
+		<input type="submit" value="查詢">
+	</form>
+
+	<a th:href="@{/admin/listAllAdmin}">listAll</a>
+</body>
+</html>

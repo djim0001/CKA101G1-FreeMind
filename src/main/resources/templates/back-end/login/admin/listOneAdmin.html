@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>管理員詳細資料</title>
+</head>
+<body>
+	<h3>管理員詳細資料</h3>
+
+	<p style="color:green;" th:if="${success != null}" th:text="${success}"></p>
+
+	<table border="1">
+		<tr><th>編號</th><td th:text="${adminVO.adminId}"></td></tr>
+		<tr><th>帳號</th><td th:text="${adminVO.adminAccount}"></td></tr>
+		<tr><th>帳號狀態</th><td th:text="${accountStatusMap.get(adminVO.accountStatus)}"></td></tr>
+		<tr><th>姓名</th><td th:text="${adminVO.name}"></td></tr>
+		<tr><th>手機號碼</th><td th:text="${adminVO.phoneNumber}"></td></tr>
+		<tr><th>入職日期</th><td th:text="${adminVO.hiredate}"></td></tr>
+	</table>
+
+	<a th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+</body>
+</html>
