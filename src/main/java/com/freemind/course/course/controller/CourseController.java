@@ -83,7 +83,7 @@ public class CourseController {
 			model.addAttribute("pError", "請先登入心理師編號");
 			return "front-end/course/course/psychSelectCourse";
 		}
-//		course.setPsychId(psychId);
+		course.setPsychId(psychId);
 		model.addAttribute("course", course);
 		return "front-end/course/course/psychAddCourse";
 	}
@@ -95,7 +95,7 @@ public class CourseController {
 			@Valid Course course, BindingResult result, 
 			@SessionAttribute(name = "psychId") Integer psychId,
 			ModelMap model) throws IOException{
-//		course.setPsychId(psychId);
+		course.setPsychId(psychId);
 		if (result.hasErrors()) {
 			return "front-end/course/course/psychAddCourse";
 		}

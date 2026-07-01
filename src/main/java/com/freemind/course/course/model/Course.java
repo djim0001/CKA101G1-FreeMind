@@ -42,11 +42,13 @@ public class Course {
 //		message = "課程名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到10之間")
 	private String courseName;
 	
-	@ManyToOne
-	@JoinColumn(name = "psych_id", referencedColumnName = "psych_id")
-//	@NotNull // 這裡不做驗證，因為 psychId 是從 session 來的
-	private Psychologist psychologist;
+//	@ManyToOne
+//	@JoinColumn(name = "psych_id", referencedColumnName = "psych_id")
+////	@NotNull // 這裡不做驗證，因為 psychId 是從 session 來的
+//	private Psychologist psychologist;
 	
+	@Column(name = "psych_id")
+	private Integer psychId;
 	@Column(name = "admin_id")
 	private Integer adminId;
 	
@@ -124,12 +126,18 @@ public class Course {
 		this.courseName = courseName;
 	}
 	
-	public Psychologist getPsychologist() {
-		return psychologist;
+public Integer getPsychId() {
+		return psychId;
 	}
-	public void setPsychologist(Psychologist psychologist) {
-		this.psychologist = psychologist;
+	public void setPsychId(Integer psychId) {
+		this.psychId = psychId;
 	}
+	//	public Psychologist getPsychologist() {
+//		return psychologist;
+//	}
+//	public void setPsychologist(Psychologist psychologist) {
+//		this.psychologist = psychologist;
+//	}
 	public Integer getAdminId() {
 		return adminId;
 	}

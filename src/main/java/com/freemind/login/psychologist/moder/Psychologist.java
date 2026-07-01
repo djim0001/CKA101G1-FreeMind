@@ -147,17 +147,17 @@ public class Psychologist implements java.io.Serializable{
 //	}
 //
 //	
-	//課程
-	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
-	private Set<Course> courses;
+//	//課程
+//	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
+//	private Set<Course> courses;
 //
-	public Set<Course> getCourses() {
-		return courses;
-	}
-
-	public void setCourse(Set<Course> courses) {
-		this.courses = courses;
-	}
+//	public Set<Course> getCourses() {
+//		return courses;
+//	}
+//
+//	public void setCourse(Set<Course> courses) {
+//		this.courses = courses;
+//	}
 //
 //	
 //	//課程撥款紀錄
