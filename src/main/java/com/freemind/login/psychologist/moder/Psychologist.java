@@ -137,11 +137,13 @@ public class Psychologist implements java.io.Serializable{
 //	
 //	//預約時段
 //	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+//	
 //	private Set<ConsultationSlots> consultationSlots;
 //	
 //	public Set<ConsultationSlots> getConsultationSlots() {
 //		return consultationSlots;
 //	}
+//	
 //	public void setConsultationSlots(Set<ConsultationSlots> consultationSlots) {
 //		this.consultationSlots = consultationSlots;
 //	}
@@ -149,6 +151,7 @@ public class Psychologist implements java.io.Serializable{
 //	
 //	//課程
 //	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
+//	
 //	private Set<Course> courses;
 //
 //	public Set<Course> getCourses() {
@@ -162,7 +165,9 @@ public class Psychologist implements java.io.Serializable{
 //	
 //	//課程撥款紀錄
 //	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+//	
 //	private set<Payouts> payouts;
+//	
 //	public set<Payouts> getPayouts() {
 //		return payouts;
 //	}
@@ -174,7 +179,9 @@ public class Psychologist implements java.io.Serializable{
 //	
 //	//文章
 //	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+//	
 //	private Set<Article> articles;
+//	
 //	public Set<Article> getArticles() {
 //		return articles;
 //	}
