@@ -28,7 +28,7 @@ public class Member {
 	private Integer memberId;
 
 	@Column(name = "member_account", length = 20)
-	@NotEmpty(message = "會員帳號: 請勿空白")
+	@NotEmpty(message = "會員帳號:請勿空白")
 	@Size(max = 20, message = "會員帳號: 長度不可超過20字元")
 	private String memberAccount;
 
