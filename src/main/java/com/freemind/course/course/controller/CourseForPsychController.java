@@ -69,12 +69,12 @@ public class CourseForPsychController {
 			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
 			HttpSession session) {
 
-		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
 		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
 		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("psychologist", psychologist);
 		if (psychId != null) {
+			Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
 			Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
+			model.addAttribute("psychologist", psychologist);
 			model.addAttribute("courseListAllPages", courseListAllPages);
 		}
 //		if(session.getAttribute(pageQty) == null) 
