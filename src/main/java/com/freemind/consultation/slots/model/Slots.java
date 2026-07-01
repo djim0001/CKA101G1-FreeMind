@@ -24,7 +24,7 @@ public class Slots {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) //因為是AI就不用再寫@Notnull
 	@Column(name = "timeslot_id")
-	private Integer timeslotId; //not null(PK)(AI)AAAAAAAAAAAAAAAAAAA
+	private Integer timeslotId; //not null(PK)(AI)
 	
 	@Column(name = "psych_id", nullable = false)
 	@NotNull(message = "心理師編號：請勿空白")
