@@ -45,8 +45,8 @@ public class CouponController {
 		if(session.getAttribute(pageQty) == null) 
 			session.setAttribute("couponPageQty", couponSvc.getPageTotal());
 
-		Coupon coupon = new Coupon();
-		model.addAttribute("coupon", coupon);
+//		Coupon coupon = new Coupon();
+//		model.addAttribute("coupon", coupon);
 		
 		return "back-end/course/coupon/selectCoupon";
 	}
@@ -101,8 +101,8 @@ public class CouponController {
 	
 	@ModelAttribute("couponListAll")
 	public List<Coupon> couponListAll(){
-		List<Coupon> couponListAll = couponSvc.getAllCoupon();
-		return couponListAll;
+//		List<Coupon> couponListAll = couponSvc.getAllCoupon();
+		return couponSvc.getAllCoupon();
 	}
 	
 	

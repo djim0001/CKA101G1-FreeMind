@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>課程詳情查看</title>
+</head>
+<body>
+	<h1>課程詳情查看</h1>
+	<h3>
+		<a th:href="@{/course/psychSelectCourse}">心理師課程一覽</a>
+	</h3>
+
+	<span>session心理師編號:</span>
+	<span th:text=${session.psychId}></span>
+	<span th:text=${course.psychologist.name}></span>
+	<br>
+	<br>
+	<span>課程狀態： </span><span th:text="${course.courseStatus}==0?草稿:待審核"></span> <br> 
+	<br>
+	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
+	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
+	<span>影片路徑： </span><span th:text="${course.videoSrc}" sytle="overflow: scroll"></span><br> 
+	<span>影片： </span><br>
+	<video width="640" controls>
+    		<source th:src="@{'/uploads/videos/' + ${course.videoSrc}}" type="video/mp4">
+	</video><br>
+	<span>預覽影片路徑： </span><span th:text="${course.videoSrcPre}" sytle="overflow: scroll"></span><br>
+	<span>預覽影片： </span><br>
+	<video width="640" controls>
+    		 <source th:src="@{'/uploads/videos/' + ${course.videoSrcPre}}" type="video/mp4">
+	</video><br>
+	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
+	<span>上架時間： </span><span th:text="${course.listedAt}"></span> <br> 
+	<span>下架時間： </span><span th:text="${course.delistedAt}"></span> <br> 
+	<span>下架原因： </span><span th:text="${course.delistReason}"></span> <br> 
+	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
+	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
+	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
+	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
+	<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
+	<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
+	<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span> <br> 
+	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
+</body>
+</html>
