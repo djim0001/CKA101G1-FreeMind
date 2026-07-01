@@ -3,30 +3,20 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>心理師查詢課程頁面</title>
-<style>
-span.error{
-color:  red;
-font-size: 12px;
-}
-</style>
+<title>員工課程頁面</title>
 </head>
 <body>
+	<h1>員工課程頁面</h1>
 	<h3>
 		<a th:href="@{/course_index}">課程商城</a>
 	</h3>
-	<h3>
-		<a th:href="@{/course/psychAddCourse}">心理師新增修改課程</a>
-	</h3>
-	<form method="post" th:action="@{set_psychId_session}">
-		<span>心理師編號：</span> <input type="text" name="psychIdSession" />
+	<form method="post" th:action="@{set_adminId_session}">
+		<span>員工編號：</span> <input type="text" name="adminIdSession" />
 		<button type="submit" id="submit">送出</button><br>
-		<span class="error" th:text="${pError}"></span>
+		<span class="error" th:text="${aError}"></span>
 	</form>
-
-	<div th:if="${session.psychId > 0}">
-		<span>session心理師編號:</span><span th:text=${session.psychId}></span><br>
-		<span>心理師名稱:</span><span th:text=${psychologist.name}></span><br>
+	<div th:if="${session.adminId > 0}">
+		<span>session員工編號:</span><span th:text=${session.adminId}></span><br>
 		<table>
 			<thead>
 				<tr>
@@ -45,7 +35,7 @@ font-size: 12px;
 				</tr>
 			</thead>
 			<tbody>
-				<th:block th:each="course : ${courseListAllPages.content}">
+				<th:block th:each="course : ${courseListAll}">
 					<tr>
 						<td th:text="${course.courseName}"></td>
 						<td th:text="${course.courseCategories.courseCatName}"></td>
@@ -59,7 +49,7 @@ font-size: 12px;
 						<td th:text="${course.discountEnd}"></td>
 						<td th:text="${course.price}"></td>
 						<td>
-							<form method="post" th:action="@{psychGetOneCourse}">
+							<form method="post" th:action="@{adminGetOneCourse}">
 								<input type="hidden" name="courseId"
 									th:value="${course.courseId}">
 								<button type="submit">查看詳情</button>
@@ -70,5 +60,7 @@ font-size: 12px;
 			</tbody>
 		</table>
 	</div>
+
+
 </body>
 </html>

@@ -42,7 +42,7 @@ public class CourseService {
 	}
 
 	// psych_function
-	public Page<Course> getCoursesBypsychId(Integer psychId, Integer page, String orderBy) {
+	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
 		
 		if(orderBy == null || orderBy.isBlank()) orderBy = "courseId";
 		if (page == null || page < 0)  page = 0;
@@ -69,7 +69,7 @@ public class CourseService {
 		};
 		Pageable pageable = PageRequest.of(page, coursePageSize, sort);
 
-		return repository.findByPsychId(psychId, pageable);
+		return repository.findByPsychologistPsychId(psychId, pageable);
 	}
 
 	// admin_function
