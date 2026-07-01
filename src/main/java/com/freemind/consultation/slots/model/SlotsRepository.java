@@ -1,9 +1,8 @@
 package com.freemind.consultation.slots.model;
 
-public class SlotsRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-	public SlotsRepository() {
-		// TODO Auto-generated constructor stub
-	}
+public interface SlotsRepository extends JpaRepository<Slots, Integer>{
+
 
 }
