@@ -30,6 +30,7 @@ public class Orders {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "order_id")
 	private Integer orderId;//not null(PK)(AI)
 	
 	@OneToOne(fetch = FetchType.LAZY) //一個時段只會有一個訂單

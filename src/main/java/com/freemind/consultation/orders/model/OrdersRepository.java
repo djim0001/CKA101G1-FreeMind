@@ -1,9 +1,10 @@
 package com.freemind.consultation.orders.model;
 
-public class OrdersRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-	public OrdersRepository() {
-		// TODO Auto-generated constructor stub
-	}
-
+@Repository
+public interface OrdersRepository extends JpaRepository<Orders, Integer>{
+	
 }
+
