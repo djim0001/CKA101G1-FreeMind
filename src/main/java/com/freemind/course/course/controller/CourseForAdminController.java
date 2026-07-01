@@ -20,16 +20,16 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/course")
 public class CourseForAdminController {
-//	@Autowired
-//	CourseService courseSvc;
-//
-//	@Autowired
-//	CourseCategoriesService courseCategoriesSvc;
+	@Autowired
+	CourseService courseSvc;
+
+	@Autowired
+	CourseCategoriesService courseCategoriesSvc;
 	
 	
-//	@PostMapping("set_adminId_session")
-//	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
-//			HttpSession session) {
+	@PostMapping("set_adminId_session")
+	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
+			HttpSession session) {
 //		session.setAttribute("adminId", adminIdSession);
 //		return "redirect:/course/adminSelectCourse";
 //	}
@@ -43,6 +43,6 @@ public class CourseForAdminController {
 //			model.addAttribute("courseListAll", courseListAll);
 //		}
 //
-//		return "back-end/course/course/adminSelectCourse";
-//	}
+		return "back-end/course/course/adminSelectCourse";
+	}
 }
