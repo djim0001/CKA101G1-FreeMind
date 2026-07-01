@@ -3,7 +3,7 @@ package com.freemind.course.course.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.freemind.login.psychologist.moder.Psychologist;
+import com.freemind.login.psychologist.model.Psychologist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

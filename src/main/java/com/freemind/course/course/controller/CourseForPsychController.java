@@ -26,8 +26,8 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
-import com.freemind.login.psychologist.moder.Psychologist;
-import com.freemind.login.psychologist.moder.PsychologistService;
+import com.freemind.login.psychologist.model.Psychologist;
+import com.freemind.login.psychologist.model.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
