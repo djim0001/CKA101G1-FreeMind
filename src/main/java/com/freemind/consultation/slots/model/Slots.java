@@ -47,6 +47,7 @@ public class Slots {
 	public Integer getTimeslotId() {
 		return timeslotId;
 	}
+	
 
 	public void setTimeslotId(Integer timeslotId) {
 		this.timeslotId = timeslotId;
