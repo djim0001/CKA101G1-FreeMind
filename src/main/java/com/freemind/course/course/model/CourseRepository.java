@@ -11,6 +11,8 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	// psych_function
 //	Page<Course> findByPsychId(Integer psychId, Pageable pageable);
 	Page<Course> findByPsychologistPsychId(Integer psychId, Pageable pageable);
+	Page<Course> findByCourseStatus(Byte courseStatus, Pageable pageable);
+	Page<Course> findByCourseStatusNot(Byte courseStatus, Pageable pageable);
 //	Page<Course> findByPsychologistPsychId(Integer psychId, Pageable pageable);
 	
 	// admin_function

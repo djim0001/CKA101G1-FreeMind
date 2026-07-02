@@ -69,18 +69,18 @@ public class CourseForPsychController {
 			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
 			HttpSession session) {
 
+		if (psychId == null) 
+			return "front-end/psych/course/selectCourse";
 		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
 		model.addAttribute("currentPage", currentPage);
-		if (psychId != null) {
-			Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
-			Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
-			model.addAttribute("psychologist", psychologist);
-			model.addAttribute("courseListAllPages", courseListAllPages);
-		}
+		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
+		Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
+		model.addAttribute("psychologist", psychologist);
+		model.addAttribute("courseListAllPages", courseListAllPages);
 //		if(session.getAttribute(pageQty) == null) 
 //			session.setAttribute("psychCoursePageQty", 1);
 
-		return "front-end/course/course/psychSelectCourse";
+		return "front-end/psych/course/selectCourse";
 	}
 
 	@GetMapping("psychAddCourse")
@@ -88,11 +88,11 @@ public class CourseForPsychController {
 		Course course = new Course();
 		if(psychId == null) {
 			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/course/course/psychSelectCourse";
+			return "front-end/psych/course/selectCourse";
 		}
 		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
 		model.addAttribute("course", course);
-		return "front-end/course/course/psychAddCourse";
+		return "front-end/psych/course/addCourse";
 	}
 
 	@PostMapping("insertOrUpdateCourse")
@@ -103,16 +103,16 @@ public class CourseForPsychController {
 			@SessionAttribute(name = "psychId") Integer psychId,
 			ModelMap model) throws IOException{
 		if (result.hasErrors()) {
-			return "front-end/course/course/psychAddCourse";
+			return "front-end/psych/course/addCourse";
 		}
 			// 確認影片是否上傳
-		if ((video == null || video.isEmpty()) && course.getCourseId() == null) {
+		if (course.getCourseId() == null && (video == null || video.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
-			return "front-end/course/course/psychAddCourse";
+			return "front-end/psych/course/addCourse";
 		}
-		if ((videoPre == null || videoPre.isEmpty()) && course.getCourseId() == null) {
+		if (course.getCourseId() == null && (videoPre == null || videoPre.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
-			return "front-end/course/course/psychAddCourse";
+			return "front-end/psych/course/addCourse";
 		}
 		// 將課程路徑存入
 		if (video != null && !video.isEmpty())
@@ -130,10 +130,11 @@ public class CourseForPsychController {
 		// 新增課程
 //		course.setPsychId(psychId);
 		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		course.setCourseStatus((byte)0);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 
-		return "front-end/course/course/psychListOneCourse";
+		return "front-end/psych/course/listOneCourse";
 	}
 	
 
@@ -141,13 +142,13 @@ public class CourseForPsychController {
 	public String psychGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
-		return "front-end/course/course/psychListOneCourse";
+		return "front-end/psych/course/listOneCourse";
 	}
 	@PostMapping("psychUpdateCourse")
 	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
-		return "front-end/course/course/psychAddCourse";
+		return "front-end/psych/course/addCourse";
 	}
 	@PostMapping("psychSubmitCourse")
 	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
@@ -155,7 +156,7 @@ public class CourseForPsychController {
 		course.setCourseStatus((byte)1);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
-		return "front-end/course/course/psychListOneCourse";
+		return "front-end/psych/course/listOneCourse";
 	}
 	
 	

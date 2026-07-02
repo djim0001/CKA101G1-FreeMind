@@ -40,6 +40,17 @@ public class CourseService {
 	public List<Course> getAllCourse() {
 		return repository.findAll();
 	}
+	
+	public Page<Course> findCoursesExcludeStatus(Byte courseStatus, int page){
+		
+		Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").ascending());
+		return repository.findByCourseStatusNot(courseStatus, pageable);
+	}
+	
+	public Page<Course> findCourseByCourseStstus(Byte courseStatus, int page){
+		Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").ascending());
+		return repository.findByCourseStatus(courseStatus, pageable);
+	}
 
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
@@ -73,7 +84,7 @@ public class CourseService {
 	}
 
 	// admin_function
-
+	
 	// member_function
 
 }
