@@ -22,6 +22,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "article_categories")
 public class ArticleCat implements Serializable{
+	
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -34,4 +35,5 @@ public class ArticleCat implements Serializable{
 
 	@OneToMany(mappedBy = "articleCat")
 	private Set<Article> articles;
+	
 }

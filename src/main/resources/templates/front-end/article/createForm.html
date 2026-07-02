@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>撰寫文章</title>
+</head>
+<body>
+
+	<h1>撰寫文章</h1>
+
+	<p th:if="${errorMessage}" th:text="${errorMessage}"
+		style="color: red;"></p>
+
+	<form th:action="@{/article/create}" th:object="${form}" method="post"
+		enctype="multipart/form-data">
+		<div>
+			<label>標題</label> <input type="text" th:field="*{title}" />
+		</div>
+
+		<div>
+			<label>文章分類</label> <select th:field="*{articleCatId}">
+				<option value="">請選擇分類</option>
+				<option th:each="cat : ${articleCats}"
+					th:value="${cat.articleCatId}" th:text="${cat.articleCatName}"></option>
+			</select>
+		</div>
+
+		<div>
+			<label>首圖</label> <input type="file" th:field="*{coverImageFile}" />
+		</div>
+
+		<div>
+			<label>內文</label>
+			<textarea id="content" th:field="*{content}"></textarea>
+		</div>
+
+		<button type="submit" name="action" value="draft">儲存草稿</button>
+		<button type="submit" name="action" value="submit">送審發布</button>
+
+	</form>
+
+	<script src="/js/tinymce/tinymce.min.js"></script>
+	<script>
+		tinymce.init({
+			selector : '#content',
+			license_key : 'gpl',
+			height : 400,
+			plugins : 'link image',
+			toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | image link',
+			images_upload_url : '/article/uploadImage'
+		});
+	</script>
+
+</body>
+</html>
