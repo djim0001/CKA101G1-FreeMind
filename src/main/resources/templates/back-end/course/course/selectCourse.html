@@ -38,7 +38,7 @@
 			<tbody>
 				<th:block th:each="course : ${courseListSubmit}">
 					<tr>
-						<td><font color="red" th:if="${course.courseStatus}==1">*</font>	</td>
+						<td><font color="#17aee6" th:if="${course.courseStatus}==1">●</font>	</td>
 						<td th:text="${course.courseName}"></td>
 						<td th:text="${course.psychologist.name}"></td>
 						<td th:text="${course.courseCategories.courseCatName}"></td>
