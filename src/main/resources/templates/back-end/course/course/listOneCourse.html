@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>員工審核課程頁面</title>
+<style>
+span.error {
+	font-size: 12px;
+	color: red;
+}
+</style>
+</head>
+<body>
+	<h1>員工審核課程頁面</h1>
+	<h3>
+		<a th:href="@{/course/adminSelectCourse}">員工課程頁面</a>
+	</h3>
+	<span>session員工編號:</span>
+	<span th:text=${session.adminId}></span><br>
+
+	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
+	<br>
+	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
+	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
+	<span>影片： </span><br>
+	<video width="640" controls>
+    		<source th:src="@{'/uploads/videos/' + ${course.videoSrc}}" type="video/mp4">
+	</video><br>
+	<span>預覽影片： </span><br>
+	<video width="640" controls>
+    		 <source th:src="@{'/uploads/videos/' + ${course.videoSrcPre}}" type="video/mp4">
+	</video><br>
+	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
+	<div th:if="${course.courseStatus}==4">
+		<span>上架時間： </span><span th:text="${course.listedAt}"></span>
+	</div>
+	<div th:if="${course.courseStatus}==5">
+		<span>下架時間： </span><span th:text="${course.delistedAt}"></span> <br> 
+		<span>下架原因： </span><span th:text="${course.delistReason}"></span> 
+	</div>
+	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
+	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
+	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
+	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
+	<div th:if="${course.psychDiscount}!=null">
+		<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
+		<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
+		<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span>
+	</div>
+	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
+	<div th:if="${course.courseStatus}==1">
+		<form method="post" th:action="@{adminExamineCourse}">
+			<input type="hidden" name="courseId"
+				th:value="${course.courseId}">
+			<input type="hidden" name="courseStatus"
+				th:value="2">
+			<button type="submit">審核通過</button>
+		</form>
+		<form method="post" th:action="@{adminExamineCourse}">
+			<input type="hidden" name="courseId"
+				th:value="${course.courseId}">
+			<input type="hidden" name="courseStatus"
+				th:value="3">
+			<button type="submit">審核失敗</button>
+		</form>
+		
+	</div>
+	
+
+</body>
+</html>

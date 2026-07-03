@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我的文章</title>
+</head>
+<body>
+	<h1>我的文章</h1>
+	<h3><a th:href="@{/article/create}">新增文章</a></h3>
+	<table>
+		<thead>
+			<!-- Each table cell is defined by a <td> and a </td> tag. -->
+			<tr>
+				<th>標題</th>
+				<th>文章分類</th>
+				<th>文章狀態</th>
+				<th>建立時間</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="article : ${articles}">
+				<td th:text="${article.title}"></td>
+				<td
+					th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></td>
+				<td th:text="${article.articleStatus}"></td>
+				<td th:text="${article.createdAt}"></td>
+				<td>
+					<form th:if="${article.articleStatus == 0}"
+						th:action="@{/article/{id}/submit(id=${article.articleId})}"
+						method="post">
+						<button type="submit">送審</button>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>

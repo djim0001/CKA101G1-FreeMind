@@ -3,6 +3,7 @@ package com.freemind.course.coupon.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.freemind.course.coupon.model.CouponService;
 import com.freemind.course.coupon.model.Coupon;
+import com.freemind.course.coupon.model.CouponService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
@@ -31,14 +34,20 @@ public class CouponController {
 	
 	@GetMapping("selectCoupon")
 	public String selectCoupon(
-			@RequestParam(name = "empPageQty", required = false) String empPageQty, 
-			ModelMap model) {
+			@RequestParam(name = "page", required = false) String page, 
+			@SessionAttribute(name = "couponPageQty", required = false) String pageQty, 
+			ModelMap model, HttpSession session) {
 		
-		Integer currentPage = (empPageQty == null) ? 1 : Integer.parseInt(empPageQty);
-		model.addAttribute("empPageQty", currentPage);
+		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
+		model.addAttribute("currentPage", currentPage);
+		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(currentPage - 1);
+		model.addAttribute("couponListAllPages", couponListAllPages);
+		if(session.getAttribute(pageQty) == null) 
+			session.setAttribute("couponPageQty", couponSvc.getPageTotal());
 
-		Coupon coupon = new Coupon();
-		model.addAttribute("coupon", coupon);
+//		Coupon coupon = new Coupon();
+//		model.addAttribute("coupon", coupon);
+		
 		return "back-end/course/coupon/selectCoupon";
 	}
 
@@ -55,8 +64,8 @@ public class CouponController {
 		return "back-end/course/coupon/listOneCoupon";
 	}
 	
-	@PostMapping("insert")
-	public String insert(@Valid Coupon coupon, BindingResult result, ModelMap model){
+	@PostMapping("insertCoupon")
+	public String insertCoupon(@Valid Coupon coupon, BindingResult result, ModelMap model){
 		
 		if(result.hasErrors()) {
 			return "back-end/course/coupon/addCoupon";
@@ -92,8 +101,8 @@ public class CouponController {
 	
 	@ModelAttribute("couponListAll")
 	public List<Coupon> couponListAll(){
-		List<Coupon> couponListAll = couponSvc.getAll();
-		return couponListAll;
+//		List<Coupon> couponListAll = couponSvc.getAllCoupon();
+		return couponSvc.getAllCoupon();
 	}
 	
 	
@@ -118,7 +127,7 @@ public class CouponController {
 	        );
 	    }
 
-	    return new ModelAndView("back-end/emp/select_page", "errorMessage", "請修正以下錯誤:<br>" + strBuilder.toString());
+	    return new ModelAndView("back-end/course/coupon/addCoupon", "errorMessage", "請修正以下錯誤:<br>" + strBuilder.toString());
 	}
 	
 }

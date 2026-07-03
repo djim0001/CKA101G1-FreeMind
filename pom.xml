@@ -184,6 +184,12 @@
             <artifactId>mysql-connector-j</artifactId>
             <!-- <version>9.7.0</version> -->         <!-- spring-boot(4.0.6) 已內建依賴9.7.0，但預設未下載 -->
         </dependency>
+        
+        <!-- Spring Data Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
 		
 		
