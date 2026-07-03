@@ -40,28 +40,35 @@ public class CourseForMemberController {
 			HttpSession session) {
 		session.setAttribute("memberId", memberIdSession);
 		
-		return "redirect:/course/selectCourse";
+		return "redirect:/course/memberSelectCourse";
 	}
 	
 	@GetMapping("memberSelectCourse")
-	public String memberSelectCourse(@SessionAttribute(name = "memberId", required = false) Integer memberId,
+	public String memberSelectCourse(
+			@SessionAttribute(name = "memberId", required = false) Integer memberId,
 			@RequestParam(name = "page", required = false) String page,
-			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
-			HttpSession session) {
+			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, 
+			ModelMap model, HttpSession session) {
 
-		if (memberId == null) 
-			return "front-end/course/course/psychSelectCourse";
+		if (memberId != null) {
+			Member member = memberService.getOneMember(memberId);
+			model.addAttribute("member", member);
+		}
 		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
 		model.addAttribute("currentPage", currentPage);
-		Member member = memberService.getOneMember(memberId);
-		Page<Course> courseListAllPages = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1);
-		model.addAttribute("member", member);
-		model.addAttribute("courseListAllPages", courseListAllPages);
+		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1);
+		model.addAttribute("courseListListed", courseListListed);
 //		if(session.getAttribute(pageQty) == null) 
 //			session.setAttribute("psychCoursePageQty", 1);
 
-		return "front-end/psych/course/selectCourse";
+		return "front-end/member/course/selectCourse";
 	}
 	
+	@PostMapping("memberGetOneCourse")
+	public String memberGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		model.addAttribute("course", course);
+		return "front-end/member/course/listOneCourse";
+	}
 	
 }
