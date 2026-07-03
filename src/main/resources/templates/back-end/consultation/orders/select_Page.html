@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>查詢諮商訂單</title>
+</head>
+<body>
+    <h3>查詢諮商訂單</h3>
+
+    <!-- 依訂單編號查詢 -->
+    <form method="post" th:action="@{/orders/getOne_For_Display}">
+        訂單編號：<input type="text" name="orderId">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依會員編號查詢 -->
+    <form method="post" th:action="@{/orders/getByMember}">
+        會員編號：<input type="text" name="memberId">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依心理師編號查詢 -->
+    <form method="post" th:action="@{/orders/getByPsychId}">
+        心理師編號：<input type="text" name="psychId">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依訂單狀態查詢 -->
+    <form method="post" th:action="@{/orders/getByOrderStatus}">
+        訂單狀態：
+        <select name="orderStatus">
+            <option value="0">0：待確認</option>
+            <option value="1">1：已確認</option>
+            <option value="2">2：已取消</option>
+            <option value="3">3：未出席</option>
+            <option value="4">4：已完成</option>
+        </select>
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依是否為政府補助查詢 -->
+    <form method="post" th:action="@{/orders/getByGovSubsidy}">
+        是否為政府補助：
+        <select name="govSubsidy">
+            <option value="false">否</option>
+            <option value="true">是</option>
+        </select>
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依諮商參與形式查詢 -->
+    <form method="post" th:action="@{/orders/getBySessionType}">
+        諮商參與形式：
+        <select name="sessionType">
+            <option value="0">0：單人諮商</option>
+            <option value="1">1：伴侶諮商</option>
+            <option value="2">2：家庭諮商</option>
+            <option value="3">3：團體諮商</option>
+        </select>
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依時段日期查詢 -->
+    <form method="post" th:action="@{/orders/getBySlotDate}">
+        時段日期：<input type="date" name="slotDate">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 單筆查詢結果 -->
+    <div th:if="${orders != null}">
+        <h4>查詢結果（單筆）</h4>
+        <table border="1">
+            <tr><th>訂單編號</th><td th:text="${orders.orderId}"></td></tr>
+            <tr><th>時段編號</th><td th:text="${orders.slot.timeslotId}"></td></tr>
+            <tr><th>會員編號</th><td th:text="${orders.memberId}"></td></tr>
+            <tr><th>心理師編號</th><td th:text="${orders.psychId}"></td></tr>
+            <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>心理師工作地點</th><td th:text="${orders.psychLoc}"></td></tr>
+            <tr><th>是否為政府補助</th><td th:text="${orders.govSubsidy}"></td></tr>
+            <tr><th>心理師諮詢費</th><td th:text="${orders.psychFee}"></td></tr>
+            <tr><th>訂單狀態</th><td th:text="${orders.orderStatus}"></td></tr>
+            <tr><th>來訪目的</th><td th:text="${orders.visitPurpose}"></td></tr>
+            <tr><th>諮商參與形式</th><td th:text="${orders.sessionType}"></td></tr>
+        </table>
+    </div>
+
+    <!-- 多筆查詢結果 -->
+    <div th:if="${ordersListData != null}">
+        <h4>查詢結果（多筆）</h4>
+        <table border="1">
+            <tr>
+                <th>訂單編號</th>
+                <th>時段編號</th>
+                <th>會員編號</th>
+                <th>心理師編號</th>
+                <th>開始時間</th>
+                <th>結束時間</th>
+                <th>訂單狀態</th>
+                <th>諮詢費</th>
+            </tr>
+            <tr th:each="order : ${ordersListData}">
+                <td th:text="${order.orderId}"></td>
+                <td th:text="${order.slot.timeslotId}"></td>
+                <td th:text="${order.memberId}"></td>
+                <td th:text="${order.psychId}"></td>
+                <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${order.orderStatus}"></td>
+                <td th:text="${order.psychFee}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <a th:href="@{/orders/listAllOrders}">回列表</a>
+
+</body>
+</html>
