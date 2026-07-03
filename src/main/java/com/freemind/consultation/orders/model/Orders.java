@@ -38,11 +38,11 @@ public class Orders {
 	private Slots slot;//not null(FK)，缺FK>>已補
 	
 	@Column(name = "cons_start", nullable = false)
-	@NotNull(message = "開始時間：請勿空白")
+//	@NotNull(message = "開始時間：請勿空白")
 	private LocalDateTime consStart; //not null
 	
 	@Column(name = "cons_end", nullable = false)
-	@NotNull(message = "結束時間：請勿空白")
+//	@NotNull(message = "結束時間：請勿空白")
 	private LocalDateTime consEnd; //not null
 	
 	@Column(name = "member_id", nullable = false)
@@ -54,7 +54,7 @@ public class Orders {
 	private Integer psychId;//not null(FK)，缺FK
 	
 	@Column(name = "created_at", nullable = false)
-	@NotNull(message = "建立時間：請勿空白")
+//	@NotNull(message = "建立時間：請勿空白")
 	private LocalDateTime createdAt; //not null
 	
 	@Column(name = "psych_loc", nullable = false, length = 50)

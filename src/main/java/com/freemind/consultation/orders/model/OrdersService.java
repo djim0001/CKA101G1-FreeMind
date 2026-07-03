@@ -15,6 +15,10 @@ public class OrdersService {
 	
 	public void addOrders(Orders orders) {
 		orders.setCreatedAt(LocalDateTime.now()); // 建立時間自動帶入
+		// consStart 和 consEnd 要根據選擇的時段帶入
+	    // 暫時先用 LocalDateTime.now() 測試
+		orders.setConsStart(LocalDateTime.now());
+		orders.setConsEnd(LocalDateTime.now().plusHours(1));
 		repository.save(orders);
 	}
 	
@@ -35,4 +39,41 @@ public class OrdersService {
 	public List<Orders> getAll(){
 		return repository.findAll();
 	}
+	
+	public List<Orders> getByMemberId(Integer memberId){
+		return repository.findByMemberId(memberId);
+	}
+	
+	public List<Orders> getByPsychId(Integer psychId){
+		return repository.findByPsychId(psychId);
+	}
+	
+	public List<Orders> getByOrderStatus(Integer orderStatus){
+		return repository.findByOrderStatus(orderStatus);
+	}
+	
+	public List<Orders> getByGovSubsidy(Boolean govSubsidy){
+		return repository.findByGovSubsidy(govSubsidy);
+	}
+	
+	public List<Orders> getBySessionType(Integer sessionType){
+		return repository.findBySessionType(sessionType);
+	}
+	
+	public List<Orders> getBySlotDate(java.time.LocalDate slotDate){
+		return repository.findBySlotDate(slotDate);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
