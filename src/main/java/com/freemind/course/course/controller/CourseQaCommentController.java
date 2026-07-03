@@ -60,41 +60,41 @@ public class CourseQaCommentController {
  // 會員送出課程提問
     @PostMapping("/ask")
     public String addQuestion(
-            @RequestParam("courseId") Integer courseId,
+            @RequestParam("questionId") Integer questionId,
             @RequestParam("courseQuestion") String courseQuestion,
-            @SessionAttribute("memberId") Integer memberId) {
+            @SessionAttribute(name="memberId",required = false) Integer memberId) {
 
-        Course course = courseService.getOneCourse(courseId);
+//        Course course = courseService.getOneCourse(courseId);
         Member member = memberService.getOneMember(memberId);
 
-        if (course == null) {
-            throw new IllegalArgumentException("找不到此課程");
-        }
+//        if (course == null) {
+//            throw new IllegalArgumentException("找不到此課程");
+//        }
 
-        if (member == null) {
-            throw new IllegalArgumentException("找不到此會員");
-        }
+//        if (member == null) {
+//            throw new IllegalArgumentException("找不到此會員");
+//        }
 
-        commentService.addQuestion(
-                course,
-                member,
-                courseQuestion
-        );
+//        commentService.addQuestion(
+//        		questionId,
+//                member,
+//                courseQuestion
+//        );
         
-        return "redirect:/course/qa/member?courseId=" + courseId;
+        return "redirect:/course/qa/member?courseId=" + questionId;
     }
  // 心理師查看自己課程收到的提問
     @GetMapping("/psych")
     public String showPsychQuestions(
-            @SessionAttribute("psychId") Integer psychId,
+            @SessionAttribute(name="psychId",required = false) Integer psychId,
             ModelMap model) {
 
         List<CourseQaComment> questions =
                 commentService.getQuestionsByPsychId(psychId);
 
-        model.addAttribute("questions", questions);
+        model.addAttribute("questions", questions);//前面的是對外面的(HTML)
 
-        return "front-end/psych/course/course/psychCourseQa";
+        return "front-end/psych/course/psychCourseQa";
     }
     //心理師送出回復
     @PostMapping("/answer")
@@ -103,9 +103,8 @@ public class CourseQaCommentController {
             @RequestParam("courseAnswer") String courseAnswer,
             @SessionAttribute("psychId") Integer psychId) {
 
-        commentService.answerQuestion(
+        commentService.answerUpdateQuestion(
                 questionId,
-                psychId,
                 courseAnswer
         );
 

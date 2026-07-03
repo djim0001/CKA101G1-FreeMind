@@ -44,6 +44,10 @@ public class CourseQaCommentService {
 
         return repository.save(comment);
     }
+    
+
+    
+    
 
     // 根據留言編號查詢單筆提問
     public CourseQaComment getOneQuestion(Integer questionId) {
@@ -92,6 +96,17 @@ public class CourseQaCommentService {
 
         return repository.save(comment);
     }
+    
+    // 心理師回覆提問-2
+    public void answerUpdateQuestion(Integer questionId,String courseAnswer) {
+    	CourseQaComment comment = getOneQuestion(questionId);
+    	comment.setCourseAnswer(courseAnswer);
+    	comment.setAnsweredAt(LocalDateTime.now());
+    	repository.save(comment);
+    }
+    
+    
+    
 
     // 查詢心理師所有課程收到的提問
     public List<CourseQaComment> getQuestionsByPsychId(
