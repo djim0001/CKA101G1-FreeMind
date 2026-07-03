@@ -10,9 +10,9 @@
     <span style="color:green;" th:if="${success != null}" th:text="${success}"></span><br>
 
     諮商問題編號：<span th:text="${reports.reportId}"></span><br>
-    會員編號：<span th:text="${reports.memberId}"></span><br>
+    會員編號：<span th:text="${reports.member.memberId}"></span><br>
     諮詢訂單編號：<span th:text="${reports.orders.orderId}"></span><br>
-    員工編號：<span th:text="${reports.adminId}"></span><br>
+    員工編號：<span th:text="${reports.admin != null ? reports.admin.adminId : '未指派'}"></span><br>
     問題描述：<span th:text="${reports.issueDesc}"></span><br>
     回報日期：<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
     處理狀態：<span th:text="${reports.reportStatus}"></span><br>

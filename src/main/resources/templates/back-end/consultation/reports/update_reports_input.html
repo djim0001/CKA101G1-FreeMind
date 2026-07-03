@@ -21,9 +21,9 @@
 		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('reportId')}" th:errors="*{reportId}"></span><br>
 		
 		會員編號：
-		<span th:text="${reports.memberId}"></span>
-		<input type="hidden" th:field="*{memberId}">
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></span><br>
+		<span th:text="${reports.member.memberId}"></span>
+		<input type="hidden" th:field="*{member.memberId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
 		
 		諮詢訂單編號：
 		<span th:text="${reports.orders.orderId}"></span>
@@ -31,8 +31,8 @@
 		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('orders')}" th:errors="*{orders}"></span><br>
 		
 		員工編號：
-		<input type="text" th:field="*{adminId}">
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('adminId')}" th:errors="*{adminId}"></span><br>
+		<input type="text" th:field="*{admin.adminId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('admin.adminId')}" th:errors="*{admin.adminId}"></span><br>
 		
 		問題描述：
 		<span th:text="${reports.issueDesc}"></span>

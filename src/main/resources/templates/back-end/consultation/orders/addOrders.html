@@ -25,9 +25,10 @@
 			th:if="${#fields.hasErrors('slot')}" th:errors="*{slot}"></span><br>
 			<span style="color:red;" th:if="${slotError != null}" th:text="${slotError}"></span><br>
 	
-		會員編號： <input type="text" th:field="*{memberId}"> <span
-			style="color: red; margin-left: 10px;"
-			th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></span><br>
+		會員編號： 
+		<input type="text" th:field="*{member.memberId}"> <span
+		style="color: red; margin-left: 10px;"
+		th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
 
 		心理師編號： <input type="text" th:field="*{psychId}"> <span
 			style="color: red; margin-left: 10px;"

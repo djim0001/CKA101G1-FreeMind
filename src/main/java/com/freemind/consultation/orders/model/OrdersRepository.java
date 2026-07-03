@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 	
-	@Query("from Orders where memberId = ?1")
+	@Query("from Orders where member.memberId = ?1")
 	List<Orders> findByMemberId(Integer memberId);
 	
 	@Query("from Orders where psychId = ?1")

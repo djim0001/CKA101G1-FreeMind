@@ -3,6 +3,8 @@ package com.freemind.consultation.reports.model;
 import java.time.LocalDateTime;
 
 import com.freemind.consultation.orders.model.Orders;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.member.model.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,17 +26,19 @@ public class Reports {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "report_id")
 	private Integer reportId; //not null(PK)(AI)
-		
-	@Column(name = "member_id", nullable = false)
+	
+	@ManyToOne(fetch = FetchType.LAZY) 
+	@JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
 	@NotNull(message = "會員編號：請勿空白") 
-	private Integer memberId; //not null(FK), 缺FK
+	private Member member; //not null(FK), 缺FK>>已改
 		
 	@ManyToOne(fetch = FetchType.LAZY) 
 	@JoinColumn(name = "order_id", referencedColumnName = "order_id")
 	private Orders orders; //not null(FK), 缺FK>>已改
 		
-	@Column(name = "admin_id")
-	private Integer adminId; //(FK), 缺FK
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
+	private Admin admin; //(FK), 缺FK>>已改
 		
 	@Column(name = "issue_desc", nullable = false, length = 200)
 	@NotBlank(message = "問題描述：請勿空白，若無需描述，請填寫無")
@@ -59,18 +63,7 @@ public class Reports {
 	public void setReportId(Integer reportId) {
 		this.reportId = reportId;
 	}
-	public Integer getMemberId() {
-		return memberId;
-	}
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
-	}
-	public Integer getAdminId() {
-		return adminId;
-	}
-	public void setAdminId(Integer adminId) {
-		this.adminId = adminId;
-	}
+	
 	public String getIssueDesc() {
 		return issueDesc;
 	}
@@ -98,8 +91,7 @@ public class Reports {
 	
 	@Override
 	public String toString() {
-		return "Reports [reportId=" + reportId + ", memberId=" + memberId + ", adminId="
-				+ adminId + ", issueDesc=" + issueDesc + ", reportDate=" + reportDate + ", reportStatus=" + reportStatus
+		return "Reports [reportId=" + reportId + ", issueDesc=" + issueDesc + ", reportDate=" + reportDate + ", reportStatus=" + reportStatus
 				+ ", reportNote=" + reportNote + "]";
 	}
 	
@@ -109,6 +101,24 @@ public class Reports {
 	public void setOrders(Orders orders) {
 		this.orders = orders;
 	}
+	
+	public Admin getAdmin() {
+		return admin;
+	}
+	public void setAdmin(Admin admin) {
+		this.admin = admin;
+	}
+	public Member getMember() {
+		return member;
+	}
+	public void setMember(Member member) {
+		this.member = member;
+	}
+	
+	
+	
+	
+	
 	
 
 }

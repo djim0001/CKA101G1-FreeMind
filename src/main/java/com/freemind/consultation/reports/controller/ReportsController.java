@@ -1,12 +1,15 @@
 package com.freemind.consultation.reports.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.reports.model.ReportsService;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.member.model.Member;
 
 import jakarta.validation.Valid;
 
@@ -26,6 +31,35 @@ public class ReportsController {
 	
 	@Autowired
 	private OrdersService ordersSvc;
+	
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(Admin.class, "admin", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Admin admin = new Admin();
+					admin.setAdminId(Integer.valueOf(text));
+					setValue(admin);
+				}
+			}
+		});
+		
+		binder.registerCustomEditor(Member.class, "member", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Member member = new Member();
+					member.setMemberId(Integer.valueOf(text));
+					setValue(member);
+				}
+			}
+		});
+	}
 	
 	@GetMapping("listAllReports")
 	public String listAllReports(ModelMap model) {
@@ -87,6 +121,11 @@ public class ReportsController {
 		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));//轉型成Integer
 		
 		//步驟三：傳給修改表單畫面
+		
+		if (reports.getAdmin() == null) {
+			reports.setAdmin(new Admin());
+		}
+		
 		model.addAttribute("reports", reports);
 		return "back-end/consultation/reports/update_reports_input";
 	}
