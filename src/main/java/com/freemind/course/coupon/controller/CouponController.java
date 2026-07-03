@@ -42,7 +42,7 @@ public class CouponController {
 		model.addAttribute("currentPage", currentPage);
 		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(currentPage - 1);
 		model.addAttribute("couponListAllPages", couponListAllPages);
-		if(session.getAttribute(pageQty) == null) 
+		if(pageQty == null || pageQty.isEmpty()) 
 			session.setAttribute("couponPageQty", couponSvc.getPageTotal());
 
 //		Coupon coupon = new Coupon();
