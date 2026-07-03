@@ -86,5 +86,14 @@ public class CourseService {
 	// admin_function
 	
 	// member_function
+	public void checkAllCourseStatus() {
+		List<Course> allCourse = getAllCourse();
+		for(Course course : allCourse) {
+			if(course.getCourseStatus() == 2) {
+				course.setCourseStatus((byte)4);
+				repository.save(course);
+			}
+		}
+	}
 
 }
