@@ -35,7 +35,7 @@
         <h4>查詢結果（單筆）</h4>
         <table border="1">
             <tr><th>編號</th><td th:text="${reports.reportId}"></td></tr>
-            <tr><th>會員編號</th><td th:text="${reports.memberId}"></td></tr>
+            <tr><th>會員編號</th><td th:text="${reports.member.memberId}"></td></tr>
             <tr><th>問題描述</th><td th:text="${reports.issueDesc}"></td></tr>
             <tr><th>回報日期</th><td th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
             <tr><th>處理狀態</th><td th:text="${reports.reportStatus}"></td></tr>
@@ -56,7 +56,7 @@
             </tr>
             <tr th:each="report : ${reportsListData}">
                 <td th:text="${report.reportId}"></td>
-                <td th:text="${report.memberId}"></td>
+                <td th:text="${report.member.memberId}"></td>
                 <td th:text="${report.issueDesc}"></td>
                 <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
                 <td th:text="${report.reportStatus}"></td>

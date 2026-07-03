@@ -16,10 +16,9 @@
 		th:action="@{/reports/insert}"
 		th:object="${reports}">
 			
-		
 		會員編號:
-		<input type="text" th:field="*{memberId}">
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></span><br>
+		<input type="text" th:field="*{member.memberId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
 		
 		諮詢訂單編號:
 		<select th:field="*{orders}">

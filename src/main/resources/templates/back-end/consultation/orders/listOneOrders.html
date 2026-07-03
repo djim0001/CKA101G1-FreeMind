@@ -11,7 +11,7 @@
 
     訂單編號：<span th:text="${orders.orderId}"></span><br>
     時段編號：<span th:text="${orders.slot.timeslotId}"></span><br>
-    會員編號：<span th:text="${orders.memberId}"></span><br>
+    會員編號：<span th:text="${orders.member.memberId}"></span><br>
     心理師編號：<span th:text="${orders.psychId}"></span><br>
     開始時間：<span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
     結束時間：<span th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></span><br>

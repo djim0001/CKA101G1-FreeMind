@@ -3,9 +3,9 @@ package com.freemind.consultation.orders.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.slots.model.Slots;
+import com.freemind.login.member.model.Member;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -45,9 +46,10 @@ public class Orders {
 //	@NotNull(message = "結束時間：請勿空白")
 	private LocalDateTime consEnd; //not null
 	
-	@Column(name = "member_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", referencedColumnName = "member_id", nullable = false)
 	@NotNull(message = "會員編號：請勿空白")
-	private Integer memberId;//not null(FK)，缺FK
+	private Member member;//not null(FK)，缺FK>>已改
 	
 	@Column(name = "psych_id", nullable = false)
 	@NotNull(message = "心理師編號：請勿空白")
@@ -147,14 +149,6 @@ public class Orders {
 
 	public void setConsEnd(LocalDateTime consEnd) {
 		this.consEnd = consEnd;
-	}
-
-	public Integer getMemberId() {
-		return memberId;
-	}
-
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
 	}
 
 	public Integer getPsychId() {
@@ -264,7 +258,7 @@ public class Orders {
 	@Override
 	public String toString() {
 		return "Orders [orderId=" + orderId + ", consStart=" + consStart + ", consEnd=" + consEnd
-				+ ", memberId=" + memberId + ", psychId=" + psychId + ", createdAt=" + createdAt + ", psychLoc="
+				+ ", psychId=" + psychId + ", createdAt=" + createdAt + ", psychLoc="
 				+ psychLoc + ", orderStatus=" + orderStatus + ", govSubsidy=" + govSubsidy + ", psychFee=" + psychFee
 				+ ", visitPurpose=" + visitPurpose + ", visitPurposeNote=" + visitPurposeNote + ", sessionType="
 				+ sessionType + ", psychNote=" + psychNote + ", rating=" + rating + ", reviewContent=" + reviewContent
@@ -278,6 +272,15 @@ public class Orders {
 	public void setReportsList(List<Reports> reportsList) {
 		this.reportsList = reportsList;
 	}
+
+	public Member getMember() {
+		return member;
+	}
+
+	public void setMember(Member member) {
+		this.member = member;
+	}
+	
 	
 	
 }

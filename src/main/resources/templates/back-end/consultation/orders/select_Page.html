@@ -72,7 +72,7 @@
         <table border="1">
             <tr><th>訂單編號</th><td th:text="${orders.orderId}"></td></tr>
             <tr><th>時段編號</th><td th:text="${orders.slot.timeslotId}"></td></tr>
-            <tr><th>會員編號</th><td th:text="${orders.memberId}"></td></tr>
+            <tr><th>會員編號</th><td th:text="${orders.member.memberId}"></td></tr>
             <tr><th>心理師編號</th><td th:text="${orders.psychId}"></td></tr>
             <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
             <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
@@ -102,7 +102,7 @@
             <tr th:each="order : ${ordersListData}">
                 <td th:text="${order.orderId}"></td>
                 <td th:text="${order.slot.timeslotId}"></td>
-                <td th:text="${order.memberId}"></td>
+                <td th:text="${order.member.memberId}"></td>
                 <td th:text="${order.psychId}"></td>
                 <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
                 <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>

@@ -1,12 +1,15 @@
 package com.freemind.consultation.orders.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +18,7 @@ import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
+import com.freemind.login.member.model.Member;
 
 import jakarta.validation.Valid;
 
@@ -27,6 +31,22 @@ public class OrdersController {
 
 	@Autowired
 	private SlotsService slotsSvc;
+	
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(Member.class, "member", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Member member = new Member();
+					member.setMemberId(Integer.valueOf(text));
+					setValue(member);
+				}
+			}
+		});
+	}
 	
 	@GetMapping("listAllOrders")
 	public String listAllOrders(ModelMap model) {

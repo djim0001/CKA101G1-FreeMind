@@ -1,15 +1,20 @@
 package com.freemind.login.admin.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.freemind.consultation.reports.model.Reports;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -53,7 +58,10 @@ public class Admin implements java.io.Serializable {
 
 	@Lob
 	@Column(name = "profile_pic", columnDefinition = "LONGBLOB")
-	private byte[] profilePic;   
+	private byte[] profilePic;  
+	
+	@OneToMany(mappedBy = "admin", fetch = FetchType.LAZY) 
+	private List<Reports> reportsList;
 	
 
 	public Integer getAdminId() {
@@ -119,6 +127,16 @@ public class Admin implements java.io.Serializable {
 	public void setProfilePic(byte[] profilePic) {
 		this.profilePic = profilePic;
 	}
+
+	public List<Reports> getReportsList() {
+		return reportsList;
+	}
+
+	public void setReportsList(List<Reports> reportsList) {
+		this.reportsList = reportsList;
+	}
+	
+	
 	
 	
 }

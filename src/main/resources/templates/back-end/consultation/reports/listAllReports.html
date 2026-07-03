@@ -23,7 +23,7 @@
         </tr>
         <tr th:each="report : ${reportsListData}">
             <td th:text="${report.reportId}"></td>
-            <td th:text="${report.memberId}"></td>
+            <td th:text="${report.member.memberId}"></td>
             <td th:text="${report.issueDesc}"></td>
             <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${report.reportStatus}"></td>
