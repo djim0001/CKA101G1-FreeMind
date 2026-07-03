@@ -104,7 +104,7 @@ public class Orders {
 	@Column(name = "reviewed_at")
 	private LocalDateTime reviewedAt;
 	
-	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "orders", cascade = CascadeType.ALL) //cascade = CascadeType.ALL大多配置在一方
 	private List<Reports> reportsList;
 
 	public Integer getOrderId() {

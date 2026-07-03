@@ -35,7 +35,7 @@ public class Slots {
 	@NotNull(message = "預約日期：請填入此格式 yyyy-MM-dd")
 	private LocalDate slotDate; //not null
 	
-	@Column(name = "cons_status", nullable = false, length = 24)
+	@Column(name = "appt_status", nullable = false, length = 24)
 	@NotNull(message = "預約狀態：請勿空白")
 	@Size(min = 24, max = 24, message = "預約狀態長度必須為24") //為String，驗證字串長度一定是24
 	@Pattern(regexp = "[012]{24}", message = "預約狀態只能為0、1或2") //驗證每個字元只能是012

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>查詢諮商問題回報</title>
+</head>
+<body>
+    <h3>查詢諮商問題回報</h3>
+
+    <!-- 依編號查詢 -->
+    <form method="post" th:action="@{/reports/getOne_For_Display}">
+        諮商問題編號：<input type="text" name="reportId">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依處理狀態查詢 -->
+    <form method="post" th:action="@{/reports/getByStatus}">
+        處理狀態：
+        <select name="reportStatus">
+            <option value="0">0：待處理</option>
+            <option value="1">1：處理中</option>
+            <option value="2">2：已解決</option>
+        </select>
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 依會員編號查詢 -->
+    <form method="post" th:action="@{/reports/getByMember}">
+        會員編號：<input type="text" name="memberId">
+        <input type="submit" value="查詢">
+    </form><br>
+
+    <!-- 單筆查詢結果 -->
+    <div th:if="${reports != null}">
+        <h4>查詢結果（單筆）</h4>
+        <table border="1">
+            <tr><th>編號</th><td th:text="${reports.reportId}"></td></tr>
+            <tr><th>會員編號</th><td th:text="${reports.memberId}"></td></tr>
+            <tr><th>問題描述</th><td th:text="${reports.issueDesc}"></td></tr>
+            <tr><th>回報日期</th><td th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>處理狀態</th><td th:text="${reports.reportStatus}"></td></tr>
+            <tr><th>處理備註</th><td th:text="${reports.reportNote}"></td></tr>
+        </table>
+    </div>
+
+    <!-- 多筆查詢結果 -->
+    <div th:if="${reportsListData != null}">
+        <h4>查詢結果（多筆）</h4>
+        <table border="1">
+            <tr>
+                <th>編號</th>
+                <th>會員編號</th>
+                <th>問題描述</th>
+                <th>回報日期</th>
+                <th>處理狀態</th>
+            </tr>
+            <tr th:each="report : ${reportsListData}">
+                <td th:text="${report.reportId}"></td>
+                <td th:text="${report.memberId}"></td>
+                <td th:text="${report.issueDesc}"></td>
+                <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td th:text="${report.reportStatus}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <a th:href="@{/reports/listAllReports}">回列表</a>
+
+</body>
+</html>

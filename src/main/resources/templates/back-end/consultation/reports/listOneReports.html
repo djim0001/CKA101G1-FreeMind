@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>諮商問題回報詳細</title>
+</head>
+<body>
+    <h3>諮商問題回報詳細</h3>
+
+    <span style="color:green;" th:if="${success != null}" th:text="${success}"></span><br>
+
+    諮商問題編號：<span th:text="${reports.reportId}"></span><br>
+    會員編號：<span th:text="${reports.memberId}"></span><br>
+    諮詢訂單編號：<span th:text="${reports.orders.orderId}"></span><br>
+    員工編號：<span th:text="${reports.adminId}"></span><br>
+    問題描述：<span th:text="${reports.issueDesc}"></span><br>
+    回報日期：<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
+    處理狀態：<span th:text="${reports.reportStatus}"></span><br>
+    處理備註：<span th:text="${reports.reportNote}"></span><br>
+
+    <a th:href="@{/reports/listAllReports}">回列表</a>
+
+</body>
+</html>

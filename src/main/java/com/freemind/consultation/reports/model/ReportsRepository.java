@@ -11,5 +11,8 @@ public interface ReportsRepository extends JpaRepository<Reports, Integer>{
 		
 	@Query(value = "from Reports where reportStatus = ?1")//查詢訂單狀態012
 	List<Reports> findByReportStatus(Integer reportStatus);
+	
+	@Query(value = "from Reports where memberId = ?1")
+	List<Reports> findByMemberId(Integer memberId);
 
 }
