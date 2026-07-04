@@ -233,7 +233,9 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+
 			 <version>1.18.46</version> 
+
 			<scope>provided</scope>      <!-- ※provided只提供編譯，jar檔不匯出 -->
 		</dependency>
 
