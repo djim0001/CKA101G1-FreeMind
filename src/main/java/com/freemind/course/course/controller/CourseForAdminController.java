@@ -21,11 +21,13 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/course")
 public class CourseForAdminController {
-	@Autowired
-	CourseService courseSvc;
-
-	@Autowired
-	CourseCategoriesService courseCategoriesSvc;
+	
+	private final CourseService courseSvc;
+	
+	public CourseForAdminController(
+			CourseService courseSvc) {
+		this.courseSvc = courseSvc;
+	}
 	
 	
 	@PostMapping("set_adminId_session")
