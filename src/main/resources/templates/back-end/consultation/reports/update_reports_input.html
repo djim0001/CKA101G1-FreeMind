@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>修改諮商問題回報</title>
+</head>
+<body>
+	<h3>修改諮商問題回報</h3>
+
+	<span style="color:red;"
+		th:if="${errorMessage != null}"
+		th:utext="${errorMessage}">
+	</span>
+	
+	<form method="post"
+		th:action="@{/reports/update}"
+		th:object="${reports}">
+		
+		諮商問題編號：
+		<input type="hidden" th:field="*{reportId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('reportId')}" th:errors="*{reportId}"></span><br>
+		
+		會員編號：
+		<span th:text="${reports.member.memberId}"></span>
+		<input type="hidden" th:field="*{member.memberId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
+		
+		諮詢訂單編號：
+		<span th:text="${reports.orders.orderId}"></span>
+		<input type="hidden" th:field="*{orders}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('orders')}" th:errors="*{orders}"></span><br>
+		
+		員工編號：
+		<input type="text" th:field="*{admin.adminId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('admin.adminId')}" th:errors="*{admin.adminId}"></span><br>
+		
+		問題描述：
+		<span th:text="${reports.issueDesc}"></span>
+		<input type="hidden" th:field="*{issueDesc}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('issueDesc')}" th:errors="*{issueDesc}"></span><br>
+		
+		回報日期：
+		<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span> <!-- 只顯示 -->
+		<input type="hidden" th:field="*{reportDate}"> <!-- 傳給後端 -->
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('reportDate')}" th:errors="*{reportDate}"></span><br>
+		
+		處理狀態：
+		<select th:field="*{reportStatus}">
+   			<option value="0">0：待處理</option>
+    		<option value="1">1：處理中</option>
+    		<option value="2">2：已解決</option>
+		</select>
+		
+		<br>
+		處理備註：
+		<textarea th:field="*{reportNote}" rows="3" cols="30" style="resize: none;"></textarea>
+		<br>		
+		<input type="submit" value="修改">
+		
+	</form>	
+	
+	<a th:href="@{/reports/listAllReports}">回列表</a>
+			
+		
+</body>
+</html>		

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>諮商訂單詳細</title>
+</head>
+<body>
+    <h3>諮商訂單詳細</h3>
+
+    <span style="color:green;" th:if="${success != null}" th:text="${success}"></span><br>
+
+    訂單編號：<span th:text="${orders.orderId}"></span><br>
+    時段編號：<span th:text="${orders.slot.timeslotId}"></span><br>
+    會員編號：<span th:text="${orders.member.memberId}"></span><br>
+    心理師編號：<span th:text="${orders.psychId}"></span><br>
+    開始時間：<span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
+    結束時間：<span th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
+    心理師工作地點：<span th:text="${orders.psychLoc}"></span><br>
+    是否為政府補助：<span th:text="${orders.govSubsidy}"></span><br>
+    心理師諮詢費：<span th:text="${orders.psychFee}"></span><br>
+    訂單狀態：<span th:text="${orders.orderStatus}"></span><br>
+    來訪目的：<span th:text="${orders.visitPurpose}"></span><br>
+    來訪目的備註：<span th:text="${orders.visitPurposeNote}"></span><br>
+    諮商參與形式：<span th:text="${orders.sessionType}"></span><br>
+
+    <a th:href="@{/orders/listAllOrders}">回列表</a>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>新增諮商訂單</title>
+</head>
+<body>
+	<h3>新增諮商訂單</h3>
+
+	<form method="post" th:action="@{/orders/insert}" th:object="${orders}">
+
+
+		<div th:if="${#fields.hasAnyErrors()}" style="color: red;">
+			<ul>
+				<li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li>
+			</ul>
+		</div>
+
+		時段選擇： 
+		<select name="slot">
+			<option value="">請選擇時段</option>
+			<option th:each="s : ${slotsList}" th:value="${s.timeslotId}"
+				th:text="${s.timeslotId} + ' - ' + ${s.slotDate}"></option>
+		</select> <span style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('slot')}" th:errors="*{slot}"></span><br>
+			<span style="color:red;" th:if="${slotError != null}" th:text="${slotError}"></span><br>
+	
+		會員編號： 
+		<input type="text" th:field="*{member.memberId}"> <span
+		style="color: red; margin-left: 10px;"
+		th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
+
+		心理師編號： <input type="text" th:field="*{psychId}"> <span
+			style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('psychId')}" th:errors="*{psychId}"></span><br>
+
+		心理師工作地點： <input type="text" th:field="*{psychLoc}"> <span
+			style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('psychLoc')}" th:errors="*{psychLoc}"></span><br>
+
+		是否為政府補助： <select th:field="*{govSubsidy}">
+			<option value="false">否</option>
+			<option value="true">是</option>
+		</select><br> 心理師諮詢費： <input type="text" th:field="*{psychFee}"> <span
+			style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('psychFee')}" th:errors="*{psychFee}"></span><br>
+
+		來訪目的： <select th:field="*{visitPurpose}">
+			<option value="emotion">情緒困擾</option>
+			<option value="stress">壓力調適</option>
+			<option value="relationship">人際關係</option>
+			<option value="family">家庭問題</option>
+			<option value="career">職涯困惑</option>
+			<option value="academic">課業壓力</option>
+			<option value="self_growth">自我探索</option>
+			<option value="sleep">睡眠問題</option>
+			<option value="anxiety">焦慮傾向</option>
+			<option value="other">其他</option>
+		</select> <span style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('visitPurpose')}"
+			th:errors="*{visitPurpose}"></span><br> 來訪目的備註：
+		<textarea th:field="*{visitPurposeNote}" rows="3" cols="30"
+			style="resize: none;"></textarea>
+		<br> 諮商參與形式： <select th:field="*{sessionType}">
+			<option value="0">0：單人諮商</option>
+			<option value="1">1：伴侶諮商</option>
+			<option value="2">2：家庭諮商</option>
+			<option value="3">3：團體諮商</option>
+		</select> <span style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('sessionType')}"
+			th:errors="*{sessionType}"></span><br> <input type="submit"
+			value="新增">
+	</form>
+
+	<a th:href="@{/orders/listAllOrders}">回列表</a>
+
+	</div>
+
+</body>
+</html>

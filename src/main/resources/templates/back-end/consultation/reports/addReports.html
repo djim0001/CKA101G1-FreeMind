@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>新增諮商問題回報</title>
+</head>
+<body>
+	<h3>新增諮商問題回報</h3>
+
+	<span style="color:red;"
+		th:if="${errorMessage != null}"
+		th:utext="${errorMessage}">
+	</span>
+	
+	<form method="post"
+		th:action="@{/reports/insert}"
+		th:object="${reports}">
+			
+		會員編號:
+		<input type="text" th:field="*{member.memberId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
+		
+		諮詢訂單編號:
+		<select th:field="*{orders}">
+            <option value="">請選擇訂單</option>
+            <option th:each="order : ${ordersList}"
+                    th:value="${order.orderId}"
+                    th:text="${order.orderId}">
+            </option>
+        </select>
+        <span style="color:red; margin-left:10px;"
+              th:if="${#fields.hasErrors('orders')}"
+              th:errors="*{orders}">
+        </span><br>
+        	
+		問題描述:
+		<textarea th:field="*{issueDesc}" rows="5" cols="30"></textarea>
+        <span style="color:red; margin-left:10px;"
+              th:if="${#fields.hasErrors('issueDesc')}"
+              th:errors="*{issueDesc}">
+        </span><br>
+		
+		處理備註:
+        <textarea th:field="*{reportNote}" rows="3" cols="30"></textarea><br>
+
+        <input type="submit" value="新增">
+    </form>
+
+    <a th:href="@{/reports/listAllReports}">回列表</a>
+		
+
+</body>
+</html>

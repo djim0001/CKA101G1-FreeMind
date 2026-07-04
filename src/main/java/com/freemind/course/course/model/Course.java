@@ -2,9 +2,11 @@ package com.freemind.course.course.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.freemind.login.psychologist.model.Psychologist;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -13,6 +15,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -113,6 +117,13 @@ public class Course {
 	@DecimalMin(value = "0", message = "課程價格: 不能小於{value}")
 	@DecimalMax(value = "1000000000", message = "課程價格: 不能小於{value}")
 	private Integer price;
+	// 課程提問
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+	@OrderBy("course_id asc")
+	private Set<CourseQaComment> courseQaComment;
+	
+	
+	
 	public Integer getCourseId() {
 		return courseId;
 	}
@@ -264,6 +275,13 @@ public class Course {
 	            return "未知狀態";
 	    }
 	}
+	public Set<CourseQaComment> getCourseQaComment() {
+		return courseQaComment;
+	}
+	public void setCourseQaComment(Set<CourseQaComment> courseQaComment) {
+		this.courseQaComment = courseQaComment;
+	}
+	
 	
 
 }

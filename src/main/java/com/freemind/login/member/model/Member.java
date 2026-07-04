@@ -2,15 +2,24 @@ package com.freemind.login.member.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.freemind.consultation.orders.model.Orders;
+import com.freemind.consultation.reports.model.Reports;
+import com.freemind.course.course.model.CourseQaComment;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -87,6 +96,21 @@ public class Member {
 	@Email(message = "信箱格式不正確")
 	private String email;
 
+	
+	// 課程提問
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OrderBy("member_id asc")
+	private Set<CourseQaComment> courseQaComment;
+	
+	//諮商問題回報
+	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+	private List<Reports> reportsList;
+	
+	//諮商訂單
+	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+	private List<Orders> ordersList;
+		
+	
 	@Column(name = "bank_account", length = 20)
 	private String bankAccount;
 
@@ -192,4 +216,30 @@ public class Member {
 	public void setBankAccount(String bankAccount) {
 		this.bankAccount = bankAccount;
 	}
+	public Set<CourseQaComment> getCourseQaComment() {
+		return courseQaComment;
+	}
+	public void setCourseQaComment(Set<CourseQaComment> courseQaComment) {
+		this.courseQaComment = courseQaComment;
+	}
+	public List<Reports> getReportsList() {
+		return reportsList;
+	}
+	public void setReportsList(List<Reports> reportsList) {
+		this.reportsList = reportsList;
+	}
+	public List<Orders> getOrdersList() {
+		return ordersList;
+	}
+	public void setOrdersList(List<Orders> ordersList) {
+		this.ordersList = ordersList;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }

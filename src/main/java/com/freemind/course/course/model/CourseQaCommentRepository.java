@@ -1,7 +1,7 @@
 package com.freemind.course.course.model;
 
 import java.util.List;
-
+  //做CRUD的地方
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourseQaCommentRepository

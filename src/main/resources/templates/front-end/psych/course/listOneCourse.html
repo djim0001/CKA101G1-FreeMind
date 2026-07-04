@@ -39,7 +39,7 @@
 	<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
 	<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span> <br> 
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<div th:if="${course.courseStatus}==0">
+	<div th:if="${course.courseStatus==0 or course.courseStatus==3}">
 		<form method="post" th:action="@{psychUpdateCourse}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
