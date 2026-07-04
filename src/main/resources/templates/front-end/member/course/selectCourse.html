@@ -62,7 +62,7 @@ span.error {
 								th:value="${course.courseId}">
 							<button type="submit">加入購物車</button>
 						</form>
-						<form method="post" th:action="@{}">
+						<form method="post" th:action="@{qa/addQa}">
 							<input type="hidden" name="courseId"
 								th:value="${course.courseId}">
 							<button type="submit">提問</button>

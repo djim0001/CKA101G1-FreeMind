@@ -57,16 +57,33 @@ public class CourseQaCommentController {
 
     	    return "front-end/course/course/memberCourseQa";
     	}
+    // 會員提問頁面
+    @PostMapping("/addQa")
+    public String memberQa(
+    	@RequestParam(name="courseId",required = false) Integer courseId,
+    	@SessionAttribute(name="memberId",required = false) Integer memberId,
+    	ModelMap model
+    		) {
+    	Course course = courseService.getOneCourse(courseId);
+    	Member member = memberService.getOneMember(memberId);
+    	CourseQaComment comment = new CourseQaComment();
+    	model.addAttribute("course", course);
+    	model.addAttribute("member", member);
+    	model.addAttribute("courseQa", comment);
+    	return "front-end/member/course/memberCourseQa";
+    }
+    
  // 會員送出課程提問
     @PostMapping("/ask")
     public String addQuestion(
-            @RequestParam("questionId") Integer questionId,
+            @RequestParam("courseId") Integer courseId,
             @RequestParam("courseQuestion") String courseQuestion,
             @SessionAttribute(name="memberId",required = false) Integer memberId) {
 
-//        Course course = courseService.getOneCourse(courseId);
+    	//用課程宣告課程VO,用courseId取得一個課程 放入course這個變數名稱
+        Course course = courseService.getOneCourse(courseId);
         Member member = memberService.getOneMember(memberId);
-
+        CourseQaComment courseQaComment = commentService.addQuestion(course, member,courseQuestion );
 //        if (course == null) {
 //            throw new IllegalArgumentException("找不到此課程");
 //        }
@@ -80,9 +97,23 @@ public class CourseQaCommentController {
 //                member,
 //                courseQuestion
 //        );
+        return "front-end/member/course/memberCourseQa";
+       }
+       
+        //查詢所有會員有購買的課程
+        public String showMemberQuestions(
+                @SessionAttribute(name="memberId",required = false) Integer memberId,
+                ModelMap model) {
+
+            List<Course> memberQuestions =
+            		courseService.getAllCourse();
+
+            model.addAttribute("memberQuestions", memberQuestions);//前面的是對外面的(HTML)
+
+            return "front-end/member/course/memberCourseQa";
+        }
         
-        return "redirect:/course/qa/member?courseId=" + questionId;
-    }
+   
  // 心理師查看自己課程收到的提問
     @GetMapping("/psych")
     public String showPsychQuestions(
@@ -97,15 +128,13 @@ public class CourseQaCommentController {
         return "front-end/psych/course/psychCourseQa";
     }
     //心理師送出回復
-    @PostMapping("/answer")
+    @PostMapping("answerQa")
     public String answerQuestion(
             @RequestParam("questionId") Integer questionId,
-            @RequestParam("courseAnswer") String courseAnswer,
-            @SessionAttribute("psychId") Integer psychId) {
+            @RequestParam("courseAnswer") String courseAnswer) {
 
         commentService.answerUpdateQuestion(
-                questionId,
-                courseAnswer
+        		questionId, courseAnswer
         );
 
         return "redirect:/course/qa/psych";

@@ -7,5 +7,44 @@
 </head>
 <body>
 
+	<h1>用戶提問</h1>
+	<table>
+			<thead>
+				<tr>
+					<th>課程名稱</th>
+					<th>會員編號</th>
+					<th>提問時間</th>
+					<th>會員提問</th>
+					<th>回復時間</th>
+					<th>心理師回復</th>
+					
+				</tr>
+			</thead>
+			<tbody>
+<!-- 				<th:block th:each=" courseQa: ${memberQuestions}"> -->
+				<form method="post" th:action="@{ask}">
+					<tr>
+						<!-- 					${} = 進入get -->
+						<td th:text="${course.courseName}"></td>
+						<td th:text="${member.name}"></td>
+						<td th:text="${courseQa.askedAt}"></td>
+						<td th:text="${courseQa.courseQuestion}"></td>
+						
+						<td th:if="${courseQa.courseQuestion}==null">
+						<input type="text" name="userQa"
+							th:value="${courseQa.courseQuestion}"> 
+							<button type="submit">送出</button></td>
+						
+						<td th:text="${courseQa.answeredAt}"></td>
+						<td th:text="${courseQa.courseAnswer}"></td>
+
+
+						
+					</tr>
+				</form> -->
+<!-- <!-- 			</th:block> -->
+			</tbody>
+		</table>
+	
 </body>
 </html>
