@@ -15,7 +15,7 @@ import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
-import com.freemind.login.psychologist.model.PsychologistService;
+import com.freemind.login.psychologist.service.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 

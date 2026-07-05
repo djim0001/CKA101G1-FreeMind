@@ -12,8 +12,8 @@ import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.repository.ArticleCatRepository;
 import com.freemind.article.repository.ArticleRepository;
-import com.freemind.login.psychologist.model.Psychologist;
-import com.freemind.login.psychologist.model.PsychologistRepository;
+import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.repository.PsychologistRepository;
 
 @Service
 public class ArticleServiceImpl implements ArticleService{
