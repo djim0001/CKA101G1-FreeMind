@@ -23,17 +23,13 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/course")
 public class CourseForMemberController {
 
-	@Autowired
-	CourseService courseSvc;
-
-	@Autowired
-	CourseCategoriesService courseCategoriesSvc;
-	
-	@Autowired
-	PsychologistService psychologistService;
-	
-	@Autowired
-	MemberService memberService;
+	private final CourseService courseSvc;
+	private final MemberService memberSvc;
+	public CourseForMemberController(
+			CourseService courseSvc, MemberService memberSvc) {
+		this.courseSvc = courseSvc;
+		this.memberSvc = memberSvc;
+	}
 	
 	@PostMapping("set_memberId_session")
 	public String setMemberIdSession(@RequestParam(name = "memberIdSession") Integer memberIdSession, ModelMap model,
@@ -51,12 +47,12 @@ public class CourseForMemberController {
 			ModelMap model, HttpSession session) {
 
 		if (memberId != null) {
-			Member member = memberService.getOneMember(memberId);
+			Member member = memberSvc.getOneMember(memberId);
 			model.addAttribute("member", member);
 		}
 		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
 		model.addAttribute("currentPage", currentPage);
-		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1);
+		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)2, currentPage - 1);
 		model.addAttribute("courseListListed", courseListListed);
 //		if(session.getAttribute(pageQty) == null) 
 //			session.setAttribute("psychCoursePageQty", 1);

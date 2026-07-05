@@ -20,21 +20,21 @@ public class CourseQaCommentService {
             Member member,
             String courseQuestion) {
 
-        if (course == null) {
-            throw new IllegalArgumentException("課程不可為空");
-        }
+//        if (course == null) {
+//            throw new IllegalArgumentException("課程不可為空");
+//        }
+//
+//        if (member == null) {
+//            throw new IllegalArgumentException("會員不可為空");
+//        }
 
-        if (member == null) {
-            throw new IllegalArgumentException("會員不可為空");
-        }
+//        if (courseQuestion == null || courseQuestion.isBlank()) {
+//            throw new IllegalArgumentException("提問內容不可為空");
+//        }
 
-        if (courseQuestion == null || courseQuestion.isBlank()) {
-            throw new IllegalArgumentException("提問內容不可為空");
-        }
-
-        if (courseQuestion.length() > 500) {
-            throw new IllegalArgumentException("提問內容不可超過 500 字");
-        }
+//        if (courseQuestion.length() > 500) {
+//            throw new IllegalArgumentException("提問內容不可超過 500 字");
+//        }
 
         CourseQaComment comment = new CourseQaComment();
         comment.setCourse(course);
@@ -98,6 +98,9 @@ public class CourseQaCommentService {
     }
     
     // 心理師回覆提問-2
+    //接收問題編號（questionId）與課程回答內容（courseAnswer），
+    //先依據問題編號查詢該筆問題資料，再將新的回答內容設定到 courseAnswer 欄位，
+    //並將回答時間設定為目前時間，最後使用 repository.save() 將修改後的資料更新回資料庫。
     public void answerUpdateQuestion(Integer questionId,String courseAnswer) {
     	CourseQaComment comment = getOneQuestion(questionId);
     	comment.setCourseAnswer(courseAnswer);
@@ -105,7 +108,7 @@ public class CourseQaCommentService {
     	repository.save(comment);
     }
     
-    
+    //查詢
     
 
     // 查詢心理師所有課程收到的提問

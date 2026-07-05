@@ -7,7 +7,7 @@
 </head>
 <body>
 
-	<h1>哈囉</h1>
+	<h1>心理師回復</h1>
 	<table>
 			<thead>
 				<tr>
@@ -22,15 +22,22 @@
 			</thead>
 			<tbody>
 				<th:block th:each="courseQa : ${questions}">
-					<tr>
+					<tr>   
+<!-- 					${} = 進入get -->
 						<td th:text="${courseQa.course.courseName}"></td>
-						<td th:text="${courseQa.course.courseName}"></td>
+						<td th:text="${courseQa.member.name}"></td>
+						<td th:text="${courseQa.askedAt}"></td>
+						<td th:text="${courseQa.courseQuestion}"></td>  
+						<td th:text="${courseQa.answeredAt}"></td>  
+						<td th:text="${courseQa.courseAnswer}"></td>  
 						
-						<td>
-							<form method="post" th:action="@{psychGetOneCourse}">
-								<input type="hidden" name="courseId"
-									th:value="${course.courseId}">
-								<button type="submit">查看詳情</button>
+						<td th:if ="${courseQa.courseAnswer}==null" >
+							<form method="post" th:action="@{answerQa}">
+								<input type="text" name="courseAnswer"
+									th:value="${courseQa.courseAnswer}">
+								<input type="hidden" name="questionId"
+									th:value="${courseQa.questionId}">
+								<button type="submit">送出</button>
 							</form>
 						</td>
 					</tr>

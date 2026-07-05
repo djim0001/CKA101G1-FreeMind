@@ -57,6 +57,16 @@ span.error {
 								th:value="${course.courseId}">
 							<button type="submit">查看詳情</button>
 						</form>
+						<form method="post" th:action="@{addCart}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button type="submit">加入購物車</button>
+						</form>
+						<form method="post" th:action="@{qa/addQa}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button type="submit">提問</button>
+						</form>
 					</td>	
 				</tr>
 			</th:block>

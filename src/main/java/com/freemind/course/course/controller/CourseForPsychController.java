@@ -36,17 +36,23 @@ import jakarta.validation.Valid;
 @RequestMapping("/course")
 public class CourseForPsychController {
 
-	@Autowired
-	CourseService courseSvc;
+	 private final CourseService courseSvc;
+	    private final CourseCategoriesService courseCategoriesSvc;
+	    private final PsychologistService psychologistService;
+	    
+	    @Value("${course.video.upload-path}")
+	    private String videoUploadPath;
 
-	@Autowired
-	CourseCategoriesService courseCategoriesSvc;
+	    public CourseForPsychController(
+	            CourseService courseSvc,
+	            CourseCategoriesService courseCategoriesSvc,
+	            PsychologistService psychologistService) {
+
+	        this.courseSvc = courseSvc;
+	        this.courseCategoriesSvc = courseCategoriesSvc;
+	        this.psychologistService = psychologistService;
+	    }
 	
-	@Autowired
-	PsychologistService psychologistService;
-	
-	@Value("${course.video.upload-path}")
-	private String videoUploadPath;
 
 	@ModelAttribute("courseCategoriesListAll")
 	public List<CourseCategories> courseCategoriesListAll() {
