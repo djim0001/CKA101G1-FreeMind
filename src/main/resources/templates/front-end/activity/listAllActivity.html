@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活動列表</title>
+</head>
+<body>
+
+    <h1>活動列表（複合查詢測試）</h1>
+    
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <form th:action="@{/activity/listActivities_ByCompositeQuery}" method="post">
+        <p>
+            縣市：<input type="text" name="activityCity">
+        </p>
+        <p>
+            區域：<input type="text" name="activityDist">
+        </p>
+        <p>
+            活動名稱關鍵字：<input type="text" name="activityName">
+        </p>
+        <button type="submit">查詢</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>活動編號</th>
+            <th>活動名稱</th>
+            <th>縣市</th>
+            <th>區域</th>
+            <th>狀態</th>
+            <th>圖片</th>
+        </tr>
+        <tr th:each="a : ${activityListData}">
+        		<td>
+	            <img th:if="${a.picture != null}" 
+	                 th:src="'data:image/jpeg;base64,' + ${#bytes.encodeBase64(a.picture)}" 
+	                 style="max-width: 100px;">
+	            <span th:if="${a.picture == null}">無圖片</span>
+        		</td>
+            <td th:text="${a.activityId}"></td>
+            <td th:text="${a.activityName}"></td>
+            <td th:text="${a.activityCity}"></td>
+            <td th:text="${a.activityDist}"></td>
+            <td th:text="${a.activityStatusText}"></td>
+            <td>
+			    <form th:action="@{/activity/getOne_For_Update}" method="post">
+			        <input type="hidden" name="activityId" th:value="${a.activityId}">
+			        <button type="submit">修改</button>
+			    </form>
+			</td>
+			
+        </tr>
+    </table>
+
+</body>
+</html>

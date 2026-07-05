@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增活動分類</title>
+</head>
+<body>
+
+    <h1>新增活動分類</h1>
+
+    <form th:action="@{/activityCat/insert}" th:object="${activityCat}" method="post">
+<!--                 表單要送去哪個網址                   要綁定的物件是activityCat -->
+        <p>
+			<!--因為上面<form>已經宣告了th:object="${activityCat}"，所以底下可以直接寫*{activityCatName}，等同於${activityCat.activityCatName} -->
+            分類名稱：
+            <input type="text" th:field="*{activityCatName}">
+			<!--驗證錯誤訊息 -->
+            <span th:if="${#fields.hasErrors('activityCatName')}" th:errors="*{activityCatName}" style="color:red;"></span>
+        </p>
+
+        <button type="submit">送出</button>
+
+    </form>
+
+</body>
+</html>

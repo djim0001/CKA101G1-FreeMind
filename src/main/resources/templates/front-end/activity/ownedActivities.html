@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我發起的活動</title>
+</head>
+<body>
+
+    <h1>我發起的活動</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+	<form th:action="@{/activity/ownedActivities_search}" method="post">
+        <p>
+            活動狀態：
+            <select name="activityStatus">
+                <option value="">全部</option>
+                <option value="0">待審核</option>
+                <option value="1">已審核</option>
+                <option value="2">已發布</option>
+                <option value="3">已退回</option>
+                <option value="4">取消</option>
+                <option value="5">延期</option>
+            </select>
+        </p>
+        <button type="submit">篩選</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>活動編號</th>
+            <th>活動名稱</th>
+            <th>狀態</th>
+        </tr>
+        <tr th:each="a : ${activityListData}">
+            <td th:text="${a.activityId}"></td>
+            <td th:text="${a.activityName}"></td>
+            <td th:text="${a.activityStatusText}"></td>
+        </tr>
+    </table>
+
+</body>
+</html>
