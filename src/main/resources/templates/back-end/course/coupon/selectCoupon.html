@@ -55,18 +55,7 @@
 		</tbody>
 
 	</table>
-	<span th:if="${currentPage > 1}">
-		<a th:href="@{/coupon/selectCoupon(page=1)}">至第一頁</a>&nbsp;
-	</span>
-	<span th:if="${currentPage-1 != 0}">
-		<a th:href="@{/coupon/selectCoupon(page=${currentPage-1})}">上一頁</a>&nbsp;
-	</span>
-	<span th:if="${currentPage+1 <= session.couponPageQty}">
-		<a th:href="@{/coupon/selectCoupon(page=${currentPage+1})}">下一頁</a>&nbsp;
-	</span>
-	<span th:if="${currentPage != session.couponPageQty}">
-		<a th:href="@{/coupon/selectCoupon(page=${session.couponPageQty})}">至最後一頁</a>&nbsp;
-	</span>
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/coupon/selectCoupon')}"></div>	
 
 
 

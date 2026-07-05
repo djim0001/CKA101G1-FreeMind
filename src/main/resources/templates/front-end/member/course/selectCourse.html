@@ -5,16 +5,43 @@
 <meta charset="UTF-8">
 <title>會員課程一覽頁面</title>
 <style>
-span.error {
-	color: red;
-	font-size: 12px;
-}
+	span.error {
+		color: red;
+		font-size: 12px;
+	}
+	.cart-modal {
+	       position: fixed;
+	       inset: 0;
+	       background-color: rgba(0, 0, 0, 0.4);
+	       display: flex;
+	       justify-content: center;
+	       align-items: center;
+	       z-index: 9999;
+	   }
+	
+	   .cart-modal-content {
+	       background-color: white;
+	       padding: 24px 36px;
+	       border-radius: 8px;
+	       text-align: center;
+	       min-width: 280px;
+	       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	   }
+	
+	   .cart-modal-content button {
+	       margin-top: 16px;
+	       padding: 8px 24px;
+	       cursor: pointer;
+	   }
 </style>
 </head>
 <body>
 	<h3>
 		<a th:href="@{/course_index}">課程商城</a>
 	</h3>
+	<h5>
+		<a th:href="@{/course/shoppingCart}">購物車</a>
+	</h5>
 	<form method="post" th:action="@{set_memberId_session}">
 		<span>會員編號：</span> <input type="text" name="memberIdSession" />
 		<button type="submit" id="submit">送出</button>
@@ -29,7 +56,6 @@ span.error {
 				<th>課程名稱</th>
 				<th>心理師名稱</th>
 				<th>課程分類名稱</th>
-				<th>課程狀態</th>
 				<th>收藏次數</th>
 				<th>平均星數</th>
 				<th>評價次數</th>
@@ -44,7 +70,6 @@ span.error {
 					<td th:text="${course.courseName}"></td>
 					<td th:text="${course.psychologist.name}"></td>
 					<td th:text="${course.courseCategories.courseCatName}"></td>
-					<td th:text="${course.courseStatusText}"></td>
 					<td th:text="${course.saveCount}"></td>
 					<td
 						th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
@@ -52,15 +77,16 @@ span.error {
 					<td th:text="${course.commentCount}"></td>
 					<td th:text="${course.price}"></td>
 					<td>
-						<form method="post" th:action="@{memberGetOneCourse}">
+						<form method="get" th:action="@{memberGetOneCourse}">
 							<input type="hidden" name="courseId"
 								th:value="${course.courseId}">
 							<button type="submit">查看詳情</button>
 						</form>
-						<form method="post" th:action="@{addCart}">
+						<form method="post" th:action="@{addCart}" >
 							<input type="hidden" name="courseId"
 								th:value="${course.courseId}">
-							<button type="submit">加入購物車</button>
+							<input type="hidden" name="returnUrl">
+							<button type="submit" id="addCart">加入購物車</button>
 						</form>
 						<form method="post" th:action="@{qa/addQa}">
 							<input type="hidden" name="courseId"
@@ -72,6 +98,21 @@ span.error {
 			</th:block>
 		</tbody>
 	</table>
-
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/memberSelectCourse')}"></div>	
+	
+	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+	    <div class="cart-modal-content">
+	        <p th:text="${cartMsg}"></p>
+	        <button type="button" onclick="closeCartModal()">確定</button>
+	    </div>
+	</div>
+	<script>
+	    function closeCartModal() {
+	        document.getElementById("cartModal").style.display = "none";
+	    }
+	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+	        input.value = window.location.pathname + window.location.search;
+	    });
+	</script>
 </body>
 </html>

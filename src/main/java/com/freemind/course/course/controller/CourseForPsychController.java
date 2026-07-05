@@ -43,15 +43,15 @@ public class CourseForPsychController {
 	    @Value("${course.video.upload-path}")
 	    private String videoUploadPath;
 
-	    public CourseForPsychController(
-	            CourseService courseSvc,
-	            CourseCategoriesService courseCategoriesSvc,
-	            PsychologistService psychologistService) {
+    public CourseForPsychController(
+            CourseService courseSvc,
+            CourseCategoriesService courseCategoriesSvc,
+            PsychologistService psychologistService) {
 
-	        this.courseSvc = courseSvc;
-	        this.courseCategoriesSvc = courseCategoriesSvc;
-	        this.psychologistService = psychologistService;
-	    }
+        this.courseSvc = courseSvc;
+        this.courseCategoriesSvc = courseCategoriesSvc;
+        this.psychologistService = psychologistService;
+    }
 	
 
 	@ModelAttribute("courseCategoriesListAll")
@@ -69,22 +69,28 @@ public class CourseForPsychController {
 	}
 
 	@GetMapping("psychSelectCourse")
-	public String psychSelectCourse(@SessionAttribute(name = "psychId", required = false) Integer psychId,
-			@RequestParam(name = "page", required = false) String page,
+	public String psychSelectCourse(
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
-			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
-			HttpSession session) {
+			ModelMap model) {
 
-		if (psychId == null) 
+		if(psychId == null)
 			return "front-end/psych/course/selectCourse";
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
-		model.addAttribute("currentPage", currentPage);
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		
 		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
-		Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
+		
+		Page<Course> courseListAllPages = 
+				courseSvc.getCoursesByPsychId(psychId, currentPage - 1, sortField);
+		
 		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("courseListAllPages", courseListAllPages);
-//		if(session.getAttribute(pageQty) == null) 
-//			session.setAttribute("psychCoursePageQty", 1);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", courseListAllPages.getTotalPages());
 
 		return "front-end/psych/course/selectCourse";
 	}

@@ -9,6 +9,30 @@ span.error {
 	font-size: 12px;
 	color: red;
 }
+.cart-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.cart-modal-content {
+    background-color: white;
+    padding: 24px 36px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.cart-modal-content button {
+    margin-top: 16px;
+    padding: 8px 24px;
+    cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -35,11 +59,8 @@ span.error {
 		<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
 	</div>
 	<div th:if="${course.courseStatus}==4">
-		<span>上架時間： </span><span th:text="${course.listedAt}"></span>
-	</div>
-	<div th:if="${course.courseStatus}==5">
-		<span>下架時間： </span><span th:text="${course.delistedAt}"></span> <br> 
-		<span>下架原因： </span><span th:text="${course.delistReason}"></span> 
+		<span>上架時間： </span>
+		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
 	</div>
 	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
 	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
@@ -51,24 +72,23 @@ span.error {
 		<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span>
 	</div>
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<div th:if="${course.courseStatus}==1">
-		<form method="post" th:action="@{adminExamineCourse}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<input type="hidden" name="courseStatus"
-				th:value="2">
-			<button type="submit">審核通過</button>
-		</form>
-		<form method="post" th:action="@{adminExamineCourse}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<input type="hidden" name="courseStatus"
-				th:value="3">
-			<button type="submit">審核失敗</button>
-		</form>
-		
+	<form th:action="@{/course/addCart}" method="post">
+	    <input type="hidden" name="courseId" th:value="${course.courseId}">
+	    <input type="hidden"
+	           name="returnUrl"
+	           th:value="@{/course/memberGetOneCourse(courseId=${course.courseId})}">
+	    <button type="submit">加入購物車</button>
+	</form>
+	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+	    <div class="cart-modal-content">
+	        <p th:text="${cartMsg}"></p>
+	        <button type="button" onclick="closeCartModal()">確定</button>
+	    </div>
 	</div>
-	
-
+	<script>
+		function closeCartModal() {
+	        document.getElementById("cartModal").style.display = "none";
+	    }
+	</script>
 </body>
 </html>
