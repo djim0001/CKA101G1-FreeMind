@@ -29,24 +29,25 @@ import jakarta.validation.Valid;
 @RequestMapping("/coupon")
 public class CouponController {
 	
-	@Autowired
-	CouponService couponSvc;
+	private final CouponService couponSvc;
+	
+	public CouponController(CouponService couponSvc) {
+		this.couponSvc = couponSvc;
+	}
 	
 	@GetMapping("selectCoupon")
 	public String selectCoupon(
-			@RequestParam(name = "page", required = false) String page, 
-			@SessionAttribute(name = "couponPageQty", required = false) String pageQty, 
+			@RequestParam(defaultValue = "1") Integer page,
 			ModelMap model, HttpSession session) {
 		
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
-		model.addAttribute("currentPage", currentPage);
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		
 		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(currentPage - 1);
+		
+		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("couponListAllPages", couponListAllPages);
-		if(pageQty == null || pageQty.isEmpty()) 
-			session.setAttribute("couponPageQty", couponSvc.getPageTotal());
-
-//		Coupon coupon = new Coupon();
-//		model.addAttribute("coupon", coupon);
+		model.addAttribute("totalPages", couponListAllPages.getTotalPages());
 		
 		return "back-end/course/coupon/selectCoupon";
 	}

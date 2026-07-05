@@ -36,18 +36,29 @@ public class CourseForAdminController {
 		session.setAttribute("adminId", adminIdSession);
 		return "redirect:/course/adminSelectCourse";
 	}
+	@PostMapping("listed")
+	public String listed() {
+		courseSvc.checkAllCourseStatus();
+		return "redirect:/course/adminSelectCourse";
+	}
 	@GetMapping("adminSelectCourse")
 	public String admunSelectCourse(
 			@SessionAttribute(name = "adminId", required = false) Integer adminId,
-			@RequestParam(name = "page", required = false) String page,
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
 
 		if (adminId == null) 
 			return "back-end/course/course/selectCourse";
 		
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
-		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus((byte)0, currentPage - 1);
+		if (page < 1)  page = 1;
+		Integer currentPage = page;		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus((byte)0, currentPage - 1, sortField);
+		
 		model.addAttribute("courseListSubmit", courseListSubmit);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", courseListSubmit.getTotalPages());
 		
 
 		return "back-end/course/course/selectCourse";

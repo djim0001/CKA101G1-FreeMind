@@ -104,7 +104,7 @@ public class Course {
 	@Column(name = "psych_discount")
 	@Digits(integer = 1, fraction = 2, message = "價格格式錯誤，最多 1 位整數與 2 位小數")
 	@DecimalMin(value = "0.01", message = "心理師折扣: 不能小於{value}")
-	@DecimalMax(value = "0.99", message = "心理師折扣: 不能超過{value}")
+	@DecimalMax(value = "1", message = "心理師折扣: 不能超過{value}")
 	private BigDecimal psychDiscount;
 	@Column(name = "discount_start")
 	@Future

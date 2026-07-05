@@ -69,6 +69,8 @@ font-size: 12px;
 				</th:block>
 			</tbody>
 		</table>
+		
+		<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/psychSelectCourse')}"></div>		
 	</div>
 </body>
 </html>

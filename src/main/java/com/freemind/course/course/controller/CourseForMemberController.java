@@ -42,25 +42,29 @@ public class CourseForMemberController {
 	@GetMapping("memberSelectCourse")
 	public String memberSelectCourse(
 			@SessionAttribute(name = "memberId", required = false) Integer memberId,
-			@RequestParam(name = "page", required = false) String page,
-			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, 
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
 
 		if (memberId != null) {
 			Member member = memberSvc.getOneMember(memberId);
 			model.addAttribute("member", member);
 		}
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
+		
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		
 		model.addAttribute("currentPage", currentPage);
-		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)2, currentPage - 1);
 		model.addAttribute("courseListListed", courseListListed);
-//		if(session.getAttribute(pageQty) == null) 
-//			session.setAttribute("psychCoursePageQty", 1);
+		model.addAttribute("totalPages", courseListListed.getTotalPages());
 
 		return "front-end/member/course/selectCourse";
 	}
 	
-	@PostMapping("memberGetOneCourse")
+	@GetMapping("memberGetOneCourse")
 	public String memberGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
