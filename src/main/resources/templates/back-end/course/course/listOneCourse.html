@@ -33,10 +33,12 @@ span.error {
 	</video><br>
 	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
 	<div th:if="${course.courseStatus}==4">
-		<span>上架時間： </span><span th:text="${course.listedAt}"></span>
+		<span>上架時間： </span>
+		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
 	</div>
 	<div th:if="${course.courseStatus}==5">
-		<span>下架時間： </span><span th:text="${course.delistedAt}"></span> <br> 
+		<span>下架時間： </span>
+		<span th:text="${#temporals.format(course.delistedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
 		<span>下架原因： </span><span th:text="${course.delistReason}"></span> 
 	</div>
 	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 

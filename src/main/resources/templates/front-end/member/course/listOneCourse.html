@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>會員課程頁面</title>
+<style>
+span.error {
+	font-size: 12px;
+	color: red;
+}
+.cart-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.cart-modal-content {
+    background-color: white;
+    padding: 24px 36px;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.cart-modal-content button {
+    margin-top: 16px;
+    padding: 8px 24px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+	<h1>會員課程頁面</h1>
+	<h3>
+		<a th:href="@{/course/memberSelectCourse}">會員課程一覽頁面</a>
+	</h3>
+	<span>session會員編號:</span>
+	<span th:text=${session.memberId}></span><br>
+
+	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
+	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
+	<div th:if="${session.memberId > 0}">
+		<span>影片： </span><br>
+		<video width="640" controls>
+	    		<source th:src="@{'/uploads/videos/' + ${course.videoSrc}}" type="video/mp4">
+		</video>
+	</div>
+	<div th:if="${session.memberId == null}">
+	<span>預覽影片： </span><br>
+		<video width="640" controls>
+	    		 <source th:src="@{'/uploads/videos/' + ${course.videoSrcPre}}" type="video/mp4">
+		</video><br>
+		<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
+	</div>
+	<div th:if="${course.courseStatus}==4">
+		<span>上架時間： </span>
+		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
+	</div>
+	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
+	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
+	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
+	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
+	<div th:if="${course.psychDiscount}!=null">
+		<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
+		<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
+		<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span>
+	</div>
+	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
+	<form th:action="@{/course/addCart}" method="post">
+	    <input type="hidden" name="courseId" th:value="${course.courseId}">
+	    <input type="hidden"
+	           name="returnUrl"
+	           th:value="@{/course/memberGetOneCourse(courseId=${course.courseId})}">
+	    <button type="submit">加入購物車</button>
+	</form>
+	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+	    <div class="cart-modal-content">
+	        <p th:text="${cartMsg}"></p>
+	        <button type="button" onclick="closeCartModal()">確定</button>
+	    </div>
+	</div>
+	<script>
+		function closeCartModal() {
+	        document.getElementById("cartModal").style.display = "none";
+	    }
+	</script>
+</body>
+</html>

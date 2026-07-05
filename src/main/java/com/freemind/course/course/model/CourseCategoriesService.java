@@ -3,18 +3,16 @@ package com.freemind.course.course.model;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CourseCategoriesService {
 
-	@Autowired
-	CourseCategoriesRepository repository;
-	
-	@Autowired
-	private SessionFactory sessionFactory;
+	private final CourseCategoriesRepository repository;
+
+    public CourseCategoriesService(CourseCategoriesRepository repository) {
+        this.repository = repository;
+    }
 	
 	public void addCourseCategories(CourseCategories courseCategories) {
 		repository.save(courseCategories);

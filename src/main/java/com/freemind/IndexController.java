@@ -18,5 +18,10 @@ public class IndexController {
     	return "back-end/course/courseIndex"; //view
     }
     
+    @GetMapping("/consultation")
+    public String consultationIndex() {
+        return "back-end/consultation/consultationIndex";
+    }
+    
 
 }

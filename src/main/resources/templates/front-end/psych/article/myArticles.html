@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我的文章</title>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
+		sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+	padding: 40px 20px;
+}
+
+h1 {
+	max-width: 1000px;
+	margin: 0 auto 10px;
+	font-size: 28px;
+	font-weight: 700;
+	color: #4a3e3e;
+}
+
+h3 {
+	max-width: 1000px;
+	margin: 0 auto 24px;
+}
+
+h3 a {
+	display: inline-block;
+	padding: 8px 18px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 6px;
+	text-decoration: none;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+h3 a.btn-create {
+	background-color: #e8b4b4;
+	color: #fff;
+	margin-right: 12px;
+}
+
+h3 a.btn-create:hover {
+	background-color: #d39393;
+}
+
+h3 a.btn-home {
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+}
+
+h3 a.btn-home:hover {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
+table {
+	max-width: 1000px;
+	width: 100%;
+	margin: 0 auto;
+	background: #fff;
+	border-collapse: collapse;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	overflow: hidden;
+	table-layout: fixed;
+}
+
+th, td {
+	padding: 14px 20px;
+	text-align: left;
+	font-size: 15px;
+}
+
+th:nth-child(1), td:nth-child(1) {
+	width: 35%;
+}
+
+th:nth-child(2), td:nth-child(2) {
+	width: 22%;
+	white-space: nowrap;
+}
+
+th:nth-child(3), td:nth-child(3) {
+	width: 13%;
+}
+
+th:nth-child(4), td:nth-child(4) {
+	width: 15%;
+}
+
+th:nth-child(5), td:nth-child(5) {
+	width: 15%;
+}
+
+th {
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	font-weight: 600;
+	border-bottom: 2px solid #f2dddd;
+}
+
+td {
+	color: #555;
+	border-bottom: 1px solid #f9f9f9;
+	word-break: break-all;
+}
+
+tr:last-child td {
+	border-bottom: none;
+}
+
+tr:hover td {
+	background-color: #fdfafaf5;
+}
+
+button[type="submit"] {
+	display: inline-block;
+	padding: 6px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+button[type="submit"]:hover {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
+a.btn-edit {
+	display: inline-block;
+	padding: 6px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	text-decoration: none;
+	cursor: pointer;
+	transition: all 0.2s;
+	margin-right: 6px;
+}
+
+a.btn-edit:hover {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
+a.btn-edit.disabled {
+	opacity: 0.4;
+	pointer-events: none;
+	cursor: default;
+}
+
+button.btn-status {
+	display: inline-block;
+	padding: 6px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+button.btn-status:hover {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
+button.btn-status.disabled {
+	opacity: 0.4;
+	pointer-events: none;
+	cursor: default;
+}
+
+@media ( max-width : 768px) {
+	table {
+		display: block;
+		overflow-x: auto;
+		white-space: nowrap;
+		table-layout: auto;
+	}
+}
+</style>
+</head>
+<body>
+	<h1>我的文章</h1>
+	<h3>
+		<a class="btn-create" th:href="@{/psych/article/create}">新增文章</a> <a
+			class="btn-home" th:href="@{/}">回首頁</a>
+	</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>標題</th>
+				<th>文章分類</th>
+				<th>文章狀態</th>
+				<th>建立時間</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="article : ${articles}">
+				<td th:text="${article.title}"></td>
+				<td
+					th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></td>
+				<td th:text="${article.articleStatus}"></td>
+				<td th:text="${article.createdAt}"></td>
+				<td>
+				    <!-- 編輯按鈕：狀態 0, 3 可點擊 -->
+				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 3}"
+				       th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
+				       class="btn-edit">編輯</a>
+				    <!-- 狀態 2, 4 編輯不可點擊 -->
+				    <a th:if="${article.articleStatus == 2 || article.articleStatus == 4}"
+				       class="btn-edit disabled">編輯</a>
+				
+				    <!-- 狀態 0：送審 -->
+				    <form th:if="${article.articleStatus == 0}"
+				          th:action="@{/psych/article/{id}/submit(id=${article.articleId})}"
+				          method="post" style="display: inline;">
+				        <button type="submit" class="btn-status">送審</button>
+				    </form>
+				
+				    <!-- 狀態 1：只顯示審核中 -->
+				    <a th:if="${article.articleStatus == 1}"
+				       class="btn-edit disabled">審核中</a>
+				
+				    <!-- 狀態 2：查看 -->
+				    <button th:if="${article.articleStatus == 2}" class="btn-status">查看</button>
+				
+				    <!-- 狀態 3：查看 -->
+				    <button th:if="${article.articleStatus == 3}" class="btn-status">查看</button>
+				
+				    <!-- 狀態 4：查看 -->
+				    <button th:if="${article.articleStatus == 4}" class="btn-status">查看</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script th:if="${alertMessage}">
+    	window.onload = function() {
+    		alert('[[${alertMessage}]]');
+    	};
+</script>
+	
+</body>
+</html>

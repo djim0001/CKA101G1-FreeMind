@@ -15,7 +15,7 @@ import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
-import com.freemind.login.psychologist.model.PsychologistService;
+import com.freemind.login.psychologist.service.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,45 +23,52 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/course")
 public class CourseForMemberController {
 
-	@Autowired
-	CourseService courseSvc;
-
-	@Autowired
-	CourseCategoriesService courseCategoriesSvc;
-	
-	@Autowired
-	PsychologistService psychologistService;
-	
-	@Autowired
-	MemberService memberService;
+	private final CourseService courseSvc;
+	private final MemberService memberSvc;
+	public CourseForMemberController(
+			CourseService courseSvc, MemberService memberSvc) {
+		this.courseSvc = courseSvc;
+		this.memberSvc = memberSvc;
+	}
 	
 	@PostMapping("set_memberId_session")
 	public String setMemberIdSession(@RequestParam(name = "memberIdSession") Integer memberIdSession, ModelMap model,
 			HttpSession session) {
 		session.setAttribute("memberId", memberIdSession);
 		
-		return "redirect:/course/selectCourse";
+		return "redirect:/course/memberSelectCourse";
 	}
 	
 	@GetMapping("memberSelectCourse")
-	public String memberSelectCourse(@SessionAttribute(name = "memberId", required = false) Integer memberId,
-			@RequestParam(name = "page", required = false) String page,
-			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
-			HttpSession session) {
+	public String memberSelectCourse(
+			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			ModelMap model, HttpSession session) {
 
-		if (memberId == null) 
-			return "front-end/course/course/psychSelectCourse";
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
+		if (memberId != null) {
+			Member member = memberSvc.getOneMember(memberId);
+			model.addAttribute("member", member);
+		}
+		
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		
 		model.addAttribute("currentPage", currentPage);
-		Member member = memberService.getOneMember(memberId);
-		Page<Course> courseListAllPages = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1);
-		model.addAttribute("member", member);
-		model.addAttribute("courseListAllPages", courseListAllPages);
-//		if(session.getAttribute(pageQty) == null) 
-//			session.setAttribute("psychCoursePageQty", 1);
+		model.addAttribute("courseListListed", courseListListed);
+		model.addAttribute("totalPages", courseListListed.getTotalPages());
 
-		return "front-end/psych/course/selectCourse";
+		return "front-end/member/course/selectCourse";
 	}
 	
+	@GetMapping("memberGetOneCourse")
+	public String memberGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		model.addAttribute("course", course);
+		return "front-end/member/course/listOneCourse";
+	}
 	
 }

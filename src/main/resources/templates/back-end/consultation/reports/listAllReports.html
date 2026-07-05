@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>諮商問題回報列表</title>
+</head>
+<body>
+    <h3>諮商問題回報列表</h3>
+
+	<span style="color:green;" th:if="${success != null}" th:text="${success}"></span>
+	
+	<a th:href="@{/reports/addReports}">新增回報</a>
+    <a th:href="@{/reports/select_Page}">查詢</a>
+    
+    <table border="1">
+        <tr>
+            <th>編號</th>
+            <th>會員編號</th>
+            <th>問題描述</th>
+            <th>回報日期</th>
+            <th>處理狀態</th>
+            <th>操作</th>
+        </tr>
+        <tr th:each="report : ${reportsListData}">
+            <td th:text="${report.reportId}"></td>
+            <td th:text="${report.member.memberId}"></td>
+            <td th:text="${report.issueDesc}"></td>
+            <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${report.reportStatus}"></td>
+            <td>
+                <form method="post" th:action="@{/reports/getOne_For_Update}">
+                    <input type="hidden" name="reportId" th:value="${report.reportId}">
+                    <input type="submit" value="修改">
+                </form>
+                <form method="post" th:action="@{/reports/delete}">
+				    <input type="hidden" name="reportId" th:value="${report.reportId}">
+				    <input type="submit" value="刪除" 
+				           onclick="return confirm('確定要刪除此筆資料嗎？')">
+				</form>
+            </td>
+        </tr>
+    </table>
+
+    
+
+</body>
+</html>

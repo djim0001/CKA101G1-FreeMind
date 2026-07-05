@@ -26,8 +26,8 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
-import com.freemind.login.psychologist.model.Psychologist;
-import com.freemind.login.psychologist.model.PsychologistService;
+import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.service.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -36,17 +36,23 @@ import jakarta.validation.Valid;
 @RequestMapping("/course")
 public class CourseForPsychController {
 
-	@Autowired
-	CourseService courseSvc;
+	 private final CourseService courseSvc;
+	    private final CourseCategoriesService courseCategoriesSvc;
+	    private final PsychologistService psychologistService;
+	    
+	    @Value("${course.video.upload-path}")
+	    private String videoUploadPath;
 
-	@Autowired
-	CourseCategoriesService courseCategoriesSvc;
+    public CourseForPsychController(
+            CourseService courseSvc,
+            CourseCategoriesService courseCategoriesSvc,
+            PsychologistService psychologistService) {
+
+        this.courseSvc = courseSvc;
+        this.courseCategoriesSvc = courseCategoriesSvc;
+        this.psychologistService = psychologistService;
+    }
 	
-	@Autowired
-	PsychologistService psychologistService;
-	
-	@Value("${course.video.upload-path}")
-	private String videoUploadPath;
 
 	@ModelAttribute("courseCategoriesListAll")
 	public List<CourseCategories> courseCategoriesListAll() {
@@ -63,22 +69,28 @@ public class CourseForPsychController {
 	}
 
 	@GetMapping("psychSelectCourse")
-	public String psychSelectCourse(@SessionAttribute(name = "psychId", required = false) Integer psychId,
-			@RequestParam(name = "page", required = false) String page,
+	public String psychSelectCourse(
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
-			@SessionAttribute(name = "psychCoursePageQty", required = false) String pageQty, ModelMap model,
-			HttpSession session) {
+			ModelMap model) {
 
-		if (psychId == null) 
+		if(psychId == null)
 			return "front-end/psych/course/selectCourse";
-		Integer currentPage = (page == null) ? 1 : Integer.parseInt(page);
-		model.addAttribute("currentPage", currentPage);
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		
 		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
-		Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psychId, currentPage - 1, "courseId");
+		
+		Page<Course> courseListAllPages = 
+				courseSvc.getCoursesByPsychId(psychId, currentPage - 1, sortField);
+		
 		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("courseListAllPages", courseListAllPages);
-//		if(session.getAttribute(pageQty) == null) 
-//			session.setAttribute("psychCoursePageQty", 1);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", courseListAllPages.getTotalPages());
 
 		return "front-end/psych/course/selectCourse";
 	}

@@ -16,14 +16,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class CouponService {
 
-	@Autowired
-	CouponRepository repository;
-	
-	@Autowired
-	private SessionFactory sessionFactory;
+	private final CouponRepository repository;
 	
 	@Value("${app.coupon.page-size:5}")
 	private int couponPageSize;
+	
+	public CouponService(CouponRepository repository) {
+		this.repository = repository;
+	}
 	
 	public void addCoupon(Coupon coupon) {
 		repository.save(coupon);
@@ -58,14 +58,5 @@ public class CouponService {
         return repository.findAll(pageable);
     }
 	
-	public Integer getPageTotal() {
-		Integer count = repository.getCouponCount();
-		Integer total = count % couponPageSize;
-		Integer pageTotal = 1;
-		if(total != 0) pageTotal = count / couponPageSize + 1;
-		else pageTotal = (count / couponPageSize);
-		
-		return pageTotal;
-	}
 	
 }

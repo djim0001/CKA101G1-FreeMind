@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>購物車</title>
+<style>
+span.error {
+	font-size: 12px;
+	color: red;
+}
+</style>
+</head>
+<body>
+	<h1>購物車</h1>
+	<h3>
+		<a th:href="@{/course/memberSelectCourse}">會員課程一覽頁面</a>
+	</h3>
+	<span>session會員編號:</span>
+	<span th:text=${session.memberId}></span>
+	<br>
+	<table>
+		<tr>
+			<th>課程名稱</th>
+			<th>心理師</th>
+			<th>原價</th>
+			<th>折扣</th>
+			<th>小計</th>
+			<th>操作</th>
+		</tr>
+
+		<tr th:each="item : ${cartList}">
+			<td th:text="${item.courseName}"></td>
+			<td th:text="${item.psychologistName}"></td>
+			<td th:text="${item.price}"></td>
+			<td th:text="${item.psychDiscount==null?'無折扣':item.psychDiscount}"></td>
+			<td th:text="${item.subtotal}"></td>
+			<td>
+				<form th:action="@{cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
+					<input type="hidden" name="courseId" th:value="${item.courseId}">
+					<button type="submit">從購物車移除</button>
+				</form>
+			</td>
+		</tr>
+	</table>
+	<br>
+	<div>
+	<form th:action="@{cart_clear}" method="post" onsubmit="return confirm('確定要清空購物車嗎？');">
+		<button type="submit">清空購物車</button>
+	</form>
+		<span>總計：</span> <span
+			style="font-weight: bold; color: #d97706; font-size: 20px;"
+			th:text="'NT$ ' + ${cartTotal}"> </span>
+	</div>
+	<form th:action="@{checkout}" method="post" onsubmit="return confirm('是否前往結帳');">
+		<input type="hidden" name="cartList" th:value="${cartList}">
+		<button type="submit">結帳</button>
+	</form>
+</body>
+</html>

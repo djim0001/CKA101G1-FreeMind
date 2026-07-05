@@ -16,7 +16,10 @@
 		<span class="error" th:text="${aError}"></span>
 	</form>
 	<div th:if="${session.adminId > 0}">
-		<span>session員工編號:</span><span th:text=${session.adminId}></span><br>
+		<span>session員工編號:</span><span th:text=${session.adminId}></span><br><br>
+		<form method="post" th:action="@{listed}">
+			<button type="submit" id="submit">一鍵上架</button>
+		</form>
 		<table>
 			<thead>
 				<tr>
@@ -38,7 +41,7 @@
 			<tbody>
 				<th:block th:each="course : ${courseListSubmit}">
 					<tr>
-						<td><font color="red" th:if="${course.courseStatus}==1">*</font>	</td>
+						<td><font color="#17aee6" th:if="${course.courseStatus}==1">●</font>	</td>
 						<td th:text="${course.courseName}"></td>
 						<td th:text="${course.psychologist.name}"></td>
 						<td th:text="${course.courseCategories.courseCatName}"></td>
@@ -62,6 +65,8 @@
 				</th:block>
 			</tbody>
 		</table>
+		<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/adminSelectCourse')}"></div>	
+		
 	</div>
 
 

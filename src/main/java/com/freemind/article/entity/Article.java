@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.freemind.login.admin.model.Admin;
-import com.freemind.login.psychologist.model.Psychologist;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
