@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.freemind.login.psychologist.model.Psychologist;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 

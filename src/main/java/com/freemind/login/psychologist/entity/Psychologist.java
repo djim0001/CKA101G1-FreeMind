@@ -1,4 +1,4 @@
-package com.freemind.login.psychologist.model;
+package com.freemind.login.psychologist.entity;
 
 import java.sql.Timestamp;
 import java.util.Set;

@@ -1,8 +1,10 @@
-package com.freemind.login.psychologist.model;
+package com.freemind.login.psychologist.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.freemind.login.psychologist.entity.Psychologist;
 
 public interface  PsychologistRepository extends JpaRepository<Psychologist, Integer> {
 	

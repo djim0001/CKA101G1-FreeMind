@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import com.freemind.login.psychologist.model.Psychologist;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
