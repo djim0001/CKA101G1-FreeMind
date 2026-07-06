@@ -43,5 +43,9 @@ public class MemberService {
 	public void deleteMember(Integer memberId) {
 		repository.deleteById(memberId);
 	}
+	
+	public Member findByAccount(String account) {
+		return repository.findByMemberAccount(account);
+	}
 
 }

@@ -48,5 +48,8 @@ public class AdminService {
 	public void deleteAdmin(Integer adminId) {
 		repository.deleteById(adminId);
 	}
+	public Admin findByAccount(String account) {
+		return repository.findByAdminAccount(account);
+	}
 
 }
