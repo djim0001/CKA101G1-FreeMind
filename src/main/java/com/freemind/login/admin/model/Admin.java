@@ -1,10 +1,13 @@
 package com.freemind.login.admin.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.freemind.consultation.reports.model.Reports;
+import com.freemind.login.permission.model.Permission;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +15,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
@@ -63,6 +69,14 @@ public class Admin implements java.io.Serializable {
 	@OneToMany(mappedBy = "admin", fetch = FetchType.LAZY) 
 	private List<Reports> reportsList;
 	
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(
+		name = "admin_permissions",
+		joinColumns = @JoinColumn(name = "admin_id"),
+		inverseJoinColumns = @JoinColumn(name = "perm_id")
+	)
+	private Set<Permission> permissions = new HashSet<>();
+
 
 	public Integer getAdminId() {
 		return adminId;
@@ -134,6 +148,14 @@ public class Admin implements java.io.Serializable {
 
 	public void setReportsList(List<Reports> reportsList) {
 		this.reportsList = reportsList;
+	}
+	
+	public Set<Permission> getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(Set<Permission> permissions) {
+		this.permissions = permissions;
 	}
 	
 	
