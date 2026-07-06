@@ -19,6 +19,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.validation.Valid;
 
@@ -43,6 +44,19 @@ public class OrdersController {
 					Member member = new Member();
 					member.setMemberId(Integer.valueOf(text));
 					setValue(member);
+				}
+			}
+		});
+		
+		binder.registerCustomEditor(Psychologist.class, "psychologist", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Psychologist psychologist = new Psychologist();
+					psychologist.setPsychId(Integer.valueOf(text));
+					setValue(psychologist);
 				}
 			}
 		});

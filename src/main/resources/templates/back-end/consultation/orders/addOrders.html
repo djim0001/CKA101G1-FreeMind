@@ -30,9 +30,9 @@
 		style="color: red; margin-left: 10px;"
 		th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
 
-		心理師編號： <input type="text" th:field="*{psychId}"> <span
+		心理師編號： <input type="text" th:field="*{psychologist.psychId}"> <span
 			style="color: red; margin-left: 10px;"
-			th:if="${#fields.hasErrors('psychId')}" th:errors="*{psychId}"></span><br>
+			th:if="${#fields.hasErrors('psychologist.psychId')}" th:errors="*{psychologist.psychId}"></span><br>
 
 		心理師工作地點： <input type="text" th:field="*{psychLoc}"> <span
 			style="color: red; margin-left: 10px;"
