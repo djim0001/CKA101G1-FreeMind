@@ -95,6 +95,8 @@ public class CourseForPsychController {
 		model.addAttribute("courseListAllPages", courseListAllPages);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", courseListAllPages.getTotalPages());
+		if(orderBy != null)
+			model.addAttribute("orderBy", orderBy);
 
 		return "front-end/psych/course/selectCourse";
 	}

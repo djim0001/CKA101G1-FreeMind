@@ -59,6 +59,8 @@ public class CourseForAdminController {
 		model.addAttribute("courseListSubmit", courseListSubmit);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", courseListSubmit.getTotalPages());
+		if(orderBy != null)
+			model.addAttribute("orderBy", orderBy);
 		
 
 		return "back-end/course/course/selectCourse";
