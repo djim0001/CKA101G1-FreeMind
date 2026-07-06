@@ -153,7 +153,7 @@ public class Psychologist implements java.io.Serializable{
 //	
 	//課程
 	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
-	@OrderBy("psych_id asc")
+	@OrderBy("course_id asc")
 	private Set<Course> courses;
 
 	public Set<Course> getCourses() {

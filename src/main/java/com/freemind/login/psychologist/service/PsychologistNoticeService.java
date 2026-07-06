@@ -24,6 +24,7 @@ public class PsychologistNoticeService {
 	public void updatePsychologistNotice(PsychologistNotice psychologistNotice) {
 		repository.save(psychologistNotice);
 	}
+	
 	public void daletePsychologistNotice(Integer psychologistNotice) {
 		if(repository.existsById(psychologistNotice))
 			repository.deleteByPsychologistNotice(psychologistNotice);	

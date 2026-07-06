@@ -11,12 +11,51 @@ import jakarta.persistence.Table;
 @Table(name = "expertise")
 public class Expertise implements java.io.Serializable{
 	
+	private static final long serialVersionUID = 1L;
+	
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "expertise_id")
 	private Integer expertiseId;
 	
-	@Column(name = "expertise_name" , nullable = false)
+	@Column(name = "expertise_name" , nullable = false , length = 50)
 	private String expertiseName;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public Integer getExpertiseId() {
+		return expertiseId;
+	}
+
+	public void setExpertiseId(Integer expertiseId) {
+		this.expertiseId = expertiseId;
+	}
+
+	public String getExpertiseName() {
+		return expertiseName;
+	}
+
+	public void setExpertiseName(String expertiseName) {
+		this.expertiseName = expertiseName;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 }
