@@ -1,5 +1,6 @@
 package com.freemind.consultation.slots.model;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,5 +33,17 @@ public class SlotsService {
 	
 	public List<Slots> getAll(){
 		return repository.findAll();
+	}
+	
+	public List<Slots> getByPsychId(Integer psychId){
+		return repository.findByPsychId(psychId);
+	}
+	
+	public List<Slots> getBySlotDate(LocalDate slotDate){
+		return repository.findBySlotDate(slotDate);
+	}
+	
+	public List<Slots> getByConsStatus(String consStatus){
+		return repository.findByConsStatus(consStatus);
 	}
 }
