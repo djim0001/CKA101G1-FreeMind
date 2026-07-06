@@ -105,14 +105,10 @@ public class PsychologistExpertise {
 		}
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
+		@Override
+		public int hashCode() {
+			return Objects.hash(psychId,expertiseId);
+		}
 		
 		
 		
