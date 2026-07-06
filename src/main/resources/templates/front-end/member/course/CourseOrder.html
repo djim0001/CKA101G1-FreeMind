@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>課程訂單查詢結果</title>
+<style>
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #f2f2f2; }
+    .status-paid { color: green; font-weight: bold; }
+    .status-unpaid { color: red; font-weight: bold; }
+</style>
+</head>
+<body>
+
+	<h1>課程訂單查詢結果</h1>
+	
+	<table>
+		<thead>
+			<tr>
+				<th>訂單編號</th>
+				<th>會員姓名</th>
+				<th>優惠券序號</th>
+				<th>訂單總額</th>
+				<th>折扣金額</th>
+				<th>實付金額</th>
+				<th>付款方式</th>
+				<th>付款狀態</th>
+				<th>訂單時間</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- 情況一：如果是用「會員編號」查出來的多筆訂單列表 (orders) -->
+			<th:block th:if="${orders != null}">
+				<tr th:each="order : ${orders}">
+					<td th:text="${order.courseOrderId}"></td>
+					<td th:text="${order.member.name}"></td>
+					<!-- 優惠券可能為空，用 ? 防止出錯 -->
+					<td th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '無使用優惠券'}"></td>
+					<td th:text="${order.orderTotal}"></td>
+					<td th:text="${order.discountAmount != null ? order.discountAmount : 0}"></td>
+					<td th:text="${order.netAmount}"></td>
+					<!-- 付款方式判斷 -->
+					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
+					<!-- 付款狀態判斷 -->
+					<td>
+						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
+						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
+					</td>
+					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+				</tr>
+			</th:block>
+
+			<!-- 情況二：如果是用「訂單編號」查出來的單筆訂單 (order) -->
+			<th:block th:if="${order != null}">
+				<tr>
+					<td th:text="${order.courseOrderId}"></td>
+					<td th:text="${order.member.name}"></td>
+					<td th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '無使用優惠券'}"></td>
+					<td th:text="${order.orderTotal}"></td>
+					<td th:text="${order.discountAmount != null ? order.discountAmount : 0}"></td>
+					<td th:text="${order.netAmount}"></td>
+					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
+					<td>
+						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
+						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
+					</td>
+					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+				</tr>
+			</th:block>
+		</tbody>
+	</table>
+	
+</body>
+</html>
