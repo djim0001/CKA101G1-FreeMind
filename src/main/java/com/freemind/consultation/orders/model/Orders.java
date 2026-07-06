@@ -18,7 +18,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,7 +34,7 @@ public class Orders {
 	@Column(name = "order_id")
 	private Integer orderId;//not null(PK)(AI)
 	
-	@OneToOne(fetch = FetchType.LAZY) //一個時段只會有一個訂單
+	@ManyToOne(fetch = FetchType.LAZY) //同一天(Slots)可以有多筆訂單，各自佔用不同小時
 	@JoinColumn(name = "time_id", referencedColumnName = "timeslot_id", nullable = false)
 	private Slots slot;//not null(FK)，缺FK>>已補
 	
