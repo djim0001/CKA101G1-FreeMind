@@ -1,10 +1,12 @@
 package com.freemind.course.order.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.freemind.course.coupon.model.MemberCoupon;
 import com.freemind.login.member.model.Member;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +14,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,6 +31,8 @@ public class CourseOrder {
 	private Integer paymentMethod;
 	private Integer paymentStatus;
 	private LocalDateTime orderedAt;
+	
+	private Set<OrderDetail> orderDetails;
 	
 	
 	@Id
@@ -115,6 +121,16 @@ public class CourseOrder {
 
 	public void setOrderedAt(LocalDateTime orderedAt) {
 		this.orderedAt = orderedAt;
+	}
+	
+	//訂單明細
+	@OneToMany(mappedBy = "courseOrder", cascade = CascadeType.ALL)
+	@OrderBy("course_order_id asc")
+	public Set<OrderDetail> getOrderDetails() {
+		return orderDetails;
+	}
+	public void setOrderDetails(Set<OrderDetail> orderDetails) {
+		this.orderDetails = orderDetails;
 	}
 
 	

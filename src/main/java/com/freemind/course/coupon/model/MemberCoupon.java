@@ -78,4 +78,11 @@ public class MemberCoupon {
 	public void setCouponEndAt(LocalDateTime couponEndAt) {
 		this.couponEndAt = couponEndAt;
 	}
+	public Set<CourseOrder> getCourseOrder() {
+		return courseOrder;
+	}
+	public void setCourseOrder(Set<CourseOrder> courseOrder) {
+		this.courseOrder = courseOrder;
+	}
+	
 }
