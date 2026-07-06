@@ -1,7 +1,5 @@
 package com.freemind.article.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import com.freemind.article.dto.ArticleCreateForm;
@@ -15,7 +13,7 @@ public interface ArticleService {
 	
 	Article submitExistingDraft(Integer articleId, Integer psychId);
 	
-	List<Article> getMyArticles(Integer psychId);
+	Page<Article> getMyArticles(Integer psychId, Integer page);
 	
 	Page<Article> getPublishedArticles(Integer catId, Integer page);
 	
