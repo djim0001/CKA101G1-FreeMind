@@ -1,6 +1,7 @@
 package com.freemind.consultation.slots.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,7 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -44,10 +45,10 @@ public class Slots {
 	@NotNull(message = "預約狀態：請勿空白")
 	@Size(min = 24, max = 24, message = "預約狀態長度必須為24") //為String，驗證字串長度一定是24
 	@Pattern(regexp = "[012]{24}", message = "預約狀態只能為0、1或2") //驗證每個字元只能是012
-	private String consStatus; //not null，0：營業時間、可預約，1：已預約、2：非營業時間
+	private String consStatus; //not null，0：不可預約，1：可預約，2：已預約
 
-	@OneToOne(mappedBy = "slot")
-	private Orders orders;
+	@OneToMany(mappedBy = "slot", fetch = FetchType.LAZY) //一天可以對應多筆訂單，各佔不同小時
+	private List<Orders> ordersList;
 	
 	public Integer getTimeslotId() {
 		return timeslotId;
@@ -74,15 +75,6 @@ public class Slots {
 		this.consStatus = consStatus;
 	}
 	
-	
-
-	public Orders getOrders() {
-		return orders;
-	}
-
-	public void setOrders(Orders orders) {
-		this.orders = orders;
-	}
 
 	@Override
 	public String toString() {
@@ -99,7 +91,18 @@ public class Slots {
 	public void setPsychologist(Psychologist psychologist) {
 		this.psychologist = psychologist;
 	}
+
+
+	public List<Orders> getOrdersList() {
+		return ordersList;
+	}
+
+
+	public void setOrdersList(List<Orders> ordersList) {
+		this.ordersList = ordersList;
+	}
 	
+
 	
 }
 

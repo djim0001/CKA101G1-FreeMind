@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>選擇時段並填寫預約資料</title>
+</head>
+<body>
+	<h3>選擇時段並填寫預約資料</h3>
+
+	心理師編號：<span th:text="${slots.psychologist.psychId}"></span><br>
+	日期：<span th:text="${slots.slotDate}"></span><br>
+
+	<form method="post" th:action="@{/orders/bookSubmit}">
+		<input type="hidden" name="timeslotId" th:value="${slots.timeslotId}">
+		<input type="hidden" name="psychId" th:value="${slots.psychologist.psychId}">
+
+		可預約時段：
+		<select name="hour">
+			<option th:each="h : ${availableHours}" th:value="${h}"
+				th:text="${h} + ':00 - ' + ${h + 1} + ':00'"></option>
+		</select><br>
+
+		會員編號：<input type="text" name="memberId"><br>
+		心理師工作地點：<input type="text" name="psychLoc"><br>
+		諮詢費：<input type="text" name="psychFee"><br>
+
+		來訪目的：
+		<select name="visitPurpose">
+			<option value="emotion">情緒困擾</option>
+			<option value="stress">壓力調適</option>
+			<option value="relationship">人際關係</option>
+			<option value="family">家庭問題</option>
+			<option value="career">職涯困惑</option>
+			<option value="academic">課業壓力</option>
+			<option value="self_growth">自我探索</option>
+			<option value="sleep">睡眠問題</option>
+			<option value="anxiety">焦慮傾向</option>
+			<option value="other">其他</option>
+		</select><br>
+
+		來訪目的備註：<textarea name="visitPurposeNote" rows="3" cols="30"></textarea><br>
+
+		諮商參與形式：
+		<select name="sessionType">
+			<option value="0">單人諮商</option>
+			<option value="1">伴侶諮商</option>
+			<option value="2">家庭諮商</option>
+			<option value="3">團體諮商</option>
+		</select><br>
+
+		<input type="submit" value="送出預約">
+	</form>
+
+</body>
+</html>

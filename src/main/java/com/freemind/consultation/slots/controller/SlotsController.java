@@ -148,6 +148,80 @@ public class SlotsController {
 		model.addAttribute("slotsListData", list);
 		return "back-end/consultation/slots/select_Page";
 	}
+	
+	// ===== 心理師：查詢/調整某天的可預約時段 =====
+	
+		@GetMapping("manageSlotsForm")
+		public String manageSlotsForm(ModelMap model) {
+			return "front-end/consultation/slots/manageSlotsForm";
+		}
+		
+		@PostMapping("manageLookup")
+		public String manageLookup(@RequestParam("psychId") String psychId,
+		                            @RequestParam("slotDate") String slotDateStr, ModelMap model) {
+			if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入心理師編號與日期");
+				return "front-end/consultation/slots/manageSlotsForm";
+			}
+			
+			Integer pid = Integer.valueOf(psychId);
+			LocalDate date = LocalDate.parse(slotDateStr);
+			
+			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+			if (slots == null) {
+				// 這一天還沒有任何記錄，建立一筆全新的（預設全部不可預約）
+				slots = new Slots();
+				Psychologist p = new Psychologist();
+				p.setPsychId(pid);
+				slots.setPsychologist(p);
+				slots.setSlotDate(date);
+				slots.setConsStatus("0".repeat(24));
+			}
+			
+			model.addAttribute("slots", slots);
+			return "front-end/consultation/slots/manageSlotsInput";
+		}
+		
+		@PostMapping("manageSubmit")
+		public String manageSubmit(@RequestParam("psychId") String psychId,
+		                            @RequestParam("slotDate") String slotDateStr,
+		                            @RequestParam(value = "openHours", required = false) List<Integer> openHours,
+		                            ModelMap model) {
+			Integer pid = Integer.valueOf(psychId);
+			LocalDate date = LocalDate.parse(slotDateStr);
+			
+			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+			boolean isNew = (slots == null);
+			
+			if (isNew) {
+				slots = new Slots();
+				Psychologist p = new Psychologist();
+				p.setPsychId(pid);
+				slots.setPsychologist(p);
+				slots.setSlotDate(date);
+			}
+			
+			String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
+			StringBuilder sb = new StringBuilder(currentStatus);
+			
+			for (int h = 0; h < 24; h++) {
+				if (sb.charAt(h) == '2') {
+					continue; // 已預約成立的時段，不可被調整
+				}
+				boolean checked = openHours != null && openHours.contains(h);
+				sb.setCharAt(h, checked ? '1' : '0');
+			}
+			slots.setConsStatus(sb.toString());
+			
+			if (isNew) {
+				slotsSvc.addSlots(slots);
+			} else {
+				slotsSvc.updateSlots(slots);
+			}
+			
+			model.addAttribute("success", "時段設定已更新！");
+			return "front-end/consultation/slots/manageSlotsSuccess";
+		}
 		
 
 }
