@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.course.course.model.CourseQaComment;
+import com.freemind.course.order.model.CourseOrder;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -64,6 +65,7 @@ public class Member {
 	@NotEmpty(message = "手機號碼: 請勿空白")
 	@Pattern(regexp = "^09[0-9]{8}$", message = "手機號碼格式不正確，必須為09開頭的10位數字")
 	private String phoneNumber;
+	
 
 	@Column(name = "birthday")
 	private LocalDate birthday;
@@ -101,6 +103,11 @@ public class Member {
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	@OrderBy("member_id asc")
 	private Set<CourseQaComment> courseQaComment;
+	
+	//課程訂單
+	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+	@OrderBy("course_order_id asc")
+	private Set<CourseOrder> courseOrder;
 	
 	//諮商問題回報
 	@OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
@@ -233,6 +240,12 @@ public class Member {
 	}
 	public void setOrdersList(List<Orders> ordersList) {
 		this.ordersList = ordersList;
+	}
+	public Set<CourseOrder> getCourseOrder() {
+		return courseOrder;
+	}
+	public void setCourseOrder(Set<CourseOrder> courseOrder) {
+		this.courseOrder = courseOrder;
 	}
 	
 	

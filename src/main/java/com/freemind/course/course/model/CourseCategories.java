@@ -31,7 +31,7 @@ public class CourseCategories {
 	private String courseCatName;
 	
 	@OneToMany(mappedBy = "courseCategories", cascade = CascadeType.ALL)
-	@OrderBy("course_cat_id asc")
+	@OrderBy("course_id asc")
 	private Set<Course> courses;
 	
 	

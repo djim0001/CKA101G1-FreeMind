@@ -119,7 +119,7 @@ public class Course {
 	private Integer price;
 	// 課程提問
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-	@OrderBy("course_id asc")
+	@OrderBy("question_id asc")
 	private Set<CourseQaComment> courseQaComment;
 	
 	
@@ -275,6 +275,16 @@ public class Course {
 	            return "未知狀態";
 	    }
 	}
+	// 允許修改心理師折扣
+	public boolean canAddPsychDiscount() {
+	    boolean statusCanDiscount = courseStatus == 2 || courseStatus == 4;
+
+	    boolean discountExpired = discountEnd == null 
+	            || discountEnd.isBefore(LocalDateTime.now());
+
+	    return statusCanDiscount && discountExpired;
+	}
+	
 	public Set<CourseQaComment> getCourseQaComment() {
 		return courseQaComment;
 	}

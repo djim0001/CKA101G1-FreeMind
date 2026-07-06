@@ -55,8 +55,8 @@ font-size: 12px;
 						<td th:text="${course.reviewCount}"></td>
 						<td th:text="${course.commentCount}"></td>
 						<td th:text="${course.psychDiscount}"></td>
-						<td th:text="${course.discountStart}"></td>
-						<td th:text="${course.discountEnd}"></td>
+						<td th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></td>
+						<td th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></td>
 						<td th:text="${course.price}"></td>
 						<td>
 							<form method="post" th:action="@{psychGetOneCourse}">
@@ -71,6 +71,9 @@ font-size: 12px;
 		</table>
 		
 		<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/psychSelectCourse')}"></div>		
+	
+		
 	</div>
+	
 </body>
 </html>
