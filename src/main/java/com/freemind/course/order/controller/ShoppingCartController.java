@@ -27,7 +27,7 @@ public class ShoppingCartController {
 			@SessionAttribute(name = "memberId", required = false) Integer memberId
 			) {
 		if(memberId == null) {
-			redirectAttributes.addFlashAttribute("mError", "請先登入");
+			redirectAttributes.addFlashAttribute("mError", "請先登入，方可查看購物車");
 			return "redirect:/course/memberSelectCourse";
 		}
 			
@@ -43,9 +43,14 @@ public class ShoppingCartController {
 	@PostMapping("addCart")
 	public String addCart(
 			@RequestParam("courseId") Integer courseId, 
-			@SessionAttribute(name = "memberId") Integer memberId, 
+			@SessionAttribute(name = "memberId", required = false) Integer memberId, 
 	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
 			RedirectAttributes redirectAttributes) {
+		
+		if(memberId == null) {
+			redirectAttributes.addFlashAttribute("mError", "先登入方可加入購物車");
+			return "redirect:/course/memberSelectCourse";
+		}
 		
 		System.out.println("returnUrl = " + returnUrl);
 		 if (ShoppingCartRedisSvc.isCourseInCart(memberId, courseId)) {

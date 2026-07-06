@@ -3,24 +3,32 @@ package com.freemind.course.course.model;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import com.freemind.course.order.model.CartItemDTO;
 
 @Service
 public class CourseService {
 
 	private final CourseRepository repository;
+	private final StringRedisTemplate stringRedisTemplate;
 	
 	@Value("${app.course.page-size:5}")
 	private int coursePageSize;
 	
-	public CourseService(CourseRepository repository) {
+	public CourseService(
+			CourseRepository repository, 
+			StringRedisTemplate stringRedisTemplate) {
 		this.repository = repository;
+		this.stringRedisTemplate = stringRedisTemplate;
 	}
 
 
@@ -127,6 +135,33 @@ public class CourseService {
 				repository.save(course);
 			}
 		}
+	}
+	
+	public void addCourseBookmark(Integer memberId, Integer courseId) {
+		String key = "bookmark:member:" + memberId;
+		stringRedisTemplate.opsForSet().add(key, String.valueOf(courseId));
+	}
+	public void removeCourseBookmark(Integer memberId, Integer courseId) {
+		String key = "bookmark:member:" + memberId;
+		stringRedisTemplate.opsForSet().remove(key, String.valueOf(courseId));
+	}
+	public boolean isCourseInBookmark(Integer memberId, Integer courseId) {
+		String key = "bookmark:member:" + memberId;
+		Boolean result = stringRedisTemplate.opsForSet().isMember(key, String.valueOf(courseId));
+		return Boolean.TRUE.equals(result);
+	}
+	public List<Course> getBookmarkCourses(Integer memberId) {
+		String key = "bookmark:member:" + memberId;
+		Set<String> courseIdSet = stringRedisTemplate.opsForSet().members(key);
+		
+		if (courseIdSet == null || courseIdSet.isEmpty()) {
+            return List.of();
+        }
+
+        List<Integer> courseIds = courseIdSet.stream()
+                .map(Integer::valueOf)
+                .toList();
+        return repository.findAllById(courseIds);
 	}
 
 }
