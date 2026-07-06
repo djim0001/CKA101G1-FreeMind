@@ -60,6 +60,8 @@ public class CourseForMemberController {
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseListListed", courseListListed);
 		model.addAttribute("totalPages", courseListListed.getTotalPages());
+		if(orderBy != null)
+			model.addAttribute("orderBy", orderBy);
 
 		return "front-end/member/course/selectCourse";
 	}

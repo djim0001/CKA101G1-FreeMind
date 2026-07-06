@@ -19,8 +19,12 @@ import com.freemind.course.order.model.ShoppingCartRedisService;
 @RequestMapping("/course")
 public class ShoppingCartController {
 	
-	@Autowired
-	ShoppingCartRedisService ShoppingCartRedisSvc;
+	private final ShoppingCartRedisService ShoppingCartRedisSvc;
+	
+	public ShoppingCartController(ShoppingCartRedisService ShoppingCartRedisSvc) {
+		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
+	}
+	
 	
 	@GetMapping("shoppingCart")
 	public String shoppingCart(ModelMap model, RedirectAttributes redirectAttributes,
@@ -83,6 +87,14 @@ public class ShoppingCartController {
 		return "redirect:/course/shoppingCart";
 	}
 	
+//	@PostMapping("checkout")
+	public String checkout(
+			@SessionAttribute(name = "memberId") Integer memberId, 
+			RedirectAttributes redirectAttributes) {
+		ShoppingCartRedisSvc.clearCart(memberId);
+		
+		return "redirect:/course/shoppingCart";
+	}
 	
 	private String safeRedirectUrl(String returnUrl) {
 	    if (returnUrl == null || returnUrl.isBlank()) {

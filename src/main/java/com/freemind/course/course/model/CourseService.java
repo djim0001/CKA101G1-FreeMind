@@ -57,7 +57,8 @@ public class CourseService {
 		}
 		
 		return switch (orderBy) {
-		case "courseCategories" -> Sort.by("courseCategories.courseCatId").descending();
+		case "courseCategoriesAsc" -> Sort.by("courseCategories.courseCatId").ascending();
+		case "courseCategoriesDesc" -> Sort.by("courseCategories.courseCatId").descending();
 		
 		case "psychIdAsc" -> Sort.by("psychologist.psychId").ascending();
 		case "psychIdDesc" -> Sort.by("psychologist.psychId").descending();
@@ -136,7 +137,7 @@ public class CourseService {
 			}
 		}
 	}
-	
+	// 收藏課程
 	public void addCourseBookmark(Integer memberId, Integer courseId) {
 		String key = "bookmark:member:" + memberId;
 		stringRedisTemplate.opsForSet().add(key, String.valueOf(courseId));
