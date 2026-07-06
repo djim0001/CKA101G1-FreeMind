@@ -6,6 +6,7 @@ import java.util.List;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -51,9 +52,10 @@ public class Orders {
 	@NotNull(message = "會員編號：請勿空白")
 	private Member member;//not null(FK)，缺FK>>已改
 	
-	@Column(name = "psych_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "psych_id", referencedColumnName = "psych_id", nullable = false)
 	@NotNull(message = "心理師編號：請勿空白")
-	private Integer psychId;//not null(FK)，缺FK
+	private Psychologist psychologist;//not null(FK)，缺FK>>已改
 	
 	@Column(name = "created_at", nullable = false)
 //	@NotNull(message = "建立時間：請勿空白")
@@ -149,14 +151,6 @@ public class Orders {
 
 	public void setConsEnd(LocalDateTime consEnd) {
 		this.consEnd = consEnd;
-	}
-
-	public Integer getPsychId() {
-		return psychId;
-	}
-
-	public void setPsychId(Integer psychId) {
-		this.psychId = psychId;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -258,7 +252,7 @@ public class Orders {
 	@Override
 	public String toString() {
 		return "Orders [orderId=" + orderId + ", consStart=" + consStart + ", consEnd=" + consEnd
-				+ ", psychId=" + psychId + ", createdAt=" + createdAt + ", psychLoc="
+				+ ", createdAt=" + createdAt + ", psychLoc="
 				+ psychLoc + ", orderStatus=" + orderStatus + ", govSubsidy=" + govSubsidy + ", psychFee=" + psychFee
 				+ ", visitPurpose=" + visitPurpose + ", visitPurposeNote=" + visitPurposeNote + ", sessionType="
 				+ sessionType + ", psychNote=" + psychNote + ", rating=" + rating + ", reviewContent=" + reviewContent
@@ -280,6 +274,18 @@ public class Orders {
 	public void setMember(Member member) {
 		this.member = member;
 	}
+
+	public Psychologist getPsychologist() {
+		return psychologist;
+	}
+
+	public void setPsychologist(Psychologist psychologist) {
+		this.psychologist = psychologist;
+	}
+
+	
+	
+	
 	
 	
 	

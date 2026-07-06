@@ -5,12 +5,16 @@ import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.freemind.consultation.orders.model.Orders;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -26,9 +30,10 @@ public class Slots {
 	@Column(name = "timeslot_id")
 	private Integer timeslotId; //not null(PK)(AI)
 	
-	@Column(name = "psych_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "psych_id", referencedColumnName = "psych_id", nullable = false)
 	@NotNull(message = "心理師編號：請勿空白")
-	private Integer psychId; //not null(FK), 缺FK
+	private Psychologist psychologist; //not null(FK), 缺FK>>已改
 	
 	@Column(name = "slot_date", nullable = false)
 	@DateTimeFormat(pattern = "yyyy-MM-dd") //pattern只可以寫日期格式字串，補充說明要在@NotNull
@@ -51,14 +56,6 @@ public class Slots {
 
 	public void setTimeslotId(Integer timeslotId) {
 		this.timeslotId = timeslotId;
-	}
-
-	public Integer getPsychId() {
-		return psychId;
-	}
-
-	public void setPsychId(Integer psychId) {
-		this.psychId = psychId;
 	}
 
 	public LocalDate getSlotDate() {
@@ -89,9 +86,20 @@ public class Slots {
 
 	@Override
 	public String toString() {
-		return "Slots [timeslotId=" + timeslotId + ", psychId=" + psychId + ", slotDate=" + slotDate + ", consStatus="
+		return "Slots [timeslotId=" + timeslotId + ", slotDate=" + slotDate + ", consStatus="
 				+ consStatus + "]";
 	}
+
+
+	public Psychologist getPsychologist() {
+		return psychologist;
+	}
+
+
+	public void setPsychologist(Psychologist psychologist) {
+		this.psychologist = psychologist;
+	}
+	
 	
 }
 

@@ -10,7 +10,7 @@
     <span style="color:green;" th:if="${success != null}" th:text="${success}"></span><br>
 
     時段編號：<span th:text="${slots.timeslotId}"></span><br>
-    心理師編號：<span th:text="${slots.psychId}"></span><br>
+    心理師編號：<span th:text="${slots.psychologist.psychId}"></span><br>
     預約日期：<span th:text="${slots.slotDate}"></span><br>
     預約狀態：<span th:text="${slots.consStatus}"></span><br>
 

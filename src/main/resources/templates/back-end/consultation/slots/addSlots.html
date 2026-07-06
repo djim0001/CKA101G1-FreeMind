@@ -16,8 +16,8 @@
 		</div>
 
 		心理師編號：
-		<input type="text" th:field="*{psychId}">
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('psychId')}" th:errors="*{psychId}"></span><br>
+		<input type="text" th:field="*{psychologist.psychId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('psychologist.psychId')}" th:errors="*{psychologist.psychId}"></span><br>
 
 		預約日期：
 		<input type="date" th:field="*{slotDate}">

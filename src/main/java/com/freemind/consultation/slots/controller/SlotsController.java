@@ -1,5 +1,6 @@
 package com.freemind.consultation.slots.controller;
 
+import java.beans.PropertyEditorSupport;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -7,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.validation.Valid;
 
@@ -24,6 +28,23 @@ public class SlotsController {
 	@Autowired
 	private SlotsService slotsSvc;
 
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		binder.registerCustomEditor(Psychologist.class, "psychologist", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Psychologist psychologist = new Psychologist();
+					psychologist.setPsychId(Integer.valueOf(text));
+					setValue(psychologist);
+				}
+			}
+		});
+	}
+	
+	
 	@GetMapping("listAllSlots")
 	public String listAllSlots(ModelMap model) {
 		List<Slots> list = slotsSvc.getAll();
@@ -84,6 +105,11 @@ public class SlotsController {
 
 	@PostMapping("getOne_For_Display")
 	public String getOne_For_Display(@RequestParam("timeslotId") String timeslotId, ModelMap model) {
+		if (timeslotId == null || timeslotId.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入時段編號");
+			return "back-end/consultation/slots/select_Page";
+		}
+		
 		Slots slots = slotsSvc.getOneSlots(Integer.valueOf(timeslotId));
 		model.addAttribute("slots", slots);
 		return "back-end/consultation/slots/select_Page";
@@ -91,6 +117,10 @@ public class SlotsController {
 
 	@PostMapping("getByPsychId")
 	public String getByPsychId(@RequestParam("psychId") String psychId, ModelMap model) {
+		if (psychId == null || psychId.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入心理師編號");
+			return "back-end/consultation/slots/select_Page";
+		}
 		List<Slots> list = slotsSvc.getByPsychId(Integer.valueOf(psychId));
 		model.addAttribute("slotsListData", list);
 		return "back-end/consultation/slots/select_Page";
@@ -98,6 +128,10 @@ public class SlotsController {
 
 	@PostMapping("getBySlotDate")
 	public String getBySlotDate(@RequestParam("slotDate") String slotDate, ModelMap model) {
+		if (slotDate == null || slotDate.isBlank()) {
+			model.addAttribute("errorMessage", "請選擇預約日期");
+			return "back-end/consultation/slots/select_Page";
+		}
 		LocalDate date = LocalDate.parse(slotDate);
 		List<Slots> list = slotsSvc.getBySlotDate(date);
 		model.addAttribute("slotsListData", list);
@@ -106,6 +140,10 @@ public class SlotsController {
 
 	@PostMapping("getByConsStatus")
 	public String getByConsStatus(@RequestParam("consStatus") String consStatus, ModelMap model) {
+		if (consStatus == null || consStatus.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入預約狀態（24碼）");
+			return "back-end/consultation/slots/select_Page";
+		}
 		List<Slots> list = slotsSvc.getByConsStatus(consStatus);
 		model.addAttribute("slotsListData", list);
 		return "back-end/consultation/slots/select_Page";

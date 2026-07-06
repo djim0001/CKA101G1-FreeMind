@@ -25,7 +25,7 @@
             <td th:text="${order.orderId}"></td>
             <td th:text="${order.slot.timeslotId}"></td>
             <td th:text="${order.member.memberId}"></td>
-            <td th:text="${order.psychId}"></td>
+            <td th:text="${order.psychologist.psychId}"></td>
             <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${order.orderStatus}"></td>

@@ -19,7 +19,7 @@
         </tr>
         <tr th:each="slot : ${slotsListData}">
             <td th:text="${slot.timeslotId}"></td>
-            <td th:text="${slot.psychId}"></td>
+            <td th:text="${slot.psychologist.psychId}"></td>
             <td th:text="${slot.slotDate}"></td>
             <td th:text="${slot.consStatus}"></td>
             <td>

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SlotsRepository extends JpaRepository<Slots, Integer>{
 
-	@Query("from Slots where psychId = ?1")
+	@Query("from Slots where psychologist.psychId = ?1")
 	List<Slots> findByPsychId(Integer psychId);
 	
 	@Query("from Slots where slotDate = ?1")
