@@ -1,7 +1,5 @@
 package com.freemind.article.service;
 
-import static com.freemind.util.Constants.ART_PAGE_SIZE;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -9,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +28,15 @@ import com.freemind.article.exception.ArticleValidationException;
 @Service
 public class ArticleServiceImpl implements ArticleService{
 	
+	@Value("${app.article.page-size}")
+	private int artPageSize;
+	
 	@Autowired
 	private ArticleRepository articleRepository;
+	
 	@Autowired
 	private ArticleCatRepository articleCatRepository;
+	
 	@Autowired
 	private PsychologistRepository psychologistRepository;
 
@@ -92,17 +96,18 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 
 	@Override
-	public List<Article> getMyArticles(Integer psychId) {
+	public Page<Article> getMyArticles(Integer psychId, Integer page) {
 		if (psychId == null) {
 			throw new IllegalArgumentException("心理師資訊未帶入，請確認登入狀態");
 		}
 		
-		return articleRepository.findArticlesByPsychId(psychId);
+		Pageable pageable = PageRequest.of(page - 1, artPageSize);
+		return articleRepository.findArticlesByPsychId(psychId, pageable);
 	}
 	
 	@Override
 	public Page<Article> getPublishedArticles(Integer page, Integer catId) {
-		Pageable pageable = PageRequest.of(page - 1, ART_PAGE_SIZE);
+		Pageable pageable = PageRequest.of(page - 1, artPageSize);
 		
 		if (catId != null ) {
 			return articleRepository.findByStatusAndCatId(2, catId, pageable);

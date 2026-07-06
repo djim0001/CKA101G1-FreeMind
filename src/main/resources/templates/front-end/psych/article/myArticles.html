@@ -195,6 +195,47 @@ button.btn-status.disabled {
 	cursor: default;
 }
 
+/* 分頁樣式 */
+.pagination {
+	max-width: 1000px;
+	margin: 24px auto 0;
+	display: flex;
+	justify-content: center;
+	gap: 6px;
+	list-style: none;
+}
+
+.pagination a, .pagination span {
+	display: inline-block;
+	padding: 8px 14px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 6px;
+	text-decoration: none;
+	border: 1px solid #f2dddd;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	transition: all 0.2s;
+}
+
+.pagination a:hover {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
+.pagination .active {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+	pointer-events: none;
+}
+
+.pagination .disabled {
+	opacity: 0.4;
+	pointer-events: none;
+}
+
 @media ( max-width : 768px) {
 	table {
 		display: block;
@@ -222,7 +263,7 @@ button.btn-status.disabled {
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="article : ${articles}">
+			<tr th:each="article : ${articlePage.content}">
 				<td th:text="${article.title}"></td>
 				<td
 					th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></td>
@@ -260,11 +301,37 @@ button.btn-status.disabled {
 			</tr>
 		</tbody>
 	</table>
+
+	<!-- 分頁 -->
+	<ul class="pagination" th:if="${articlePage.totalPages > 1}">
+		<!-- 上一頁 -->
+		<li>
+			<a th:if="${currentPage > 1}"
+			   th:href="@{/psych/article/myArticles(page=${currentPage - 1})}">上一頁</a>
+			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
+		</li>
+
+		<!-- 頁碼 -->
+		<li th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
+			<a th:if="${i != currentPage}"
+			   th:href="@{/psych/article/myArticles(page=${i})}"
+			   th:text="${i}"></a>
+			<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
+		</li>
+
+		<!-- 下一頁 -->
+		<li>
+			<a th:if="${currentPage < articlePage.totalPages}"
+			   th:href="@{/psych/article/myArticles(page=${currentPage + 1})}">下一頁</a>
+			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
+		</li>
+	</ul>
+
 	<script th:if="${alertMessage}">
     	window.onload = function() {
     		alert('[[${alertMessage}]]');
     	};
-</script>
+	</script>
 	
 </body>
 </html>

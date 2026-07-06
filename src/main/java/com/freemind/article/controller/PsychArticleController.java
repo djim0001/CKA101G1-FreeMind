@@ -69,7 +69,9 @@ public class PsychArticleController {
 	}
 
 	@GetMapping("/myArticles")
-	public String myArticles(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
+	public String myArticles(Model model, 
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@RequestParam(name = "page", defaultValue = "1") Integer page) {
 
 		if (psychId == null) {
 			model.addAttribute("errorMessage", "請先登入心理師帳號");
@@ -77,8 +79,9 @@ public class PsychArticleController {
 			return "front-end/psych/article/test-login";
 		}
 
-		List<Article> articles = articleService.getMyArticles(psychId);
-		model.addAttribute("articles", articles);
+		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
+		model.addAttribute("articlePage", articlePage);
+		model.addAttribute("currentPage", page);
 		return "front-end/psych/article/myArticles";
 	}
 
