@@ -12,13 +12,20 @@ import com.freemind.login.psychologist.repository.ExpertiseRepository;
 import com.freemind.login.psychologist.repository.PsychologistExpertiseRepository;
 
 @Service
-public class ExpertiseServise {
+public class ExpertiseService {
 
-	@Autowired
-	private ExpertiseRepository repository;
+	private final ExpertiseRepository repository;
+	private final PsychologistExpertiseRepository peRepository;
 	
-	@Autowired
-	private PsychologistExpertiseRepository peRepository;
+	
+	public ExpertiseService(ExpertiseRepository repository, PsychologistExpertiseRepository peRepository) {
+		this.repository = repository;
+		this.peRepository = peRepository;
+		
+	}
+	
+	
+	
 	
 	public void addExpertise(Expertise expertise) {
 		repository.save(expertise);
