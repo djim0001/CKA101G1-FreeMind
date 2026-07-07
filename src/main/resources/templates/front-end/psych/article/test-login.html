@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>文章管理-測試登入</title>
+    <title>我的文章-測試登入</title>
 </head>
 <body>
 
@@ -16,13 +16,9 @@
         <span style="color:red;" th:text="${errorMessage}"></span> 
     </form>
 
-    <!-- session.psychId 取代 session.loginPsych -->
     <div th:if="${session.psychId != null}">
         <span>目前登入的心理師編號：</span>
         <span th:text="${session.psychId}"></span>
-        <br><br>
-        <a th:href="@{/article/myArticles}">前往我的文章</a> |
-        <a th:href="@{/article/create}">新增文章</a> 
     </div>
 
 </body>

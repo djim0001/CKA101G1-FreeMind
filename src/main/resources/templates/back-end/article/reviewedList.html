@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>已審核文章列表</title>
+<style>
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th, td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	text-align: left;
+}
+
+th {
+	background-color: #f2f2f2;
+}
+
+.tab {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-right: 4px;
+	text-decoration: none;
+	color: #333;
+	border: 1px solid #ccc;
+}
+
+.tab.active {
+	background-color: #333;
+	color: #fff;
+}
+
+.pagination {
+	margin-top: 15px;
+}
+
+.pagination a {
+	margin: 0 4px;
+	text-decoration: none;
+}
+
+.pagination span {
+	margin: 0 4px;
+	font-weight: bold;
+}
+
+.btn-back {
+	display: inline-block;
+	padding: 6px 12px;
+	background-color: #f0f0f0;
+	color: #000000;
+	text-decoration: none;
+	border: 1px solid #000000;
+	border-radius: 4px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.btn-back:hover {
+	background-color: #e0e0e0;
+}
+</style>
+</head>
+<body>
+	<h1>已審核文章列表</h1>
+	<a th:href="@{/admin/article}" class="btn-back">返回文章管理</a>
+	<br>
+	<br>
+
+	<!-- 狀態篩選 -->
+	<a th:href="@{/admin/article/reviewed}"
+		th:classappend="${currentStatus == null} ? 'tab active' : 'tab'">全部</a>
+	<a th:href="@{/admin/article/reviewed(status=2)}"
+		th:classappend="${currentStatus == 2} ? 'tab active' : 'tab'">已上架</a>
+	<a th:href="@{/admin/article/reviewed(status=3)}"
+		th:classappend="${currentStatus == 3} ? 'tab active' : 'tab'">已退回</a>
+	<a th:href="@{/admin/article/reviewed(status=4)}"
+		th:classappend="${currentStatus == 4} ? 'tab active' : 'tab'">已下架</a>
+	<br>
+	<br>
+
+	<!-- 文章列表 -->
+	<table th:if="${articlePage.totalElements > 0}">
+		<thead>
+			<tr>
+				<th>文章標題</th>
+				<th>分類</th>
+				<th>狀態</th>
+				<th>審核時間</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="article : ${articlePage.content}">
+				<td th:text="${article.title}"></td>
+				<td th:text="${article.articleCat.articleCatName}"></td>
+				<td><span th:if="${article.articleStatus == 2}">已上架</span> <span
+					th:if="${article.articleStatus == 3}">已退回</span> <span
+					th:if="${article.articleStatus == 4}">已下架</span></td>
+				<td th:text="${article.reviewedAt}"></td>
+				<td>
+					<form th:if="${article.articleStatus == 2}"
+						th:action="@{/admin/article/{id}/unpublish(id=${article.articleId})}"
+						method="post" onsubmit="return confirm('確定要下架這篇文章嗎？');"
+						style="display: inline;">
+						<button type="submit">下架</button>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p th:if="${articlePage.totalElements == 0}">目前沒有文章</p>
+
+	<!-- 分頁 -->
+	<div class="pagination" th:if="${articlePage.totalPages > 1}">
+		<a th:if="${currentPage > 1}"
+			th:href="@{/admin/article/reviewed(page=${currentPage - 1}, status=${currentStatus})}">上一頁</a>
+
+		<th:block
+			th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
+			<span th:if="${i == currentPage}" th:text="${i}"></span>
+			<a th:unless="${i == currentPage}"
+				th:href="@{/admin/article/reviewed(page=${i}, status=${currentStatus})}"
+				th:text="${i}"></a>
+		</th:block>
+
+		<a th:if="${currentPage < articlePage.totalPages}"
+			th:href="@{/admin/article/reviewed(page=${currentPage + 1}, status=${currentStatus})}">下一頁</a>
+	</div>
+
+	<!-- alertMessage -->
+	<script th:if="${alertMessage}">
+		window.onload = function() {
+			alert('[[${alertMessage}]]');
+		};
+	</script>
+</body>
+</html>

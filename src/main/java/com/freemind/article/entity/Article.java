@@ -36,6 +36,9 @@ public class Article implements Serializable {
 	@Column(name = "article_id")
 	private Integer articleId;
 	
+	@Column(name = "parent_article_id")
+	private Integer parentArticleId; 
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "article_cat_id")
 	private ArticleCat articleCat;
