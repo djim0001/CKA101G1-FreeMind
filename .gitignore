@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Upload settings ###
-#uploads/
+uploads/
