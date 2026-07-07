@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>待審核文章</title>
+<style>
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+</style>
+</head>
+<body>
+    <h1>審核文章詳情</h1>
+    <a th:href="@{/admin/article/pending}">返回待審核文章列表</a>
+	<br>
+ 	<p>送審時間：<span th:text="${article.submittedAt}"></span></p>
+    <h2 th:text="${article.title}"></h2>
+    <p>文章分類：<span th:text="${article.articleCat.articleCatName}"></span></p>
+    
+    <div th:if="${article.coverImage != null}">
+    	<p>首圖：</p>
+        <img th:src="@{/article/{id}/cover(id=${article.articleId})}"
+             style="max-width: 300px; border-radius: 6px;" />
+    </div>
+
+    <p>內文：</p>
+    <div th:utext="${article.content}"></div>
+
+    <hr/>
+
+    <form th:action="@{/admin/article/{id}/review(id=${article.articleId})}" method="post"
+    	  onsubmit="return validateForm(event)">
+        <div>
+            <label>退回原因</label>
+            <select name="rejectReason">
+                <option value="" disabled selected>請選擇</option>
+                <option value="0">內容品質</option>
+                <option value="1">違反專業法規</option>
+                <option value="2">版權問題</option>
+                <option value="3">違反平台規範</option>
+                <option value="4">其他</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>退回說明（選擇「其他」時必填）</label>
+            <textarea name="rejectNote" rows="3"></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button type="submit" name="action" value="approve">審核通過</button>
+            <button type="submit" name="action" value="reject">退回審核</button>
+        </div>
+    </form>
+    
+    <script>
+		function validateForm(event) {
+		    const action = event.submitter.value;
+		    if (action === 'reject') {
+		        const reason = document.querySelector('select[name="rejectReason"]');
+		        const note = document.querySelector('textarea[name="rejectNote"]');
+		        if (!reason.value) {
+		            alert('請選擇退回原因');
+		            return false;
+		        }
+		        if (reason.value === '4' && !note.value.trim()) {
+		            alert('選擇「其他」時退回說明必填');
+		            return false;
+		        }
+		    }
+		    return true;
+		}
+	</script>
+
+</body>
+</html>

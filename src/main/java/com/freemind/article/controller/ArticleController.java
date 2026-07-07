@@ -32,8 +32,8 @@ public class ArticleController {
 		return articleCatService.getAllCats();
 	}
 
-	@GetMapping("/list")
-	public String listPublishedArticles(Model model, 
+	@GetMapping("/")
+	public String getPublishedArticles(Model model, 
 										@RequestParam(name = "page", defaultValue = "1") Integer page, 
 										@RequestParam(name = "catId", required = false) Integer catId) {
 		Page<Article> articlePage = articleService.getPublishedArticles(page, catId);

@@ -179,15 +179,34 @@ button[value="submit"]:hover {
 			<p th:if="${catError}" th:text="${catError}" class="field-error"></p>
 		</div>
 		<div>
-			<label>封面圖片</label>
-			<div th:if="${hasCoverImage}">
-				<img th:src="@{/article/{id}/cover(id=${articleId})}"
-					style="max-width: 200px; max-height: 150px; margin-bottom: 10px; border-radius: 6px;" />
-			</div>
-			<input type="file" name="coverImageFile" accept="image/*" />
-			<p th:if="${coverError}" th:text="${coverError}" class="field-error"></p>
+		    <label>首圖</label>
+		    <div th:if="${hasCoverImage}">
+		        <img id="coverPreview"
+		             th:src="@{/article/{id}/cover(id=${articleId})}"
+		             style="max-width: 200px; max-height: 150px; margin-bottom: 10px; border-radius: 6px;" />
+		        <p id="coverFileName" style="font-size: 13px; color: #999;">已有封面圖片</p>
+		    </div>
+		    
+		     <!-- 沒有舊圖時準備一個隱藏的 img, 選檔後顯示 -->
+		    <div th:unless="${hasCoverImage}">
+		        <img id="coverPreview"
+		             style="max-width: 200px; max-height: 150px; margin-bottom: 10px; border-radius: 6px; display: none;" />
+		        <p id="coverFileName" style="font-size: 13px; color: #999;"></p>
+		    </div>
+		
+		    <!-- 隱藏原生 file input -->
+		    <input type="file" name="coverImageFile" accept="image/*"
+		           id="coverInput" style="display: none;" />
+		    <!-- 自訂按鈕 -->
+		    <button type="button" id="coverBtn"
+		            style="padding: 8px 16px; background-color: #fbf2f2; color: #7a6b6b;
+		                   border: 1px solid #f2dddd; border-radius: 6px; cursor: pointer; font-size: 14px;">
+		        選擇圖片
+		    </button>
+		
+		    <p th:if="${coverError}" th:text="${coverError}" class="field-error"></p>
 		</div>
-		<div>
+		<div>	
 			<label>內容</label>
 			<textarea name="content" id="content" th:text="${form.content}"></textarea>
 			<p th:if="${contentError}" th:text="${contentError}" class="field-error"></p>
@@ -213,6 +232,23 @@ button[value="submit"]:hover {
 			convert_urls : false,
 			content_style: 'body { line-height: 1.4; } p { margin: 0 0 0.5em 0; }'
 		});
+		
+		// 點按鈕觸發檔案選擇
+		document.getElementById('coverBtn').addEventListener('click', function() {
+		    document.getElementById('coverInput').click();
+		});
+		// 選檔後更新預覽和檔名
+		document.getElementById('coverInput').addEventListener('change', function(e) {
+		    const file = e.target.files[0];
+		    const preview = document.getElementById('coverPreview');
+		    const fileName = document.getElementById('coverFileName');
+		    if (file) {
+		        preview.src = URL.createObjectURL(file);
+		        preview.style.display = 'block';
+		        fileName.textContent = file.name;  // 這行會顯示檔名
+		    }
+		});
+		
 	</script>
 </body>
 </html>

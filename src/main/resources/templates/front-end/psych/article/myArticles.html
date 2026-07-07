@@ -135,6 +135,7 @@ button[type="submit"] {
 	border-radius: 6px;
 	cursor: pointer;
 	transition: all 0.2s;
+	font-family: inherit;
 }
 
 button[type="submit"]:hover {
@@ -181,6 +182,7 @@ button.btn-status {
 	border-radius: 6px;
 	cursor: pointer;
 	transition: all 0.2s;
+	font-family: inherit;
 }
 
 button.btn-status:hover {
@@ -195,7 +197,11 @@ button.btn-status.disabled {
 	cursor: default;
 }
 
-/* 分頁樣式 */
+.status-rejected {
+	color: #d9534f;
+	font-weight: bold;
+}
+
 .pagination {
 	max-width: 1000px;
 	margin: 24px auto 0;
@@ -267,71 +273,76 @@ button.btn-status.disabled {
 				<td th:text="${article.title}"></td>
 				<td
 					th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></td>
-				<td th:text="${article.articleStatus}"></td>
+				<td th:text="${article.articleStatus}"
+					th:classappend="${article.articleStatus == 3} ? 'status-rejected' : ''"></td>
 				<td th:text="${article.createdAt}"></td>
-				<td>
-				    <!-- 編輯按鈕：狀態 0, 3 可點擊 -->
-				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 3}"
+					<td>
+				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 2 || article.articleStatus == 3}"
 				       th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
 				       class="btn-edit">編輯</a>
-				    <!-- 狀態 2, 4 編輯不可點擊 -->
-				    <a th:if="${article.articleStatus == 2 || article.articleStatus == 4}"
+				    <a th:if="${article.articleStatus == 4}"
 				       class="btn-edit disabled">編輯</a>
 				
-				    <!-- 狀態 0：送審 -->
+				    <!-- 草稿：送審 -->
 				    <form th:if="${article.articleStatus == 0}"
 				          th:action="@{/psych/article/{id}/submit(id=${article.articleId})}"
 				          method="post" style="display: inline;">
 				        <button type="submit" class="btn-status">送審</button>
 				    </form>
 				
-				    <!-- 狀態 1：只顯示審核中 -->
+				    <!-- 草稿 & 審核未通過：刪除 -->
+				    <form th:if="${article.articleStatus == 0 || article.articleStatus == 3}"
+				          th:action="@{/psych/article/{id}/delete(id=${article.articleId})}"
+				          method="post" style="display: inline;"
+				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
+				        <button type="submit" class="btn-status">刪除</button>
+				    </form>
+				
+				    <!-- 審核中 -->
 				    <a th:if="${article.articleStatus == 1}"
 				       class="btn-edit disabled">審核中</a>
 				
-				    <!-- 狀態 2：查看 -->
+				    <!-- 已發布：查看 + 下架 -->
 				    <button th:if="${article.articleStatus == 2}" class="btn-status">查看</button>
+				    <form th:if="${article.articleStatus == 2}"
+				          th:action="@{/psych/article/{id}/unpublish(id=${article.articleId})}"
+				          method="post" style="display: inline;"
+				          onsubmit="return confirm('確定要下架此文章嗎？');">
+				        <button type="submit" class="btn-status">下架</button>
+				    </form>
 				
-				    <!-- 狀態 3：查看 -->
+				    <!-- 審核未通過：查看 -->
 				    <button th:if="${article.articleStatus == 3}" class="btn-status">查看</button>
 				
-				    <!-- 狀態 4：查看 -->
+				    <!-- 已下架：查看 -->
 				    <button th:if="${article.articleStatus == 4}" class="btn-status">查看</button>
 				</td>
 			</tr>
 		</tbody>
 	</table>
 
-	<!-- 分頁 -->
 	<ul class="pagination" th:if="${articlePage.totalPages > 1}">
-		<!-- 上一頁 -->
-		<li>
-			<a th:if="${currentPage > 1}"
-			   th:href="@{/psych/article/myArticles(page=${currentPage - 1})}">上一頁</a>
-			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
-		</li>
+		<li><a th:if="${currentPage > 1}"
+			th:href="@{/psych/article/myArticles(page=${currentPage - 1})}">上一頁</a>
+			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span></li>
 
-		<!-- 頁碼 -->
 		<li th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
 			<a th:if="${i != currentPage}"
-			   th:href="@{/psych/article/myArticles(page=${i})}"
-			   th:text="${i}"></a>
+			th:href="@{/psych/article/myArticles(page=${i})}" th:text="${i}"></a>
 			<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
 		</li>
 
-		<!-- 下一頁 -->
-		<li>
-			<a th:if="${currentPage < articlePage.totalPages}"
-			   th:href="@{/psych/article/myArticles(page=${currentPage + 1})}">下一頁</a>
-			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
-		</li>
+		<li><a th:if="${currentPage < articlePage.totalPages}"
+			th:href="@{/psych/article/myArticles(page=${currentPage + 1})}">下一頁</a>
+			<span th:if="${currentPage >= articlePage.totalPages}"
+			class="disabled">下一頁</span></li>
 	</ul>
 
 	<script th:if="${alertMessage}">
-    	window.onload = function() {
-    		alert('[[${alertMessage}]]');
-    	};
+		window.onload = function() {
+			alert('[[${alertMessage}]]');
+		};
 	</script>
-	
+
 </body>
 </html>

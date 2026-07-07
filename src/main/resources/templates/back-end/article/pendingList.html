@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>待審核文章列表</title>
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-top: 15px;
+	}
+	th, td {
+		border: 1px solid #000000;
+		padding: 8px;
+		text-align: left;
+	}
+	.btn-back {
+		display: inline-block;
+		padding: 6px 12px;
+		background-color: #f0f0f0;
+		color: #000000;
+		text-decoration: none;
+		border: 1px solid #000000;
+		border-radius: 4px;
+		font-size: 14px;
+		cursor: pointer;
+	}
+	.btn-back:hover {
+		background-color: #e0e0e0;
+	}
+</style>
+</head>
+<body>
+	<h1>待審核文章列表</h1>
+	<a th:href="@{/admin/article/}" class="btn-back">返回文章管理</a>
+	<table>
+		<thead>
+			<tr>
+				<th>文章標題</th>
+				<th>文章分類</th>
+				<th>創建時間</th>
+				<th>送審時間</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="article : ${articlePage.content}">
+				<td th:text="${article.title}"></td>
+				<td th:text="${article.articleCat.articleCatName}"></td>
+				<td th:text="${article.createdAt}"></td>
+				<td th:text="${article.submittedAt}"></td>
+				<td><a th:href="@{/admin/article/{id}/review(id=${article.articleId})}" class="btn-edit">審核</a></td>
+			</tr>
+		</tbody>
+	</table>
+	
+	<script th:if="${alertMessage}">
+        window.onload = function() {
+            alert('[[${alertMessage}]]');
+        };
+    </script>
+    
+</body>
+</html>
