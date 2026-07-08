@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -111,6 +112,10 @@ public class Course {
 	@DecimalMin(value = "0", message = "課程價格: 不能小於{value}")
 	@DecimalMax(value = "1000000000", message = "課程價格: 不能小於{value}")
 	private Integer price;
+	
+	@Transient
+	private Boolean saved = false;
+	
 	// 課程提問
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
 	@OrderBy("question_id asc")
@@ -221,6 +226,9 @@ public class Course {
 	public BigDecimal getPsychDiscount() {
 		return psychDiscount;
 	}
+	public BigDecimal getValidPsychDiscount() {
+	    return isDiscountValid() ? psychDiscount : null;
+	}
 	public void setPsychDiscount(BigDecimal psychDiscount) {
 		this.psychDiscount = psychDiscount;
 	}
@@ -255,6 +263,14 @@ public class Course {
 	public void setOrderDetails(Set<OrderDetail> orderDetails) {
 		this.orderDetails = orderDetails;
 	}
+	public Boolean getSaved() {
+		return saved;
+	}
+	public void setSaved(Boolean saved) {
+		this.saved = saved;
+	}
+	
+	
 	// 課程狀態文字版
 	public String getCourseStatusText() {
 	    if (courseStatus == null) {
@@ -282,12 +298,18 @@ public class Course {
 	public boolean canAddPsychDiscount() {
 	    boolean statusCanDiscount = courseStatus == 2 || courseStatus == 4;
 
-	    boolean discountExpired = discountEnd == null 
-	            || discountEnd.isBefore(LocalDateTime.now());
-
-	    return statusCanDiscount && discountExpired;
+	    return statusCanDiscount && !isDiscountValid();
 	}
-	
+	// 心理師折扣是否有效
+	public boolean isDiscountValid() {
+	    LocalDateTime now = LocalDateTime.now();
+
+	    return psychDiscount != null
+	            && discountStart != null
+	            && discountEnd != null
+	            && !now.isBefore(discountStart)
+	            && !now.isAfter(discountEnd);
+	}
 	
 	
 	

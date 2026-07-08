@@ -35,7 +35,7 @@ public class CouponController {
 		this.couponSvc = couponSvc;
 	}
 	
-	@GetMapping("selectCoupon")
+	@GetMapping("/select_coupon")
 	public String selectCoupon(
 			@RequestParam(defaultValue = "1") Integer page,
 			ModelMap model, HttpSession session) {
@@ -52,20 +52,20 @@ public class CouponController {
 		return "back-end/course/coupon/selectCoupon";
 	}
 
-	@GetMapping("addCoupon")
+	@GetMapping("/add_coupon")
 	public String addCoupon(ModelMap model) {
 		Coupon coupon = new Coupon();
 		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/addCoupon";
 	}
-	@PostMapping("select_one_coupon")
+	@PostMapping("/select_one_coupon")
 	public String listOneCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
 		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
 		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/listOneCoupon";
 	}
 	
-	@PostMapping("insertCoupon")
+	@PostMapping("/insert_coupon")
 	public String insertCoupon(@Valid Coupon coupon, BindingResult result, ModelMap model){
 		
 		if(result.hasErrors()) {
@@ -77,7 +77,7 @@ public class CouponController {
 		return "back-end/course/coupon/listOneCoupon";
 	}
 	
-	@PostMapping("update_coupon")
+	@PostMapping("/update_coupon")
 	public String updateCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
 		
 		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
@@ -86,7 +86,7 @@ public class CouponController {
 		return "back-end/course/coupon/updateCoupon";
 	}
 	
-	@PostMapping("update")
+	@PostMapping("/update")
 	public String update(@Valid Coupon coupon, BindingResult result, ModelMap model) {
 		
 		if(result.hasErrors()) {

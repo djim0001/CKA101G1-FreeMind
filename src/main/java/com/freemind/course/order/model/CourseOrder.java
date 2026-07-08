@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
@@ -29,7 +30,7 @@ public class CourseOrder {
 	private Integer discountAmount;
 	private Integer netAmount;
 	private Integer paymentMethod;
-	private Integer paymentStatus;
+	private Integer paymentStatus = 0;
 	private LocalDateTime orderedAt;
 	
 	private Set<OrderDetail> orderDetails;
@@ -56,8 +57,8 @@ public class CourseOrder {
 		this.member = member;
 	}
 	
-	@ManyToOne
-	@JoinColumn(name ="coupon_serial_no",referencedColumnName="coupon_serial_no",nullable=true)
+	@OneToOne
+	@JoinColumn(name ="coupon_serial_no")
 	
 	public MemberCoupon getMemberCoupon() {
 		return memberCoupon;

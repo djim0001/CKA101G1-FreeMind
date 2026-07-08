@@ -177,6 +177,30 @@ public class OrderDetail {
 		public void setCourseId(Integer courseId) {
 			this.courseId = courseId;
 		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((courseId == null) ? 0 : courseId.hashCode());
+			result = prime * result + ((courseOrderId == null) ? 0 : courseOrderId.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+
+			if (obj != null && getClass() == obj.getClass()) {
+				CompositeOrderDetail compositeOrderDetail = (CompositeOrderDetail) obj;
+				if (courseOrderId.equals(compositeOrderDetail.courseOrderId) 
+						&& courseId.equals(compositeOrderDetail.courseId)) {
+					return true;
+				}
+			}
+			return false;
+		}
 
 	}
 

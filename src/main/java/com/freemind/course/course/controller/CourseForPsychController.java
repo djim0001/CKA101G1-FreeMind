@@ -37,7 +37,7 @@ import jakarta.validation.Valid;
 
 //@Validated
 @Controller
-@RequestMapping("/course")
+@RequestMapping("/course/psych")
 public class CourseForPsychController {
 
 	private final CourseService courseSvc;
@@ -69,10 +69,10 @@ public class CourseForPsychController {
 			HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
 		
-		return "redirect:/course/psychSelectCourse";
+		return "redirect:/course/psych/select_course";
 	}
 
-	@GetMapping("psychSelectCourse")
+	@GetMapping("/select_course")
 	public String psychSelectCourse(
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			@RequestParam(defaultValue = "1") Integer page,
@@ -101,7 +101,7 @@ public class CourseForPsychController {
 		return "front-end/psych/course/selectCourse";
 	}
 
-	@GetMapping("psychAddCourse")
+	@GetMapping("/add_course")
 	public String psychAddCourse(ModelMap model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
 		Course course = new Course();
 		if(psychId == null) {
@@ -113,7 +113,7 @@ public class CourseForPsychController {
 		return "front-end/psych/course/addCourse";
 	}
 	
-	@PostMapping("insertOrUpdateCourse")
+	@PostMapping("/insert_or_update_course")
 	public String insertOrUpdateCourse (
 			@RequestParam(name="video") MultipartFile video,
 			@RequestParam(name="videoPre") MultipartFile videoPre,
@@ -155,7 +155,7 @@ public class CourseForPsychController {
 		return "front-end/psych/course/listOneCourse";
 	}
 	
-	@PostMapping("updatePsychDiscount")
+	@PostMapping("/update_psych_discount")
 	public String updatePsychDiscount(
 	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountForm form,
 	        BindingResult result, ModelMap model,
@@ -181,19 +181,19 @@ public class CourseForPsychController {
 		return "front-end/psych/course/listOneCourse";
 	}
 
-	@PostMapping("psychGetOneCourse")
+	@PostMapping("/get_one_course")
 	public String psychGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
-	@PostMapping("psychUpdateCourse")
+	@PostMapping("/update_course")
 	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
-	@PostMapping("psychSubmitCourse")
+	@PostMapping("/submit_course")
 	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus((byte)1);
@@ -201,7 +201,7 @@ public class CourseForPsychController {
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
-	@PostMapping("discountModelBox")
+	@PostMapping("/discount_model_box")
 	public String discountModelBox(ModelMap model, 
 			@RequestParam("courseId") Integer courseId,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {

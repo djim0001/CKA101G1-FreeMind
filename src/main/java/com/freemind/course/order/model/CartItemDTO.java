@@ -47,7 +47,5 @@ public class CartItemDTO {
 		this.subtotal = subtotal;
 	}
 	
-//	public getDiscountExpire
-
 
 }

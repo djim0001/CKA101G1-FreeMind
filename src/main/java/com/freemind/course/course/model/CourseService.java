@@ -102,7 +102,7 @@ public class CourseService {
 	    );	
 		return repository.findByCourseStatus(courseStatus, pageable);
 	}
-
+	
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
 
@@ -151,18 +151,24 @@ public class CourseService {
 		Boolean result = stringRedisTemplate.opsForSet().isMember(key, String.valueOf(courseId));
 		return Boolean.TRUE.equals(result);
 	}
-	public List<Course> getBookmarkCourses(Integer memberId) {
-		String key = "bookmark:member:" + memberId;
-		Set<String> courseIdSet = stringRedisTemplate.opsForSet().members(key);
-		
-		if (courseIdSet == null || courseIdSet.isEmpty()) {
-            return List.of();
-        }
+	public Page<Course> getBookmarkCourses(Integer memberId, Integer page, String orderBy) {
 
-        List<Integer> courseIds = courseIdSet.stream()
-                .map(Integer::valueOf)
-                .toList();
-        return repository.findAllById(courseIds);
+	    if (page == null || page < 1) {
+	        page = 0;
+	    }
+	    String key = "bookmark:member:" + memberId;
+
+	    Set<String> courseIdSet = stringRedisTemplate
+	            .opsForSet()
+	            .members(key);
+	    if (courseIdSet == null || courseIdSet.isEmpty()) {
+	        return Page.empty();
+	    }
+	    List<Integer> courseIds = courseIdSet.stream()
+	            .map(Integer::valueOf)
+	            .toList();
+	    Pageable pageable = PageRequest.of(page, coursePageSize, getCourseSort(orderBy));
+	    return repository.findByCourseIdIn(courseIds, pageable);
 	}
 
 }
