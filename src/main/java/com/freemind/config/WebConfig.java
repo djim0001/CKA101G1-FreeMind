@@ -8,8 +8,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 	
-	@Value("${course.video.upload-path}")
-	private String videoUploadPath;
+	@Value("${course.video.upload.dir}")
+	private String videoUploadDir;
 
 	@Value("${course.video.url-path}")
 	private String videoUrlPath;
@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
    
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler(videoUrlPath).addResourceLocations("file:" + videoUploadPath);
+		registry.addResourceHandler(videoUrlPath).addResourceLocations("file:" + videoUploadDir);
 		registry.addResourceHandler(articleUrlPath).addResourceLocations("file:" + articleUploadDir);
 	}
 	

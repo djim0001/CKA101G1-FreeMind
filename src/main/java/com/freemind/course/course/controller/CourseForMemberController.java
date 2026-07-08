@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/course/member")
@@ -32,36 +36,29 @@ public class CourseForMemberController {
 		this.memberSvc = memberSvc;
 	}
 	
-	@PostMapping("set_memberId_session")
-	public String setMemberIdSession(@RequestParam(name = "memberIdSession") Integer memberIdSession, ModelMap model,
-			HttpSession session) {
-		session.setAttribute("memberId", memberIdSession);
-		
-		return "redirect:/course/member/select_course";
-	}
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        return memberSvc.findByAccount(authentication.getName());
+    }
 	
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
+			@ModelAttribute("member") Member member,
 			ModelMap model, HttpSession session) {
 
-		if (memberId != null) {
-			Member member = memberSvc.getOneMember(memberId);
-			model.addAttribute("member", member);
-		}
-		
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		
+		System.out.println(member);
+		System.out.println(member.getName());
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		for(Course course : courseListListed) {
 			course.setSaved(courseSvc
-					.isCourseInBookmark(memberId, course.getCourseId()));
+					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		}
-		
+		model.addAttribute("memberName", member.getName());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseListListed", courseListListed);
 		model.addAttribute("totalPages", courseListListed.getTotalPages());
@@ -73,24 +70,24 @@ public class CourseForMemberController {
 	
 	@GetMapping("/get_one_course")
 	public String memberGetOneCourse(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
-			@RequestParam("courseId") Integer courseId, ModelMap model) {
+			@RequestParam("courseId") Integer courseId,
+			@ModelAttribute("member") Member member,ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setSaved(courseSvc
-				.isCourseInBookmark(memberId, course.getCourseId()));
+				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";
 	}
 	@GetMapping("/my_bookmarks")
 	public String myBookmarks(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@ModelAttribute("member") Member member,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(memberId, currentPage - 1, sortField);
+		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(member.getMemberId(), currentPage - 1, sortField);
 		model.addAttribute("myBookmarks", myBookmarks);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", myBookmarks.getTotalPages());
@@ -100,14 +97,14 @@ public class CourseForMemberController {
 	}
 	@GetMapping("/my_courses")
 	public String myCourses(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@ModelAttribute("member") Member member,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(memberId, currentPage - 1, sortField);
+		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(member.getMemberId(), currentPage - 1, sortField);
 		model.addAttribute("myBookmarks", myBookmarks);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", myBookmarks.getTotalPages());
@@ -119,7 +116,7 @@ public class CourseForMemberController {
 	
 	@PostMapping("/favorite/toggle")
 	public String favoriteToggle(
-	        @SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@ModelAttribute("member") Member member,
 	        @RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer page,
 	        @RequestParam(name = "orderBy", required = false) String orderBy,
 	        @RequestParam(name = "courseId") Integer courseId,
@@ -129,17 +126,17 @@ public class CourseForMemberController {
 	    System.out.println("page = " + page);
 	    System.out.println("orderBy = " + orderBy);
 
-	    if (memberId == null) {
+	    if (member == null) {
 	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");
 	        redirectAttributes.addFlashAttribute("page", page);
 	        redirectAttributes.addFlashAttribute("orderBy", orderBy);
 	        return "redirect:/course/memberSelectCourse";
 	    }
 
-	    if (!courseSvc.isCourseInBookmark(memberId, courseId)) {
-	        courseSvc.addCourseBookmark(memberId, courseId);
+	    if (!courseSvc.isCourseInBookmark(member.getMemberId(), courseId)) {
+	        courseSvc.addCourseBookmark(member.getMemberId(), courseId);
 	    } else {
-	        courseSvc.removeCourseBookmark(memberId, courseId);
+	        courseSvc.removeCourseBookmark(member.getMemberId(), courseId);
 	    }
 
 	    redirectAttributes.addFlashAttribute("page", page);
