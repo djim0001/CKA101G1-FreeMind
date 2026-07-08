@@ -51,7 +51,7 @@ public class MemberSecurityConfig {
                 .loginProcessingUrl("/front-end/login")
                 .usernameParameter("memberAccount")
                 .passwordParameter("memberPassword")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/", false)
                 .failureUrl("/front-end/login?error=true")
                 .permitAll()
             )
