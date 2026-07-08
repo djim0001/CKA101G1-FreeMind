@@ -134,7 +134,7 @@ public class CourseForMemberController {
 	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");
 	        redirectAttributes.addFlashAttribute("page", page);
 	        redirectAttributes.addFlashAttribute("orderBy", orderBy);
-	        return "redirect:/course/memberSelectCourse";
+	        return "redirect:/course/member/select_course";
 	    }
 
 	    if (!courseSvc.isCourseInBookmark(member.getMemberId(), courseId)) {

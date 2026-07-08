@@ -60,11 +60,6 @@
 		<a th:href="@{/course/member/shopping_cart}">購物車</a>
 		<a th:href="@{/course/member/my_bookmarks}">收藏課程</a>
 	</h5>
-	<form method="post" th:action="@{set_memberId_session}">
-		<span>會員編號：</span> <input type="text" name="memberIdSession" />
-		<button type="submit" id="submit">送出</button>
-		<br> <span class="error" th:text="${mError}"></span>
-	</form>
 	<span>會員名稱:</span>
 	<span th:text=${memberName}></span>
 	<br>

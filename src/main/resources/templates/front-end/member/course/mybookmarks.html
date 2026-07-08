@@ -84,7 +84,7 @@
 							<input type="hidden" name="returnUrl">
 							<button type="submit" id="addCart">加入購物車</button>
 						</form>
-						<form th:action="@{/course/favorite/toggle}" method="post">
+						<form th:action="@{favorite/toggle}" method="post">
 						    <input type="hidden" name="courseId" th:value="${course.courseId}">
 						    <input type="hidden" name="returnUrl">
 						    <button type="submit"
