@@ -33,17 +33,45 @@ span.error {
     padding: 8px 24px;
     cursor: pointer;
 }
+	.favorite-btn {
+	    border: none;
+	    background: none;
+	    font-size: 28px;
+	    cursor: pointer;
+	    color: #ccc;
+	    transition: 0.2s;
+	}
+	
+	.favorite-btn.active {
+	    color: red;
+	}
+	
+	.favorite-btn:hover {
+	    transform: scale(1.15);
+	}
 </style>
 </head>
 <body>
 	<h1>會員課程頁面</h1>
 	<h3>
-		<a th:href="@{/course/memberSelectCourse}">會員課程一覽頁面</a>
+		<a th:href="@{/course/member/select_course}">會員課程一覽頁面</a>
 	</h3>
 	<span>session會員編號:</span>
 	<span th:text=${session.memberId}></span><br>
 
-	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
+	<span>課程名稱： <span><span th:text="${course.courseName}"></span>
+	<form th:action="@{favorite/toggle}" method="post">
+	    <input type="hidden" name="courseId" th:value="${course.courseId}">
+	    <input type="hidden" name="currentPage" th:value="${currentPage}">
+					<input type="hidden" name="orderBy" th:value="${orderBy}">
+	    <input type="hidden" name="returnUrl">
+	    <button type="submit"
+	            class="favorite-btn"
+	            th:classappend="${course.saved} ? ' active' : ''">
+	        ♥
+	    </button>
+	</form>
+	<br> 
 	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
 	<div th:if="${session.memberId > 0}">
 		<span>影片： </span><br>
@@ -66,18 +94,19 @@ span.error {
 	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
 	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
 	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
-	<div th:if="${course.psychDiscount}!=null">
-		<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
-		<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
-		<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span>
+	<div th:if="${course.discountValid}">
+		<span>心理師折扣： </span><span th:text="${course.validPsychDiscount}"></span> <br> 
+		<span>折扣開始時間： </span>
+		<span th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></span><br>
+		<span>折扣結束時間： </span>
+		<span th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></span>
 	</div>
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<form th:action="@{/course/addCart}" method="post">
-	    <input type="hidden" name="courseId" th:value="${course.courseId}">
-	    <input type="hidden"
-	           name="returnUrl"
-	           th:value="@{/course/memberGetOneCourse(courseId=${course.courseId})}">
-	    <button type="submit">加入購物車</button>
+	<form method="post" th:action="@{add_cart}" >
+		<input type="hidden" name="courseId"
+			th:value="${course.courseId}">
+		<input type="hidden" name="returnUrl">
+		<button type="submit" id="addCart">加入購物車</button>
 	</form>
 	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
 	    <div class="cart-modal-content">
@@ -86,9 +115,12 @@ span.error {
 	    </div>
 	</div>
 	<script>
-		function closeCartModal() {
-	        document.getElementById("cartModal").style.display = "none";
+	function closeCartModal() {
+        document.getElementById("cartModal").style.display = "none";
 	    }
+	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+	        input.value = window.location.pathname + window.location.search;
+	    });
 	</script>
 </body>
 </html>

@@ -19,7 +19,7 @@ import com.freemind.course.course.model.CourseService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/course")
+@RequestMapping("/course/admin")
 public class CourseForAdminController {
 	
 	private final CourseService courseSvc;
@@ -34,14 +34,14 @@ public class CourseForAdminController {
 	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
 			HttpSession session) {
 		session.setAttribute("adminId", adminIdSession);
-		return "redirect:/course/adminSelectCourse";
+		return "redirect:/course/admin/select_course";
 	}
-	@PostMapping("listed")
+	@PostMapping("/listed")
 	public String listed() {
 		courseSvc.checkAllCourseStatus();
-		return "redirect:/course/adminSelectCourse";
+		return "redirect:/course/admin/select_course";
 	}
-	@GetMapping("adminSelectCourse")
+	@GetMapping("/select_course")
 	public String admunSelectCourse(
 			@SessionAttribute(name = "adminId", required = false) Integer adminId,
 			@RequestParam(defaultValue = "1") Integer page,
@@ -66,14 +66,14 @@ public class CourseForAdminController {
 		return "back-end/course/course/selectCourse";
 	}
 	
-	@PostMapping("adminGetOneCourse")
+	@PostMapping("/get_one_course")
 	public String adminGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "back-end/course/course/listOneCourse";
 	}
 	
-	@PostMapping("adminExamineCourse")
+	@PostMapping("/examine_course")
 	public String adminExamineCourse(
 			@RequestParam("courseId") Integer courseId, 
 			@RequestParam("courseStatus") Byte courseStatus, 

@@ -64,7 +64,6 @@ public class ShoppingCartRedisService {
             item.setCourseName(course.getCourseName());
             item.setPsychologistName(course.getPsychologist().getName());
             item.setPrice(course.getPrice());
-            item.setPsychDiscount(course.getPsychDiscount());
             
             BigDecimal price = course.getPrice() != null
                     ? BigDecimal.valueOf(course.getPrice())
@@ -73,6 +72,8 @@ public class ShoppingCartRedisService {
             BigDecimal discount = course.getPsychDiscount() != null
                     ? course.getPsychDiscount()
                     : BigDecimal.ONE;
+            
+            item.setPsychDiscount(discount);
 
             BigDecimal subtotal = price.multiply(discount)
                     .setScale(0, RoundingMode.HALF_UP);

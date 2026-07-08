@@ -12,7 +12,7 @@
 		<a th:href="@{/course_index}">課程商城</a>
 	</h3>
 	<h3>
-		<a th:href="@{/coupon/addCoupon}">新增優惠券</a>
+		<a th:href="@{/coupon/add_coupon}">新增優惠券</a>
 	</h3>
 	<br>
 	<div th:utext="${errorMessage}">${errorMessage}</div>
@@ -55,7 +55,7 @@
 		</tbody>
 
 	</table>
-	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/coupon/selectCoupon')}"></div>	
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/coupon/select_coupon')}"></div>	
 
 
 

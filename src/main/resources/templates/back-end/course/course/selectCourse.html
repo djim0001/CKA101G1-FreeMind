@@ -8,7 +8,11 @@
 <body>
 	<h1>員工課程頁面</h1>
 	<h3>
-		<a th:href="@{/course_index}">課程商城</a>
+		<a th:href="@{/}">首頁</a>
+	</h3>
+	<h3>
+		<a th:href="@{/coupon/select_coupon}">優惠券</a>
+		<a th:href="@{/course/select_course_categories}">課程分類</a>
 	</h3>
 	<form method="post" th:action="@{set_adminId_session}">
 		<span>員工編號：</span> <input type="text" name="adminIdSession" />
@@ -24,28 +28,28 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th><a th:href="@{/course/adminSelectCourse}">課程名稱</a></th>
+					<th><a th:href="@{/course/admin/select_course}">課程名稱</a></th>
 					<th>心理師名稱</th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
 						    			)}">課程分類名稱</a>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'courseStatusAsc' ? 'courseStatusDesc' : 'courseStatusAsc'}
 						    			)}">課程狀態</a></th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
 						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
 						    			)}">平均星數</a></th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
 						    			)}">評價次數</a></th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
 						    			)}">提問次數</a></th>
 					<th>心理師折扣</th>
-					<th><a th:href="@{/course/adminSelectCourse(page=1,
+					<th><a th:href="@{/course/admin/select_course(page=1,
 							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
 						    			)}">課程定價</a></th>
 					<th>審核員工</th>
@@ -68,7 +72,7 @@
 						<td th:text="${course.price}"></td>
 						<td th:text="${course.adminId}"></td>
 						<td>
-							<form method="post" th:action="@{adminGetOneCourse}">
+							<form method="post" th:action="@{get_one_course}">
 								<input type="hidden" name="courseId"
 									th:value="${course.courseId}">
 								<button type="submit" 
@@ -79,7 +83,7 @@
 				</th:block>
 			</tbody>
 		</table>
-		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/adminSelectCourse', ${orderBy})}"></div>	
+		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/admin/select_course', ${orderBy})}"></div>	
 		
 	</div>
 
