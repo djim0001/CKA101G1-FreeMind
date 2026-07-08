@@ -40,6 +40,7 @@ public class CourseForMemberController {
     public Member currentMember(Authentication authentication) {
         return memberSvc.findByAccount(authentication.getName());
     }
+
 	
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
