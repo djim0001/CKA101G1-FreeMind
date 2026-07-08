@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改活動分類</title>
+</head>
+<body>
+
+    <h1>修改活動分類</h1>
+
+    <form th:action="@{/activityCat/update}" th:object="${activityCat}" method="post">
+
+        <input type="hidden" th:field="*{activityCatId}">
+
+        <p>
+            分類名稱：
+            <input type="text" th:field="*{activityCatName}">
+            <span th:if="${#fields.hasErrors('activityCatName')}" th:errors="*{activityCatName}" style="color:red;"></span>
+        </p>
+
+        <button type="submit">送出</button>
+
+    </form>
+
+</body>
+</html>
