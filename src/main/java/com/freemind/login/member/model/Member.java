@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.freemind.activity.activity.model.Activity;
 import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.course.coupon.model.MemberCoupon;
@@ -121,6 +122,10 @@ public class Member {
 	//會員優惠券
 	@OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
 	private Set<MemberCoupon> memberCoupons;
+	
+	//活動
+	@OneToMany(mappedBy = "member")
+	private Set<Activity> activities;
 		
 	
 	@Column(name = "bank_account", length = 20)
@@ -259,7 +264,13 @@ public class Member {
 		this.memberCoupons = memberCoupons;
 	}
 	
-	
+	public Set<Activity> getActivities() {
+	    return activities;
+	}
+
+	public void setActivities(Set<Activity> activities) {
+	    this.activities = activities;
+	}
 	
 	
 	
