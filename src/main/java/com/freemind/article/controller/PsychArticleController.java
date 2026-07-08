@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,32 +40,11 @@ public class PsychArticleController {
 		return articleCatService.getAllCats();
 	}
 
-	@ExceptionHandler(value = { IllegalStateException.class, IllegalArgumentException.class }) // Service 層的表單驗證錯誤
-	public String handleError(Exception e, Model model) {
-		model.addAttribute("errorMessage", e.getMessage());
-		model.addAttribute("form", new ArticleCreateForm());
-		model.addAttribute("articleCats", articleCatService.getAllCats());
-		return "front-end/psych/article/createForm";
-	}
-
 	// testing
 	@PostMapping("/set_psychId_session")
-	public String setPsychIdSession(@RequestParam("psychIdSession") Integer psychIdSession, HttpSession session) {
+	public String setPsychIdSession(@RequestParam(name = "psychIdSession", required = false) Integer psychIdSession, HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
 		return "redirect:/psych/article/myArticles";
-	}
-
-	@GetMapping("/create")
-	public String showCreateForm(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
-
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
-			return "front-end/psych/article/test-login";
-		}
-
-		model.addAttribute("form", new ArticleCreateForm());
-		return "front-end/psych/article/createForm";
 	}
 
 	@GetMapping("/myArticles")
@@ -73,9 +52,9 @@ public class PsychArticleController {
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			@RequestParam(name = "page", defaultValue = "1") Integer page) {
 
+		// testing
 		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
+			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
 
@@ -84,15 +63,28 @@ public class PsychArticleController {
 		model.addAttribute("currentPage", page);
 		return "front-end/psych/article/myArticles";
 	}
+	
+	@GetMapping("/create")
+	public String showCreateForm(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
+
+		// testing
+		if (psychId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "front-end/psych/article/test-login";
+		}
+
+		model.addAttribute("form", new ArticleCreateForm());
+		return "front-end/psych/article/createForm";
+	}
 
 	@PostMapping("/create")
 	public String createArticle(Model model, @ModelAttribute ArticleCreateForm form,
 			@RequestParam("action") String action,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
 
+		// testing
 		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
+			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
 
@@ -120,16 +112,16 @@ public class PsychArticleController {
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			RedirectAttributes redirectAttributes) {
 
+		// testing
 		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
+			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
 
 		try {
 			articleService.submitExistingDraft(articleId, psychId);
 		} catch (ArticleValidationException e) {
-			redirectAttributes.addFlashAttribute("alertMessage", "無法送審，請先編輯文章填寫完整欄位");
+			redirectAttributes.addFlashAttribute("alertMessage", "無法送審，請先編輯文章，填寫完整欄位");
 			return "redirect:/psych/article/myArticles";
 		} catch (IllegalArgumentException e) {
 			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
@@ -140,19 +132,26 @@ public class PsychArticleController {
 	}
 
 	@GetMapping("/{articleId}/edit")
-	public String showEditForm(Model model, @PathVariable Integer articleId,
+	public String showEditForm(Model model, 
+			@PathVariable Integer articleId,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			RedirectAttributes redirectAttributes) {
 
+		// testing
 		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
+			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
 
-		// 可編輯: 0 草稿, 3 審核未通過 ; 2 已發布先不讓修改
+		// 可編輯: 0 草稿, 2 已發布, 3 審核未通過
 		try {
 			Article article = articleService.getEditableArticle(articleId, psychId);
+			
+			if (article.getArticleStatus() == 2) {
+				Article copy = articleService.createEditCopy(articleId, psychId);
+				return "redirect:/psych/article/" + copy.getArticleId() + "/edit";
+			}
+			
 			// 把資料填回 form
 			ArticleCreateForm form = new ArticleCreateForm();
 			form.setTitle(article.getTitle());
@@ -178,9 +177,9 @@ public class PsychArticleController {
 			@RequestParam("action") String action, @PathVariable Integer articleId,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
 
+		// testing
 		if (psychId == null) {
-			model.addAttribute("errorMessage", "請先登入心理師帳號");
-			// testing
+			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
 
@@ -205,6 +204,50 @@ public class PsychArticleController {
 		}
 
 		return "redirect:/psych/article/myArticles";
+	}
+	
+	@PostMapping("/{articleId}/unpublish")
+	public String unpublishArticle(Model model,
+			@PathVariable Integer articleId, 
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			RedirectAttributes redirectAttributes) {
+		
+		// testing
+		if (psychId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "front-end/psych/article/test-login";
+		}
+		
+		try {
+			articleService.unPublishMyArticle(articleId, psychId);
+			redirectAttributes.addFlashAttribute("alertMessage", "文章已下架");
+		} catch (IllegalArgumentException | IllegalStateException e) {
+	        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+		}
+
+        return "redirect:/psych/article/myArticles";
+	}
+	
+	@PostMapping("/{articleId}/delete")
+	public String deleteDraft(Model model,
+			@PathVariable Integer articleId,
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			RedirectAttributes redirectAttributes) {
+		
+		// testing
+		if (psychId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "front-end/psych/article/test-login";
+		}
+		
+		try {
+			articleService.deleteDraft(articleId, psychId);
+	        redirectAttributes.addFlashAttribute("alertMessage", "草稿已刪除");
+		} catch (IllegalArgumentException | IllegalStateException e) {
+	        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+		}
+		
+        return "redirect:/psych/article/myArticles";
 	}
 
 }

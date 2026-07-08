@@ -35,7 +35,12 @@ public class ArticleImageUploadController {
 	@GetMapping("/{articleId}/cover")
 	public ResponseEntity<byte[]> getCoverImage(@PathVariable Integer articleId,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
-		Article article = articleService.getArticle(articleId, psychId);
+		Article article;
+		if (psychId != null) {
+			article = articleService.getArticle(articleId, psychId);
+		} else {
+			article = articleService.getArticleForAdmin(articleId);
+		}
 	    
 		if (article == null || article.getCoverImage() == null) {
 	        return ResponseEntity.notFound().build();
@@ -56,7 +61,7 @@ public class ArticleImageUploadController {
 	            .body(image);
 	}
 
-	// saving <img src=""> to the backend from TinyMCE
+	// saving <img src=""> to backend from TinyMCE
 	@PostMapping("/uploadImage") 
 	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
 		Map<String, String> jsonResult = new HashMap<>();

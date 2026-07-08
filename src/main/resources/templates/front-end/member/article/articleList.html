@@ -251,10 +251,10 @@ body {
 		</div>
 
 		<div class="category-filter">
-			<a th:href="@{/article/list}"
+			<a th:href="@{/article/}"
 				th:classappend="${selectedCatId == null} ? 'active' : ''">全部</a> <a
 				th:each="cat : ${articleCats}"
-				th:href="@{/article/list(catId=${cat.articleCatId})}"
+				th:href="@{/article/(catId=${cat.articleCatId})}"
 				th:text="${cat.articleCatName}"
 				th:classappend="${selectedCatId != null && selectedCatId == cat.articleCatId} ? 'active' : ''"></a>
 		</div>
@@ -291,21 +291,21 @@ body {
 		<div class="pagination" th:if="${articlePage.totalPages > 1}">
 			<!-- 上一頁 -->
 			<a th:if="${currentPage > 1}"
-				th:href="@{/article/list(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
+				th:href="@{/article/(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
 			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
 
 			<!-- 頁碼 -->
 			<th:block
 				th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
 				<a th:if="${i != currentPage}"
-					th:href="@{/article/list(page=${i}, catId=${selectedCatId})}"
+					th:href="@{/article/(page=${i}, catId=${selectedCatId})}"
 					th:text="${i}"></a>
 				<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
 			</th:block>
 
 			<!-- 下一頁 -->
 			<a th:if="${currentPage < articlePage.totalPages}"
-				th:href="@{/article/list(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
+				th:href="@{/article/(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
 			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
 				
 		</div>

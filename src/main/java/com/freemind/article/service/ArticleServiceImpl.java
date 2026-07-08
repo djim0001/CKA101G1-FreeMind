@@ -2,6 +2,7 @@ package com.freemind.article.service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.freemind.article.dto.ArticleCreateForm;
@@ -18,10 +20,12 @@ import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.repository.ArticleCatRepository;
 import com.freemind.article.repository.ArticleRepository;
-
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminRepository;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.repository.PsychologistRepository;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.freemind.article.exception.ArticleValidationException;
 
 
@@ -39,7 +43,11 @@ public class ArticleServiceImpl implements ArticleService{
 	
 	@Autowired
 	private PsychologistRepository psychologistRepository;
+	
+	@Autowired
+	private AdminRepository adminRepository;
 
+	
 	@Override
 	public Article createDraft(ArticleCreateForm form, Integer psychId) {
 		if (psychId == null) {
@@ -122,12 +130,23 @@ public class ArticleServiceImpl implements ArticleService{
 		if (article == null) return null;
 		
 		int status = article.getArticleStatus();
-		
+		// 已發布文章 || 心理師本人查看所有狀態的文章
 		if (status == 2 || psychId != null && psychId.equals(article.getPsychologist().getPsychId())) {
 			return article;
 		}	
 		
 		return null;
+	}
+	
+	@Override
+	public Article getArticleForAdmin(Integer articleId) {
+		Article article = articleRepository.findById(articleId).orElse(null);
+		
+		if (article == null) return null;
+		// 後台不查看草稿
+		if (article.getArticleStatus() == 0) return null;
+		
+		return article;
 	}
 	
 	@Override
@@ -144,11 +163,43 @@ public class ArticleServiceImpl implements ArticleService{
 			throw new IllegalStateException("無權編輯此文章");
 		}
 		
-		if (article.getArticleStatus() != 0 && article.getArticleStatus() != 3) {
+		if (article.getArticleStatus() != 0 && article.getArticleStatus() != 2 && article.getArticleStatus() != 3) {
 			throw new IllegalStateException("此文章狀態無法編輯");
 		}
 		
 		return article;
+	}
+	
+	@Override
+	public Article createEditCopy(Integer articleId, Integer psychId) {
+		Article article = getEditableArticle(articleId, psychId);
+		
+		if (article.getArticleStatus() != 2) {
+			throw new IllegalStateException("此文章狀態無法編輯");
+		}
+		
+		// 已發布文章, 建立可編輯的副本
+		
+		List<Integer> statuses = new ArrayList<>();
+		statuses.add(0); // 副本狀態: 編輯中
+		statuses.add(1); // 副本狀態: 送審中
+		
+		Article existingCopy = articleRepository.findEditCopy(articleId, statuses);
+		if (existingCopy != null) {
+			return existingCopy;
+		}
+		
+		Article copy = new Article();
+		copy.setParentArticleId(article.getArticleId());
+		copy.setArticleCat(article.getArticleCat());
+		copy.setPsychologist(article.getPsychologist());
+		copy.setCoverImage(article.getCoverImage());
+		copy.setTitle(article.getTitle());
+		copy.setContent(article.getContent());
+		copy.setArticleStatus(0);
+		copy.setCreatedAt(LocalDateTime.now());
+		
+		return articleRepository.save(copy);
 	}
 
 	@Override
@@ -173,7 +224,7 @@ public class ArticleServiceImpl implements ArticleService{
 		return articleRepository.save(article);
 		
 	}
-
+	
 	private Article createArticleWithForm(ArticleCreateForm form, Integer psychId) {
 		Article article = new Article();
 		article.setTitle(form.getTitle());
@@ -244,6 +295,132 @@ public class ArticleServiceImpl implements ArticleService{
 		}
 		
 		article.setUpdatedAt(LocalDateTime.now());
+	}
+	
+	@Override
+	public void deleteDraft(Integer articleId, Integer psychId) {
+		Article article = getEditableArticle(articleId, psychId);
+		
+		int status = article.getArticleStatus();
+		if (status != 0 && status != 3) {
+			throw new IllegalStateException("此文章狀態無法刪除");
+		}
+		
+		articleRepository.delete(article);
+	}
+
+	@Override
+	public void unPublishMyArticle(Integer articleId, Integer psychId) {
+		Article article = getPublishedArticle(articleId);
+		
+		if (!article.getPsychologist().getPsychId().equals(psychId)) {
+	        throw new IllegalArgumentException("無權操作此文章");
+	    }
+		
+		article.setArticleStatus(4);
+		articleRepository.save(article);
+	}
+	
+	@Override
+	public Page<Article> getPendingArticles(Integer page) {
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("submittedAt").ascending());
+		return articleRepository.findByStatus(1, pageable);
+	}
+	
+	@Override
+	public Article getArticleForReview(Integer articleId) {
+		Article article = articleRepository.findById(articleId)
+				.orElseThrow(() -> new IllegalArgumentException("查無此文章"));
+		
+		if (article.getArticleStatus() != 1) {
+			throw new IllegalStateException("此文章不在審核中");
+		}
+		
+		return article;
+	}
+	
+	@Transactional
+	@Override
+	public void approveArticle(Integer articleId, Integer adminId) {
+		Article article = getArticleForReview(articleId);
+		
+		Admin admin = adminRepository.findById(adminId)
+        		.orElseThrow(() -> new IllegalArgumentException("查無此員工"));
+		
+		// 副本覆寫原文, 刪除副本
+		if (article.getParentArticleId() != null) {
+			Article original = articleRepository.findById(article.getParentArticleId())
+					.orElseThrow(() -> new IllegalArgumentException("查無此文章"));
+		
+			article.setAdmin(admin);
+			original.setArticleCat(article.getArticleCat());
+			original.setCoverImage(article.getCoverImage());
+			original.setTitle(article.getTitle());
+			original.setContent(article.getContent());
+			original.setReviewedAt(LocalDateTime.now());
+	        original.setPublishedAt(LocalDateTime.now());
+	        articleRepository.save(original);
+	        articleRepository.delete(article);
+		} else {
+			article.setAdmin(admin);
+			article.setArticleStatus(2);
+			article.setReviewedAt(LocalDateTime.now());
+			article.setPublishedAt(LocalDateTime.now());
+			articleRepository.save(article);
+		}
+	}
+
+	@Override
+	public void rejectArticle(Integer articleId, Integer adminId, Integer rejectReason, String rejectNote) {
+		Article article = getArticleForReview(articleId);
+		
+		Admin admin = adminRepository.findById(adminId)
+				.orElseThrow(() -> new IllegalArgumentException("查無此員工"));
+		
+		if (rejectReason == null) {
+	        throw new IllegalArgumentException("請選擇退回原因");
+	    }
+		
+		if (rejectReason == 4 && (rejectNote == null || rejectNote.isBlank())) {
+			throw new IllegalArgumentException("退回說明，選擇「其他」時必填");
+		}
+		
+		article.setAdmin(admin);
+		article.setArticleStatus(3);
+		article.setReviewedAt(LocalDateTime.now());
+		article.setRejectReason(rejectReason);
+		article.setRejectNote(rejectNote);
+		articleRepository.save(article);
+	}
+
+	@Override
+	public void unPublishArticle(Integer articleId, Integer adminId) {
+		Article article = getPublishedArticle(articleId);
+		
+		Admin admin = adminRepository.findById(adminId)
+				.orElseThrow(() -> new IllegalArgumentException("查無此員工"));
+		
+		article.setAdmin(admin);
+	    article.setArticleStatus(4);
+		articleRepository.save(article);
+	}
+
+	@Override
+	public Page<Article> getReviewedArticles(Integer status, Integer page) {
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("reviewedAt").descending());
+		List<Integer> statuses;
+		
+		 if (status != null) {
+			 statuses = new ArrayList<>();
+			 statuses.add(status);
+		 } else {
+			 statuses = new ArrayList<>();
+			 statuses.add(2);
+			 statuses.add(3);
+			 statuses.add(4);
+		 }
+		
+		return articleRepository.findByStatuses(statuses, pageable);
 	}
 
 }
