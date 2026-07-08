@@ -197,7 +197,7 @@ public class OrdersController {
 	
 		@GetMapping("bookForm")
 		public String bookForm(ModelMap model) {
-			return "front-end/consultation/orders/bookForm";
+			return "front-end/member/consultation/orders/bookForm";
 		}
 		
 		@PostMapping("bookLookup")
@@ -205,7 +205,7 @@ public class OrdersController {
 		                          @RequestParam("slotDate") String slotDateStr, ModelMap model) {
 			if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
 				model.addAttribute("errorMessage", "請輸入心理師編號與日期");
-				return "front-end/consultation/orders/bookForm";
+				return "front-end/member/consultation/orders/bookForm";
 			}
 			
 			Integer pid = Integer.valueOf(psychId);
@@ -214,7 +214,7 @@ public class OrdersController {
 			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 			if (slots == null) {
 				model.addAttribute("errorMessage", "該心理師這天尚未開放預約");
-				return "front-end/consultation/orders/bookForm";
+				return "front-end/member/consultation/orders/bookForm";
 			}
 			
 			List<Integer> availableHours = new java.util.ArrayList<>();
@@ -227,12 +227,12 @@ public class OrdersController {
 			
 			if (availableHours.isEmpty()) {
 				model.addAttribute("errorMessage", "該心理師這天已無可預約時段");
-				return "front-end/consultation/orders/bookForm";
+				return "front-end/member/consultation/orders/bookForm";
 			}
 			
 			model.addAttribute("slots", slots);
 			model.addAttribute("availableHours", availableHours);
-			return "front-end/consultation/orders/bookInput";
+			return "front-end/member/consultation/orders/bookInput";
 		}
 		
 		@PostMapping("bookSubmit")
@@ -283,6 +283,6 @@ public class OrdersController {
 			ordersSvc.addOrders(orders);
 			
 			model.addAttribute("success", "預約成功！等待心理師確認。");
-			return "front-end/consultation/orders/bookSuccess";
+			return "front-end/member/consultation/orders/bookSuccess";
 		}
 }
