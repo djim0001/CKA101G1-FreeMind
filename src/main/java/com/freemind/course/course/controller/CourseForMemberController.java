@@ -40,7 +40,10 @@ public class CourseForMemberController {
     public Member currentMember(Authentication authentication) {
         return memberSvc.findByAccount(authentication.getName());
     }
+<<<<<<< Upstream, based on branch 'main' of https://github.com/djim0001/CKA101G1-FreeMind.git
 
+=======
+>>>>>>> 15028a9 course-v6
 	
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
