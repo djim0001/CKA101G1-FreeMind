@@ -32,14 +32,14 @@ public class MemberSecurityConfig {
 
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**","/member/**")
+            .securityMatcher("/","/front-end/**","/member/**","/course/member/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
 //                .requestMatchers("/front-end/**").authenticated()
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
-//                .anyRequest().authenticated()
+                .anyRequest().authenticated()
             )
 
             .userDetailsService(memberUserDetailsService)

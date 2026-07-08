@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/course/member")
@@ -32,6 +36,11 @@ public class CourseForMemberController {
 		this.memberSvc = memberSvc;
 	}
 	
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        return memberSvc.findByAccount(authentication.getName());
+    }
+	
 	@PostMapping("set_memberId_session")
 	public String setMemberIdSession(@RequestParam(name = "memberIdSession") Integer memberIdSession, ModelMap model,
 			HttpSession session) {
@@ -42,26 +51,28 @@ public class CourseForMemberController {
 	
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+//			@SessionAttribute(name = "memberId", required = false) Integer memberId,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
+			@ModelAttribute("member") Member member,
 			ModelMap model, HttpSession session) {
 
-		if (memberId != null) {
-			Member member = memberSvc.getOneMember(memberId);
-			model.addAttribute("member", member);
-		}
+//		if (memberId != null) {
+//			Member member = memberSvc.getOneMember(memberId);
+//			model.addAttribute("member", member);
+//		}
 		
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		
+		System.out.println(member);
+		System.out.println(member.getName());
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		for(Course course : courseListListed) {
 			course.setSaved(courseSvc
-					.isCourseInBookmark(memberId, course.getCourseId()));
+					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		}
-		
+		model.addAttribute("memberName", member.getName());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseListListed", courseListListed);
 		model.addAttribute("totalPages", courseListListed.getTotalPages());
