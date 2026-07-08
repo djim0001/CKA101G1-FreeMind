@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.freemind.consultation.slots.model.SlotsService;
+
 @Service
 public class OrdersService {
 
@@ -62,6 +64,30 @@ public class OrdersService {
 	
 	public List<Orders> getBySlotDate(java.time.LocalDate slotDate){
 		return repository.findBySlotDate(slotDate);
+	}
+	
+	public List<Orders> getPendingOrdersByPsychId(Integer psychId) {
+		return repository.findByPsychIdAndOrderStatus(psychId, 0); // 0 = 待確認
+	}
+	
+	public void approveOrder(Integer orderId) {
+		Orders orders = getOneOrders(orderId);
+		if (orders != null) {
+			orders.setOrderStatus(1); // 已確認
+			updateOrders(orders);
+		}
+	}
+	
+	public void rejectOrder(Integer orderId, SlotsService slotsSvc) {
+		Orders orders = getOneOrders(orderId);
+		if (orders != null) {
+			orders.setOrderStatus(2); // 已取消
+			updateOrders(orders);
+			
+			// 釋放時段：把該小時從 2(已預約) 改回 1(可預約)
+			int hour = orders.getConsStart().getHour();
+			slotsSvc.updateHourStatus(orders.getSlot().getTimeslotId(), hour, '2', '1');
+		}
 	}
 	
 	

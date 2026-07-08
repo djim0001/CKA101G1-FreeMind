@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>待確認訂單</title>
+</head>
+<body>
+	<h3>查看待確認訂單</h3>
+
+	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+
+	<form method="post" th:action="@{/orders/psychPending}">
+		心理師編號：<input type="text" name="psychId">
+		<input type="submit" value="查詢">
+	</form>
+
+</body>
+</html>
