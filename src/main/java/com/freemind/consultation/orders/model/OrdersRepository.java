@@ -12,7 +12,7 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 	@Query("from Orders where member.memberId = ?1")
 	List<Orders> findByMemberId(Integer memberId);
 	
-	@Query("from Orders where psychId = ?1")
+	@Query("from Orders where psychologist.psychId = ?1")
 	List<Orders> findByPsychId(Integer psychId);
 
 	@Query("from Orders where orderStatus = ?1")

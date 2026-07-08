@@ -15,18 +15,38 @@ public interface ArticleService {
 	
 	Article submitExistingDraft(Integer articleId, Integer psychId);
 	
-	List<Article> getMyArticles(Integer psychId);
+	Page<Article> getMyArticles(Integer psychId, Integer page);
 	
 	Page<Article> getPublishedArticles(Integer catId, Integer page);
 	
+	Page<Article> getPendingArticles(Integer page);
+	
 	Article getArticle(Integer articleId, Integer psychId);
 
+	Article getArticleForAdmin(Integer articleId);
+	
 	Article getPublishedArticle(Integer articleId);
 	
 	Article getEditableArticle(Integer articleId, Integer pysch);
 	
+	Article createEditCopy(Integer articleId, Integer pysch);
+	
 	Article updateDraft(Integer articleId, ArticleCreateForm form, Integer psychId);
 	
 	Article updateAndSubmit(Integer articleId, ArticleCreateForm form, Integer psychId);
+	
+	void deleteDraft(Integer articleId, Integer psychId);
+	
+	void unPublishMyArticle(Integer articleId, Integer psychId);
+	
+	Article getArticleForReview(Integer articleId);
+	
+	void approveArticle(Integer articleId, Integer adminId);
+	
+	void rejectArticle(Integer articleId, Integer adminId, Integer rejectReason, String rejectNote);
+
+	void unPublishArticle(Integer articleId, Integer adminId);
+
+	Page<Article> getReviewedArticles(Integer status, Integer page);
 	
 }

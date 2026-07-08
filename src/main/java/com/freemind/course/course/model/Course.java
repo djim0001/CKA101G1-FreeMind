@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import com.freemind.course.order.model.OrderDetail;
 import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.CascadeType;
@@ -18,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -29,13 +31,6 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "courses")
 public class Course {
 	
-	public Course() {
-		setSaveCount(0);
-		setStarCount(0);
-		setReviewCount(0);
-		setCommentCount(0);
-		setCourseStatus((byte)0);
-	}
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "course_id")
@@ -84,23 +79,23 @@ public class Course {
 	@NotNull
 	@DecimalMin(value = "0")
 	@DecimalMax(value = "5")
-	private Byte courseStatus;
+	private Byte courseStatus = 0;
 	@Column(name = "save_count")
 	@NotNull
 	@DecimalMin(value = "0")
-	private Integer saveCount;
+	private Integer saveCount = 0;
 	@Column(name = "star_count")
 	@NotNull
 	@DecimalMin(value = "0")
-	private Integer starCount;
+	private Integer starCount = 0;
 	@Column(name = "review_count")
 	@NotNull
 	@DecimalMin(value = "0")
-	private Integer reviewCount;
+	private Integer reviewCount = 0;
 	@Column(name = "comment_count")
 	@NotNull
 	@DecimalMin(value = "0")
-	private Integer commentCount;
+	private Integer commentCount = 0;
 	@Column(name = "psych_discount")
 	@Digits(integer = 1, fraction = 2, message = "價格格式錯誤，最多 1 位整數與 2 位小數")
 	@DecimalMin(value = "0.01", message = "心理師折扣: 不能小於{value}")
@@ -117,10 +112,18 @@ public class Course {
 	@DecimalMin(value = "0", message = "課程價格: 不能小於{value}")
 	@DecimalMax(value = "1000000000", message = "課程價格: 不能小於{value}")
 	private Integer price;
+	
+	@Transient
+	private Boolean saved = false;
+	
 	// 課程提問
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-	@OrderBy("course_id asc")
+	@OrderBy("question_id asc")
 	private Set<CourseQaComment> courseQaComment;
+	//訂單明細
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+	@OrderBy("course_order_id asc")
+	private Set<OrderDetail> orderDetails;
 	
 	
 	
@@ -136,14 +139,7 @@ public class Course {
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
 	}
-	
-//	public Integer getPsychId() {
-//		return psychId;
-//	}
-//	public void setPsychId(Integer psychId) {
-//		this.psychId = psychId;
-//	}
-		public Psychologist getPsychologist() {
+	public Psychologist getPsychologist() {
 		return psychologist;
 	}
 	public void setPsychologist(Psychologist psychologist) {
@@ -230,6 +226,9 @@ public class Course {
 	public BigDecimal getPsychDiscount() {
 		return psychDiscount;
 	}
+	public BigDecimal getValidPsychDiscount() {
+	    return isDiscountValid() ? psychDiscount : null;
+	}
 	public void setPsychDiscount(BigDecimal psychDiscount) {
 		this.psychDiscount = psychDiscount;
 	}
@@ -251,6 +250,26 @@ public class Course {
 	public void setPrice(Integer price) {
 		this.price = price;
 	}
+	public Set<CourseQaComment> getCourseQaComment() {
+		return courseQaComment;
+	}
+	public void setCourseQaComment(Set<CourseQaComment> courseQaComment) {
+		this.courseQaComment = courseQaComment;
+	}
+	
+	public Set<OrderDetail> getOrderDetails() {
+		return orderDetails;
+	}
+	public void setOrderDetails(Set<OrderDetail> orderDetails) {
+		this.orderDetails = orderDetails;
+	}
+	public Boolean getSaved() {
+		return saved;
+	}
+	public void setSaved(Boolean saved) {
+		this.saved = saved;
+	}
+	
 	
 	// 課程狀態文字版
 	public String getCourseStatusText() {
@@ -275,12 +294,23 @@ public class Course {
 	            return "未知狀態";
 	    }
 	}
-	public Set<CourseQaComment> getCourseQaComment() {
-		return courseQaComment;
+	// 允許修改心理師折扣
+	public boolean canAddPsychDiscount() {
+	    boolean statusCanDiscount = courseStatus == 2 || courseStatus == 4;
+
+	    return statusCanDiscount && !isDiscountValid();
 	}
-	public void setCourseQaComment(Set<CourseQaComment> courseQaComment) {
-		this.courseQaComment = courseQaComment;
+	// 心理師折扣是否有效
+	public boolean isDiscountValid() {
+	    LocalDateTime now = LocalDateTime.now();
+
+	    return psychDiscount != null
+	            && discountStart != null
+	            && discountEnd != null
+	            && !now.isBefore(discountStart)
+	            && !now.isAfter(discountEnd);
 	}
+	
 	
 	
 

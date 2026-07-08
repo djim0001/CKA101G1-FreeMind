@@ -1,5 +1,7 @@
 package com.freemind.course.course.model;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +16,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	Page<Course> findByPsychologistPsychId(Integer psychId, Pageable pageable);
 	Page<Course> findByCourseStatus(Byte courseStatus, Pageable pageable);
 	Page<Course> findByCourseStatusNot(Byte courseStatus, Pageable pageable);
+	Page<Course> findByCourseIdIn(List<Integer> courseIds, Pageable pageable);
 //	Page<Course> findByPsychologistPsychId(Integer psychId, Pageable pageable);
 	long countByPsychologist_PsychId(Integer psychId);
 	

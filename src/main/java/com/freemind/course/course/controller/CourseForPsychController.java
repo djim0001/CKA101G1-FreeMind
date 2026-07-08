@@ -7,13 +7,15 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,22 +28,24 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.course.model.PsychDiscountForm;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+//@Validated
 @Controller
-@RequestMapping("/course")
+@RequestMapping("/course/psych")
 public class CourseForPsychController {
 
-	 private final CourseService courseSvc;
-	    private final CourseCategoriesService courseCategoriesSvc;
-	    private final PsychologistService psychologistService;
-	    
-	    @Value("${course.video.upload-path}")
-	    private String videoUploadPath;
+	private final CourseService courseSvc;
+    private final CourseCategoriesService courseCategoriesSvc;
+    private final PsychologistService psychologistService;
+    
+    @Value("${course.video.upload-path}")
+    private String videoUploadPath;
 
     public CourseForPsychController(
             CourseService courseSvc,
@@ -65,10 +69,10 @@ public class CourseForPsychController {
 			HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
 		
-		return "redirect:/course/psychSelectCourse";
+		return "redirect:/course/psych/select_course";
 	}
 
-	@GetMapping("psychSelectCourse")
+	@GetMapping("/select_course")
 	public String psychSelectCourse(
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			@RequestParam(defaultValue = "1") Integer page,
@@ -91,11 +95,13 @@ public class CourseForPsychController {
 		model.addAttribute("courseListAllPages", courseListAllPages);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", courseListAllPages.getTotalPages());
+		if(orderBy != null)
+			model.addAttribute("orderBy", orderBy);
 
 		return "front-end/psych/course/selectCourse";
 	}
 
-	@GetMapping("psychAddCourse")
+	@GetMapping("/add_course")
 	public String psychAddCourse(ModelMap model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
 		Course course = new Course();
 		if(psychId == null) {
@@ -106,26 +112,28 @@ public class CourseForPsychController {
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
-
-	@PostMapping("insertOrUpdateCourse")
+	
+	@PostMapping("/insert_or_update_course")
 	public String insertOrUpdateCourse (
-			@RequestParam(name="video", required = false) MultipartFile video,
-			@RequestParam(name="videoPre", required = false) MultipartFile videoPre,
+			@RequestParam(name="video") MultipartFile video,
+			@RequestParam(name="videoPre") MultipartFile videoPre,
 			@Valid Course course, BindingResult result, 
 			@SessionAttribute(name = "psychId") Integer psychId,
 			ModelMap model) throws IOException{
-		if (result.hasErrors()) {
-			return "front-end/psych/course/addCourse";
-		}
-			// 確認影片是否上傳
+		result = removeFieldError(course, result, "video");
+		result = removeFieldError(course, result, "videoPre");
+		boolean videoExist = false;
+		// 確認影片是否上傳
 		if (course.getCourseId() == null && (video == null || video.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
-			return "front-end/psych/course/addCourse";
-		}
-		if (course.getCourseId() == null && (videoPre == null || videoPre.isEmpty())) {
+		}else if (course.getCourseId() == null && (videoPre == null || videoPre.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
+		}else 
+			videoExist = true;
+		if (result.hasErrors() || !videoExist) {
 			return "front-end/psych/course/addCourse";
 		}
+		
 		// 將課程路徑存入
 		if (video != null && !video.isEmpty())
 			course.setVideoSrc(uploadVideo(video));
@@ -140,34 +148,74 @@ public class CourseForPsychController {
 			course.setVideoSrcPre(videoSrcPre);
 		}
 		// 新增課程
-//		course.setPsychId(psychId);
 		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
-		course.setCourseStatus((byte)0);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 
 		return "front-end/psych/course/listOneCourse";
 	}
 	
+	@PostMapping("/update_psych_discount")
+	public String updatePsychDiscount(
+	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountForm form,
+	        BindingResult result, ModelMap model,
+	        @RequestParam(name = "courseId") Integer courseId) {
+		
+		if (result.hasErrors()) {
+			Course course = courseSvc.getOneCourse(form.getCourseId());
 
-	@PostMapping("psychGetOneCourse")
+	        model.addAttribute("course", course);
+	        model.addAttribute("psychDiscountMsg", "show");
+			return "front-end/psych/course/listOneCourse";
+		}
+		Course course = courseSvc.getOneCourse(courseId);
+		course.setPsychDiscount(form.getPsychDiscount());
+		course.setDiscountStart(form.getDiscountStart().atStartOfDay());
+		course.setDiscountEnd(
+				form.getDiscountStart()
+				.plusMonths(form.getDiscountMonth())
+				.atStartOfDay());
+		courseSvc.updateCourse(course);
+		
+		model.addAttribute("course", course);
+		return "front-end/psych/course/listOneCourse";
+	}
+
+	@PostMapping("/get_one_course")
 	public String psychGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
-	@PostMapping("psychUpdateCourse")
+	@PostMapping("/update_course")
 	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
-	@PostMapping("psychSubmitCourse")
+	@PostMapping("/submit_course")
 	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus((byte)1);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
+		return "front-end/psych/course/listOneCourse";
+	}
+	@PostMapping("/discount_model_box")
+	public String discountModelBox(ModelMap model, 
+			@RequestParam("courseId") Integer courseId,
+			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
+		if(psychId == null) {
+			model.addAttribute("pError", "請先登入心理師編號");
+			return "front-end/psych/course/selectCourse";
+		}
+		Course course = courseSvc.getOneCourse(courseId);
+		PsychDiscountForm form = new PsychDiscountForm();
+	    form.setCourseId(courseId);
+	    
+		model.addAttribute("course", course);
+		model.addAttribute("psychDiscountForm", form);
+		model.addAttribute("psychDiscountMsg", "show");
 		return "front-end/psych/course/listOneCourse";
 	}
 	
@@ -197,5 +245,26 @@ public class CourseForPsychController {
 		
 		return newFileName;
 	}
+	
+	// 去除BindingResult中某個欄位的FieldError紀錄
+	public BindingResult removeFieldError(
+			Course course, BindingResult result, 
+			String removedFieldname) {
+		// 從原BindingResult中去除removedFieldname這個欄位的紀錄之後，再將其它所保留下來的欄位的FieldError紀錄轉換成errorsListToKeep這個List物件
+		List<FieldError> errorsListToKeep = result.getFieldErrors().stream()
+				.filter(fieldError -> !fieldError.getField().equals(removedFieldname))
+				.collect(Collectors.toList());
+		// 對驗證的目標對象建立一個新(空)的BindingResult的物件
+		// 參數一：目標對象
+		// 參數二：對象的名稱(通常是類別名首字母小寫)
+		result = new BeanPropertyBindingResult(course, "course");
+		// 將新(空)的BindingResult的物件加入保留下來的其它欄位的FieldError紀錄
+		for (FieldError fieldError : errorsListToKeep) {
+			result.addError(fieldError);
+		}
+		// 更新後的BindingResult
+		return result;
+	}
+	
 
 }

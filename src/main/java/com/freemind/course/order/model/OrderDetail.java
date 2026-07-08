@@ -16,21 +16,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
-//@Entity
-@Table(name = "courses")
+@Entity
+@Table(name = "order_details")
 public class OrderDetail {
 
 	public OrderDetail() {
-		setCoursePermission((byte)0);
 	}
 
 	@EmbeddedId
 	private CompositeOrderDetail compositeOrderDetail;
 
-//	@ManyToOne
-//	@MapsId("course_order_id")
-//	@JoinColumn(name = "course_order_id")
-//	private courseOrder courseOrder;
+	@ManyToOne
+	@MapsId("courseOrderId")
+	@JoinColumn(name = "course_order_id")
+	private CourseOrder courseOrder;
 	@ManyToOne
 	@MapsId("courseId")
 	@JoinColumn(name = "course_id")
@@ -41,7 +40,7 @@ public class OrderDetail {
 	@Column(name = "discounted_price")
 	private Integer discountedPrice;
 	@Column(name = "course_permission")
-	private Byte coursePermission;
+	private Byte coursePermission = 0;
 	@Column(name = "rating")
 	private Byte rating;
 	@Column(name = "review_content")
@@ -61,13 +60,13 @@ public class OrderDetail {
 		this.compositeOrderDetail = compositeOrderDetail;
 	}
 
-//	public courseOrder getCourseOrder() {
-//		return courseOrder;
-//	}
-//
-//	public void setCourseOrder(courseOrder courseOrder) {
-//		this.courseOrder = courseOrder;
-//	}
+	public CourseOrder getCourseOrder() {
+		return courseOrder;
+	}
+
+	public void setCourseOrder(CourseOrder courseOrder) {
+		this.courseOrder = courseOrder;
+	}
 
 	public Course getCourse() {
 		return course;
@@ -177,6 +176,30 @@ public class OrderDetail {
 
 		public void setCourseId(Integer courseId) {
 			this.courseId = courseId;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((courseId == null) ? 0 : courseId.hashCode());
+			result = prime * result + ((courseOrderId == null) ? 0 : courseOrderId.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+
+			if (obj != null && getClass() == obj.getClass()) {
+				CompositeOrderDetail compositeOrderDetail = (CompositeOrderDetail) obj;
+				if (courseOrderId.equals(compositeOrderDetail.courseOrderId) 
+						&& courseId.equals(compositeOrderDetail.courseId)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 	}

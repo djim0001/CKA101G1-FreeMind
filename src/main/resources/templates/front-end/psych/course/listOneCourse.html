@@ -4,11 +4,87 @@
 <head>
 <meta charset="UTF-8">
 <title>課程詳情查看</title>
+<style>
+	/* 背景遮罩 */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.5);
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		z-index: 9999;
+	}
+
+	/* 彈出視窗 */
+	.modal-box {
+		background-color: white;
+		width: 420px;
+		padding: 25px;
+		border-radius: 8px;
+		position: relative;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+	}
+
+	.modal-box h3 {
+		margin-top: 0;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+
+	.modal-box div {
+		margin-bottom: 15px;
+	}
+
+	.modal-box label {
+		display: inline-block;
+		width: 120px;
+	}
+
+	.modal-box input[type="text"],
+	.modal-box input[type="number"],
+	.modal-box input[type="date"] {
+		width: 200px;
+		padding: 5px;
+	}
+
+	/* 右上角關閉按鈕 */
+	.modal-close {
+		position: absolute;
+		top: 8px;
+		right: 10px;
+		border: none;
+		background: none;
+		font-size: 24px;
+		cursor: pointer;
+	}
+
+	.modal-actions {
+		text-align: center;
+		margin-top: 20px;
+	}
+
+	.modal-actions button {
+		margin: 0 8px;
+		padding: 6px 14px;
+		cursor: pointer;
+	}
+
+	.error {
+		color: red;
+		font-size: 14px;
+	}
+</style>
 </head>
 <body>
 	<h1>課程詳情查看</h1>
 	<h3>
-		<a th:href="@{/course/psychSelectCourse}">心理師課程一覽</a>
+		<a th:href="@{/course/psych/select_course}">心理師課程一覽</a>
 	</h3>
 
 	<span>session心理師編號:</span>
@@ -16,6 +92,13 @@
 	<br>
 	<br>
 	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
+	<div th:if="${course.canAddPsychDiscount()}">
+	<form method="post" th:action="@{discount_model_box}">
+			<input type="hidden" name="courseId" th:value="${course.courseId}">
+			<button type="submit">添加心理師折扣</button>
+		</form>
+	</div>
+	<button th:if="${!course.canAddPsychDiscount()}">尚無法更改心理師折扣</button>
 	<br>
 	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
 	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
@@ -38,26 +121,115 @@
 		<span>下架原因： </span><span th:text="${course.delistReason}"></span> 
 	</div>
 	
-	<span>下架原因： </span><span th:text="${course.delistReason}"></span> <br> 
 	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
 	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
 	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
 	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
-	<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
-	<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
-	<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span> <br> 
+	<span>心理師折扣： </span><span th:text="${course.psychDiscount==null?'無':course.psychDiscount}"></span> <br> 
+	<div th:if="${course.psychDiscount!=null}">
+		<span>折扣開始時間： </span>
+		<span th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></span><br>
+		<span>折扣結束時間： </span>
+		<span th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></span>
+	</div>
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
 	<div th:if="${course.courseStatus==0 or course.courseStatus==3}">
-		<form method="post" th:action="@{psychUpdateCourse}">
+		<form method="post" th:action="@{update_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<button type="submit">修改</button>
 		</form>
-		<form method="post" th:action="@{psychSubmitCourse}">
+		<form method="post" th:action="@{submit_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<button type="submit">送出審核</button>
 		</form>
 	</div>
+	
+	
+	<div th:if="${psychDiscountMsg == 'show'}" class="modal-overlay" id="psychDiscountModal">
+
+		<div class="modal-box">
+	
+			<button type="button" class="modal-close" onclick="closePsychDiscountModal()">×</button>
+	
+			<h3>添加心理師折扣</h3>
+	
+			<form method="post"
+				  th:action="@{update_psych_discount}"
+				  th:object="${psychDiscountForm}"
+				  onsubmit="closePsychDiscountModal()">
+	
+				<div>
+					<label>心理師折扣:<font color="red">*</font></label>
+					<input type="text" th:field="*{psychDiscount}" />
+					<br />
+					<span
+						th:if="${#fields.hasErrors('psychDiscount')}"
+						th:errors="*{psychDiscount}"
+						class="error"
+						id="psychDiscount.errors">
+					</span>
+				</div>
+	
+				<div>
+					<label>折扣時間:<font color="red">*</font></label>
+					<input type="number" name="discountMonth" min="1" value="3" />
+					<span> 月</span><br>
+					<span
+						th:if="${#fields.hasErrors('discountMonth')}"
+						th:errors="*{discountMonth}"
+						class="error"
+						id="discountMonth.errors">
+					</span>
+				</div>
+	
+				<div>
+					<label>折扣開始日期:<font color="red">*</font></label>
+					<input type="date" th:field="*{discountStart}" id="discountStart" />
+					<br />
+					<span
+						th:if="${#fields.hasErrors('discountStart')}"
+						th:errors="*{discountStart}"
+						class="error"
+						id="discountStart.errors">
+					</span>
+				</div>
+	
+				<input type="hidden" name="courseId" th:value="${course.courseId}">
+	
+				<div class="modal-actions">
+					<button type="button" onclick="closePsychDiscountModal()">取消</button>
+					<button type="submit">添加心理師折扣</button>
+				</div>
+	
+			</form>
+		</div>
+	</div>
+	
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const discountStart = document.getElementById('discountStart');
+	
+			if (discountStart) {
+				const tomorrow = new Date();
+				tomorrow.setDate(tomorrow.getDate() + 1);
+	
+				const year = tomorrow.getFullYear();
+				const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+				const day = String(tomorrow.getDate()).padStart(2, '0');
+	
+				const minDate = `${year}-${month}-${day}`;
+				discountStart.min = minDate;
+			}
+		});
+	
+		function closePsychDiscountModal() {
+			const modal = document.getElementById('psychDiscountModal');
+			if (modal) {
+				modal.style.display = 'none';
+			}
+		}
+	</script>
 </body>
 </html>

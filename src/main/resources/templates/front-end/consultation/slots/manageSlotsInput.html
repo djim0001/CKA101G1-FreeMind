@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>調整當日可預約時段</title>
+</head>
+<body>
+	<h3>調整可預約時段</h3>
+
+	心理師編號：<span th:text="${slots.psychologist.psychId}"></span><br>
+	日期：<span th:text="${slots.slotDate}"></span><br>
+	<p>已被預約的時段無法更動；請勾選您要開放預約的時段：</p>
+
+	<form method="post" th:action="@{/slots/manageSubmit}">
+		<input type="hidden" name="psychId" th:value="${slots.psychologist.psychId}">
+		<input type="hidden" name="slotDate" th:value="${slots.slotDate}">
+
+		<div th:each="hour : ${#numbers.sequence(0, 23)}" style="margin-bottom:4px;">
+			<input type="checkbox" name="openHours" th:value="${hour}"
+				th:checked="${slots.consStatus.charAt(hour) == '1' or slots.consStatus.charAt(hour) == '2'}"
+				th:disabled="${slots.consStatus.charAt(hour) == '2'}">
+			<span th:text="${hour} + ':00 - ' + ${hour + 1} + ':00'"></span>
+			<span th:if="${slots.consStatus.charAt(hour) == '2'}" style="color:red;">（已被預約成立，無法更動）</span>
+		</div>
+
+		<br>
+		<input type="submit" value="儲存設定">
+	</form>
+
+</body>
+</html>

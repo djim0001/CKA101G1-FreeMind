@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>修改時段</title>
+</head>
+<body>
+	<h3>修改時段</h3>
+
+	<form method="post" th:action="@{/slots/update}" th:object="${slots}">
+
+		<div th:if="${#fields.hasAnyErrors()}" style="color: red;">
+			<ul>
+				<li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li>
+			</ul>
+		</div>
+
+		<input type="hidden" th:field="*{timeslotId}">
+
+		時段編號：
+		<span th:text="${slots.timeslotId}"></span><br>
+
+		心理師編號：
+		<input type="text" th:field="*{psychologist.psychId}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('psychologist.psychId')}" th:errors="*{psychologist.psychId}"></span><br>
+
+		預約日期：
+		<input type="date" th:field="*{slotDate}">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('slotDate')}" th:errors="*{slotDate}"></span><br>
+
+		預約狀態（24碼，每碼只能是0、1或2，代表當天24小時的狀態）：<br>
+		<input type="text" th:field="*{consStatus}" size="30" maxlength="24">
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('consStatus')}" th:errors="*{consStatus}"></span><br>
+		<small>0：可預約　1：已預約　2：非營業時間</small><br>
+
+		<input type="submit" value="修改">
+	</form>
+
+	<a th:href="@{/slots/listAllSlots}">回列表</a>
+
+</body>
+</html>

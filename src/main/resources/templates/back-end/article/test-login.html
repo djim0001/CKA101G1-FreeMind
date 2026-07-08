@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>後台文章管理-測試登入</title>
+</head>
+<body>
+    <h3>後台文章管理 - 測試登入</h3>
+
+    <form method="post" th:action="@{/admin/article/set_adminId_session}">
+        <span>員工編號：</span>
+        <input type="text" name="adminIdSession" />
+        <button type="submit">送出</button><br>
+        <span style="color:red;" th:text="${errorMessage}"></span>
+    </form>
+
+    <div th:if="${session.adminId != null}">
+        <span>目前登入的員工編號：</span>
+        <span th:text="${session.adminId}"></span>
+    </div>
+</body>
+</html>

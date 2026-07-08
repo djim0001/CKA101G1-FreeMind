@@ -1,17 +1,22 @@
 package com.freemind.consultation.slots.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.freemind.consultation.orders.model.Orders;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -26,9 +31,10 @@ public class Slots {
 	@Column(name = "timeslot_id")
 	private Integer timeslotId; //not null(PK)(AI)
 	
-	@Column(name = "psych_id", nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "psych_id", referencedColumnName = "psych_id", nullable = false)
 	@NotNull(message = "心理師編號：請勿空白")
-	private Integer psychId; //not null(FK), 缺FK
+	private Psychologist psychologist; //not null(FK), 缺FK>>已改
 	
 	@Column(name = "slot_date", nullable = false)
 	@DateTimeFormat(pattern = "yyyy-MM-dd") //pattern只可以寫日期格式字串，補充說明要在@NotNull
@@ -39,10 +45,10 @@ public class Slots {
 	@NotNull(message = "預約狀態：請勿空白")
 	@Size(min = 24, max = 24, message = "預約狀態長度必須為24") //為String，驗證字串長度一定是24
 	@Pattern(regexp = "[012]{24}", message = "預約狀態只能為0、1或2") //驗證每個字元只能是012
-	private String consStatus; //not null，0：營業時間、可預約，1：已預約、2：非營業時間
+	private String consStatus; //not null，0：不可預約，1：可預約，2：已預約
 
-	@OneToOne(mappedBy = "slot")
-	private Orders orders;
+	@OneToMany(mappedBy = "slot", fetch = FetchType.LAZY) //一天可以對應多筆訂單，各佔不同小時
+	private List<Orders> ordersList;
 	
 	public Integer getTimeslotId() {
 		return timeslotId;
@@ -51,14 +57,6 @@ public class Slots {
 
 	public void setTimeslotId(Integer timeslotId) {
 		this.timeslotId = timeslotId;
-	}
-
-	public Integer getPsychId() {
-		return psychId;
-	}
-
-	public void setPsychId(Integer psychId) {
-		this.psychId = psychId;
 	}
 
 	public LocalDate getSlotDate() {
@@ -77,21 +75,34 @@ public class Slots {
 		this.consStatus = consStatus;
 	}
 	
-	
-
-	public Orders getOrders() {
-		return orders;
-	}
-
-	public void setOrders(Orders orders) {
-		this.orders = orders;
-	}
 
 	@Override
 	public String toString() {
-		return "Slots [timeslotId=" + timeslotId + ", psychId=" + psychId + ", slotDate=" + slotDate + ", consStatus="
+		return "Slots [timeslotId=" + timeslotId + ", slotDate=" + slotDate + ", consStatus="
 				+ consStatus + "]";
 	}
+
+
+	public Psychologist getPsychologist() {
+		return psychologist;
+	}
+
+
+	public void setPsychologist(Psychologist psychologist) {
+		this.psychologist = psychologist;
+	}
+
+
+	public List<Orders> getOrdersList() {
+		return ordersList;
+	}
+
+
+	public void setOrdersList(List<Orders> ordersList) {
+		this.ordersList = ordersList;
+	}
+	
+
 	
 }
 

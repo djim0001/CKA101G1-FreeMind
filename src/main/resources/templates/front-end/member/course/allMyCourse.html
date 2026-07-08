@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>會員課程一覽頁面</title>
+
+</head>
+<body>
+	<h3>
+		<a th:href="@{/course_index}">課程商城</a>
+	</h3>
+	<h5>
+		<a th:href="@{/course/member/shopping_cart}">購物車</a>
+		<a th:href="@{/coupon/member/my_coupon}">我的優惠券</a>
+	</h5>
+	<h1>我的課程</h1>
+	<span>session會員編號:</span>
+	<span th:text=${session.memberId}></span>
+	<br>
+	<table>
+		<thead>
+			<tr>
+				<th><a th:href="@{/course/member/my_bookmarks}">課程名稱</a></th>
+				<th>心理師名稱</th>
+				<th><a th:href="@{/course/member/my_bookmarks(page=1,
+							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
+						    			)}">課程分類名稱</a>
+				<th><a th:href="@{/course/member/my_bookmarks(page=1,
+							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
+						    			)}">收藏次數</a></th>
+					<th><a th:href="@{/course/member/my_bookmarks(page=1,
+							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
+						    			)}">平均星數</a></th>
+					<th><a th:href="@{/course/member/my_bookmarks(page=1,
+							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
+						    			)}">評價次數</a></th>
+					<th><a th:href="@{/course/member/my_bookmarks(page=1,
+							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
+						    			)}">提問次數</a></th>
+				<th>功能</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="course : ${myBookmarks}">
+				<tr>
+					<td th:text="${course.courseName}"></td>
+					<td th:text="${course.psychologist.name}"></td>
+					<td th:text="${course.courseCategories.courseCatName}"></td>
+					<td th:text="${course.saveCount}"></td>
+					<td
+						th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
+					<td th:text="${course.reviewCount}"></td>
+					<td th:text="${course.commentCount}"></td>
+					<td>
+						<form method="get" th:action="@{memberGetOneCourse}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button type="submit">查看詳情</button>
+						</form>
+					</td>	
+				</tr>
+			</th:block>
+		</tbody>
+	</table>
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/my_bookmarks', ${orderBy})}"></div>	
+		
+	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+	    <div class="cart-modal-content">
+	        <p th:text="${cartMsg}"></p>
+	        <button type="button" onclick="closeCartModal()">確定</button>
+	    </div>
+	</div>
+	<script>
+	    function closeCartModal() {
+	        document.getElementById("cartModal").style.display = "none";
+	    }
+	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+	        input.value = window.location.pathname + window.location.search;
+	    });
+	    document.addEventListener("DOMContentLoaded", function () {
+
+	        document.querySelectorAll(".favorite-btn").forEach(function (btn) {
+
+	            btn.addEventListener("click", function () {
+
+	                const courseId = this.dataset.courseId;
+	                const button = this;
+
+	                fetch("/course/favorite/toggle", {
+	                    method: "POST",
+	                    headers: {
+	                        "Content-Type": "application/x-www-form-urlencoded"
+	                    },
+	                    body: "courseId=" + encodeURIComponent(courseId)
+	                })
+	                .then(response => response.json())
+	                .then(data => {
+	                    if (data.saved) {
+	                        button.classList.add("active");
+	                    } else {
+	                        button.classList.remove("active");
+	                    }
+	                })
+	                .catch(error => {
+	                    console.error("收藏失敗", error);
+	                    alert("收藏失敗，請稍後再試");
+	                });
+
+	            });
+
+	        });
+
+	    });
+	</script>
+</body>
+</html>

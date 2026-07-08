@@ -13,10 +13,10 @@ font-size: 12px;
 </head>
 <body>
 	<h3>
-		<a th:href="@{/course_index}">課程商城</a>
+		<a th:href="@{/}">首頁</a>
 	</h3>
 	<h3>
-		<a th:href="@{/course/psychAddCourse}">心理師新增修改課程</a>
+		<a th:href="@{/course/psych/add_course}">心理師新增修改課程</a>
 	</h3>
 	<form method="post" th:action="@{set_psychId_session}">
 		<span>心理師編號：</span> <input type="text" name="psychIdSession" />
@@ -30,17 +30,32 @@ font-size: 12px;
 		<table>
 			<thead>
 				<tr>
-					<th>課程名稱</th>
-					<th>課程分類名稱</th>
-					<th>課程狀態</th>
-					<th>收藏次數</th>
-					<th>平均星數</th>
-					<th>評價次數</th>
-					<th>提問次數</th>
+					<th><a th:href="@{/course/psych/select_course}">課程名稱</a></th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
+						    			)}">課程分類名稱</a>
+					</th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'courseStatusAsc' ? 'courseStatusDesc' : 'courseStatusAsc'}
+						    			)}">課程狀態</a></th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
+						    			)}">收藏次數</a></th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
+						    			)}">平均星數</a></th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
+						    			)}">評價次數</a></th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
+						    			)}">提問次數</a></th>
 					<th>心理師折扣</th>
 					<th>折扣開始時間</th>
 					<th>折扣結束時間</th>
-					<th>課程定價</th>
+					<th><a th:href="@{/course/psych/select_course(page=1,
+							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
+						    			)}">課程定價</a></th>
 					<th>功能</th>
 				</tr>
 			</thead>
@@ -55,11 +70,11 @@ font-size: 12px;
 						<td th:text="${course.reviewCount}"></td>
 						<td th:text="${course.commentCount}"></td>
 						<td th:text="${course.psychDiscount}"></td>
-						<td th:text="${course.discountStart}"></td>
-						<td th:text="${course.discountEnd}"></td>
+						<td th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></td>
+						<td th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></td>
 						<td th:text="${course.price}"></td>
 						<td>
-							<form method="post" th:action="@{psychGetOneCourse}">
+							<form method="post" th:action="@{get_one_course}">
 								<input type="hidden" name="courseId"
 									th:value="${course.courseId}">
 								<button type="submit">查看詳情</button>
@@ -70,7 +85,9 @@ font-size: 12px;
 			</tbody>
 		</table>
 		
-		<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/psychSelectCourse')}"></div>		
+		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/psych/select_course', ${orderBy})}"></div>	
+		
 	</div>
+	
 </body>
 </html>

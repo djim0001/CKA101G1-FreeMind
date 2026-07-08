@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 import com.freemind.article.entity.Article;
+import com.freemind.consultation.orders.model.Orders;
+import com.freemind.consultation.slots.model.Slots;
 import com.freemind.course.course.model.Course;
 
 import jakarta.persistence.CascadeType;
@@ -124,36 +126,36 @@ public class Psychologist implements java.io.Serializable{
 	
 	
 //	//預約訂單
-//	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
-//	private Set<ConsultationOrders> consultationOrders;
-//	
-//	
-//	public Set<ConsultationOrders> getConsultationOrders() {
-//		return consultationOrders;
-//	}
-//
-//	public void setConsultationOrders(Set<ConsultationOrders> consultationOrders) {
-//		this.consultationOrders = consultationOrders;
-//	}
-//
-//	
+	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+	private Set<Orders> consultationOrders;
+	
+	
+	public Set<Orders> getConsultationOrders() {
+		return consultationOrders;
+	}
+
+	public void setConsultationOrders(Set<Orders> consultationOrders) {
+		this.consultationOrders = consultationOrders;
+	}
+
+	
 //	//預約時段
-//	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
-//	
-//	private Set<ConsultationSlots> consultationSlots;
-//	
-//	public Set<ConsultationSlots> getConsultationSlots() {
-//		return consultationSlots;
-//	}
-//	
-//	public void setConsultationSlots(Set<ConsultationSlots> consultationSlots) {
-//		this.consultationSlots = consultationSlots;
-//	}
-//
-//	
+	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
+	
+	private Set<Slots> consultationSlots;
+	
+	public Set<Slots> getConsultationSlots() {
+		return consultationSlots;
+	}
+	
+	public void setConsultationSlots(Set<Slots> consultationSlots) {
+		this.consultationSlots = consultationSlots;
+	}
+
+	
 	//課程
 	@OneToMany(mappedBy = "psychologist",cascade = CascadeType.ALL)
-	@OrderBy("psych_id asc")
+	@OrderBy("course_id asc")
 	private Set<Course> courses;
 
 	public Set<Course> getCourses() {

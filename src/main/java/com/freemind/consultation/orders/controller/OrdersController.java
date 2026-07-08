@@ -1,6 +1,7 @@
 package com.freemind.consultation.orders.controller;
 
 import java.beans.PropertyEditorSupport;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.validation.Valid;
 
@@ -43,6 +45,19 @@ public class OrdersController {
 					Member member = new Member();
 					member.setMemberId(Integer.valueOf(text));
 					setValue(member);
+				}
+			}
+		});
+		
+		binder.registerCustomEditor(Psychologist.class, "psychologist", new PropertyEditorSupport() {
+			@Override
+			public void setAsText(String text) {
+				if (text == null || text.isBlank()) {
+					setValue(null);
+				} else {
+					Psychologist psychologist = new Psychologist();
+					psychologist.setPsychId(Integer.valueOf(text));
+					setValue(psychologist);
 				}
 			}
 		});
@@ -178,4 +193,96 @@ public class OrdersController {
 	    return "back-end/consultation/orders/select_Page";
 	}
 	
+	// ===== 會員：前台選時段下訂單 =====
+	
+		@GetMapping("bookForm")
+		public String bookForm(ModelMap model) {
+			return "front-end/consultation/orders/bookForm";
+		}
+		
+		@PostMapping("bookLookup")
+		public String bookLookup(@RequestParam("psychId") String psychId,
+		                          @RequestParam("slotDate") String slotDateStr, ModelMap model) {
+			if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入心理師編號與日期");
+				return "front-end/consultation/orders/bookForm";
+			}
+			
+			Integer pid = Integer.valueOf(psychId);
+			LocalDate date = LocalDate.parse(slotDateStr);
+			
+			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+			if (slots == null) {
+				model.addAttribute("errorMessage", "該心理師這天尚未開放預約");
+				return "front-end/consultation/orders/bookForm";
+			}
+			
+			List<Integer> availableHours = new java.util.ArrayList<>();
+			String status = slots.getConsStatus();
+			for (int h = 0; h < 24; h++) {
+				if (status.charAt(h) == '1') {
+					availableHours.add(h);
+				}
+			}
+			
+			if (availableHours.isEmpty()) {
+				model.addAttribute("errorMessage", "該心理師這天已無可預約時段");
+				return "front-end/consultation/orders/bookForm";
+			}
+			
+			model.addAttribute("slots", slots);
+			model.addAttribute("availableHours", availableHours);
+			return "front-end/consultation/orders/bookInput";
+		}
+		
+		@PostMapping("bookSubmit")
+		public String bookSubmit(@RequestParam("timeslotId") String timeslotId,
+		                          @RequestParam("hour") String hourStr,
+		                          @RequestParam("memberId") String memberId,
+		                          @RequestParam("psychId") String psychId,
+		                          @RequestParam("psychLoc") String psychLoc,
+		                          @RequestParam("psychFee") String psychFee,
+		                          @RequestParam("visitPurpose") String visitPurpose,
+		                          @RequestParam(value = "visitPurposeNote", required = false) String visitPurposeNote,
+		                          @RequestParam("sessionType") String sessionType,
+		                          ModelMap model) {
+			
+			int hour = Integer.parseInt(hourStr);
+			Integer tid = Integer.valueOf(timeslotId);
+			
+			// 先嘗試鎖定時段：1 -> 2
+			boolean locked = slotsSvc.updateHourStatus(tid, hour, '1', '2');
+			if (!locked) {
+				model.addAttribute("errorMessage", "很抱歉，這個時段剛被其他人預約走了，請重新選擇。");
+				return "redirect:/orders/bookForm";
+			}
+			
+			// 鎖定成功，建立訂單
+			Slots slot = slotsSvc.getOneSlots(tid);
+			
+			Member member = new Member();
+			member.setMemberId(Integer.valueOf(memberId));
+			
+			Psychologist psychologist = new Psychologist();
+			psychologist.setPsychId(Integer.valueOf(psychId));
+			
+			Orders orders = new Orders();
+			orders.setSlot(slot);
+			orders.setMember(member);
+			orders.setPsychologist(psychologist);
+			orders.setConsStart(slot.getSlotDate().atTime(hour, 0));
+			orders.setConsEnd(slot.getSlotDate().atTime(hour + 1, 0));
+			orders.setPsychLoc(psychLoc);
+			orders.setPsychFee(Integer.valueOf(psychFee));
+			orders.setVisitPurpose(visitPurpose);
+			orders.setVisitPurposeNote(visitPurposeNote);
+			orders.setSessionType(Integer.valueOf(sessionType));
+			orders.setOrderStatus(0); // 待確認
+			orders.setGovSubsidy(false);
+			
+			ordersSvc.addOrders(orders);
+			
+			model.addAttribute("success", "預約成功！等待心理師確認。");
+			return "front-end/consultation/orders/bookSuccess";
+		}
 }

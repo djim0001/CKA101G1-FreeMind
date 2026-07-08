@@ -28,13 +28,13 @@ public class CourseCategoriesController {
 	@Autowired
 	CourseCategoriesService courseCategoriesSvc;
 	
-	@GetMapping("selectCourseCategories")
+	@GetMapping("/select_course_categories")
 	public String selectCourseCategories(ModelMap model) {
 		CourseCategories courseCategories = new CourseCategories();
 		model.addAttribute("courseCategories", courseCategories);
 		return "back-end/course/course/selectCourseCategories";
 	}
-	@PostMapping("insertCourseCategories")
+	@PostMapping("/insert_course_categories")
 	public String insertCourseCategories(
 			@Valid @ModelAttribute("courseCategories")CourseCategories courseCategories, 
 			BindingResult result, ModelMap model) {
@@ -42,7 +42,7 @@ public class CourseCategoriesController {
 			return "back-end/course/course/selectCourseCategories";
 		}
 		courseCategoriesSvc.addCourseCategories(courseCategories);
-		return "redirect:/course/selectCourseCategories";
+		return "redirect:/course/select_course_categories";
 	}
 
 	@ModelAttribute("courseCategoriesListAll")
