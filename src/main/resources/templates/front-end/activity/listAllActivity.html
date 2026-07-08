@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活動列表</title>
+    <style>
+  /* =================================================================== */
+  /* 🎯 分配 10 個直行的寬度比例 (加起來剛好 100%) */
+  /* =================================================================== */
+  th:nth-child(1) { width: 10%; }  /* 圖片 */
+  th:nth-child(2) { width: 4%; }  /* 編號 */
+  th:nth-child(3) { width: 22%; } /* 活動名稱 */
+  th:nth-child(4) { width: 6%; } /* 縣市 */
+  th:nth-child(5) { width: 6%; } /* 區域 */
+  th:nth-child(6) { width: 14%; } /* 活動時間 */
+  th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
+  th:nth-child(8) { width: 14%; } /* 報名時間 */
+  th:nth-child(9) { width: 10%; }  /* 報名狀態 */
+  th:nth-child(10) { width: 7%; } /* 操作按鈕 */
+
+    
+    </style>
+</head>
+<body>
+
+    <h1>活動列表</h1>
+    
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <form th:action="@{/activity/listActivities_ByCompositeQuery}" method="post">
+        <p>
+            縣市：<input type="text" name="activityCity">
+        </p>
+        <p>
+            區域：<input type="text" name="activityDist">
+        </p>
+        <p>
+            活動名稱關鍵字：<input type="text" name="activityName">
+        </p>
+      	<p>
+		    活動分類：
+		    <select name="activityCatId">
+		        <option value="">全部</option>
+		        <option th:each="cat : ${activityCatListData}"
+		                th:value="${cat.activityCatId}"
+		                th:text="${cat.activityCatName}">
+		        </option>
+		    </select>
+		</p>
+		<p>
+		    報名狀態：
+		    <select name="registrationStatus">
+		        <option value="">全部</option>
+		        <option value="0">尚未開放報名</option>
+		        <option value="1">可報名中</option>
+		        <option value="2">已截止報名</option>
+		        <option value="3">已結束</option>
+		    </select>
+		</p>
+		<p>
+		    名額狀態：
+		    <select name="isFull">
+		        <option value="">全部</option>
+		        <option value="false">尚有名額</option>
+		        <option value="true">已額滿</option>
+		    </select>
+		</p>
+		<p>
+		    活動開始時間範圍：
+		    <input type="date" name="activityStartFrom"> ~ 
+		    <input type="date" name="activityStartTo">
+		</p>
+        <button type="submit">查詢</button>
+    </form>
+
+	<table border="1">
+	    <tr>
+	        <th>活動圖片</th>
+	        <th>活動編號</th>
+	        <th>活動名稱</th>
+	        <th>縣市</th>
+	        <th>區域</th>
+	        <th>活動時間</th>
+	        <th>名額</th>
+	        <th>報名時間</th>
+	        <th>報名狀態</th>
+	        <th></th>
+	    </tr>
+	    <tr th:each="a : ${activityListData}">
+	        <td>
+	            <img th:if="${a.picture != null}" 
+	                 th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+	                 style="max-width: 100px;">
+	            <img th:unless="${a.picture != null}" 
+	                 th:src="@{/images/no-image.jpg}" 
+	                 style="max-width: 100px;">
+	        </td>
+	        <td th:text="${a.activityId}"></td>
+	        <td th:text="${a.activityName}"></td>
+	        <td th:text="${a.activityCity}"></td>
+	        <td th:text="${a.activityDist}"></td>
+	        <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+	        <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+	        <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+	        <td th:text="${a.registrationStatusText}"></td>
+			<td>
+			    <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+			        <input type="hidden" name="activityId" th:value="${a.activityId}">
+			        <button type="submit">查看詳情</button>
+			    </form>
+			</td>
+	    </tr>
+	</table>
+	<div>
+	    <form th:action="@{/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+	        <input type="hidden" name="currentPage" th:value="${i}">
+	        <input type="hidden" name="activityCity" th:value="${param.activityCity}">
+	        <input type="hidden" name="activityDist" th:value="${param.activityDist}">
+	        <input type="hidden" name="activityName" th:value="${param.activityName}">
+	        <input type="hidden" name="activityCatId" th:value="${param.activityCatId}">
+	        <input type="hidden" name="registrationStatus" th:value="${param.registrationStatus}">
+	        <input type="hidden" name="isFull" th:value="${param.isFull}">
+	        <input type="hidden" name="activityStartFrom" th:value="${param.activityStartFrom}">
+	        <input type="hidden" name="activityStartTo" th:value="${param.activityStartTo}">
+	        <button type="submit" th:text="${i}" 
+	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
+	    </form>
+	</div>
+
+</body>
+</html>

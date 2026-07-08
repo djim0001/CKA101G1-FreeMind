@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我發起的活動</title>
+    <style>
+  /* =================================================================== */
+  /* 🎯 分配 10 個直行的寬度比例 (加起來剛好 100%) */
+  /* =================================================================== */
+  th:nth-child(1) { width: 10%; }  /* 活動圖片 */
+  th:nth-child(2) { width: 4%; }  /* 編號 */
+  th:nth-child(3) { width: 20%; } /* 活動名稱 */
+  th:nth-child(4) { width: 8%; } /* 活動狀態 */
+  th:nth-child(5) { width: 13%; } /* 活動時間 */
+  th:nth-child(6) { width: 7%; }  /* 已報名/名額 */
+  th:nth-child(7) { width: 13%; } /* 報名時間 */
+  th:nth-child(8) { width: 6%; }  /* 報名狀態狀態 */
+  th:nth-child(9) { width: 8%; } /* 查看詳情按鈕欄位 */	
+  th:nth-child(10) { width: 11%; } /* 其他操作按鈕欄位 */	
+  
+  /* 針對第 10 個 td (操作欄) 下達不准換行的指令，按鈕就絕對會乖乖併排 */
+  td:nth-child(10) {
+    white-space: nowrap; 
+  }
+  .action-block {
+    display: inline-block;
+  }
+    </style>
+</head>
+<body>
+
+    <h1>我發起的活動</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+	<form th:action="@{/activity/ownedActivities_search}" method="post">
+        <p>
+            活動狀態：
+            <select name="activityStatus">
+                <option value="">全部</option>
+                <option value="0">待審核</option>
+                <option value="1">已審核</option>
+                <option value="2">已發布</option>
+                <option value="3">已退回</option>
+                <option value="4">取消</option>
+                <option value="5">延期</option>
+            </select>
+        </p>
+        <button type="submit">篩選</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>圖片</th>
+            <th>編號</th>
+            <th>活動名稱</th>
+            <th>活動狀態</th>
+            <th>活動時間</th>
+			<th>名額</th>
+			<th>報名時間</th>
+			<th>報名狀態</th>
+			<th></th>
+			<th></th>
+        </tr>
+        <tr th:each="a : ${activityListData}">
+		    <td>
+		        <img th:if="${a.picture != null}" 
+		             th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+		             style="max-width: 100px;">
+		        <img th:unless="${a.picture != null}" 
+		             th:src="@{/images/no-image.jpg}" 
+		             style="max-width: 100px;">
+		    </td>
+		    <td th:text="${a.activityId}"></td>
+		    <td th:text="${a.activityName}"></td>
+		    <td th:text="${a.activityStatusText}"></td>
+		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+		    <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+		    <td th:text="${a.registrationStatusText}"></td>
+		    <td>
+		        <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+		            <input type="hidden" name="activityId" th:value="${a.activityId}">
+		            <button type="submit">查看詳情</button>
+		        </form>
+		    </td>
+		    
+			<td>
+			    <div class="action-block" th:if="${a.activityStatus == 0 || a.activityStatus == 3}">
+			        <form th:action="@{/activity/getOne_For_Update}" method="post" style="display:inline;">
+			            <input type="hidden" name="activityId" th:value="${a.activityId}">
+			            <button type="submit">修改</button>
+			        </form>
+			    </div>
+			
+				<div class="action-block" th:if="${(a.activityStatus == 0 || a.activityStatus == 1 || a.activityStatus == 2 || a.activityStatus == 5) && !a.ended}">
+				    <button type="button" th:id="'cancelBtn' + ${a.activityId}"
+				            th:onclick="'toggleCancelForm(' + ${a.activityId} + ')'">取消活動</button>
+				
+				    <div th:id="'cancelForm' + ${a.activityId}" style="display:none;">
+				        <form th:action="@{/activity/cancel}" method="post"
+				              onsubmit="return confirm('確定要取消這個活動嗎？')">
+				            <input type="hidden" name="activityId" th:value="${a.activityId}">
+				            <input type="text" name="cancelNote" placeholder="請填取消原因" required>
+				            <button type="submit">確認取消</button>
+				        </form>
+				    </div>
+				</div>
+			    
+			    <div class="action-block" th:if="${a.activityStatus == 2 && !a.ended}">
+			        <button type="button"  th:id="'postponeBtn' + ${a.activityId}"
+			                th:onclick="'togglePostponeForm(' + ${a.activityId} + ')'">延期</button>
+			
+			        <div th:id="'postponeForm' + ${a.activityId}" style="display:none;">
+			            <form th:action="@{/activity/postpone}" method="post"
+			                  onsubmit="return confirm('確定要延期這個活動嗎？')">
+			                <input type="hidden" name="activityId" th:value="${a.activityId}">
+			                <input type="text" name="postponeNote" placeholder="請填延期原因" required>
+			                <button type="submit">確認延期</button>
+			            </form>
+			        </div>
+			    </div>
+			    
+			    <div class="action-block" th:if="${a.activityStatus == 5}">
+			        <button type="button"  th:id="'scheduleBtn' + ${a.activityId}"
+			        			th:onclick="'toggleScheduleForm(' + ${a.activityId} + ')'">確認新時間</button>
+			
+			        <div th:id="'scheduleForm' + ${a.activityId}" style="display:none;">
+			            <form th:action="@{/activity/confirmNewSchedule}" method="post"
+			                  onsubmit="return confirm('確定要送出新的活動時間嗎？')">
+			                <input type="hidden" name="activityId" th:value="${a.activityId}">
+			                <p>新活動開始時間：<input type="datetime-local" name="activityStart" required></p>
+			                <p>新活動結束時間：<input type="datetime-local" name="activityEnd" required></p>
+			                <p>新報名開始時間（選填）：<input type="datetime-local" name="regisStart"></p>
+			                <p>新報名截止時間（選填）：<input type="datetime-local" name="regisEnd"></p>
+			                <button type="submit">確認送出</button>
+			            </form>
+			        </div>
+			    </div>
+			</td>
+        </tr>
+    </table>
+    <div>
+	    <form th:action="@{/activity/ownedActivities_search}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+	        <input type="hidden" name="currentPage" th:value="${i}">
+	        <input type="hidden" name="activityStatus" th:value="${param.activityStatus}">
+	        <button type="submit" th:text="${i}" 
+	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
+	    </form>
+	</div>
+
+
+<script>
+function toggleCancelForm(activityId) {
+    const form = document.getElementById('cancelForm' + activityId);
+    const button = document.getElementById('cancelBtn' + activityId);
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+
+function togglePostponeForm(activityId) {
+    const form = document.getElementById('postponeForm' + activityId);
+    const button = document.getElementById('postponeBtn' + activityId);
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+
+function toggleScheduleForm(activityId) {
+    const form = document.getElementById('scheduleForm' + activityId);
+    const button = document.getElementById('scheduleBtn' + activityId);
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+</script>
+</body>
+</html>

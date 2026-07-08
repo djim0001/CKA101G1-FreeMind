@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活動分類列表</title>
+</head>
+<body>
+
+    <h1>活動分類列表</h1>
+
+	<p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+	<form th:action="@{/activityCat/searchByName}" method="post">
+	    <input type="text" name="keyword" th:value="${keyword}" placeholder="輸入分類名稱關鍵字">
+	    <button type="submit">搜尋</button>
+	</form>
+
+    <table>
+        <tr>
+            <th>分類編號</th>
+            <th>分類名稱</th>
+        </tr>
+        <tr th:each="cat : ${activityCatListData}">  <!-- 把清單裡每筆資料依序取出來，取名叫cat -->
+            <td th:text="${cat.activityCatId}"></td>
+            <td th:text="${cat.activityCatName}"></td>
+            <td>
+			    <form th:action="@{/activityCat/getOne_For_Update}" method="post">
+			        <input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
+			        <button type="submit">修改</button>
+			    </form>
+			</td>
+			<td>
+			    <form th:action="@{/activityCat/delete}" method="post">
+			        <input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
+			        <button type="submit" onclick="return confirm('確定要刪除這筆分類嗎？')">刪除</button>
+			    </form>
+			</td>
+        </tr>
+    </table>
+
+</body>
+</html>
