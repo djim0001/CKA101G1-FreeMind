@@ -1,5 +1,7 @@
 package com.freemind.course.order.model;
 
-public class PayoutRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-}
+public interface PayoutRepository 
+		extends JpaRepository<Payout, Integer> {
+   }
