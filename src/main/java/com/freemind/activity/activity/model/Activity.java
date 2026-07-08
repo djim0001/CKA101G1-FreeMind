@@ -114,6 +114,12 @@ public class Activity implements java.io.Serializable{
 
 	@Column(name = "reject_note", length = 200)
 	private String rejectNote;
+	
+	@Column(name = "cancel_note", length = 200)
+	private String cancelNote;
+	
+	@Column(name = "postpone_note", length = 200)
+	private String postponeNote;
 
 	@Column(name = "published_at")
 	private LocalDateTime publishedAt;
@@ -293,6 +299,22 @@ public class Activity implements java.io.Serializable{
 	public void setRejectNote(String rejectNote) {
 		this.rejectNote = rejectNote;
 	}
+	
+	public String getCancelNote() {
+	    return cancelNote;
+	}
+
+	public void setCancelNote(String cancelNote) {
+	    this.cancelNote = cancelNote;
+	}
+	
+	public String getPostponeNote() {
+	    return postponeNote;
+	}
+
+	public void setPostponeNote(String postponeNote) {
+	    this.postponeNote = postponeNote;
+	}
 
 	public LocalDateTime getPublishedAt() {
 		return publishedAt;
@@ -332,5 +354,26 @@ public class Activity implements java.io.Serializable{
 			case 3: return "其他";
 			default: return "未定義的退件原因";
 		}
+	}
+	
+	public String getRegistrationStatusText() {
+		if (this.activityStatus == null || this.activityStatus != 2) {
+	        return "—";  // 非已發布狀態，不適用報名狀態判斷
+	    }
+	    LocalDateTime now = LocalDateTime.now();
+
+	    if (now.isBefore(this.regisStart)) {
+	        return "尚未開放報名";
+	    } else if (!now.isAfter(this.regisEnd)) {
+	        return "可報名中";
+	    } else if (now.isBefore(this.activityEnd)) {
+	        return "已截止報名";
+	    } else {
+	        return "已結束";
+	    }
+	}
+	
+	public boolean isEnded() {
+	    return this.activityEnd != null && LocalDateTime.now().isAfter(this.activityEnd);
 	}
 }

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>後台活動列表</title>
+    <style>
+  /* =================================================================== */
+  /* 🎯 分配 12 個直行的寬度比例 (加起來剛好 100%) */
+  /* =================================================================== */
+  th:nth-child(1) { width: 10%; }  /* 圖片 */
+  th:nth-child(2) { width: 4%; }  /* 編號 */
+  th:nth-child(3) { width: 20%; } /* 活動名稱 */
+  th:nth-child(4) { width: 5%; } /* 縣市 */
+  th:nth-child(5) { width: 5%; } /* 區域 */
+  th:nth-child(6) { width: 13%; } /* 活動時間 */
+  th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
+  th:nth-child(8) { width: 13%; } /* 報名時間 */
+  th:nth-child(9) { width: 7%; }  /* 報名狀態 */
+  th:nth-child(10) { width: 7%; } /* 活動狀態 */
+  th:nth-child(11) { width: 8%; } /* 查看詳情按鈕欄位 */	
+  th:nth-child(12) { width: 11%; } /* 其他操作按鈕欄位 */	
+
+  /* 針對第 12 個 td (操作欄) 下達不准換行的指令，按鈕就絕對會乖乖併排 */
+  td:nth-child(12) {
+    white-space: nowrap; 
+  }
+  .action-block {
+    display: inline-block;
+  }
+    </style>
+</head>
+<body>
+    <h1>後台活動列表</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <form th:action="@{/admin/activity/listActivities_ByCompositeQuery}" method="post">
+        <p>
+            縣市：<input type="text" name="activityCity">
+        </p>
+        <p>
+            區域：<input type="text" name="activityDist">
+        </p>
+        <p>
+            活動名稱關鍵字：<input type="text" name="activityName">
+        </p>
+        <p>
+            活動狀態：
+            <select name="activityStatus">
+                <option value="">全部</option>
+                <option value="0">待審核</option>
+                <option value="1">已審核</option>
+                <option value="2">已發布</option>
+                <option value="3">已退回</option>
+                <option value="4">取消</option>
+                <option value="5">延期</option>
+            </select>
+        </p>
+        <button type="submit">查詢</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>圖片</th>
+            <th>編號</th>
+            <th>活動名稱</th>
+            <th>縣市</th>
+            <th>區域</th>
+		    <th>活動時間</th>
+		    <th>名額</th>
+		    <th>報名時間</th>
+		    <th>報名狀態</th>
+		    <th>活動狀態</th>
+		    <th></th>
+		    <th></th>
+		</tr>
+		
+        <tr th:each="a : ${activityListData}">
+             <td>
+		        <img th:if="${a.picture != null}" 
+		             th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+		             style="max-width: 100px;">
+		        <img th:unless="${a.picture != null}" 
+		             th:src="@{/images/no-image.jpg}" 
+		             style="max-width: 100px;">
+		    </td>
+		    <td th:text="${a.activityId}"></td>
+		    <td th:text="${a.activityName}"></td>
+		    <td th:text="${a.activityCity}"></td>
+		    <td th:text="${a.activityDist}"></td>
+		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+		    <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+		    <td th:text="${a.registrationStatusText}"></td>
+		    	<td th:text="${a.activityStatusText}"></td>
+		    <td>
+		        <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+		            <input type="hidden" name="activityId" th:value="${a.activityId}">
+		            <button type="submit">查看詳情</button>
+		        </form>
+		    </td>
+            <td>
+            		<div class="action-block" th:if="${a.activityStatus == 0}">
+			    <form th:action="@{/admin/activity/approve}" method="post"
+			          onsubmit="return confirm('確定審核通過嗎？')" style="display:inline;">
+			        <input type="hidden" name="activityId" th:value="${a.activityId}">
+			        <button type="submit">審核通過</button>
+			    </form>
+			
+			    <button type="button" th:onclick="'toggleRejectForm(' + ${a.activityId} + ')'">退回</button>
+			
+				    <div class="action-block" th:id="'rejectForm' + ${a.activityId}" style="display:none;">
+				        <form th:action="@{/admin/activity/reject}" method="post"
+				              onsubmit="return confirm('確定要退回這個活動嗎？')">
+				            <input type="hidden" name="activityId" th:value="${a.activityId}">
+				            <select name="rejectReason">
+				                <option value="0">資訊不完整</option>
+				                <option value="1">內容不當</option>
+				                <option value="2">名額設定異常</option>
+				                <option value="3">其他</option>
+				            </select>
+				            <input type="text" name="rejectNote" placeholder="退回原因說明">
+				            <button type="submit">確認退回</button>
+				        </form>
+				    	</div>
+			    </div>
+			    
+			    <div class="action-block" th:if="${a.activityStatus == 1}">
+			        <form th:action="@{/admin/activity/publish}" method="post"
+			              onsubmit="return confirm('確定要發布這個活動嗎？')">
+			            <input type="hidden" name="activityId" th:value="${a.activityId}">
+			            <button type="submit">發布</button>
+			        </form>
+			    </div>
+			</td>
+        </tr>
+    </table>
+    <div>
+	    <form th:action="@{/admin/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+	        <input type="hidden" name="currentPage" th:value="${i}">
+	        <input type="hidden" name="activityCity" th:value="${param.activityCity}">
+	        <input type="hidden" name="activityDist" th:value="${param.activityDist}">
+	        <input type="hidden" name="activityName" th:value="${param.activityName}">
+	        <input type="hidden" name="activityStatus" th:value="${param.activityStatus}">
+	        <button type="submit" th:text="${i}" 
+	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
+	    </form>
+	</div>
+
+
+
+<script>
+function toggleRejectForm(activityId) {
+    const form = document.getElementById('rejectForm' + activityId);
+    form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
