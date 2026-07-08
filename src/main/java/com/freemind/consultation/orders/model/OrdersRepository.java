@@ -26,6 +26,9 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 	
 	@Query("from Orders o where o.slot.slotDate = ?1")
 	List<Orders> findBySlotDate(java.time.LocalDate slotDate);
+	
+	@Query("from Orders where psychologist.psychId = ?1 and orderStatus = ?2")
+	List<Orders> findByPsychIdAndOrderStatus(Integer psychId, Integer orderStatus);
 
 }
 

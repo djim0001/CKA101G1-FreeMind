@@ -21,6 +21,7 @@ import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.repository.PsychologistRepository;
 
 import jakarta.validation.Valid;
 
@@ -33,6 +34,9 @@ public class OrdersController {
 
 	@Autowired
 	private SlotsService slotsSvc;
+	
+	@Autowired
+	private PsychologistRepository psychologistRepository;
 	
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -230,8 +234,15 @@ public class OrdersController {
 				return "front-end/member/consultation/orders/bookForm";
 			}
 			
+			Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
+			if (psychologist == null) {
+				model.addAttribute("errorMessage", "查無此心理師");
+				return "front-end/member/consultation/orders/bookForm";
+			}
+			
 			model.addAttribute("slots", slots);
 			model.addAttribute("availableHours", availableHours);
+			model.addAttribute("psychologist", psychologist);
 			return "front-end/member/consultation/orders/bookInput";
 		}
 		
@@ -284,5 +295,66 @@ public class OrdersController {
 			
 			model.addAttribute("success", "預約成功！等待心理師確認。");
 			return "front-end/member/consultation/orders/bookSuccess";
+		}
+		
+		// ===== 心理師：查看待確認訂單並同意/拒絕 =====
+		
+		
+		@GetMapping("psychPendingForm")
+		public String psychPendingForm(ModelMap model) {
+			return "front-end/psych/consultation/orders/psychPendingForm";
+		}
+		
+		@PostMapping("psychPending")
+		public String psychPending(@RequestParam("psychId") String psychId, ModelMap model) {
+			if (psychId == null || psychId.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入心理師編號");
+				return "front-end/psych/consultation/orders/psychPendingForm";
+			}
+			List<Orders> list = ordersSvc.getPendingOrdersByPsychId(Integer.valueOf(psychId));
+			model.addAttribute("ordersListData", list);
+			model.addAttribute("psychId", psychId);
+			return "front-end/psych/consultation/orders/psychPendingList";
+		}
+		
+		@GetMapping("psychPending")
+		public String psychPendingRedirect(@RequestParam("psychId") String psychId, ModelMap model) {
+			List<Orders> list = ordersSvc.getPendingOrdersByPsychId(Integer.valueOf(psychId));
+			model.addAttribute("ordersListData", list);
+			model.addAttribute("psychId", psychId);
+			return "front-end/psych/consultation/orders/psychPendingList";
+		}
+		
+		@PostMapping("approve")
+		public String approve(@RequestParam("orderId") String orderId,
+		                       @RequestParam("psychId") String psychId, ModelMap model) {
+			ordersSvc.approveOrder(Integer.valueOf(orderId));
+			return "redirect:/orders/psychPending?psychId=" + psychId;
+		}
+		
+		@PostMapping("reject")
+		public String reject(@RequestParam("orderId") String orderId,
+		                      @RequestParam("psychId") String psychId, ModelMap model) {
+			ordersSvc.rejectOrder(Integer.valueOf(orderId), slotsSvc);   // ← 改成 slotsSvc
+			return "redirect:/orders/psychPending?psychId=" + psychId;
+		}
+		
+		// ===== 會員：查看自己的訂單記錄 =====
+		
+		@GetMapping("myOrdersForm")
+		public String myOrdersForm(ModelMap model) {
+			return "front-end/member/consultation/orders/myOrdersForm";
+		}
+		
+		@PostMapping("myOrders")
+		public String myOrders(@RequestParam("memberId") String memberId, ModelMap model) {
+			if (memberId == null || memberId.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入會員編號");
+				return "front-end/member/consultation/orders/myOrdersForm";
+			}
+			List<Orders> list = ordersSvc.getByMemberId(Integer.valueOf(memberId));
+			model.addAttribute("ordersListData", list);
+			model.addAttribute("memberId", memberId);
+			return "front-end/member/consultation/orders/myOrdersList";
 		}
 }
