@@ -26,7 +26,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/coupon")
+@RequestMapping("/course/admin/coupon")
 public class CouponController {
 	
 	private final CouponService couponSvc;

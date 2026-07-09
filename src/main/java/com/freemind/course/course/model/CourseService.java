@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.freemind.course.order.model.CartItemDTO;
+import com.freemind.course.util.CourseSortUtil;
 
 @Service
 public class CourseService {
@@ -50,46 +50,12 @@ public class CourseService {
 		return repository.findAll();
 	}
 	
-	private Sort getCourseSort(String orderBy) {
-		
-		if (orderBy == null || orderBy.isBlank()) {
-			orderBy = "courseId";
-		}
-		
-		return switch (orderBy) {
-		case "courseCategoriesAsc" -> Sort.by("courseCategories.courseCatId").ascending();
-		case "courseCategoriesDesc" -> Sort.by("courseCategories.courseCatId").descending();
-		
-		case "psychIdAsc" -> Sort.by("psychologist.psychId").ascending();
-		case "psychIdDesc" -> Sort.by("psychologist.psychId").descending();
-		
-		case "courseStatusAsc" -> Sort.by("courseStatus").ascending();
-		case "courseStatusDesc" -> Sort.by("courseStatus").descending();
-		
-		case "saveCountAsc" -> Sort.by("saveCount").ascending();
-		case "saveCountDesc" -> Sort.by("saveCount").descending();
-		
-		case "starCountAsc" -> Sort.by("starCount").ascending();
-		case "starCountDesc" -> Sort.by("starCount").descending();
-		
-		case "reviewCountAsc" -> Sort.by("reviewCount").ascending();
-		case "reviewCountDesc" -> Sort.by("reviewCount").descending();
-		
-		case "commentCountAsc" -> Sort.by("commentCount").ascending();
-		case "commentCountDesc" -> Sort.by("commentCount").descending();
-		
-		case "priceAsc" -> Sort.by("price").ascending();
-		case "priceDesc" -> Sort.by("price").descending();
-		
-		default -> Sort.by("courseId").descending();
-		};
-	}
 	
 	public Page<Course> findCoursesExcludeStatus(Byte courseStatus, int page, String orderBy){
 		Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );		
 		return repository.findByCourseStatusNot(courseStatus, pageable);
 	}
@@ -98,7 +64,7 @@ public class CourseService {
 		Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );	
 		return repository.findByCourseStatus(courseStatus, pageable);
 	}
@@ -117,7 +83,7 @@ public class CourseService {
 	    Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );
 
 	    return repository.findByPsychologistPsychId(psychId, pageable);
@@ -167,7 +133,7 @@ public class CourseService {
 	    List<Integer> courseIds = courseIdSet.stream()
 	            .map(Integer::valueOf)
 	            .toList();
-	    Pageable pageable = PageRequest.of(page, coursePageSize, getCourseSort(orderBy));
+	    Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 	    return repository.findByCourseIdIn(courseIds, pageable);
 	}
 
