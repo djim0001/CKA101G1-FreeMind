@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>編輯會員資料</title>
+</head>
+<body>
+
+    <h1>編輯會員資料</h1>
+
+    <form th:action="@{/member/update}" th:object="${member}" method="post" enctype="multipart/form-data">
+
+        <p>
+            <label>頭像：<input type="file" name="profilePicFile" accept="image/*" onchange="previewPic(this)"></label><br>
+            <img id="picPreview" width="150"
+                 th:src="${member.profilePic != null} ? @{/member/profilePic} : ''"
+                 th:style="${member.profilePic != null} ? '' : 'display:none'">
+        </p>
+
+        <p>
+            <label>姓名：<input type="text" th:field="*{name}"></label>
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </p>
+
+        <p>
+            <label>暱稱：<input type="text" th:field="*{nickname}"></label>
+            <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+        </p>
+
+        <p>
+            <label>性別：
+                <select th:field="*{gender}">
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </label>
+            <span th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+        </p>
+
+        <p>
+            <label>生日：<input type="date" th:field="*{birthday}"></label>
+            <span th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
+        </p>
+
+        <p>
+            <label>手機號碼：<input type="text" th:field="*{phoneNumber}"></label>
+            <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+        </p>
+
+        <p>
+            <label>信箱：<input type="text" th:field="*{email}"></label>
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+        </p>
+
+        <p>
+            <label>城市：<input type="text" th:field="*{city}"></label>
+            <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+        </p>
+
+        <p>
+            <label>地區：<input type="text" th:field="*{dist}"></label>
+            <span th:if="${#fields.hasErrors('dist')}" th:errors="*{dist}"></span>
+        </p>
+
+        <p>
+            <label>地址：<input type="text" th:field="*{address}"></label>
+            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+        </p>
+
+        <button type="submit">儲存</button>
+    </form>
+
+    <p>
+        <a th:href="@{/member/profile}">取消，回會員資料</a>
+    </p>
+
+    <script>
+        // 選了新頭像後立即在頁面上預覽（尚未上傳，只是本機讀檔）
+        function previewPic(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.getElementById('picPreview');
+                img.src = e.target.result;
+                img.style.display = '';
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
+
+</body>
+</html>
