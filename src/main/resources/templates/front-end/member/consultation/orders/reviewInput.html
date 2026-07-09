@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>撰寫心得評論</title>
+</head>
+<body>
+	<h3>撰寫心得評論</h3>
+
+	訂單編號：<span th:text="${orders.orderId}"></span><br>
+	心理師編號：<span th:text="${orders.psychologist.psychId}"></span><br>
+	諮商時間：<span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm')}"></span><br>
+
+	<form method="post" th:action="@{/orders/submitReview}">
+		<input type="hidden" name="orderId" th:value="${orders.orderId}">
+
+		評分：
+		<select name="rating">
+			<option value="5">5分</option>
+			<option value="4">4分</option>
+			<option value="3">3分</option>
+			<option value="2">2分</option>
+			<option value="1">1分</option>
+		</select><br>
+
+		心得內容：<br>
+		<textarea name="reviewContent" rows="5" cols="40"></textarea><br>
+
+		<input type="submit" value="送出評論">
+	</form>
+
+</body>
+</html>

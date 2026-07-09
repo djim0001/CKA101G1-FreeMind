@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>回覆諮商問題回報</title>
+</head>
+<body>
+	<h3>回覆諮商問題回報</h3>
+
+	<form method="post" th:action="@{/reports/reply}">
+		<input type="hidden" name="reportId" th:value="${reports.reportId}">
+
+		諮商問題編號：<span th:text="${reports.reportId}"></span><br>
+		會員編號：<span th:text="${reports.member.memberId}"></span><br>
+		諮詢訂單編號：<span th:text="${reports.orders != null ? reports.orders.orderId : '無'}"></span><br>
+		問題描述：<span th:text="${reports.issueDesc}"></span><br>
+		回報日期：<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
+
+		員工編號：<input type="text" name="adminId" th:value="${reports.admin != null ? reports.admin.adminId : ''}"><br>
+
+		處理狀態：
+		<select name="reportStatus">
+			<option value="0" th:selected="${reports.reportStatus == 0}">0：待處理</option>
+			<option value="1" th:selected="${reports.reportStatus == 1}">1：處理中</option>
+			<option value="2" th:selected="${reports.reportStatus == 2}">2：已解決</option>
+		</select><br>
+
+		處理備註：<br>
+		<textarea name="reportNote" rows="3" cols="30" th:text="${reports.reportNote}"></textarea><br>
+
+		<input type="submit" value="送出回覆">
+	</form>
+
+	<a th:href="@{/reports/listAllReports}">回列表</a>
+
+</body>
+</html>
