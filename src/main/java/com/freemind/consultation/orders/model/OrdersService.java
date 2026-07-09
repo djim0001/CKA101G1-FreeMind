@@ -105,13 +105,6 @@ public class OrdersService {
 		return repository.findConfirmedByPsychId(psychId);
 	}
 
-	public void completeOrder(Integer orderId) {
-		Orders orders = getOneOrders(orderId);
-		if (orders != null) {
-			orders.setOrderStatus(4); // 已完成
-			updateOrders(orders);
-		}
-	}
 	
 	// 心理師查看自己收到的評論（只列出已評論的訂單）
 		public List<Orders> getReviewsByPsychId(Integer psychId) {
@@ -132,4 +125,22 @@ public class OrdersService {
 		}
 	}
 	
-}
+	//心理師填寫晤談筆記
+	public void completeOrder(Integer orderId, String psychNote) {
+		Orders orders = getOneOrders(orderId);
+		if (orders != null) {
+			orders.setOrderStatus(4);//已完成
+			orders.setPsychNote(psychNote);
+			updateOrders(orders);
+		}
+	}
+	
+	public List<Orders> getCompletedUnratedByMemberId(Integer memberId){
+		return repository.findCompletedUnratedByMemberId(memberId);
+	}
+	
+	public List<Orders> getConfirmedOrCompletedByMemberId(Integer memberId){
+		return repository.findConfirmedOrCompletedByMemberId(memberId);
+
+	}
+}	

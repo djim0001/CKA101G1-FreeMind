@@ -11,15 +11,15 @@
 		th:if="${errorMessage != null}"
 		th:utext="${errorMessage}">
 	</span>
-	
+
 	<form method="post"
 		th:action="@{/reports/insert}"
 		th:object="${reports}">
-			
+
 		會員編號:
 		<input type="text" th:field="*{member.memberId}">
 		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
-		
+
 		諮詢訂單編號:
 		<select th:field="*{orders}">
             <option value="">請選擇訂單</option>
@@ -32,14 +32,14 @@
               th:if="${#fields.hasErrors('orders')}"
               th:errors="*{orders}">
         </span><br>
-        	
+
 		問題描述:
 		<textarea th:field="*{issueDesc}" rows="5" cols="30"></textarea>
         <span style="color:red; margin-left:10px;"
               th:if="${#fields.hasErrors('issueDesc')}"
               th:errors="*{issueDesc}">
         </span><br>
-		
+
 		處理備註:
         <textarea th:field="*{reportNote}" rows="3" cols="30"></textarea><br>
 
@@ -47,7 +47,7 @@
     </form>
 
     <a th:href="@{/reports/listAllReports}">回列表</a>
-		
+
 
 </body>
 </html>

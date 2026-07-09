@@ -373,13 +373,6 @@ public class OrdersController {
 		return "front-end/psych/consultation/orders/psychConfirmedList";
 	}
 
-	@PostMapping("complete")
-	public String complete(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
-			ModelMap model) {
-		ordersSvc.completeOrder(Integer.valueOf(orderId));
-		return "redirect:/orders/psychConfirmed?psychId=" + psychId;
-	}
-
 	// ===== 會員：填寫心得評論 =====
 
 	@GetMapping("reviewForm")
@@ -388,26 +381,27 @@ public class OrdersController {
 	}
 
 	@PostMapping("reviewLookup")
-	public String reviewLookup(@RequestParam("orderId") String orderId, @RequestParam("memberId") String memberId,
-			ModelMap model) {
+	public String reviewLookup(@RequestParam("memberId") String memberId, ModelMap model) {
+		if (memberId == null || memberId.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入會員編號");
+			return "front-end/member/consultation/orders/reviewForm";
+		}
+		
+		List<Orders> list = ordersSvc.getCompletedUnratedByMemberId(Integer.valueOf(memberId));
+		
+		if (list.isEmpty()) {
+			model.addAttribute("errorMessage", "目前沒有可評論的諮商紀錄。");
+			return "front-end/member/consultation/orders/reviewForm";
+		}
+		
+		model.addAttribute("ordersListData", list);
+		model.addAttribute("memberId", memberId);
+		return "front-end/member/consultation/orders/reviewList";
+	}
+	
+	@PostMapping("reviewSelect")
+	public String reviewSelect(@RequestParam("orderId") String orderId, ModelMap model) {
 		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
-
-		if (orders == null || orders.getMember() == null
-				|| !orders.getMember().getMemberId().equals(Integer.valueOf(memberId))) {
-			model.addAttribute("errorMessage", "查無此訂單，或此訂單不屬於您輸入的會員編號。");
-			return "front-end/member/consultation/orders/reviewForm";
-		}
-
-		if (orders.getOrderStatus() != 4) {
-			model.addAttribute("errorMessage", "此諮商尚未完成，暫時無法評論。");
-			return "front-end/member/consultation/orders/reviewForm";
-		}
-
-		if (orders.getRating() != null) {
-			model.addAttribute("errorMessage", "您已經對這筆諮商評論過了。");
-			return "front-end/member/consultation/orders/reviewForm";
-		}
-
 		model.addAttribute("orders", orders);
 		return "front-end/member/consultation/orders/reviewInput";
 	}
@@ -437,5 +431,15 @@ public class OrdersController {
 			model.addAttribute("ordersListData", list);
 			model.addAttribute("psychId", psychId);
 			return "front-end/psych/consultation/orders/psychReviewList";
+		}
+		
+		//諮商師填寫晤談筆記
+		@PostMapping("complete")
+		public String complete(@RequestParam("orderId") String orderId,
+							   @RequestParam("psychId") String psychId,
+							   @RequestParam(value = "psychNote", required = false) String psychNote,
+							   ModelMap model) {
+			ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
+			return "redirect:/orders/psychConfirmed?psychId=" + psychId;
 		}
 }

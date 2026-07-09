@@ -14,6 +14,7 @@
 			<th>開始時間</th>
 			<th>結束時間</th>
 			<th>來訪目的</th>
+			<th>來訪目的備註</th>
 			<th>操作</th>
 		</tr>
 		<tr th:each="order : ${ordersListData}">
@@ -22,11 +23,14 @@
 			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 			<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
 			<td th:text="${order.visitPurpose}"></td>
+			<td th:text="${order.visitPurposeNote}"></td>
 			<td>
 				<form method="post" th:action="@{/orders/complete}">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="hidden" name="psychId" th:value="${psychId}">
-					<input type="submit" value="標記為已完成"
+					晤談筆記：<br>
+					<textarea name="psychNote" rows="3" cols="30" style="resize:none;" placeholder="這次諮商的重點記錄，會員將能看到"></textarea><br>
+					<input type="submit" value="送出"
 						onclick="return confirm('確定這次諮商已經結束了嗎？')">
 				</form>
 			</td>

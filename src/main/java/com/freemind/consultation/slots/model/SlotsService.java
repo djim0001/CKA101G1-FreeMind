@@ -66,4 +66,47 @@ public class SlotsService {
 		updateSlots(slots);
 		return true;
 	}
+	
+	private static final java.time.LocalDate TEMPLATE_DATE = java.time.LocalDate.of(2000, 1, 1);
+
+	// 依範本，幫指定心理師產生未來14天的時段（如果那天已有記錄就跳過，不覆蓋）
+	public void generateNext14DaysForPsych(Integer psychId) {
+		Slots template = getOneByPsychAndDate(psychId, TEMPLATE_DATE);
+		if (template == null) {
+			return; // 該心理師還沒設定範本，跳過
+		}
+		String fixedHours = template.getConsStatus();
+		
+		java.time.LocalDate today = java.time.LocalDate.now();
+		for (int i = 1; i <= 14; i++) {
+			java.time.LocalDate targetDate = today.plusDays(i);
+			
+			Slots existing = getOneByPsychAndDate(psychId, targetDate);
+			if (existing != null) {
+				continue; // 該天已經有記錄（可能是心理師手動調整過），不覆蓋
+			}
+			
+			Slots newSlot = new Slots();
+			com.freemind.login.psychologist.entity.Psychologist p = new com.freemind.login.psychologist.entity.Psychologist();
+			p.setPsychId(psychId);
+			newSlot.setPsychologist(p);
+			newSlot.setSlotDate(targetDate);
+			newSlot.setConsStatus(fixedHours);
+			addSlots(newSlot);
+		}
+	}
+	
+	// 對所有有設定範本的心理師，批次執行
+	public void generateNext14DaysForAll() {
+		List<Slots> allSlots = getAll();
+		java.util.Set<Integer> psychIdsWithTemplate = new java.util.HashSet<>();
+		for (Slots s : allSlots) {
+			if (s.getSlotDate().equals(TEMPLATE_DATE)) {
+				psychIdsWithTemplate.add(s.getPsychologist().getPsychId());
+			}
+		}
+		for (Integer psychId : psychIdsWithTemplate) {
+			generateNext14DaysForPsych(psychId);
+		}
+	}
 }

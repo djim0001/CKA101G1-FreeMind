@@ -219,5 +219,78 @@ public class SlotsController {
 		model.addAttribute("success", "時段設定已更新！");
 		return "front-end/psych/consultation/slots/manageSlotsSuccess";
 	}
-
+	
+	// ===== 心理師：設定固定範本（範本日固定為 2000-01-01） =====
+	
+		private static final LocalDate TEMPLATE_DATE = LocalDate.of(2000, 1, 1);
+		
+		@GetMapping("templateForm")
+		public String templateForm(ModelMap model) {
+			return "front-end/psych/consultation/slots/templateForm";
+		}
+		
+		@PostMapping("templateLookup")
+		public String templateLookup(@RequestParam("psychId") String psychId, ModelMap model) {
+			if (psychId == null || psychId.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入心理師編號");
+				return "front-end/psych/consultation/slots/templateForm";
+			}
+			
+			Integer pid = Integer.valueOf(psychId);
+			
+			Slots template = slotsSvc.getOneByPsychAndDate(pid, TEMPLATE_DATE);
+			if (template == null) {
+				template = new Slots();
+				Psychologist p = new Psychologist();
+				p.setPsychId(pid);
+				template.setPsychologist(p);
+				template.setSlotDate(TEMPLATE_DATE);
+				template.setConsStatus("0".repeat(24));
+			}
+			
+			model.addAttribute("slots", template);
+			return "front-end/psych/consultation/slots/templateInput";
+		}
+		
+		@PostMapping("templateSubmit")
+		public String templateSubmit(@RequestParam("psychId") String psychId,
+		                              @RequestParam(value = "openHours", required = false) List<Integer> openHours,
+		                              ModelMap model) {
+			Integer pid = Integer.valueOf(psychId);
+			
+			Slots template = slotsSvc.getOneByPsychAndDate(pid, TEMPLATE_DATE);
+			boolean isNew = (template == null);
+			
+			if (isNew) {
+				template = new Slots();
+				Psychologist p = new Psychologist();
+				p.setPsychId(pid);
+				template.setPsychologist(p);
+				template.setSlotDate(TEMPLATE_DATE);
+			}
+			
+			StringBuilder sb = new StringBuilder("0".repeat(24));
+			for (int h = 0; h < 24; h++) {
+				boolean checked = openHours != null && openHours.contains(h);
+				sb.setCharAt(h, checked ? '1' : '0');
+			}
+			template.setConsStatus(sb.toString());
+			
+			if (isNew) {
+				slotsSvc.addSlots(template);
+			} else {
+				slotsSvc.updateSlots(template);
+			}
+			
+			model.addAttribute("success", "固定範本已更新！之後排程會依此規則自動產生時段。");
+			return "front-end/psych/consultation/slots/templateSuccess";
+		}
+		
+		//心理師可預約時段 14天排成器手動觸發按鈕
+		@PostMapping("triggerGenerate")
+		public String triggerGenerate(@RequestParam("psychId") String psychId, ModelMap model) {
+			slotsSvc.generateNext14DaysForPsych(Integer.valueOf(psychId));
+			model.addAttribute("success", "已手動觸發，未來14天的時段已依範本產生！");
+			return "front-end/psych/consultation/slots/templateSuccess";
+		}
 }
