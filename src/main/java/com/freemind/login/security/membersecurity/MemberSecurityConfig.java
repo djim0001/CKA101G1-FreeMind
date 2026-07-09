@@ -36,6 +36,7 @@ public class MemberSecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
+                .requestMatchers("/course/member/select_course").permitAll()
 //                .requestMatchers("/front-end/**").authenticated()
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
