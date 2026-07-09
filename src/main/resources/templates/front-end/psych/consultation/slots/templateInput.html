@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>設定固定範本</title>
+</head>
+<body>
+	<h3>設定固定可預約範本</h3>
+
+	心理師編號：<span th:text="${slots.psychologist.psychId}"></span><br>
+	<p>這是您每天固定開放的時段規則，之後系統會依此自動產生未來時段：</p>
+
+	<button type="button" onclick="checkAll(true)">一鍵全選</button>
+	<button type="button" onclick="checkAll(false)">一鍵全部取消</button>
+	<br><br>
+
+	<form method="post" th:action="@{/slots/templateSubmit}">
+		<input type="hidden" name="psychId" th:value="${slots.psychologist.psychId}">
+
+		<div th:each="hour : ${#numbers.sequence(0, 23)}" style="margin-bottom:4px;">
+			<input type="checkbox" name="openHours" class="hourCheckbox" th:value="${hour}"
+				th:checked="${slots.consStatus.charAt(hour) == '1'}">
+			<span th:text="${hour} + ':00 - ' + ${hour + 1} + ':00'"></span>
+		</div>
+
+		<br>
+		<input type="submit" value="儲存範本">
+	</form>
+
+	<script>
+		function checkAll(shouldCheck) {
+			var checkboxes = document.getElementsByClassName('hourCheckbox');
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = shouldCheck;
+			}
+		}
+	</script>
+
+</body>
+</html>

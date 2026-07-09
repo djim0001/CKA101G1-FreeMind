@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.reports.model.ReportsService;
@@ -109,6 +110,21 @@ public class ReportsController {
 		model.addAttribute("success", "- (新增成功)");
 		return "redirect:/reports/listAllReports";
 	}
+	
+	// ===== 會員：新增問題回報（表單提交）=====
+	
+		@PostMapping("frontInsert")
+		public String frontInsert(@Valid Reports reports, BindingResult result, ModelMap model) {
+			
+			if (result.hasErrors()) {
+				return "front-end/member/consultation/reports/addReports";
+			}
+			
+			reportsSvc.addReports(reports);
+			
+			model.addAttribute("success", "問題回報已送出，我們會盡快處理！");
+			return "front-end/member/consultation/reports/reportSuccess";
+		}
 
 	/*
 	 * 點擊修改按鈕時，查出單筆資料並轉交至修改頁面
@@ -248,8 +264,48 @@ public class ReportsController {
 		model.addAttribute("reports", updatedReports);
 		return "back-end/consultation/reports/listOneReports";
 	
-	
 	}
+	
+	// ===== 會員：新增問題回報（先選訂單）=====
+	
+		@GetMapping("reportLookupForm")
+		public String reportLookupForm(ModelMap model) {
+			return "front-end/member/consultation/reports/reportLookupForm";
+		}
+		
+		@PostMapping("reportLookup")
+		public String reportLookup(@RequestParam("memberId") String memberId, ModelMap model) {
+			if (memberId == null || memberId.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入會員編號");
+				return "front-end/member/consultation/reports/reportLookupForm";
+			}
+			
+			List<Orders> list = ordersSvc.getConfirmedOrCompletedByMemberId(Integer.valueOf(memberId));
+			
+			if (list.isEmpty()) {
+				model.addAttribute("errorMessage", "查無可回報的諮商紀錄。");
+				return "front-end/member/consultation/reports/reportLookupForm";
+			}
+			
+			model.addAttribute("ordersListData", list);
+			model.addAttribute("memberId", memberId);
+			return "front-end/member/consultation/reports/reportOrderList";
+		}
+		
+		@PostMapping("reportSelect")
+		public String reportSelect(@RequestParam("orderId") String orderId,
+		                            @RequestParam("memberId") String memberId, ModelMap model) {
+			Reports reports = new Reports();
+			Member member = new Member();
+			member.setMemberId(Integer.valueOf(memberId));
+			reports.setMember(member);
+			
+			Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+			reports.setOrders(orders);
+			
+			model.addAttribute("reports", reports);
+			return "front-end/member/consultation/reports/addReports";
+		}
 	
 	
 }

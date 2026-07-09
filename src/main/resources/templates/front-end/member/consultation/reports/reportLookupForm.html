@@ -2,16 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>撰寫心得評論</title>
+<title>選擇要回報的諮商紀錄</title>
 </head>
 <body>
-	<h3>撰寫心得評論</h3>
+	<h3>新增諮商問題回報</h3>
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/orders/reviewLookup}">
+	<form method="post" th:action="@{/reports/reportLookup}">
 		會員編號：<input type="text" name="memberId"><br>
-		<input type="submit" value="查看可評論的諮商紀錄">
+		<input type="submit" value="查看我的諮商紀錄">
 	</form>
 
 </body>

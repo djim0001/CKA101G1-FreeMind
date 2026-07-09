@@ -36,5 +36,11 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 	//心理師查看已確認的訂單
 	@Query("from Orders where psychologist.psychId = ?1 and orderStatus = 1")
 	List<Orders> findConfirmedByPsychId(Integer psychId);
+
+	@Query("from Orders where member.memberId = ?1 and orderStatus = 4 and rating is null")
+	List<Orders> findCompletedUnratedByMemberId(Integer memberId);
+
+	@Query("from Orders where member.memberId = ?1 and (orderStatus = 1 or orderStatus = 4)")
+	List<Orders> findConfirmedOrCompletedByMemberId(Integer memberId);
 }
 

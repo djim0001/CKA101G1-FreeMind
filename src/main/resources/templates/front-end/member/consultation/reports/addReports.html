@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>新增諮商問題回報</title>
+</head>
+<body>
+	<h3>新增諮商問題回報</h3>
+
+	<span style="color:red;"
+		th:if="${errorMessage != null}"
+		th:utext="${errorMessage}">
+	</span>
+
+	<form method="post"
+		th:action="@{/reports/frontInsert}"
+		th:object="${reports}">
+
+		會員編號:
+		<span th:text="${reports.member.memberId}"></span>
+		<input type="hidden" th:field="*{member.memberId}"><br>
+
+		諮詢訂單編號:
+		<span th:text="${reports.orders.orderId}"></span>
+		<input type="hidden" th:field="*{orders}"><br>
+
+		問題描述:
+		<textarea th:field="*{issueDesc}" rows="5" cols="30" style="resize:none;"></textarea>
+        <span style="color:red; margin-left:10px;"
+              th:if="${#fields.hasErrors('issueDesc')}"
+              th:errors="*{issueDesc}">
+        </span><br>
+
+        <input type="submit" value="新增">
+    </form>
+
+    <a th:href="@{/reports/reportLookupForm}">回列表</a>
+
+</body>
+</html>
