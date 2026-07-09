@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,17 +56,19 @@ public class ShoppingCartController {
 		this.memberSvc = memberSvc;
 	}
 	
+	@ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        return memberSvc.findByAccount(authentication.getName());
+    }
+	
 	
 	@GetMapping("/shopping_cart")
-	public String shoppingCart(ModelMap model, RedirectAttributes redirectAttributes,
-			@SessionAttribute(name = "memberId", required = false) Integer memberId
+	public String shoppingCart(ModelMap model, 
+			@ModelAttribute("member") Member member,
+			RedirectAttributes redirectAttributes
 			) {
-		if(memberId == null) {
-			redirectAttributes.addFlashAttribute("mError", "請先登入，方可查看購物車");
-			return "redirect:/course/memberSelectCourse";
-		}
 			
-		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(memberId);
+		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 		model.addAttribute("cartList", cartList);
 		model.addAttribute("cartTotal", cartTotal);
@@ -74,14 +78,10 @@ public class ShoppingCartController {
 	
 	@GetMapping("/goto_checkout")
 	public String goToCheckout(ModelMap model, RedirectAttributes redirectAttributes,
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@ModelAttribute("member") Member member,
 			HttpSession session) {
-		if(memberId == null) {
-			redirectAttributes.addFlashAttribute("mError", "請先登入，方可前往結帳");
-			return "redirect:/course/member/select_course";
-		}
 		
-		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(memberId);
+		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
 			return "redirect:/course/member/select_course";
@@ -106,20 +106,15 @@ public class ShoppingCartController {
 	@PostMapping("/add_cart")
 	public String addCart(
 			@RequestParam("courseId") Integer courseId, 
-			@SessionAttribute(name = "memberId", required = false) Integer memberId, 
+			@ModelAttribute("member") Member member,
 	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
 			RedirectAttributes redirectAttributes) {
 		
-		if(memberId == null) {
-			redirectAttributes.addFlashAttribute("mError", "先登入方可加入購物車");
-			return "redirect:/course/member/select_course";
-		}
-		
 //		System.out.println("returnUrl = " + returnUrl);
-		if (ShoppingCartRedisSvc.isCourseInCart(memberId, courseId)) {
+		if (ShoppingCartRedisSvc.isCourseInCart(member.getMemberId(), courseId)) {
 		        redirectAttributes.addFlashAttribute("cartMsg", "此課程已在購物車中");
 		} else {
-			ShoppingCartRedisSvc.addCourse(memberId, courseId);
+			ShoppingCartRedisSvc.addCourse(member.getMemberId(), courseId);
 		    redirectAttributes.addFlashAttribute("cartMsg", "成功加入購物車!");
 		}
 		 redirectAttributes.addFlashAttribute("courseId", courseId);
@@ -130,18 +125,18 @@ public class ShoppingCartController {
 	@PostMapping("/cart_remove")
 	public String cartRemove(
 			@RequestParam("courseId") Integer courseId, 
-			@SessionAttribute(name = "memberId", required = false) Integer memberId, 
+			@ModelAttribute("member") Member member,
 			RedirectAttributes redirectAttributes) {
-		ShoppingCartRedisSvc.removeCourse(memberId, courseId);
+		ShoppingCartRedisSvc.removeCourse(member.getMemberId(), courseId);
 		
 		return "redirect:/course/member/shopping_cart";
 	}
 	
 	@PostMapping("/cart_clear")
 	public String cartClear(
-			@SessionAttribute(name = "memberId", required = false) Integer memberId, 
+			@ModelAttribute("member") Member member,
 			RedirectAttributes redirectAttributes) {
-		ShoppingCartRedisSvc.clearCart(memberId);
+		ShoppingCartRedisSvc.clearCart(member.getMemberId());
 		
 		return "redirect:/course/member/shopping_cart";
 	}
@@ -149,20 +144,15 @@ public class ShoppingCartController {
 	@PostMapping("/checkout")
 	public String checkout(HttpSession session,
 			@RequestParam(name = "paymentMethod", required = false) Integer paymentMethod,
-			@SessionAttribute(name = "memberId", required = false) Integer memberId, 
+			@ModelAttribute("member") Member member,
 			RedirectAttributes redirectAttributes) {
-		if(memberId == null) {
-			redirectAttributes.addFlashAttribute("mError", "先登入方可加入購物車");
-			return "redirect:/course/member/select_sourse";
-		}
 		if(paymentMethod == null) {
 			System.out.print("無支付方式");
 			redirectAttributes.addFlashAttribute("paymentMethodMsg", "請選擇支付方式");
 			return "redirect:/course/member/goto_checkout";
 		}
-		Member member = memberSvc.getOneMember(memberId);
 		CourseOrder courseOrder = new CourseOrder();
-		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(memberId);
+		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
 			return "redirect:/course/member/select_course";
@@ -204,7 +194,7 @@ public class ShoppingCartController {
 			OrderDetailSvc.addOrderDetail(orderDetail);
 		}
 		
-		ShoppingCartRedisSvc.clearCart(memberId);
+		ShoppingCartRedisSvc.clearCart(member.getMemberId());
 		redirectAttributes.addFlashAttribute("cartMsg", "結帳成功");
 		
 		return "redirect:/course/member/select_course";

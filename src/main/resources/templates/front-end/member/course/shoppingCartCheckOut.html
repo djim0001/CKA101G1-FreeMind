@@ -71,7 +71,7 @@ span.error {
 	</table>
 	<br>
 
-	<form method="post" th:action="@{/coupon/member/coupon_model_box}">
+	<form method="post" th:action="@{/course/member/coupon/coupon_model_box}">
 	    <button type="submit">選擇優惠券</button>
 	
 	    <span th:if="${orderCoupon != null}">
@@ -81,7 +81,7 @@ span.error {
 	</form>
 	<form th:if="${orderCoupon != null}"
 	      method="post"
-	      th:action="@{/coupon/member/remove_coupon}">
+	      th:action="@{remove_coupon}">
 	    <button type="submit">取消優惠券</button>
 	</form>
 	

@@ -3,9 +3,11 @@ package com.freemind.course.coupon.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +24,7 @@ import com.freemind.login.member.model.MemberService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/coupon/member")
+@RequestMapping("/course/member/coupon")
 public class MemberCouponController {
 	
 private final MemberCouponService memCouponSvc;
@@ -38,18 +40,20 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 		this.memberSvc = memberSvc;
 	}
 
+	@ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        return memberSvc.findByAccount(authentication.getName());
+    }
+	
 	@GetMapping("/my_coupon")
 	public String myCoupon(
 			@RequestParam(defaultValue = "1") Integer page,
-			@SessionAttribute(name = "memberId", required = false) Integer memberId,
+			@ModelAttribute("member") Member member,
 			ModelMap model, HttpSession session) {
 		
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		Member member = memberSvc.getOneMember(memberId);
 		Page<MemberCoupon> myCoupons = memCouponSvc.getMyCoupons(member, currentPage - 1);
-		
-		
 		
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("myCoupons", myCoupons);
@@ -60,15 +64,11 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	
 	@PostMapping("/coupon_model_box")
 	public String couponModelBox(ModelMap model, HttpSession session,
-			@SessionAttribute(name = "memberId", required = false) Integer memberId) {
-		if(memberId == null) {
-			model.addAttribute("mError", "請先登入");
-			return "front-end/member/course/selectCourse";
-		}
-		Member member = memberSvc.getOneMember(memberId);
+			@ModelAttribute("member") Member member) {
+		
 		List<MemberCoupon> memCoupons = memCouponSvc.getAllMyValidCoupon(member);
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
-		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(memberId);
+		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		Integer cartTotal = null;
 		if(!cartList.isEmpty())
 			cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
@@ -84,14 +84,9 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	@PostMapping("/choose_coupon")
 	public String chooseCoupon(
 	        @RequestParam("couponSerialNo") Integer couponSerialNo,
-	        @SessionAttribute(name = "memberId", required = false) Integer memberId,
+	        @ModelAttribute("member") Member member,
 	        HttpSession session,
 	        RedirectAttributes redirectAttributes) {
-
-	    if (memberId == null) {
-	        redirectAttributes.addFlashAttribute("mError", "請先登入");
-	        return "redirect:/course/member/select_course";
-	    }
 
 	    MemberCoupon memberCoupon =
 	            memCouponSvc.getOneByPK(couponSerialNo);
@@ -101,7 +96,7 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        return "redirect:/course/member/goto_checkout";
 	    }
 
-	    if (!memberCoupon.getMember().getName().equals(memberId)) {
+	    if (!memberCoupon.getMember().getName().equals(member.getAccountStatus())) {
 	        redirectAttributes.addFlashAttribute("mError", "此優惠券不屬於目前會員");
 	        return "redirect:/course/member/goto_checkout";
 	    }
