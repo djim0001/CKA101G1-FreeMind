@@ -37,6 +37,10 @@ public class CourseOrderService {
     public List<CourseOrder> getOrdersByMember(Member member) {
     	return repository.findByMember(member);
     }
+    
+    public void addOrder(CourseOrder courseOrder) {
+    		repository.save(courseOrder);
+    }
 
 	
 	

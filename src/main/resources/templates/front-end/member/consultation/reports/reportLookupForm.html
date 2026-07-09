@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>選擇要回報的諮商紀錄</title>
+</head>
+<body>
+	<h3>新增諮商問題回報</h3>
+
+	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+
+	<form method="post" th:action="@{/reports/reportLookup}">
+		會員編號：<input type="text" name="memberId"><br>
+		<input type="submit" value="查看我的諮商紀錄">
+	</form>
+
+</body>
+</html>

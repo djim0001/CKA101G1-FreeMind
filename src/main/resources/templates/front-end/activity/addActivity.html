@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增活動申請</title>
+</head>
+<body>
+
+    <h1>新增活動申請</h1>
+    
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <form th:action="@{/activity/insert}" th:object="${activity}" method="post" enctype="multipart/form-data">
+
+        <p>
+            發起會員編號（暫時簡化，之後改為自動帶入）：
+            <input type="text" name="memberId">
+        </p>
+
+        <p>
+            活動名稱：
+            <input type="text" th:field="*{activityName}">
+            <span th:if="${#fields.hasErrors('activityName')}" th:errors="*{activityName}" style="color:red;"></span>
+        </p>
+
+        <p>
+            活動分類：
+            <select th:field="*{activityCat}">
+                <option th:each="cat : ${activityCatListData}"
+                        th:value="${cat.activityCatId}"
+                        th:text="${cat.activityCatName}">
+                </option>
+            </select>
+        </p>
+
+        <p>
+            活動內容：
+            <textarea th:field="*{activityContent}"></textarea>
+            <span th:if="${#fields.hasErrors('activityContent')}" th:errors="*{activityContent}" style="color:red;"></span>
+        </p>
+
+        <p>
+            縣市：
+            <input type="text" th:field="*{activityCity}">
+            <span th:if="${#fields.hasErrors('activityCity')}" th:errors="*{activityCity}" style="color:red;"></span>
+        </p>
+
+        <p>
+            區域：
+            <input type="text" th:field="*{activityDist}">
+            <span th:if="${#fields.hasErrors('activityDist')}" th:errors="*{activityDist}" style="color:red;"></span>
+        </p>
+
+        <p>
+            詳細地點：
+            <input type="text" th:field="*{activityLoc}">
+            <span th:if="${#fields.hasErrors('activityLoc')}" th:errors="*{activityLoc}" style="color:red;"></span>
+        </p>
+
+        <p>
+            報名開始時間：
+            <input type="datetime-local" th:field="*{regisStart}">
+            <span th:if="${#fields.hasErrors('regisStart')}" th:errors="*{regisStart}" style="color:red;"></span>
+        </p>
+
+        <p>
+            報名截止時間：
+            <input type="datetime-local" th:field="*{regisEnd}">
+            <span th:if="${#fields.hasErrors('regisEnd')}" th:errors="*{regisEnd}" style="color:red;"></span>
+        </p>
+
+        <p>
+            活動開始時間：
+            <input type="datetime-local" th:field="*{activityStart}">
+            <span th:if="${#fields.hasErrors('activityStart')}" th:errors="*{activityStart}" style="color:red;"></span>
+        </p>
+
+        <p>
+            活動結束時間：
+            <input type="datetime-local" th:field="*{activityEnd}">
+            <span th:if="${#fields.hasErrors('activityEnd')}" th:errors="*{activityEnd}" style="color:red;"></span>
+        </p>
+
+        <p>
+            活動名額：
+            <input type="number" th:field="*{capacity}">
+            <span th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" style="color:red;"></span>
+        </p>
+		
+		<p>
+   			活動圖片（選填）：
+   			<input type="file" name="pictureFile" onchange="previewImage(event)">
+		    <br>
+   		    <img id="preview" src="#" alt="圖片預覽" style="max-width: 200px; display: none;">
+		</p>
+		
+        <button type="submit">送出申請</button>
+
+    </form>
+
+<script>
+// 預覽圖片
+function previewImage(event) {
+    const preview = document.getElementById('preview');
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>

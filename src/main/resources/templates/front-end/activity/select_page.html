@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活動頁面 - select_page</title>
+</head>
+<body>
+
+    <h1>活動頁面</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <h3>資料查詢</h3>
+    <ul>
+        <li><a th:href="@{/activity/listAllActivity}">查看全部活動列表</a></li>
+
+        <li>
+			<form method="post" th:action="@{/activity/listActivities_ByCompositeQuery}">
+			    <p>縣市：<input type="text" name="activityCity"></p>
+			    <p>區域：<input type="text" name="activityDist"></p>
+			    <p>活動名稱關鍵字：<input type="text" name="activityName"></p>
+			    <p>
+				    活動分類：
+				    <select name="activityCatId">
+				        <option value="">全部</option>
+				        <option th:each="cat : ${activityCatListData}"
+				                th:value="${cat.activityCatId}"
+				                th:text="${cat.activityCatName}">
+				        </option>
+				    </select>
+				</p>
+				<p>
+				    報名狀態：
+				    <select name="registrationStatus">
+				        <option value="">全部</option>
+				        <option value="0">尚未開放報名</option>
+				        <option value="1">可報名中</option>
+				        <option value="2">已截止報名</option>
+				        <option value="3">已結束</option>
+				    </select>
+				</p>
+				<p>
+				    名額狀態：
+				    <select name="isFull">
+				        <option value="">全部</option>
+				        <option value="false">尚有名額</option>
+				        <option value="true">已額滿</option>
+				    </select>
+				</p>
+				<p>
+				    活動開始時間範圍：
+				    <input type="date" name="activityStartFrom"> ~ 
+				    <input type="date" name="activityStartTo">
+				</p>
+			    <button type="submit">查詢</button>
+			</form>
+        </li>
+    </ul>
+
+    <h3>活動管理</h3>
+    <ul>
+        <li><a th:href="@{/activity/addActivity}">新增活動申請</a></li>
+        <li><a th:href="@{/activity/ownedActivities}">查看我發起的活動</a></li>
+    </ul>
+
+</body>
+</html>

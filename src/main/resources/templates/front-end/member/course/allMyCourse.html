@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>會員課程一覽頁面</title>
+
+</head>
+<body>
+	<h3>
+		<a th:href="@{/course/member/select_course}">課程商城</a>
+	</h3>
+	<h5>
+		<a th:href="@{/course/member/shopping_cart}">購物車</a>
+		<a th:href="@{/course/member/coupon/my_coupon}">我的優惠券</a>
+	</h5>
+	<h1>我的課程</h1>
+	<span>會員名稱:</span>
+	<span th:text=${member.name}></span>
+	<br>
+	<table>
+    <tr>
+    <th>
+	    <a th:href="@{/course/member/my_courses(
+	        page=${currentPage},
+	        orderBy=${orderBy == 'courseIdAsc' ? 'courseIdDesc' : 'courseIdAsc'}
+	    )}">課程名稱
+	    </a>
+	</th>
+	
+	<th>
+	    <a th:href="@{/course/member/my_courses(
+	        page=${currentPage},
+	        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
+	    )}">價格
+	    </a>
+	</th>
+	
+	<th>
+	    <a th:href="@{/course/member/my_courses(
+	        page=${currentPage},
+	        orderBy=${orderBy == 'discountedPriceAsc' ? 'discountedPriceDesc' : 'discountedPriceAsc'}
+	    )}">折扣後價格
+	    </a>
+	</th>
+	
+	<th>
+	    <a th:href="@{/course/member/my_courses(
+	        page=${currentPage},
+	        orderBy=${orderBy == 'courseProgressAsc' ? 'courseProgressDesc' : 'courseProgressAsc'}
+	    )}">進度
+	    </a>
+	</th>
+	<th>上次播放時間點</th>
+	<th>功能</th>
+    </tr>
+
+    <tr th:each="orderDetail : ${myCourses}">
+	    <td th:text="${orderDetail.course.courseName}"></td>
+	    <td th:text="${orderDetail.price}"></td>
+	    <td th:text="${orderDetail.discountedPrice}"></td>
+	    <td th:text="${orderDetail.courseProgress}+'/100'"></td>
+	    <td th:text="${orderDetail.playbackPosition}"></td>
+	    <td>
+	    		<form method="get" th:action="@{one_my_course}">
+				<input type="hidden" name="courseId"
+					th:value="${orderDetail.course.courseId}">
+				<button type="submit">查看詳情</button>
+			</form>
+	    </td>
+	</tr>
+</table>
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/my_bookmarks', ${orderBy})}"></div>	
+		
+	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+	    <div class="cart-modal-content">
+	        <p th:text="${cartMsg}"></p>
+	        <button type="button" onclick="closeCartModal()">確定</button>
+	    </div>
+	</div>
+	
+</body>
+</html>

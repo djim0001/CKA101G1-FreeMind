@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>結帳頁面</title>
+<style>
+span.error {
+	font-size: 12px;
+	color: red;
+}
+span.error {
+    font-size: 12px;
+    color: red;
+}
+
+.modal {
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 8px;
+}
+</style>
+</head>
+<body>
+	<h1>結帳頁面</h1>
+	<h3>
+		<a th:href="@{/course/member/select_course}">會員課程一覽頁面</a>
+	</h3>
+	<span>session會員編號:</span>
+	<span th:text=${session.memberId}></span>
+	<br>
+	<table>
+		<tr>
+			<th>課程名稱</th>
+			<th>心理師</th>
+			<th>原價</th>
+			<th>折扣</th>
+			<th>小計</th>
+			<th>操作</th>
+		</tr>
+
+		<tr th:each="item : ${cartList}">
+			<td th:text="${item.courseName}"></td>
+			<td th:text="${item.psychologistName}"></td>
+			<td th:text="${item.price}"></td>
+			<td th:text="${item.psychDiscount==null?'無折扣':item.psychDiscount}"></td>
+			<td th:text="${item.subtotal}"></td>
+			<td>
+				<form th:action="@{cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
+					<input type="hidden" name="courseId" th:value="${item.courseId}">
+					<button type="submit">從購物車移除</button>
+				</form>
+			</td>
+		</tr>
+	</table>
+	<br>
+
+	<form method="post" th:action="@{/course/member/coupon/coupon_model_box}">
+	    <button type="submit">選擇優惠券</button>
+	
+	    <span th:if="${orderCoupon != null}">
+	        已選擇：
+	        <b th:text="${couponName}"></b>
+	    </span>
+	</form>
+	<form th:if="${orderCoupon != null}"
+	      method="post"
+	      th:action="@{remove_coupon}">
+	    <button type="submit">取消優惠券</button>
+	</form>
+	
+	<div>
+	<form th:action="@{cart_clear}" method="post" onsubmit="return confirm('確定要清空購物車嗎？');">
+		<button type="submit">清空購物車</button>
+	</form>
+		<span>總計：</span> <span
+			style="font-weight: bold; color: #d97706; font-size: 20px;"
+			th:text="'NT$ ' + ${cartTotal}"> </span>
+	</div>
+	
+	<form th:action="@{checkout}" method="post" onsubmit="return confirm('訂單資訊確認無誤');">
+	<div>
+	    <label>
+	        <input type="radio" name="paymentMethod" value="0">
+	        信用卡支付
+	    </label>
+	    <label>
+	        <input type="radio" name="paymentMethod" value="1">
+	        第三方支付
+	    </label><br>
+	    <span class="error" th:text="${paymentMethodMsg}"></span>
+	</div>
+		</div>
+	    <button type="submit">確認結帳</button>
+	</form>
+	
+	
+	
+<div id="couponModal" class="modal" th:if="${chooseCouponMsg == 'show'}">
+    <div class="modal-content">
+        <h2>選擇優惠券</h2>
+
+        <table border="1" width="100%">
+            <thead>
+                <tr>
+                    <th>優惠券編號</th>
+                    <th>優惠券名稱</th>
+                    <th>優惠券折扣</th>
+                    <th>開始時間</th>
+                    <th>結束時間</th>
+                    <th>狀態</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:if="${memCoupons == null or memCoupons.isEmpty()}">
+                    <td colspan="6">目前沒有可使用的優惠券</td>
+                </tr>
+
+                <tr th:each="memberCoupon : ${memCoupons}">
+                    <td th:text="${memberCoupon.couponSerialNo}"></td>
+
+                    <td th:text="${memberCoupon.coupon.couponName}"></td>
+                    
+                    <td th:text="${memberCoupon.coupon.discount}"></td>
+
+                    <td th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy-MM-dd')}"></td>
+
+                    <td th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy-MM-dd')}"></td>
+
+                    <td th:text="${memberCoupon.couponStatus == null ? '未使用' : memberCoupon.couponStatus}"></td>
+
+                    <td>
+                        <form method="post" th:action="@{/coupon/member/choose_coupon}">
+                            <input type="hidden"
+                                   name="couponSerialNo"
+                                   th:value="${memberCoupon.couponSerialNo}">
+
+                            <button type="submit">使用此優惠券</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br>
+
+        <button type="button" onclick="closeCouponModal()">關閉</button>
+    </div>
+</div>	
+<script>
+function closeCouponModal() {
+    const modal = document.getElementById("couponModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+</script>	
+</body>
+</html>

@@ -61,7 +61,7 @@ public class AdminSecurityConfig {
                 .logoutUrl("/back-end/logout")
                 .logoutSuccessUrl("/back-end/login?logout")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID","remember-me-admin")
                 .permitAll()
             )
 

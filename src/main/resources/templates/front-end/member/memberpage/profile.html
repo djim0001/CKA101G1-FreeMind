@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>會員資料</title>
+</head>
+<body>
+
+    <h1>會員資料</h1>
+
+    <!-- 修改成功訊息 -->
+    <p th:if="${success}" th:text="${success}"></p>
+
+    <!-- 頭像（沒設定頭像就不顯示） -->
+    <p><img th:if="${member.profilePic != null}" th:src="@{/member/profilePic}" width="150"></p>
+
+    <table border="1">
+        <tr><th>會員帳號</th><td th:text="${member.memberAccount}"></td></tr>
+        <tr><th>姓名</th><td th:text="${member.name}"></td></tr>
+        <tr><th>暱稱</th><td th:text="${member.nickname}"></td></tr>
+        <tr><th>性別</th><td th:text="${member.gender}"></td></tr>
+        <tr><th>生日</th><td th:text="${member.birthday}"></td></tr>
+        <tr><th>手機號碼</th><td th:text="${member.phoneNumber}"></td></tr>
+        <tr><th>信箱</th><td th:text="${member.email}"></td></tr>
+        <tr><th>城市</th><td th:text="${member.city}"></td></tr>
+        <tr><th>地區</th><td th:text="${member.dist}"></td></tr>
+        <tr><th>地址</th><td th:text="${member.address}"></td></tr>
+        <tr><th>註冊時間</th><td th:text="${#temporals.format(member.regisAt, 'yyyy-MM-dd HH:mm')}"></td></tr>
+    </table>
+
+    <p>
+        <a th:href="@{/member/update}">編輯資料</a> |
+        <a th:href="@{/}">回首頁</a>
+    </p>
+
+</body>
+</html>

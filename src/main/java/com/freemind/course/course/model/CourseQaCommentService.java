@@ -46,7 +46,10 @@ public class CourseQaCommentService {
     }
     
 
-    
+    // 查詢某一堂課的所有 QA，照提問時間排序
+    public List<CourseQaComment> getAllCourseQaByCourseId(Integer courseId){
+    		return repository.findByCourse_CourseIdOrderByAskedAtDesc(courseId);
+    }
     
 
     // 根據留言編號查詢單筆提問

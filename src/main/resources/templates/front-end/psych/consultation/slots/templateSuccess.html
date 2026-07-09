@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>範本設定成功</title>
+</head>
+<body>
+	<h3 th:text="${success}"></h3>
+	<a th:href="@{/slots/templateForm}">繼續設定其他心理師</a>
+	<br><br>
+
+	<form method="post" th:action="@{/slots/triggerGenerate}">
+		<input type="text" name="psychId" placeholder="輸入心理師編號">
+		<input type="submit" value="立即依範本產生未來14天時段（測試用）">
+	</form>
+
+</body>
+</html>

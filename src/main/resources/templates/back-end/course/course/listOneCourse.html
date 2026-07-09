@@ -14,7 +14,7 @@ span.error {
 <body>
 	<h1>員工審核課程頁面</h1>
 	<h3>
-		<a th:href="@{/course/adminSelectCourse}">員工課程頁面</a>
+		<a th:href="@{/course/admin/select_course}">員工課程頁面</a>
 	</h3>
 	<span>session員工編號:</span>
 	<span th:text=${session.adminId}></span><br>
@@ -25,11 +25,11 @@ span.error {
 	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
 	<span>影片： </span><br>
 	<video width="640" controls>
-    		<source th:src="@{'/uploads/videos/' + ${course.videoSrc}}" type="video/mp4">
+    		<source th:src="@{${course.videoSrc}}" type="video/mp4">
 	</video><br>
 	<span>預覽影片： </span><br>
 	<video width="640" controls>
-    		 <source th:src="@{'/uploads/videos/' + ${course.videoSrcPre}}" type="video/mp4">
+    		 <source th:src="@{${course.videoSrcPre}}" type="video/mp4">
 	</video><br>
 	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
 	<div th:if="${course.courseStatus}==4">
@@ -52,14 +52,14 @@ span.error {
 	</div>
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
 	<div th:if="${course.courseStatus}==1">
-		<form method="post" th:action="@{adminExamineCourse}">
+		<form method="post" th:action="@{examine_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<input type="hidden" name="courseStatus"
 				th:value="2">
 			<button type="submit">審核通過</button>
 		</form>
-		<form method="post" th:action="@{adminExamineCourse}">
+		<form method="post" th:action="@{examine_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<input type="hidden" name="courseStatus"

@@ -1,11 +1,9 @@
 package com.freemind.course.coupon.model;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
-import com.freemind.course.order.model.CourseOrder;
+import com.freemind.login.member.model.Member;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,8 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,18 +24,19 @@ public class MemberCoupon {
 	@ManyToOne
 	@JoinColumn(name = "coupon_id", referencedColumnName = "coupon_id")
 	private Coupon coupon;
-	@Column(name = "member_id")
-	private Integer memberId;
+	
+	@ManyToOne
+	@JoinColumn(name = "member_id", referencedColumnName = "member_id")
+	private Member member;
+//	@Column(name = "member_id")
+//	private Integer memberId;
+	
 	@Column(name = "coupon_status")
-	private Byte couponStatus;
+	private Byte couponStatus = 0;
 	@Column(name = "coupon_start_at")
 	private LocalDateTime couponStartAt;
 	@Column(name = "coupon_end_at")
 	private LocalDateTime couponEndAt;
-	
-	@OneToMany(mappedBy = "memberCoupon", cascade = CascadeType.ALL)
-	@OrderBy("course_order_id asc")
-	private Set<CourseOrder> courseOrder;
 	
 	
 	public Integer getCouponSerialNo() {
@@ -54,12 +51,12 @@ public class MemberCoupon {
 	public void setCoupon(Coupon coupon) {
 		this.coupon = coupon;
 	}
-	public Integer getMemberId() {
-		return memberId;
-	}
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
-	}
+//	public Integer getMemberId() {
+//		return memberId;
+//	}
+//	public void setMemberId(Integer memberId) {
+//		this.memberId = memberId;
+//	}
 	public Byte getCouponStatus() {
 		return couponStatus;
 	}
@@ -78,11 +75,38 @@ public class MemberCoupon {
 	public void setCouponEndAt(LocalDateTime couponEndAt) {
 		this.couponEndAt = couponEndAt;
 	}
-	public Set<CourseOrder> getCourseOrder() {
-		return courseOrder;
+	public Member getMember() {
+		return member;
 	}
-	public void setCourseOrder(Set<CourseOrder> courseOrder) {
-		this.courseOrder = courseOrder;
+	public void setMember(Member member) {
+		this.member = member;
+	}
+	// util
+	public String getCouponStatusText() {
+	    if (couponStatus == null) {
+	        return "未知狀態";
+	    }
+	    byte status = couponStatus;
+	    switch (couponStatus) {
+	        case 0:
+	            return "未使用";
+	        case 1:
+	            return "已使用";
+	        default:
+	            return "未知狀態";
+	    }
+	}
+	
+	// 會員優惠券是否可用
+	public boolean isCouponValid() {
+	    LocalDateTime now = LocalDateTime.now();
+	    couponStatus = couponStatus == null ? 0 : couponStatus;
+
+	    return couponStatus != 1
+	            && couponStartAt != null
+	            && couponEndAt != null
+	            && !now.isBefore(couponStartAt)
+	            && !now.isAfter(couponEndAt);
 	}
 	
 }

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>待確認訂單列表</title>
+</head>
+<body>
+	<h3>心理師編號 <span th:text="${psychId}"></span> 的待確認訂單</h3>
+
+	<table border="1">
+		<tr>
+			<th>訂單編號</th>
+			<th>會員編號</th>
+			<th>開始時間</th>
+			<th>結束時間</th>
+			<th>來訪目的</th>
+			<th>來訪目的備註</th>
+			<th>操作</th>
+		</tr>
+		<tr th:each="order : ${ordersListData}">
+			<td th:text="${order.orderId}"></td>
+			<td th:text="${order.member.memberId}"></td>
+			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${order.visitPurpose}"></td>
+			<td th:text="${order.visitPurposeNote}"></td>
+			<td>
+				<form method="post" th:action="@{/orders/approve}" style="display:inline;">
+					<input type="hidden" name="orderId" th:value="${order.orderId}">
+					<input type="hidden" name="psychId" th:value="${psychId}">
+					<input type="submit" value="同意">
+				</form>
+				<form method="post" th:action="@{/orders/reject}" style="display:inline;">
+					<input type="hidden" name="orderId" th:value="${order.orderId}">
+					<input type="hidden" name="psychId" th:value="${psychId}">
+					<input type="submit" value="拒絕"
+						onclick="return confirm('確定要拒絕這筆訂單嗎？拒絕後時段將重新開放。')">
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<a th:href="@{/orders/psychPendingForm}">重新查詢</a>
+
+</body>
+</html>

@@ -11,14 +11,14 @@ span.error{
 </style>
 </head>
 <body>
-	<a th:href="@{/coupon/selectCoupon}">返回優惠券</a>
+	<a th:href="@{/course/admin/coupon/select_coupon}">返回優惠券</a>
 
 	<h3>
 		<b>新增優惠券</b>
 	</h3>
 	<p><font color="red">*</font>表示必填</p>
 	<p th:text=${errorMessage}></p>
-	<form th:action="@{insertCoupon}" method="post" th:object="${coupon}">
+	<form th:action="@{insert_coupon}" method="post" th:object="${coupon}">
 
 		<div>
 			<label>優惠券名稱:<font color="red">*</font></label> 

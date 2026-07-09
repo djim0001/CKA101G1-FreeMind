@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.freemind.activity.activity.model.Activity;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.login.permission.model.Permission;
 
@@ -76,6 +77,10 @@ public class Admin implements java.io.Serializable {
 		inverseJoinColumns = @JoinColumn(name = "perm_id")
 	)
 	private Set<Permission> permissions = new HashSet<>();
+	
+	// 活動
+	@OneToMany(mappedBy = "admin")
+	private Set<Activity> activities;
 
 
 	public Integer getAdminId() {
@@ -158,7 +163,13 @@ public class Admin implements java.io.Serializable {
 		this.permissions = permissions;
 	}
 	
-	
+	public Set<Activity> getActivities() {
+	    return activities;
+	}
+
+	public void setActivities(Set<Activity> activities) {
+	    this.activities = activities;
+	}
 	
 	
 }

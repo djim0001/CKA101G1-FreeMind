@@ -84,7 +84,7 @@
 <body>
 	<h1>課程詳情查看</h1>
 	<h3>
-		<a th:href="@{/course/psychSelectCourse}">心理師課程一覽</a>
+		<a th:href="@{/course/psych/select_course}">心理師課程一覽</a>
 	</h3>
 
 	<span>session心理師編號:</span>
@@ -93,7 +93,7 @@
 	<br>
 	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
 	<div th:if="${course.canAddPsychDiscount()}">
-	<form method="post" th:action="@{discountModelBox}">
+	<form method="post" th:action="@{discount_model_box}">
 			<input type="hidden" name="courseId" th:value="${course.courseId}">
 			<button type="submit">添加心理師折扣</button>
 		</form>
@@ -104,11 +104,11 @@
 	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
 	<span>影片： </span><br>
 	<video width="640" controls>
-    		<source th:src="@{'/uploads/videos/' + ${course.videoSrc}}" type="video/mp4">
+    		<source th:src="@{${course.videoSrc}}" type="video/mp4">
 	</video><br>
 	<span>預覽影片： </span><br>
 	<video width="640" controls>
-    		 <source th:src="@{'/uploads/videos/' + ${course.videoSrcPre}}" type="video/mp4">
+    		 <source th:src="@{${course.videoSrcPre}}" type="video/mp4">
 	</video><br>
 	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
 	<div th:if="${course.courseStatus}==4">
@@ -134,12 +134,12 @@
 	</div>
 	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
 	<div th:if="${course.courseStatus==0 or course.courseStatus==3}">
-		<form method="post" th:action="@{psychUpdateCourse}">
+		<form method="post" th:action="@{update_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<button type="submit">修改</button>
 		</form>
-		<form method="post" th:action="@{psychSubmitCourse}">
+		<form method="post" th:action="@{submit_course}">
 			<input type="hidden" name="courseId"
 				th:value="${course.courseId}">
 			<button type="submit">送出審核</button>
@@ -156,7 +156,7 @@
 			<h3>添加心理師折扣</h3>
 	
 			<form method="post"
-				  th:action="@{updatePsychDiscount}"
+				  th:action="@{update_psych_discount}"
 				  th:object="${psychDiscountForm}"
 				  onsubmit="closePsychDiscountModal()">
 	

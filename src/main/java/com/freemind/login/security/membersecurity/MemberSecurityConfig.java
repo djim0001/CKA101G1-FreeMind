@@ -32,10 +32,11 @@ public class MemberSecurityConfig {
 
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**")
+            .securityMatcher("/","/front-end/**","/member/**","/course/member/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
+                .requestMatchers("/course/member/select_course").permitAll()
 //                .requestMatchers("/front-end/**").authenticated()
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
@@ -51,7 +52,7 @@ public class MemberSecurityConfig {
                 .loginProcessingUrl("/front-end/login")
                 .usernameParameter("memberAccount")
                 .passwordParameter("memberPassword")
-                .defaultSuccessUrl("/", true)
+                .defaultSuccessUrl("/", false)
                 .failureUrl("/front-end/login?error=true")
                 .permitAll()
             )

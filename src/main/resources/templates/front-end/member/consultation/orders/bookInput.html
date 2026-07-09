@@ -21,8 +21,12 @@
 		</select><br>
 
 		會員編號：<input type="text" name="memberId"><br>
-		心理師工作地點：<input type="text" name="psychLoc"><br>
-		諮詢費：<input type="text" name="psychFee"><br>
+
+		心理師工作地點：<span th:text="${psychologist.psychLoc}"></span>
+		<input type="hidden" name="psychLoc" th:value="${psychologist.psychLoc}"><br>
+
+		諮詢費：<span th:text="${psychologist.psychFee}"></span>
+		<input type="hidden" name="psychFee" th:value="${psychologist.psychFee}"><br>
 
 		來訪目的：
 		<select name="visitPurpose">

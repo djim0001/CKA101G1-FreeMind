@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>撰寫心得評論</title>
+</head>
+<body>
+	<h3>撰寫心得評論</h3>
+
+	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+
+	<form method="post" th:action="@{/orders/reviewLookup}">
+		會員編號：<input type="text" name="memberId"><br>
+		<input type="submit" value="查看可評論的諮商紀錄">
+	</form>
+
+</body>
+</html>

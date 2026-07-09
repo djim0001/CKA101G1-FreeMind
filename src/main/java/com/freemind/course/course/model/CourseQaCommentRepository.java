@@ -19,4 +19,9 @@ public interface CourseQaCommentRepository
             Integer courseId,
             Integer memberId
     );
+    // 查詢某一堂課的所有 QA
+    List<CourseQaComment> findByCourse_CourseId(Integer courseId);
+    
+    // 查詢某一堂課的所有 QA，照提問時間排序
+    List<CourseQaComment> findByCourse_CourseIdOrderByAskedAtDesc(Integer courseId);
 }
