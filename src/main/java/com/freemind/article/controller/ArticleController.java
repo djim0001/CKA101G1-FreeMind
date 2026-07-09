@@ -34,12 +34,12 @@ public class ArticleController {
 
 	@GetMapping("/")
 	public String getPublishedArticles(Model model, 
-										@RequestParam(name = "page", defaultValue = "1") Integer page, 
-										@RequestParam(name = "catId", required = false) Integer catId) {
+						@RequestParam(name = "page", defaultValue = "1") Integer page, 
+						@RequestParam(name = "catId", required = false) Integer catId) {
 		Page<Article> articlePage = articleService.getPublishedArticles(page, catId);
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("articleCats", articleCatService.getAllCats());
+		model.addAttribute("articleCats", articleCatService.getActiveCats());
 		model.addAttribute("selectedCatId", catId);
 		return "front-end/member/article/articleList";
 	}

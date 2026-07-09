@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>新增文章分類</title>
+<style>
+.btn-action {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    color: #000000;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.form-group input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px;
+}
+
+.error-text {
+    color: #d9534f;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.similar-list {
+    color: #d9534f;
+    font-size: 13px;
+    margin-top: 2px;
+    padding-left: 16px;
+}
+
+.success-msg {
+    padding: 4px 10px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.error-msg {
+    padding: 4px 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+</style>
+</head>
+<body>
+    <h1>新增文章分類</h1>
+    <a th:href="@{/admin/article/categories}" class="btn-action">返回分類搜尋</a>
+    <br><br>
+
+    <form th:action="@{/admin/article/categories/create}" method="post" id="createForm">
+        <div class="form-group">
+            <label for="catName">分類名稱：</label>
+            <input type="text" id="catName" name="catName" required maxlength="50"
+                   placeholder="請輸入分類名稱" autocomplete="off" />
+            <div id="errorText" class="error-text" style="display: none;"></div>
+            <ul id="similarList" class="similar-list" style="display: none;"></ul>
+        </div>
+        <button type="submit" id="submitBtn" class="btn-action">新增</button>
+
+        <span id="alertMsg" th:if="${alertMessage}" 
+         	  th:classappend="${alertType == 'error'} ? 'error-msg' : 'success-msg'"
+              th:text="${alertMessage}" style="margin-left: 10px;"></span>
+    </form>
+
+    <script th:inline="javascript">
+        const allCatNames = /*[[${catNames}]]*/ [];
+    </script>
+
+    <script>
+        const catNameInput = document.getElementById('catName');
+        const errorText = document.getElementById('errorText');
+        const similarList = document.getElementById('similarList');
+        const submitBtn = document.getElementById('submitBtn');
+        const createForm = document.getElementById('createForm');
+
+        catNameInput.addEventListener('input', function() {
+            const keyword = this.value.trim().toLowerCase();
+            errorText.style.display = 'none';
+            similarList.style.display = 'none';
+            similarList.innerHTML = '';
+            submitBtn.disabled = false;
+
+            if (keyword === '') return;
+
+            // 完全一致
+            const exactMatch = allCatNames.find(name =>
+                name.toLowerCase() === keyword
+            );
+
+            if (exactMatch) {
+                errorText.textContent = '此分類名稱已存在';
+                errorText.style.display = 'block';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            // 模糊比對：輸入包含在既有名稱中，或既有名稱包含在輸入中
+            const similarMatches = allCatNames.filter(name =>
+                name.toLowerCase().includes(keyword) ||
+                keyword.includes(name.toLowerCase())
+            );
+
+            if (similarMatches.length > 0) {
+                errorText.textContent = '已有相似的分類名稱：';
+                errorText.style.display = 'block';
+                similarMatches.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    similarList.appendChild(li);
+                });
+                similarList.style.display = 'block';
+                submitBtn.disabled = true;
+            }
+        });
+
+        // 表單送出前再檢查一次
+        createForm.addEventListener('submit', function(e) {
+            if (submitBtn.disabled) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+    <script th:if="${alertMessage}">
+        setTimeout(function() {
+            const msg = document.getElementById('alertMsg');
+            if (msg) {
+                msg.style.opacity = '0';
+                setTimeout(function() {
+                    msg.style.display = 'none';
+                }, 500);
+            }
+        }, 1500);
+    </script>
+</body>
+</html>
