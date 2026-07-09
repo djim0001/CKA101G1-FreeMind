@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.freemind.article.entity.Article;
+import com.freemind.article.entity.ArticleCat;
 
 public interface ArticleRepository extends JpaRepository<Article, Integer>{
 
@@ -28,6 +29,6 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
 	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);
 
-	
+	boolean existsByArticleCat(ArticleCat articleCat);
 
 }

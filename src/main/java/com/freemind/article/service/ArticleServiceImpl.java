@@ -389,6 +389,11 @@ public class ArticleServiceImpl implements ArticleService{
 		article.setArticleStatus(3);
 		article.setReviewedAt(LocalDateTime.now());
 		article.setRejectReason(rejectReason);
+		
+		if (rejectNote != null && rejectNote.length() >200) {
+		    throw new IllegalArgumentException("退回說明不可超過200字");
+		}
+		
 		article.setRejectNote(rejectNote);
 		articleRepository.save(article);
 	}

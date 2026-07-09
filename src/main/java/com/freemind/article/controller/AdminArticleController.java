@@ -1,5 +1,11 @@
 package com.freemind.article.controller;
 
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.entity.Article;
+import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleService;
 
@@ -25,6 +32,9 @@ public class AdminArticleController {
 
 	@Autowired
 	private ArticleService articleService;
+	
+	@Autowired
+	private ArticleCatService articleCatService;
 	
 	// testing
 	@PostMapping("/set_adminId_session")
@@ -49,8 +59,7 @@ public class AdminArticleController {
     @GetMapping("/pending")
     public String getPendingArticles(Model model, 
     		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@SessionAttribute(name="adminId", required = false) Integer adminId,
-    		RedirectAttributes redirectAttributes) {
+    		@SessionAttribute(name="adminId", required = false) Integer adminId) {
 		
     	// testing
 		if (adminId == null) {
@@ -107,10 +116,150 @@ public class AdminArticleController {
     	return "back-end/article/reviewDetail";
     }
     
+    @GetMapping("/categories")
+    public String getCatSearch(Model model,
+    		@RequestParam(name = "catId", required = false) Integer catId,
+    		@RequestParam(name = "page", defaultValue = "1") Integer page,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId) {
+		
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+		
+//    	Page<ArticleCat> articleCatPage = articleCatService.getAllCats(catId, page);
+//    	model.addAttribute("articleCatPage", articleCatPage);
+//    	model.addAttribute("currentPage", page);
+		
+		List<ArticleCat> cats = articleCatService.getAllCats();
+		List<Map<String, Object>> catList = new ArrayList<>();
+		
+		for (ArticleCat cat : cats) {
+			Map<String, Object> map = new HashMap<>();
+			map.put("articleCatId", cat.getArticleCatId());
+			map.put("articleCatName", cat.getArticleCatName());
+			catList.add(map);
+		}
+		
+		model.addAttribute("articleCats", catList);
+    	return "back-end/article/articleCatSearch";
+	}
+    
+    @GetMapping("/categories/create")
+    public String getCreateForm(Model model,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId) {
+		
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+		
+    	return "back-end/article/createCatForm";
+    }
+    
+    @GetMapping("/categories/{catId}")
+    public String getCatDetail(Model model,
+    		@PathVariable Integer catId,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		RedirectAttributes redirectAttributes) {
+		
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+		
+		try {
+			ArticleCat articleCat = articleCatService.getCatById(catId);
+			model.addAttribute("articleCat", articleCat);
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+	        return "redirect:/admin/article/categories";
+		}
+		
+    	return "back-end/article/articleCatDetail";
+    }
+    
+    @PostMapping("/categories/create")
+    public String createCat(Model model,
+    		@RequestParam(name = "catName") String catName,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		RedirectAttributes redirectAttributes) {
+			
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+    	
+		try {
+			ArticleCat articleCat = articleCatService.createCat(catName);
+			redirectAttributes.addFlashAttribute("alertMessage", "新增成功");
+			redirectAttributes.addFlashAttribute("alertType", "success");
+		    return "redirect:/admin/article/categories/" + articleCat.getArticleCatId();
+		} catch (IllegalArgumentException e) {
+	        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+	        redirectAttributes.addFlashAttribute("alertType", "error");
+	        return "redirect:/admin/article/categories/create";
+	    }
+				
+    }
+    
+    @PostMapping("/categories/{catId}/edit")
+    public String editArticleCat(Model model,
+    		@PathVariable(name = "catId") Integer catId,
+    		@RequestParam(name = "catName") String catName,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		RedirectAttributes redirectAttributes) {
+	 
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+    	
+		try {
+			articleCatService.updateCat(catId, catName);
+	        redirectAttributes.addFlashAttribute("alertMessage", "更新成功");
+	        redirectAttributes.addFlashAttribute("alertType", "success");
+		} catch (IllegalArgumentException e) {
+	        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+	        redirectAttributes.addFlashAttribute("alertType", "error"); 
+	    }
+    	
+    	return "redirect:/admin/article/categories/" + catId;
+    }
+    
+    @PostMapping("/categories/{catId}/deactivate")
+    public String deactivateArticleCat(Model model,
+    		@PathVariable Integer catId,
+    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		RedirectAttributes redirectAttributes) {
+    	
+    	// testing
+		if (adminId == null) {
+			model.addAttribute("errorMessage", "*請先登入");
+			return "back-end/article/test-login";
+		}
+    	
+		try {
+			articleCatService.deactivateCat(catId);
+	        redirectAttributes.addFlashAttribute("alertMessage", "更新成功");
+	        redirectAttributes.addFlashAttribute("alertType", "success");
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			 redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+			 redirectAttributes.addFlashAttribute("alertType", "error");
+		}
+		
+    	return "redirect:/admin/article/categories/" + catId;
+    }
+    		
 	@PostMapping("/{articleId}/review")
 	public String reviewArticle(Model model, 
 			@PathVariable Integer articleId,
-			@RequestParam("action") String action,
+			@RequestParam(name = "action") String action,
 			@RequestParam(value = "rejectReason", required = false) Integer rejectReason,
 			@RequestParam(value = "rejectNote", required = false) String rejectNote,
 			@SessionAttribute(name = "adminId", required = false) Integer adminId,
@@ -130,6 +279,8 @@ public class AdminArticleController {
 			}
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+		} catch (Exception e) { // 資料庫欄位超長: DataIntegrityViolationException
+	        redirectAttributes.addFlashAttribute("alertMessage", "系統錯誤，請稍後再試");
 		}
 		
 		return "redirect:/admin/article/pending";

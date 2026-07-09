@@ -4,6 +4,22 @@
 <meta charset="UTF-8">
 <title>待審核文章</title>
 <style>
+    .btn-action {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #f0f0f0;
+        color: #000000;
+        text-decoration: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-action:hover {
+        background-color: #e0e0e0;
+    }
+
     .form-group {
         display: flex;
         flex-direction: column;
@@ -18,7 +34,7 @@
 </head>
 <body>
     <h1>審核文章詳情</h1>
-    <a th:href="@{/admin/article/pending}">返回待審核文章列表</a>
+    <a th:href="@{/admin/article/pending}" class="btn-action">返回待審核列表</a>
 	<br>
  	<p>送審時間：<span th:text="${article.submittedAt}"></span></p>
     <h2 th:text="${article.title}"></h2>
@@ -50,7 +66,9 @@
         </div>
         <div class="form-group">
             <label>退回說明（選擇「其他」時必填）</label>
-            <textarea name="rejectNote" rows="3"></textarea>
+            <textarea name="rejectNote" rows="3" maxlength="200"
+                      oninput="updateCount(this)"></textarea>
+            <span id="charCount">0 / 200</span> 
         </div>
         
         <div class="button-group">
@@ -75,6 +93,10 @@
 		        }
 		    }
 		    return true;
+		}
+		
+		function updateCount(textarea) {
+		    document.getElementById('charCount').textContent = textarea.value.length + ' / 200';
 		}
 	</script>
 

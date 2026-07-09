@@ -242,6 +242,64 @@ button.btn-status.disabled {
 	pointer-events: none;
 }
 
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 70vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.modal-box h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
+    color: #4a3e3e;
+}
+
+.modal-box p {
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #555;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.modal-close {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 6px 16px;
+    font-size: 14px;
+    background-color: #e8b4b4;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background-color: #d39393;
+}
+
 @media ( max-width : 768px) {
 	table {
 		display: block;
@@ -277,24 +335,21 @@ button.btn-status.disabled {
 					th:classappend="${article.articleStatus == 3} ? 'status-rejected' : ''"></td>
 				<td th:text="${article.createdAt}"></td>
 					<td>
-				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 2 || article.articleStatus == 3}"
+					<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
+				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 2}"
 				       th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
 				       class="btn-edit">編輯</a>
-				    <a th:if="${article.articleStatus == 4}"
-				       class="btn-edit disabled">編輯</a>
 				
-				    <!-- 草稿：送審 -->
 				    <form th:if="${article.articleStatus == 0}"
 				          th:action="@{/psych/article/{id}/submit(id=${article.articleId})}"
 				          method="post" style="display: inline;">
 				        <button type="submit" class="btn-status">送審</button>
 				    </form>
 				
-				    <!-- 草稿 & 審核未通過：刪除 -->
-				    <form th:if="${article.articleStatus == 0 || article.articleStatus == 3}"
+				    <form th:if="${article.articleStatus == 0}"
 				          th:action="@{/psych/article/{id}/delete(id=${article.articleId})}"
 				          method="post" style="display: inline;"
-				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
+				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
 				        <button type="submit" class="btn-status">刪除</button>
 				    </form>
 				
@@ -302,8 +357,11 @@ button.btn-status.disabled {
 				    <a th:if="${article.articleStatus == 1}"
 				       class="btn-edit disabled">審核中</a>
 				
-				    <!-- 已發布：查看 + 下架 -->
-				    <button th:if="${article.articleStatus == 2}" class="btn-status">查看</button>
+				    <!-- 已發布：查看, 下架 -->
+					<a th:if="${article.articleStatus == 2}"
+					   th:href="@{/article/detail/{id}(id=${article.articleId})}"
+					   target="_blank"
+					   class="btn-edit">查看</a>
 				    <form th:if="${article.articleStatus == 2}"
 				          th:action="@{/psych/article/{id}/unpublish(id=${article.articleId})}"
 				          method="post" style="display: inline;"
@@ -311,11 +369,27 @@ button.btn-status.disabled {
 				        <button type="submit" class="btn-status">下架</button>
 				    </form>
 				
-				    <!-- 審核未通過：查看 -->
-				    <button th:if="${article.articleStatus == 3}" class="btn-status">查看</button>
+				    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
+				    <a th:if="${article.articleStatus == 3}"
+					   th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
+					   class="btn-edit">編輯</a>
+   
+					<button th:if="${article.articleStatus == 3}"
+					        class="btn-status"
+					        th:data-reason="${article.rejectReason}"
+					        th:data-note="${article.rejectNote}"
+					        onclick="showRejectDetail(this)">查看</button>
 				
-				    <!-- 已下架：查看 -->
-				    <button th:if="${article.articleStatus == 4}" class="btn-status">查看</button>
+					<form th:if="${article.articleStatus == 3}"
+					      th:action="@{/psych/article/{id}/delete(id=${article.articleId})}"
+					      method="post" style="display: inline;"
+					      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
+					    <button type="submit" class="btn-status">刪除</button>
+					</form>
+
+				    <!-- 已下架：編輯, 查看 -->
+				    <a th:if="${article.articleStatus == 4}" class="btn-edit disabled">編輯</a>
+					<button th:if="${article.articleStatus == 4}" class="btn-status disabled" disabled>查看</button>
 				</td>
 			</tr>
 		</tbody>
@@ -337,11 +411,46 @@ button.btn-status.disabled {
 			<span th:if="${currentPage >= articlePage.totalPages}"
 			class="disabled">下一頁</span></li>
 	</ul>
+	
+	<!-- 退回原因 Modal -->
+	<div id="rejectModal" class="modal-overlay" onclick="closeModal(event)">
+	    <div class="modal-box">
+	        <h3>退回原因</h3>
+	        <p id="modalReason"></p>
+	        <p id="modalNote"></p>
+	        <button class="modal-close" onclick="closeModal()">關閉</button>
+	    </div>
+	</div>
 
 	<script th:if="${alertMessage}">
 		window.onload = function() {
 			alert('[[${alertMessage}]]');
 		};
+	</script>	
+		
+	<script>	
+		function showRejectDetail(btn) {
+			const reasonMap = {
+		            '0': '內容品質',
+		            '1': '違反專業法規',
+		            '2': '版權問題',
+		            '3': '違反平台規範',
+		            '4': '其他'
+		        };
+		        const reasonCode = btn.getAttribute('data-reason');
+		        const note = btn.getAttribute('data-note');
+		        const reasonText = reasonMap[reasonCode] || '未知';
+
+		        document.getElementById('modalReason').textContent = '退回原因：' + reasonText;
+		        document.getElementById('modalNote').textContent = note ? '退回說明：' + note : '';
+		        document.getElementById('rejectModal').classList.add('active');
+		    }
+
+		    function closeModal(event) {
+		        if (!event || event.target === document.getElementById('rejectModal') || event.target.classList.contains('modal-close')) {
+		            document.getElementById('rejectModal').classList.remove('active');
+		        }
+		    }
 	</script>
 
 </body>

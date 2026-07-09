@@ -86,6 +86,7 @@ th {
 	<table th:if="${articlePage.totalElements > 0}">
 		<thead>
 			<tr>
+				<th>文章編號</th>
 				<th>文章標題</th>
 				<th>分類</th>
 				<th>狀態</th>
@@ -95,6 +96,7 @@ th {
 		</thead>
 		<tbody>
 			<tr th:each="article : ${articlePage.content}">
+				<td th:text="${article.articleId}"></td>
 				<td th:text="${article.title}"></td>
 				<td th:text="${article.articleCat.articleCatName}"></td>
 				<td><span th:if="${article.articleStatus == 2}">已上架</span> <span
