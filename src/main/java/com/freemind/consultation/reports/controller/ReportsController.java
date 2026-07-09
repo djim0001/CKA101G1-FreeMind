@@ -191,7 +191,7 @@ public class ReportsController {
 		return "back-end/consultation/reports/select_Page";
 	}
 
-	// ===== 會員：查看自己的問題回報處理進度 =====
+	// 會員：查看自己的問題回報處理進度
 
 	@GetMapping("myReportsForm")
 	public String myReportsForm(ModelMap model) {
@@ -209,5 +209,47 @@ public class ReportsController {
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/reports/myReportsList";
 	}
-
+	
+	// 後台：查看問題回報
+	
+	@PostMapping("getOne_For_Reply")
+	public String getOne_For_Reply(@RequestParam("reportId") String reportId, ModelMap model) {
+		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
+	
+		if (reports.getAdmin() == null) {
+			reports.setAdmin(new Admin());
+		}
+		
+		model.addAttribute("reports", reports);
+		return "back-end/consultation/reports/reply_reports_input";
+	}
+	
+	@PostMapping("reply")
+	public String reply(@RequestParam("reportId") String reportId,
+						@RequestParam(value = "adminId", required = false) String adminId,
+						@RequestParam("reportStatus") String reportStatus,
+						@RequestParam(value = "reportNote", required = false) String reportNote,
+						ModelMap model) {
+		
+		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
+	
+		if (adminId != null && !adminId.isBlank()) {
+			Admin admin = new Admin();
+			admin.setAdminId(Integer.valueOf(adminId));
+			reports.setAdmin(admin);
+		}
+		reports.setReportStatus(Integer.valueOf(reportStatus));
+		reports.setReportNote(reportNote);
+		
+		reportsSvc.updateReports(reports);
+		
+		model.addAttribute("success", "-(回覆成功)");
+		Reports updatedReports = reportsSvc.getOneReports(reports.getReportId());
+		model.addAttribute("reports", updatedReports);
+		return "back-end/consultation/reports/listOneReports";
+	
+	
+	}
+	
+	
 }

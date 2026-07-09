@@ -28,10 +28,10 @@
             <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${report.reportStatus}"></td>
             <td>
-                <form method="post" th:action="@{/reports/getOne_For_Update}">
-                    <input type="hidden" name="reportId" th:value="${report.reportId}">
-                    <input type="submit" value="修改">
-                </form>
+                <form method="post" th:action="@{/reports/getOne_For_Reply}">
+					<input type="hidden" name="reportId" th:value="${report.reportId}">
+					<input type="submit" value="回覆">
+				</form>
                 <form method="post" th:action="@{/reports/delete}">
 				    <input type="hidden" name="reportId" th:value="${report.reportId}">
 				    <input type="submit" value="刪除" 

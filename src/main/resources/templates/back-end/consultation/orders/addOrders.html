@@ -16,7 +16,7 @@
 			</ul>
 		</div>
 
-		時段選擇： 
+		時段選擇：
 		<select name="slot">
 			<option value="">請選擇時段</option>
 			<option th:each="s : ${slotsList}" th:value="${s.timeslotId}"
@@ -24,8 +24,18 @@
 		</select> <span style="color: red; margin-left: 10px;"
 			th:if="${#fields.hasErrors('slot')}" th:errors="*{slot}"></span><br>
 			<span style="color:red;" th:if="${slotError != null}" th:text="${slotError}"></span><br>
-	
-		會員編號： 
+
+		開始時間：
+		<input type="datetime-local" th:field="*{consStart}"> <span
+			style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('consStart')}" th:errors="*{consStart}"></span><br>
+
+		結束時間：
+		<input type="datetime-local" th:field="*{consEnd}"> <span
+			style="color: red; margin-left: 10px;"
+			th:if="${#fields.hasErrors('consEnd')}" th:errors="*{consEnd}"></span><br>
+
+		會員編號：
 		<input type="text" th:field="*{member.memberId}"> <span
 		style="color: red; margin-left: 10px;"
 		th:if="${#fields.hasErrors('member.memberId')}" th:errors="*{member.memberId}"></span><br>
