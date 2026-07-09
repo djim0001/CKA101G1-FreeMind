@@ -83,8 +83,8 @@ public class ShoppingCartController {
 		
 		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		if(cartList.isEmpty()){
-			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
-			return "redirect:/course/member/select_course";
+			redirectAttributes.addFlashAttribute("cartMsg", "請先加入課程至購物車");
+			return "redirect:/course/member/shopping_cart";
 		}
 		Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
@@ -93,6 +93,10 @@ public class ShoppingCartController {
 			cartTotal = BigDecimal.valueOf(cartTotal)
 						.multiply(orderCoupon.getCoupon().getDiscount())
 						.intValue();
+		}
+		if(cartList.isEmpty()){
+			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
+			return "redirect:/course/member/select_course";
 		}
 		model.addAttribute("cartList", cartList);
 		model.addAttribute("cartTotal", cartTotal);

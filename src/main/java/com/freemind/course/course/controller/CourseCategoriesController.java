@@ -28,27 +28,27 @@ public class CourseCategoriesController {
 	@Autowired
 	CourseCategoriesService courseCategoriesSvc;
 	
-	@GetMapping("/select_course_categories")
-	public String selectCourseCategories(ModelMap model) {
-		CourseCategories courseCategories = new CourseCategories();
-		model.addAttribute("courseCategories", courseCategories);
-		return "back-end/course/course/selectCourseCategories";
-	}
-	@PostMapping("/insert_course_categories")
-	public String insertCourseCategories(
-			@Valid @ModelAttribute("courseCategories")CourseCategories courseCategories, 
-			BindingResult result, ModelMap model) {
-		if(result.hasErrors()) {
-			return "back-end/course/course/selectCourseCategories";
-		}
-		courseCategoriesSvc.addCourseCategories(courseCategories);
-		return "redirect:/course/select_course_categories";
-	}
-
-	@ModelAttribute("courseCategoriesListAll")
-	public List<CourseCategories> courseCategoriesListAll(){
-		List<CourseCategories> courseCategoriesListAll = courseCategoriesSvc.getAllCourseCategories();
-		return courseCategoriesListAll;
-	}
+//	@GetMapping("/select_course_categories")
+//	public String selectCourseCategories(ModelMap model) {
+//		CourseCategories courseCategories = new CourseCategories();
+//		model.addAttribute("courseCategories", courseCategories);
+//		return "back-end/course/course/selectCourseCategories";
+//	}
+//	@PostMapping("/insert_course_categories")
+//	public String insertCourseCategories(
+//			@Valid @ModelAttribute("courseCategories")CourseCategories courseCategories, 
+//			BindingResult result, ModelMap model) {
+//		if(result.hasErrors()) {
+//			return "back-end/course/course/selectCourseCategories";
+//		}
+//		courseCategoriesSvc.addCourseCategories(courseCategories);
+//		return "redirect:/course/select_course_categories";
+//	}
+//
+//	@ModelAttribute("courseCategoriesListAll")
+//	public List<CourseCategories> courseCategoriesListAll(){
+//		List<CourseCategories> courseCategoriesListAll = courseCategoriesSvc.getAllCourseCategories();
+//		return courseCategoriesListAll;
+//	}
 	
 }

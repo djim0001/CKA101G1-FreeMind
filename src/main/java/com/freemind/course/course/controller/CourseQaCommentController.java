@@ -4,8 +4,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +22,7 @@ import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
 @Controller
-@RequestMapping("/course/qa")
+@RequestMapping("/course/member")
 public class CourseQaCommentController {
 
     @Autowired
@@ -61,11 +64,10 @@ public class CourseQaCommentController {
     @PostMapping("/addQa")
     public String memberQa(
     	@RequestParam(name="courseId",required = false) Integer courseId,
-    	@SessionAttribute(name="memberId",required = false) Integer memberId,
+    	@ModelAttribute("member") Member member,
     	ModelMap model
     		) {
     	Course course = courseService.getOneCourse(courseId);
-    	Member member = memberService.getOneMember(memberId);
     	CourseQaComment comment = new CourseQaComment();
     	model.addAttribute("course", course);
     	model.addAttribute("member", member);
@@ -112,6 +114,14 @@ public class CourseQaCommentController {
 
             return "front-end/member/course/memberCourseQa";
         }
+    //查看此課程的全部QA
+    @GetMapping("/course/member/allQa/{courseId}")
+    public String showCourseQa(@PathVariable Integer courseId, ModelMap model) {
+    		List<CourseQaComment> listcourseQa = commentService.getAllCourseQaByCourseId(courseId);
+    		model.addAttribute("listcourseQa", listcourseQa);
+
+    		return "front-end/member/course/allCourseQa";
+    }
         
    
  // 心理師查看自己課程收到的提問

@@ -1,126 +1,185 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>會員課程頁面</title>
-<style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-.cart-modal {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.cart-modal-content {
-    background-color: white;
-    padding: 24px 36px;
-    border-radius: 8px;
-    text-align: center;
-    min-width: 280px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.cart-modal-content button {
-    margin-top: 16px;
-    padding: 8px 24px;
-    cursor: pointer;
-}
-	.favorite-btn {
-	    border: none;
-	    background: none;
-	    font-size: 28px;
-	    cursor: pointer;
-	    color: #ccc;
-	    transition: 0.2s;
-	}
-	
-	.favorite-btn.active {
-	    color: red;
-	}
-	
-	.favorite-btn:hover {
-	    transform: scale(1.15);
-	}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>會員課程一覽頁面</title>
+  <link rel="stylesheet" th:href="@{/css/course/listOneCourse.css}"/>
 </head>
 <body>
-	<h1>會員課程頁面</h1>
-	<h3>
-		<a th:href="@{/course/member/select_course}">會員課程一覽頁面</a>
-	</h3>
-	<span>session會員編號:</span>
-	<span th:text=${session.memberId}></span><br>
+  <div class="app">
+    <header class="topbar">
+      <a class="brand" th:href="@{/course/member/select_course}" aria-label="回到課程商城">
+        <span class="brand-mark">課</span>
+        <span>課程商城</span>
+      </a>
+      <nav class="course-path" aria-label="課程導覽">
+        <strong th:text="${course.courseName}"></strong>
+      </nav>
+      <div class="profile">
+        <div class="progress-ring" aria-label="會員課程">會員</div>
+        <div class="avatar" aria-label="使用者">蘇</div>
+      </div>
+    </header>
 
-	<span>課程名稱： <span><span th:text="${course.courseName}"></span>
-	<form th:action="@{favorite/toggle}" method="post">
-	    <input type="hidden" name="courseId" th:value="${course.courseId}">
-	    <input type="hidden" name="currentPage" th:value="${currentPage}">
-					<input type="hidden" name="orderBy" th:value="${orderBy}">
-	    <input type="hidden" name="returnUrl">
-	    <button type="submit"
-	            class="favorite-btn"
-	            th:classappend="${course.saved} ? ' active' : ''">
-	        ♥
-	    </button>
-	</form>
-	<br> 
-	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
-	<div th:if="${session.memberId > 0}">
-		<span>影片： </span><br>
-		<video width="640" controls>
-	    		<source th:src="${course.videoSrc}" type="video/mp4">
-		</video>
-	</div>
-	<div th:if="${session.memberId == null}">
-	<span>預覽影片： </span><br>
-		<video width="640" controls>
-	    		 <source th:src="@{${course.videoSrcPre}}" type="video/mp4">
-		</video><br>
-		<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
-	</div>
-	<div th:if="${course.courseStatus}==4">
-		<span>上架時間： </span>
-		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
-	</div>
-	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
-	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
-	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
-	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
-	<div th:if="${course.discountValid}">
-		<span>心理師折扣： </span><span th:text="${course.validPsychDiscount}"></span> <br> 
-		<span>折扣開始時間： </span>
-		<span th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></span><br>
-		<span>折扣結束時間： </span>
-		<span th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></span>
-	</div>
-	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<form method="post" th:action="@{add_cart}" >
-		<input type="hidden" name="courseId"
-			th:value="${course.courseId}">
-		<input type="hidden" name="returnUrl">
-		<button type="submit" id="addCart">加入購物車</button>
-	</form>
-	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
-	    <div class="cart-modal-content">
-	        <p th:text="${cartMsg}"></p>
-	        <button type="button" onclick="closeCartModal()">確定</button>
-	    </div>
-	</div>
-	<script>
-	function closeCartModal() {
-        document.getElementById("cartModal").style.display = "none";
-	    }
-	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-	        input.value = window.location.pathname + window.location.search;
-	    });
-	</script>
+    <main class="layout">
+      <section class="main" aria-label="課程觀看主內容">
+        <section class="player">
+          <div class="video-frame video-native" th:if="${session.memberId != null and session.memberId > 0}">
+            <video id="courseVideo" controls preload="metadata" poster="">
+              <source src="" th:src="${course.videoSrc}" type="video/mp4" />
+              您的瀏覽器不支援影片播放。
+            </video>
+            <button class="play-button" id="heroPlayButton" type="button" aria-label="播放課程">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="video-frame video-native" th:if="${session.memberId == null}">
+            <video id="courseVideo" controls preload="metadata" poster="">
+              <source src="" th:src="@{${course.videoSrcPre}}" type="video/mp4" />
+              您的瀏覽器不支援影片播放。
+            </video>
+            <button class="play-button" id="heroPlayButton" type="button" aria-label="播放預覽影片">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <section class="course-info">
+          <div class="lesson-meta">
+            <div>
+              <span class="badge" th:text="${course.courseCategories.courseCatName}">心理健康</span>
+              <h1 th:text="${course.courseName}">情緒覺察與壓力調節入門</h1>
+            </div>
+
+            <form class="favorite-form" th:action="@{favorite/toggle}" method="post">
+              <input type="hidden" name="courseId" th:value="${course.courseId}" />
+              <input type="hidden" name="currentPage" th:value="${currentPage}" />
+              <input type="hidden" name="orderBy" th:value="${orderBy}" />
+              <input type="hidden" name="returnUrl" id="returnUrl" />
+              <button
+                type="submit"
+                class="favorite-btn"
+                th:classappend="${course.saved} ? ' active' : ''"
+                th:attr="aria-pressed=${course.saved}">
+                ♥
+              </button>
+            </form>
+          </div>
+
+          <p class="summary" th:text="${course.outline}">
+            這裡會顯示課程大綱，協助會員快速理解課程內容與學習重點。
+          </p>
+
+          <div class="listed-time" th:if="${course.courseStatus == 4}">
+            <span>上架時間：</span>
+            <strong th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}">2026年07月09日 10:00</strong>
+          </div>
+
+          <div class="actions course-actions" aria-label="課程操作">
+            <form class="add-cart-form" method="post" th:action="@{add_cart}">
+              <input type="hidden" name="courseId" th:value="${course.courseId}" />
+              <input type="hidden" name="returnUrl" />
+              <button th:if="${!coursePermission}" type="submit" id="addCart" class="action primary">加入購物車</button>
+            </form>
+            <button class="action" type="button">學習紀錄</button>
+            <button class="action" type="button">課程討論</button>
+          </div>
+        </section>
+
+        <section class="notes" aria-label="筆記與教材">
+          <div class="note-editor">
+            <h2 class="section-title">我的課堂提問</h2>
+            <textarea id="noteInput" placeholder="建議把影片中的問題、想法與疑問記錄下來，方便後續提問與複習。"></textarea>
+            <div class="note-actions">
+              <button class="action primary" id="saveNoteButton" type="button">交出提問</button>
+              <span class="save-state" id="saveState" aria-live="polite"></span>
+            </div>
+          </div>
+          <aside class="materials" aria-label="課程資訊">
+            <h2 class="section-title">課程資訊</h2>
+            <div class="material">
+              <span>課程分類</span>
+              <strong th:text="${course.courseCategories.courseCatName}">心理健康</strong>
+            </div>
+            <div class="material">
+              <span>收藏次數</span>
+              <strong th:text="${course.saveCount}">0</strong>
+            </div>
+            <div class="material">
+              <span>提問次數</span>
+              <strong th:text="${course.commentCount}">0</strong>
+            </div>
+          </aside>
+        </section>
+      </section>
+
+      <aside class="sidebar" aria-label="課程側欄">
+        <section class="side-panel stats-panel">
+          <div class="panel-header">
+            <h2>課程數據</h2>
+            <span class="badge">即時</span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span>收藏次數</span>
+              <strong th:text="${course.saveCount}">0</strong>
+            </div>
+            <div class="stat-card">
+              <span>評價次數</span>
+              <strong th:text="${course.starCount}">0</strong>
+            </div>
+            <div class="stat-card">
+              <span>平均星數</span>
+              <div
+                class="rating-stars"
+                th:with="avg=${course.starCount != null and course.starCount > 0 ? (course.reviewCount != null ? course.reviewCount : 0) * 1.0 / course.starCount : 0}">
+                <div class="stars" th:attr="aria-label=|平均 ${#numbers.formatDecimal(avg, 1, 1)} 顆星|">
+                  <span class="star" th:classappend="${avg >= 1 ? ' full' : avg >= 0.5 ? ' half' : ''}">★</span>
+                  <span class="star" th:classappend="${avg >= 2 ? ' full' : avg >= 1.5 ? ' half' : ''}">★</span>
+                  <span class="star" th:classappend="${avg >= 3 ? ' full' : avg >= 2.5 ? ' half' : ''}">★</span>
+                  <span class="star" th:classappend="${avg >= 4 ? ' full' : avg >= 3.5 ? ' half' : ''}">★</span>
+                  <span class="star" th:classappend="${avg >= 5 ? ' full' : avg >= 4.5 ? ' half' : ''}">★</span>
+                </div>
+                <strong th:text="${#numbers.formatDecimal(avg, 1, 1)}">0.0</strong>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span>提問次數</span>
+              <strong th:text="${course.commentCount}">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="side-panel mentor">
+          <h2 class="section-title">學習提醒</h2>
+          <div class="mentor-card">
+            <div class="mentor-photo">學</div>
+            <div>
+              <strong>完成影片後，整理 3 個重點</strong>
+              <p>看看其他人問了什麼</p>
+            </div>
+          </div>
+			<a class="action primary"
+			   th:href="@{/course/member/allQa/{courseId}(courseId=${course.courseId})}">
+			    查看課程提問</a>        
+		</section>
+      </aside>
+    </main>
+  </div>
+
+  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+    <div class="cart-modal-content">
+      <p th:text="${cartMsg}">已加入購物車。</p>
+      <button type="button" class="action primary" onclick="closeCartModal()">確定</button>
+    </div>
+  </div>
+
+  <script th:src="@{/js/course/listOneCourse.js}"></script>
 </body>
 </html>
