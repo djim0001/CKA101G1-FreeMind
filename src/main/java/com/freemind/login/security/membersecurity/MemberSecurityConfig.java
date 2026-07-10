@@ -32,15 +32,15 @@ public class MemberSecurityConfig {
 
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**","/member/**","/course/member/**")
+            .securityMatcher("/","/front-end/**","/member/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
-                .requestMatchers("/course/member/select_course").permitAll()
+                .requestMatchers("/member/course/select_course").permitAll()
 //                .requestMatchers("/front-end/**").authenticated()
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().hasRole("MEMBER")
             )
 
             .userDetailsService(memberUserDetailsService)
@@ -78,6 +78,9 @@ public class MemberSecurityConfig {
                 .authenticationEntryPoint((request, response, authException) -> {
                     requestCache.saveRequest(request, response);
                     response.sendRedirect("/front-end/login");
+                })
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                	response.sendRedirect("/front-end/login");
                 })
             );
 
