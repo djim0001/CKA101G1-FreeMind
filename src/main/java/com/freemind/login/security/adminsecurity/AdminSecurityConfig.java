@@ -39,8 +39,9 @@ public class AdminSecurityConfig {
                 .requestMatchers("/","/back-end/login").permitAll()
 //                .requestMatchers("/course_index/**").hasAnyRole("super_admin","courses")
                 .requestMatchers("/admin/select_page").hasRole("super_admin")
-                // 其他所有 /back-end/** 和 /admin/** 都需要登入
-                .anyRequest().authenticated()
+                // 其他所有 /back-end/** 和 /admin/** 都需要「管理員」身分
+                // （不能用 authenticated()：兩條 chain 共用 session，會員登入也算已認證）
+                .anyRequest().hasRole("ADMIN")
             )
 
             .userDetailsService(adminUserDetailsService)
@@ -77,6 +78,10 @@ public class AdminSecurityConfig {
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException) -> {
                     requestCache.saveRequest(request, response);
+                    response.sendRedirect("/back-end/login");
+                })
+                // 已登入但不是管理員（例如會員）闖入後台 → 導向後台登入頁
+                .accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.sendRedirect("/back-end/login");
                 })
             );

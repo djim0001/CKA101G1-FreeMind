@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>通知範本列表</title>
+</head>
+<body>
+	<h3>通知範本列表</h3>
+
+	<a th:href="@{/admin/notice/addNoticeTemplate}">新增範本</a>
+
+	<table border="1">
+		<tr>
+			<th>範本編號</th><th>員工姓名</th><th>範本內容</th><th>操作</th>
+		</tr>
+		<tr th:each="noticeTemplate : ${noticeTemplateListData}">
+			<td th:text="${noticeTemplate.templateId}"></td>
+			<td th:text="${noticeTemplate.admin != null ? noticeTemplate.admin.name : noticeTemplate.adminId}"></td>
+			<td th:text="${noticeTemplate.templateContent}"></td>
+			<td>
+				<form method="post" th:action="@{/admin/notice/getOne_For_Update}" style="display:inline;">
+					<input type="hidden" name="templateId" th:value="${noticeTemplate.templateId}">
+					<input type="submit" value="修改">
+				</form>
+				<form method="post" th:action="@{/admin/notice/delete}" style="display:inline;">
+					<input type="hidden" name="templateId" th:value="${noticeTemplate.templateId}">
+					<input type="submit" value="刪除">
+				</form>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

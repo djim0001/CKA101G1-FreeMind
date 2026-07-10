@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>修改通知範本</title>
+</head>
+<body>
+	<h3>修改通知範本</h3>
+
+	<form method="post" th:action="@{/admin/notice/update}" th:object="${noticeTemplate}">
+
+		<input type="hidden" th:field="*{templateId}">
+
+		範本編號: <span th:text="*{templateId}"></span><br>
+
+		範本內容:<br>
+		<textarea th:field="*{templateContent}" rows="6" cols="60" maxlength="1000"></textarea>
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('templateContent')}" th:errors="*{templateContent}"></span><br>
+
+		<input type="submit" value="修改">
+	</form>
+
+	<a th:href="@{/admin/notice/listAllNoticeTemplate}">回通知範本列表</a>
+</body>
+</html>

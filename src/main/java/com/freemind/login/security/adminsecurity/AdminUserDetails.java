@@ -1,6 +1,7 @@
 package com.freemind.login.security.adminsecurity;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -22,9 +23,12 @@ public class AdminUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 將 permissions 轉換為 Spring Security 的 GrantedAuthority
-        return admin.getPermissions().stream()
+        List<GrantedAuthority> authorities = admin.getPermissions().stream()
                 .map(p -> new SimpleGrantedAuthority("ROLE_" + p.getPermName()))
                 .collect(Collectors.toList());
+        // 所有管理員共同的基底角色，管理員與會員
+        authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        return authorities;
     }
 
     @Override

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>修改系統公告</title>
+</head>
+<body>
+	<h3>修改系統公告</h3>
+
+	<form method="post" th:action="@{/admin/notifications/update}" th:object="${notification}">
+
+		<input type="hidden" th:field="*{noticeId}">
+
+		公告編號: <span th:text="*{noticeId}"></span><br>
+
+		建立時間: <span th:text="${notification.createdAt != null ? #dates.format(notification.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span><br>
+
+		公告內容:<br>
+		<textarea th:field="*{systemContent}" rows="6" cols="60" maxlength="1000"></textarea>
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('systemContent')}" th:errors="*{systemContent}"></span><br>
+
+		公告狀態:
+		<select th:field="*{noticeStatus}">
+			<option th:each="entry : ${noticeStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+		</select>
+		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('noticeStatus')}" th:errors="*{noticeStatus}"></span><br>
+
+		<input type="submit" value="修改">
+	</form>
+
+	<a th:href="@{/admin/notifications/listAllNotification}">回系統公告列表</a>
+</body>
+</html>
