@@ -1,28 +1,37 @@
 package com.freemind.course.coupon.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+
+import com.freemind.login.member.model.Member;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CouponService {
 
 	private final CouponRepository repository;
+	private final StringRedisTemplate stringRedisTemplate;
 	
 	@Value("${app.coupon.page-size:5}")
 	private int couponPageSize;
 	
-	public CouponService(CouponRepository repository) {
+	public CouponService(CouponRepository repository,
+			MemberCouponRepository memberCouponRepository,
+			StringRedisTemplate stringRedisTemplate) {
 		this.repository = repository;
+		this.stringRedisTemplate = stringRedisTemplate;
 	}
 	
 	public void addCoupon(Coupon coupon) {
@@ -57,6 +66,14 @@ public class CouponService {
 
         return repository.findAll(pageable);
     }
+	
+	public List<Coupon> getAvailableCoupons(){
+		return null;
+	}
+	public void initCouponStock(Integer couponId, Integer stock) {
+	    String stockKey = "coupon:stock:" + couponId;
+	    stringRedisTemplate.opsForValue().set(stockKey, String.valueOf(stock));
+	}
 	
 	
 }

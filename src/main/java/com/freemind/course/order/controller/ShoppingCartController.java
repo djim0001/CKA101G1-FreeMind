@@ -31,7 +31,7 @@ import com.freemind.login.member.model.MemberService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/course/member")
+@RequestMapping("/member/course")
 public class ShoppingCartController {
 	
 	private final ShoppingCartRedisService ShoppingCartRedisSvc;
@@ -84,7 +84,7 @@ public class ShoppingCartController {
 		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("cartMsg", "請先加入課程至購物車");
-			return "redirect:/course/member/shopping_cart";
+			return "redirect:/member/course/shopping_cart";
 		}
 		Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
@@ -96,7 +96,7 @@ public class ShoppingCartController {
 		}
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
-			return "redirect:/course/member/select_course";
+			return "redirect:/member/course/select_course";
 		}
 		model.addAttribute("cartList", cartList);
 		model.addAttribute("cartTotal", cartTotal);
@@ -130,10 +130,12 @@ public class ShoppingCartController {
 	public String cartRemove(
 			@RequestParam("courseId") Integer courseId, 
 			@ModelAttribute("member") Member member,
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
 			RedirectAttributes redirectAttributes) {
 		ShoppingCartRedisSvc.removeCourse(member.getMemberId(), courseId);
 		
-		return "redirect:/course/member/shopping_cart";
+//		return "redirect:/member/course/shopping_cart";
+		return "redirect:" + returnUrl;
 	}
 	
 	@PostMapping("/cart_clear")
@@ -142,7 +144,7 @@ public class ShoppingCartController {
 			RedirectAttributes redirectAttributes) {
 		ShoppingCartRedisSvc.clearCart(member.getMemberId());
 		
-		return "redirect:/course/member/shopping_cart";
+		return "redirect:/member/course/shopping_cart";
 	}
 	
 	@PostMapping("/checkout")
@@ -153,13 +155,13 @@ public class ShoppingCartController {
 		if(paymentMethod == null) {
 			System.out.print("無支付方式");
 			redirectAttributes.addFlashAttribute("paymentMethodMsg", "請選擇支付方式");
-			return "redirect:/course/member/goto_checkout";
+			return "redirect:/member/course/goto_checkout";
 		}
 		CourseOrder courseOrder = new CourseOrder();
 		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
-			return "redirect:/course/member/select_course";
+			return "redirect:/member/course/select_course";
 		}
 		Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 		
@@ -201,7 +203,7 @@ public class ShoppingCartController {
 		ShoppingCartRedisSvc.clearCart(member.getMemberId());
 		redirectAttributes.addFlashAttribute("cartMsg", "結帳成功");
 		
-		return "redirect:/course/member/select_course";
+		return "redirect:/member/course/select_course";
 	}
 	
 	private String safeRedirectUrl(String returnUrl) {

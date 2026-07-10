@@ -14,7 +14,7 @@ span.error {
 <body>
 	<h1>購物車</h1>
 	<h3>
-		<a th:href="@{/course/member/select_course}">會員課程一覽頁面</a>
+		<a th:href="@{/member/course/select_course}">會員課程一覽頁面</a>
 	</h3>
 	<span>會員名稱:</span>
 	<span th:text=${memberName}></span>
@@ -39,6 +39,7 @@ span.error {
 			<td>
 				<form th:action="@{cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
 					<input type="hidden" name="courseId" th:value="${item.courseId}">
+					<input type="hidden" name="returnUrl">
 					<button type="submit">從購物車移除</button>
 				</form>
 			</td>
@@ -57,5 +58,11 @@ span.error {
 		<input type="hidden" name="cartList" th:value="${cartList}">
 		<button type="submit">結帳</button>
 	</form>
+	
+	<script>
+	document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+        input.value = window.location.pathname + window.location.search;
+    });
+	</script>
 </body>
 </html>

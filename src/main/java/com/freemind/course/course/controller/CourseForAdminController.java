@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/course/admin")
+@RequestMapping("/admin/course")
 public class CourseForAdminController {
 	
 	private final CourseService courseSvc;
@@ -41,12 +41,12 @@ public class CourseForAdminController {
 	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
 			HttpSession session) {
 		session.setAttribute("adminId", adminIdSession);
-		return "redirect:/course/admin/select_course";
+		return "redirect:/admin/course/select_course";
 	}
 	@PostMapping("/listed")
 	public String listed() {
 		courseSvc.checkAllCourseStatus();
-		return "redirect:/course/admin/select_course";
+		return "redirect:/admin/course/select_course";
 	}
 	@GetMapping("/select_course")
 	public String admunSelectCourse(
@@ -111,7 +111,7 @@ public class CourseForAdminController {
 			return "back-end/course/course/selectCourseCategories";
 		}
 		courseCategoriesSvc.addCourseCategories(courseCategories);
-		return "redirect:/course/admin/select_course_categories";
+		return "redirect:/admin/course/select_course_categories";
 	}
 
 	@ModelAttribute("courseCategoriesListAll")
