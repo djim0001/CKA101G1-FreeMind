@@ -1,9 +1,9 @@
 package com.freemind.course.coupon.model;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -11,12 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
-
-import com.freemind.login.member.model.Member;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class CouponService {
@@ -67,13 +62,59 @@ public class CouponService {
         return repository.findAll(pageable);
     }
 	
-	public List<Coupon> getAvailableCoupons(){
-		return null;
-	}
-	public void initCouponStock(Integer couponId, Integer stock) {
-	    String stockKey = "coupon:stock:" + couponId;
-	    stringRedisTemplate.opsForValue().set(stockKey, String.valueOf(stock));
-	}
+	 public void publishCoupon(
+	            Integer couponId,
+	            Integer stock,
+	            Long ttlHours) {
+
+	        if (couponId == null) {
+	            throw new IllegalArgumentException(
+	                "優惠券編號不能為空"
+	            );
+	        }
+
+	        if (stock == null || stock <= 0) {
+	            throw new IllegalArgumentException(
+	                "發放數量必須大於 0"
+	            );
+	        }
+
+	        if (ttlHours == null || ttlHours <= 0) {
+	            throw new IllegalArgumentException(
+	                "有效時數必須大於 0"
+	            );
+	        }
+
+	        boolean exists =
+	            repository.existsById(couponId);
+
+	        if (!exists) {
+	            throw new IllegalArgumentException(
+	                "找不到指定優惠券"
+	            );
+	        }
+
+	        String stockKey =
+	            "coupon:stock:" + couponId;
+
+	        String publishedKey =
+	            "coupon:published:" + couponId;
+
+	        stringRedisTemplate.opsForValue().set(
+	            stockKey,
+	            stock.toString(),
+	            ttlHours,
+	            TimeUnit.HOURS
+	        );
+
+//	        stringRedisTemplate.opsForValue().set(
+//	            publishedKey,
+//	            "1",
+//	            ttlHours,
+//	            TimeUnit.HOURS
+//	        );
+	    }
+	 
 	
 	
 }

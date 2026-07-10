@@ -15,154 +15,256 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import com.freemind.course.coupon.dto.CouponClaimResult;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
 public class MemberCouponService {
 
-	private final MemberCouponRepository repository;
-	private final CouponRepository couponRepository;
-	private final StringRedisTemplate stringRedisTemplate;
+	private static final String CLAIM_COUPON_SCRIPT = """
+			local stockKey = KEYS[1]
+			local claimedKey = KEYS[2]
 
+			local memberId = ARGV[1]
+
+			if redis.call('EXISTS', stockKey) == 0 then
+			    return -1
+			end
+
+			if redis.call('SISMEMBER', claimedKey, memberId) == 1 then
+			    return -2
+			end
+
+			local stock = tonumber(redis.call('GET', stockKey))
+
+			if stock == nil or stock <= 0 then
+			    return 0
+			end
+
+			redis.call('DECR', stockKey)
+			redis.call('SADD', claimedKey, memberId)
+
+			local ttl = redis.call('TTL', stockKey)
+
+			if ttl > 0 then
+			    redis.call('EXPIRE', claimedKey, ttl)
+			end
+
+			return 1
+			""";
 	@Value("${app.coupon.page-size:5}")
 	private int couponPageSize;
+	private final CouponRepository couponRepository;
+	private final MemberRepository memberRepository;
+	private final MemberCouponRepository memberCouponRepository;
+	private final StringRedisTemplate redisTemplate;
+	private final DefaultRedisScript<Long> claimCouponScript;
 
-	public MemberCouponService(
-			MemberCouponRepository repository,
-			CouponRepository couponRepository,
-			StringRedisTemplate stringRedisTemplate) {
-		this.repository = repository;
+	public MemberCouponService(CouponRepository couponRepository, MemberRepository memberRepository,
+			MemberCouponRepository memberCouponRepository, StringRedisTemplate redisTemplate) {
+
 		this.couponRepository = couponRepository;
-		this.stringRedisTemplate = stringRedisTemplate;
+		this.memberRepository = memberRepository;
+		this.memberCouponRepository = memberCouponRepository;
+		this.redisTemplate = redisTemplate;
+
+		this.claimCouponScript = new DefaultRedisScript<>();
+
+		this.claimCouponScript.setScriptText(CLAIM_COUPON_SCRIPT);
+
+		this.claimCouponScript.setResultType(Long.class);
 	}
-	
+
 	public void addCoupon(MemberCoupon memCoupon) {
-		repository.save(memCoupon);
+		memberCouponRepository.save(memCoupon);
 	}
-	
+
 	public void updateCoupon(MemberCoupon memCoupon) {
-		repository.save(memCoupon);
+		memberCouponRepository.save(memCoupon);
 	}
-	
+
 	public MemberCoupon getOneByPK(Integer couponSerialNo) {
 		// 代表回傳直可能為Optional.empty() => 不是 null -- Jpa 用法 --
-		Optional<MemberCoupon> optional = repository.findById(couponSerialNo);
+		Optional<MemberCoupon> optional = memberCouponRepository.findById(couponSerialNo);
 		return optional.orElse(null);
 	}
-	
-	public List<MemberCoupon> getAllMemberCoupon(){
-		return repository.findAll();
+
+	public List<MemberCoupon> getAllMemberCoupon() {
+		return memberCouponRepository.findAll();
 	}
-	
-	public List<MemberCoupon> getAllMemberCoupon(Map<String, String[]> map){
-		return repository.findAll();
+
+	public List<MemberCoupon> getAllMemberCoupon(Map<String, String[]> map) {
+		return memberCouponRepository.findAll();
 	}
-	
+
 	public List<MemberCoupon> getAllMyValidCoupon(Member member) {
-		
-		List<MemberCoupon> coupons = repository.findByMember(member);
-	    List<MemberCoupon> couponsValid = new ArrayList<>();
 
-	    if (coupons == null || coupons.isEmpty()) {
-	        return couponsValid;
-	    }
+		List<MemberCoupon> coupons = memberCouponRepository.findByMember(member);
+		List<MemberCoupon> couponsValid = new ArrayList<>();
 
-	    for (MemberCoupon coupon : coupons) {
-	        if (coupon.isCouponValid()) {
-	            couponsValid.add(coupon);
-	        }
-	    }
+		if (coupons == null || coupons.isEmpty()) {
+			return couponsValid;
+		}
 
-	    return couponsValid;
+		for (MemberCoupon coupon : coupons) {
+			if (coupon.isCouponValid()) {
+				couponsValid.add(coupon);
+			}
+		}
+
+		return couponsValid;
 	}
+
 	public List<MemberCoupon> getAllMyCoupon(Member member) {
-		return repository.findByMember(member);
+		return memberCouponRepository.findByMember(member);
 	}
+
 	public Page<MemberCoupon> getMemberCouponPage(Integer page) {
 
-        Pageable pageable = PageRequest.of(
-            page,
-            couponPageSize,
-            Sort.by("couponSerialNo").ascending()
-        );
+		Pageable pageable = PageRequest.of(page, couponPageSize, Sort.by("couponSerialNo").ascending());
 
-        return repository.findAll(pageable);
-    }
-	public Page<MemberCoupon> getMyCoupons(Member member, Integer page) {
-		
-		Pageable pageable = PageRequest.of(
-				page,
-				couponPageSize,
-				Sort.by("couponSerialNo").ascending()
-				);
-		
-		return repository.findByMember(member, pageable);
+		return memberCouponRepository.findAll(pageable);
 	}
-	
-	@Transactional
-    public String claimCoupon(Integer memberId, Integer couponId) {
 
-        String stockKey = "coupon:stock:" + couponId;
-        String claimedKey = "coupon:claimed:" + couponId;
+	public Page<MemberCoupon> getMyCoupons(Member member, Integer page) {
 
-        String luaScript = """
-                if redis.call('SISMEMBER', KEYS[2], ARGV[1]) == 1 then
-                    return -1
-                end
+		Pageable pageable = PageRequest.of(page, couponPageSize, Sort.by("couponSerialNo").ascending());
 
-                local stock = tonumber(redis.call('GET', KEYS[1]))
+		return memberCouponRepository.findByMember(member, pageable);
+	}
 
-                if stock == nil or stock <= 0 then
-                    return 0
-                end
+	 public List<Coupon> getAvailableCoupons() {
 
-                redis.call('DECR', KEYS[1])
-                redis.call('SADD', KEYS[2], ARGV[1])
+        List<Coupon> allCoupons =
+            couponRepository.findAll();
 
-                return 1
-                """;
+        return allCoupons.stream()
+            .filter(coupon -> {
 
-        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
-        redisScript.setScriptText(luaScript);
-        redisScript.setResultType(Long.class);
+                String stockKey =
+                    "coupon:stock:"
+                    + coupon.getCouponId();
 
-        Long result = stringRedisTemplate.execute(
-                redisScript,
-                List.of(stockKey, claimedKey),
-                String.valueOf(memberId)
+                String stock =
+                    redisTemplate.opsForValue()
+                        .get(stockKey);
+
+                if (stock == null) {
+                    return false;
+                }
+
+                try {
+                    return Long.parseLong(stock) > 0;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            })
+            .toList();
+    }
+
+    @Transactional
+    public CouponClaimResult claimCoupon(
+            Integer memberId,
+            Integer couponId) {
+
+        Coupon coupon =
+            couponRepository.findById(couponId)
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "優惠券不存在"
+                    )
+                );
+
+        Member member =
+            memberRepository.findById(memberId)
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "會員不存在"
+                    )
+                );
+
+        /*
+         * 資料庫先檢查。
+         * 即使 Redis 資料遺失，也可避免再次新增。
+         */
+        boolean alreadyClaimed =
+            memberCouponRepository
+                .existsByMemberMemberIdAndCouponCouponId(
+                    memberId,
+                    couponId
+                );
+
+        if (alreadyClaimed) {
+            return CouponClaimResult.ALREADY_CLAIMED;
+        }
+
+        String stockKey =
+            "coupon:stock:" + couponId;
+
+        String claimedKey =
+            "coupon:claimed:" + couponId;
+
+        Long result = redisTemplate.execute(
+            claimCouponScript,
+            List.of(stockKey, claimedKey),
+            memberId.toString()
         );
 
-        if (result == null) {
-            return "系統錯誤，請稍後再試";
+        if (result == null || result == -1L) {
+            return CouponClaimResult.NOT_PUBLISHED;
         }
 
-        if (result == -1) {
-            return "你已經領取過此優惠券";
+        if (result == -2L) {
+            return CouponClaimResult.ALREADY_CLAIMED;
         }
 
-        if (result == 0) {
-            return "優惠券已被領完";
+        if (result == 0L) {
+            return CouponClaimResult.SOLD_OUT;
         }
 
-        Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new RuntimeException("查無此優惠券"));
+        try {
+            LocalDateTime now =
+                LocalDateTime.now();
 
-        Member member = new Member();
-        member.setMemberId(memberId);
+            MemberCoupon memberCoupon =
+                new MemberCoupon();
 
-        MemberCoupon memberCoupon = new MemberCoupon();
-        memberCoupon.setCoupon(coupon);
-        memberCoupon.setMember(member);
-        memberCoupon.setCouponStartAt(LocalDateTime.now());
-        memberCoupon.setCouponEndAt(
-        	    LocalDateTime.now().plusDays(coupon.getDiscountDuration())
-        	);
+            memberCoupon.setCoupon(coupon);
+            memberCoupon.setMember(member);
+            memberCoupon.setCouponStatus((byte) 0);
+            memberCoupon.setCouponStartAt(now);
 
-        repository.save(memberCoupon);
+            memberCoupon.setCouponEndAt(
+                now.plusDays(
+                    coupon.getDiscountDuration()
+                )
+            );
 
-        return "領取成功";
+            memberCouponRepository.save(
+                memberCoupon
+            );
+
+            return CouponClaimResult.SUCCESS;
+
+        } catch (RuntimeException e) {
+
+            /*
+             * MySQL 新增失敗，補回 Redis。
+             */
+            redisTemplate.opsForValue()
+                .increment(stockKey);
+
+            redisTemplate.opsForSet()
+                .remove(
+                    claimedKey,
+                    memberId.toString()
+                );
+
+            throw e;
+        }
     }
-	
+
 }

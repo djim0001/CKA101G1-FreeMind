@@ -78,11 +78,12 @@ span.error {
 	    <span th:if="${orderCoupon != null}">
 	        已選擇：
 	        <b th:text="${couponName}"></b>
+	        <b th:text="${couponError}"></b>
 	    </span>
 	</form>
 	<form th:if="${orderCoupon != null}"
 	      method="post"
-	      th:action="@{remove_coupon}">
+	      th:action="@{/member/coupon/remove_coupon}">
 	    <input type="hidden" name="returnUrl">
 	    <button type="submit">取消優惠券</button>
 	</form>
@@ -150,7 +151,7 @@ span.error {
                     <td th:text="${memberCoupon.couponStatus == null ? '未使用' : memberCoupon.couponStatus}"></td>
 
                     <td>
-                        <form method="post" th:action="@{/coupon/member/choose_coupon}">
+                        <form method="post" th:action="@{/member/coupon/choose_coupon}">
                             <input type="hidden"
                                    name="couponSerialNo"
                                    th:value="${memberCoupon.couponSerialNo}">

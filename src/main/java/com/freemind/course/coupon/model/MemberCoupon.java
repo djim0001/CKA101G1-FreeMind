@@ -28,8 +28,6 @@ public class MemberCoupon {
 	@ManyToOne
 	@JoinColumn(name = "member_id", referencedColumnName = "member_id")
 	private Member member;
-//	@Column(name = "member_id")
-//	private Integer memberId;
 	
 	@Column(name = "coupon_status")
 	private Byte couponStatus = 0;
