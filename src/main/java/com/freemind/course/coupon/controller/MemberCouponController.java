@@ -150,11 +150,10 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        redirectAttributes.addFlashAttribute("couponError", "找不到此優惠券");
 	        return "redirect:/member/course/goto_checkout";
 	    }
-
-//	    if (!memberCoupon.getMember().getName().equals(member.getAccountStatus())) {
-//	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
-//	        return "redirect:/member/course/goto_checkout";
-//	    }
+	    if (!(memberCoupon.getMember().getMemberId() == member.getMemberId())) {
+	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
+	        return "redirect:/member/course/goto_checkout";
+	    }
 
 	    session.setAttribute("orderCoupon", memberCoupon);
 
