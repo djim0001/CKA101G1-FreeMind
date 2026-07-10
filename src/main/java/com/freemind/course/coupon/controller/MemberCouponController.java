@@ -8,10 +8,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.coupon.model.MemberCoupon;
@@ -62,6 +62,20 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 		return "front-end/member/course/myCoupon";
 	}
 	
+	
+	@PostMapping("/claim/{couponId}")
+	public String claimCoupon(
+	        @PathVariable Integer couponId,
+	        HttpSession session,
+	        RedirectAttributes redirectAttributes) {
+
+
+//	    String message = memCouponSvc.claimCoupon(member.getName(), couponId);
+
+//	    redirectAttributes.addFlashAttribute("message", message);
+
+	    return "redirect:/coupon/list";
+	}
 	@PostMapping("/coupon_model_box")
 	public String couponModelBox(ModelMap model, HttpSession session,
 			@ModelAttribute("member") Member member) {

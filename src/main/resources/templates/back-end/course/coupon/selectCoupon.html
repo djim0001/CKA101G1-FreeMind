@@ -23,6 +23,15 @@
 				th:value="${coupon.couponId}" th:text="${coupon.couponName}" />
 		</select> <input type="submit" value="送出">
 	</form>
+	<form method="post" th:action="@{distribute_coupons}">
+		發放優惠券: <select name="couponId">
+			<option th:text="--請選擇--">
+			<option th:each="coupon : ${couponListAll}"
+				th:value="${coupon.couponId}" th:text="${coupon.couponName}" />
+		</select> <br>
+		<span>發放數量:</span><input type="number" name="couponCount" min="1" value="100" >
+		<input type="submit" value="發布">
+	</form>
 	<br>
 
 	<p th:if="${session.couponPageQty > 0}">

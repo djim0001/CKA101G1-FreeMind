@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.coupon.model.Coupon;
 import com.freemind.course.coupon.model.CouponService;
@@ -97,6 +98,17 @@ public class CouponController {
 		model.addAttribute("success", "修改成功");
 		coupon = couponSvc.getOneCoupon(Integer.valueOf(coupon.getCouponId()));
 		model.addAttribute("coupon", coupon);
+		return "back-end/course/coupon/listOneCoupon";
+	}	
+	
+	@PostMapping("/distribute_coupons")
+	public String distributeCoupons(
+			@RequestParam(name="couponId",required = false) Integer couponId,
+			@RequestParam(name="couponCount",required = false) Integer couponCount,
+			ModelMap model) {
+		couponSvc.initCouponStock(couponId, couponCount);
+		System.out.println("成功");
+		
 		return "back-end/course/coupon/listOneCoupon";
 	}	
 	
