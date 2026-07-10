@@ -313,8 +313,8 @@ button.btn-status.disabled {
 <body>
 	<h1>我的文章</h1>
 	<h3>
-		<a class="btn-create" th:href="@{/psych/article/create}">新增文章</a> <a
-			class="btn-home" th:href="@{/}">回首頁</a>
+		<a class="btn-create" th:href="@{/psych/article/create}">新增文章</a> 
+		<a class="btn-home" th:href="@{/}">回首頁</a>
 	</h3>
 	<table>
 		<thead>
@@ -337,7 +337,7 @@ button.btn-status.disabled {
 					<td>
 					<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
 				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 2}"
-				       th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
+				       th:href="@{/psych/article/{id}/edit(id=${article.articleId}, page=${currentPage})}"
 				       class="btn-edit">編輯</a>
 				
 				    <form th:if="${article.articleStatus == 0}"
@@ -359,7 +359,7 @@ button.btn-status.disabled {
 				
 				    <!-- 已發布：查看, 下架 -->
 					<a th:if="${article.articleStatus == 2}"
-					   th:href="@{/article/detail/{id}(id=${article.articleId})}"
+					   th:href="@{/article/{id}(id=${article.articleId})}"
 					   target="_blank"
 					   class="btn-edit">查看</a>
 				    <form th:if="${article.articleStatus == 2}"
@@ -371,7 +371,7 @@ button.btn-status.disabled {
 				
 				    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
 				    <a th:if="${article.articleStatus == 3}"
-					   th:href="@{/psych/article/{id}/edit(id=${article.articleId})}"
+					   th:href="@{/psych/article/{id}/edit(id=${article.articleId}, page=${currentPage})}"
 					   class="btn-edit">編輯</a>
    
 					<button th:if="${article.articleStatus == 3}"

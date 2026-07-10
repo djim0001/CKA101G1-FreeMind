@@ -85,17 +85,20 @@
 
     <form th:action="@{/admin/article/categories/create}" method="post" id="createForm">
         <div class="form-group">
-            <label for="catName">分類名稱：</label>
-            <input type="text" id="catName" name="catName" required maxlength="50"
-                   placeholder="請輸入分類名稱" autocomplete="off" />
-            <div id="errorText" class="error-text" style="display: none;"></div>
-            <ul id="similarList" class="similar-list" style="display: none;"></ul>
-        </div>
-        <button type="submit" id="submitBtn" class="btn-action">新增</button>
+		    <label for="catName">分類名稱：</label>
+		    <div style="display: flex; align-items: center; gap: 10px;">
+		        <input type="text" id="catName" name="catName" required maxlength="50"
+		               placeholder="請輸入分類名稱" autocomplete="off" />
+		        <button type="submit" id="submitBtn" class="btn-action">新增</button>
+		    </div>
+		    <div id="errorText" class="error-text" style="display: none;"></div>
+		    <ul id="similarList" class="similar-list" style="display: none;"></ul>
+		</div>
 
         <span id="alertMsg" th:if="${alertMessage}" 
          	  th:classappend="${alertType == 'error'} ? 'error-msg' : 'success-msg'"
-              th:text="${alertMessage}" style="margin-left: 10px;"></span>
+              th:text="${alertMessage}" style="margin-left: 10px;">
+        </span>
     </form>
 
     <script th:inline="javascript">

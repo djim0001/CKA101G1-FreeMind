@@ -277,7 +277,7 @@ body {
 						<span th:text="${article.publishedAt}"></span>
 					</div>
 					<div class="article-action">
-						<a th:href="@{/article/detail/{id}(id=${article.articleId})}">查看詳情</a>
+						<a th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage}, catId=${selectedCatId})}">查看詳情</a>
 					</div>
 				</div>
 

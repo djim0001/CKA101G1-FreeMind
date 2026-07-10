@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="${article.title}">文章詳情</title>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
 * {
 	margin: 0;
@@ -100,6 +102,57 @@ body {
 	font-weight: 500;
 }
 
+/* 互動列：靠 margin-left:auto 推到 meta 列最右邊 */
+.article-actions {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.action-form {
+	display: inline-flex;
+	margin: 0;
+}
+
+.action-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 34px;
+	padding: 0 14px;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 20px;
+	font-size: 14px;
+	font-family: inherit;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.action-btn:hover {
+	background-color: #f2dddd;
+	color: #4a3e3e;
+}
+
+.action-btn i {
+	font-size: 16px;
+}
+
+.action-btn .count {
+	font-weight: 600;
+	min-width: 10px;
+}
+
+/* 已按讚/已收藏的高亮狀態 */
+.action-btn.active {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
 .article-content {
 	font-size: 16px;
 	color: #444;
@@ -136,16 +189,21 @@ body {
 	.article-meta {
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 8px;
+		gap: 10px;
+	}
+	/* 手機時互動列不靠右，改靠左換行 */
+	.article-actions {
+		margin-left: 0;
+		flex-wrap: wrap;
 	}
 }
-
 </style>
 </head>
 <body>
 	<div class="container">
 
-		<a class="back-link" th:href="@{/article/}">返回文章列表</a>
+		<a class="back-link"
+			th:href="@{/article/(page=${currentPage}, catId=${selectedCatId})}">返回文章列表</a>
 
 		<div class="article-detail">
 
@@ -160,6 +218,44 @@ body {
 					<span class="cat-tag"
 						th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
 					<span th:text="'發布時間：' + ${article.publishedAt}"></span>
+
+					<!-- 互動列：按讚 / 收藏 / 分享（靠右） -->
+					<div class="article-actions">
+
+						<!-- 按讚 -->
+						<form class="action-form" method="post"
+							th:action="@{/member/article/{id}/like(id=${article.articleId})}">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+							<input type="hidden" name="page" th:value="${currentPage}" />
+							<input type="hidden" name="catId" th:value="${selectedCatId}" />
+							<button type="submit" class="action-btn like-btn"
+								th:classappend="${likedByMe} ? 'active' : ''">
+								<i class="fa-regular fa-heart"></i>
+								<span class="count" th:text="${likeCount}">0</span>
+							</button>
+						</form>
+
+						<!-- 收藏（後端尚未做，先放；點了會 404，可先註解此段） -->
+						<form class="action-form" method="post"
+							th:action="@{/member/article/{id}/bookmark(id=${article.articleId})}">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+							<input type="hidden" name="page" th:value="${currentPage}" />
+							<input type="hidden" name="catId" th:value="${selectedCatId}" />
+							<button type="submit" class="action-btn bookmark-btn"
+								th:classappend="${bookmarkedByMe} ? 'active' : ''">
+								<i class="fa-regular fa-bookmark"></i>
+								<span class="count" th:text="${bookmarkCount != null ? bookmarkCount : 0}">0</span>
+							</button>
+						</form>
+
+						<!-- 分享（純前端複製網址） -->
+						<button type="button" class="action-btn share-btn"
+							onclick="copyShareLink(this)">
+							<i class="fa-regular fa-share-from-square"></i>
+							<span class="count" th:text="${shareCount != null ? shareCount : 0}">0</span>
+						</button>
+
+					</div>
 				</div>
 
 				<!-- 文章內文 (TinyMCE 存的是 HTML，用 utext 才能渲染) -->
@@ -169,5 +265,18 @@ body {
 		</div>
 
 	</div>
+
+	<script>
+		function copyShareLink(btn) {
+			navigator.clipboard.writeText(window.location.href).then(function() {
+				var icon = btn.querySelector('i');
+				var original = icon.className;
+				icon.className = 'fa-regular fa-circle-check';
+				setTimeout(function() {
+					icon.className = original;
+				}, 1500);
+			});
+		}
+	</script>
 </body>
 </html>
