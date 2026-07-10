@@ -2,8 +2,8 @@ package com.freemind.course.course.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -18,6 +18,8 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -27,22 +29,23 @@ import jakarta.validation.Valid;
 public class CourseForAdminController {
 	
 	private final CourseService courseSvc;
-	private final CourseCategoriesService courseCategoriesSvc;;
+	private final AdminService adminSvc;
+	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForAdminController(
 			CourseService courseSvc,
+			AdminService adminSvc,
 			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
+		this.adminSvc = adminSvc;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
+	@ModelAttribute("admin")
+    public Admin currentAdmin(Authentication authentication) {
+        return adminSvc.findByAccount(authentication.getName());
+    }
 	
-	@PostMapping("set_adminId_session")
-	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
-			HttpSession session) {
-		session.setAttribute("adminId", adminIdSession);
-		return "redirect:/admin/course/select_course";
-	}
 	@PostMapping("/listed")
 	public String listed() {
 		courseSvc.checkAllCourseStatus();
@@ -50,13 +53,10 @@ public class CourseForAdminController {
 	}
 	@GetMapping("/select_course")
 	public String admunSelectCourse(
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
-
-		if (adminId == null) 
-			return "back-end/course/course/selectCourse";
 		
 		if (page < 1)  page = 1;
 		Integer currentPage = page;		
@@ -68,7 +68,6 @@ public class CourseForAdminController {
 		model.addAttribute("totalPages", courseListSubmit.getTotalPages());
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
-		
 
 		return "back-end/course/course/selectCourse";
 	}
@@ -84,11 +83,11 @@ public class CourseForAdminController {
 	public String adminExamineCourse(
 			@RequestParam("courseId") Integer courseId, 
 			@RequestParam("courseStatus") Byte courseStatus, 
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
 			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus(courseStatus);
-		course.setAdminId(adminId);
+		course.setAdmin(admin);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 		return "back-end/course/course/listOneCourse";

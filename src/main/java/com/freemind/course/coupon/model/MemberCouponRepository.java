@@ -12,7 +12,12 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Inte
 
 //	Page<MemberCoupon> findByMemberMemberId(Integer memberId, Pageable pageable);
 	Page<MemberCoupon> findByMember(Member member, Pageable pageable);
+
 	List<MemberCoupon> findByMember(Member member);
-	
+
 	List<MemberCoupon> findByCouponStatus(Byte couponStatus);
+
+	boolean existsByMemberMemberIdAndCouponCouponId(Integer memberId, Integer couponId);
+
+	List<MemberCoupon> findByMemberMemberId(Integer memberId);
 }

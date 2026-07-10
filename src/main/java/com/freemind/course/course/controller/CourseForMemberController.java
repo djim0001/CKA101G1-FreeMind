@@ -31,7 +31,6 @@ public class CourseForMemberController {
 
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;
-	private final CourseOrderService courseOrderSvc;
 	private final OrderDetailService orderDetailSvc;
 	public CourseForMemberController(
 			CourseService courseSvc, MemberService memberSvc,
@@ -39,7 +38,6 @@ public class CourseForMemberController {
 			OrderDetailService orderDetailSvc) {
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
-		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
 	}
 	
@@ -57,8 +55,6 @@ public class CourseForMemberController {
 
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		System.out.println(member);
-		System.out.println(member.getName());
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		for(Course course : courseListListed) {
@@ -117,10 +113,6 @@ public class CourseForMemberController {
 		Page<OrderDetail> myCoursePage =
                 orderDetailSvc.getMyCourses(member.getMemberId(), currentPage - 1, sortField);
 		
-		System.out.println("目前 memberId = " + member.getMemberId());
-		System.out.println("查到筆數 = " + myCoursePage.getTotalElements());
-	    System.out.println("目前頁資料筆數 = " + myCoursePage.getContent().size());
-	    
 		model.addAttribute("myCoursePage", myCoursePage);
 		model.addAttribute("myCourses", myCoursePage.getContent());
 		model.addAttribute("currentPage", currentPage);
@@ -151,9 +143,6 @@ public class CourseForMemberController {
 	        @RequestParam(name = "courseId") Integer courseId,
 	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
 	        RedirectAttributes redirectAttributes) {
-
-	    System.out.println("page = " + page);
-	    System.out.println("orderBy = " + orderBy);
 
 	    if (member == null) {
 	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");

@@ -14,13 +14,7 @@
 		<a th:href="@{/admin/coupon/select_coupon}">優惠券</a>
 		<a th:href="@{/admin/course/select_course_categories}">課程分類</a>
 	</h3>
-	<form method="post" th:action="@{set_adminId_session}">
-		<span>員工編號：</span> <input type="text" name="adminIdSession" />
-		<button type="submit" id="submit">送出</button><br>
-		<span class="error" th:text="${aError}"></span>
-	</form>
-	<div th:if="${session.adminId > 0}">
-		<span>session員工編號:</span><span th:text=${session.adminId}></span><br><br>
+	<span>員工姓名：</span><b th:text="${admin.name}"></b>
 		<form method="post" th:action="@{listed}">
 			<button type="submit" id="submit">一鍵上架</button>
 		</form>
@@ -70,7 +64,7 @@
 						<td th:text="${course.commentCount}"></td>
 						<td th:text="${course.psychDiscount}"></td>
 						<td th:text="${course.price}"></td>
-						<td th:text="${course.adminId}"></td>
+						<td th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}"></td>
 						<td>
 							<form method="post" th:action="@{get_one_course}">
 								<input type="hidden" name="courseId"
@@ -85,7 +79,6 @@
 		</table>
 		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course', ${orderBy})}"></div>	
 		
-	</div>
 
 
 </body>

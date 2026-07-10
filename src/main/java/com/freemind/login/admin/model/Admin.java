@@ -8,8 +8,10 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.consultation.reports.model.Reports;
+import com.freemind.course.course.model.Course;
 import com.freemind.login.permission.model.Permission;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,6 +23,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -81,6 +84,10 @@ public class Admin implements java.io.Serializable {
 	// 活動
 	@OneToMany(mappedBy = "admin")
 	private Set<Activity> activities;
+	
+	//課程
+	@OneToMany(mappedBy = "admin",cascade = CascadeType.ALL)
+	private Set<Course> courses;
 
 
 	public Integer getAdminId() {
@@ -169,6 +176,14 @@ public class Admin implements java.io.Serializable {
 
 	public void setActivities(Set<Activity> activities) {
 	    this.activities = activities;
+	}
+
+	public Set<Course> getCourses() {
+		return courses;
+	}
+
+	public void setCourses(Set<Course> courses) {
+		this.courses = courses;
 	}
 	
 	
