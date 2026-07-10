@@ -26,7 +26,7 @@ import com.freemind.login.member.model.MemberService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/course/member")
+@RequestMapping("/member/course")
 public class CourseForMemberController {
 
 	private final CourseService courseSvc;
@@ -159,7 +159,7 @@ public class CourseForMemberController {
 	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");
 	        redirectAttributes.addFlashAttribute("page", page);
 	        redirectAttributes.addFlashAttribute("orderBy", orderBy);
-	        return "redirect:/course/memberSelectCourse";
+	        return "redirect:/member/course/select_course";
 	    }
 
 	    if (!courseSvc.isCourseInBookmark(member.getMemberId(), courseId)) {

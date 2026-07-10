@@ -67,6 +67,9 @@ public class CouponService {
         return repository.findAll(pageable);
     }
 	
+	public List<Coupon> getAvailableCoupons(){
+		return null;
+	}
 	public void initCouponStock(Integer couponId, Integer stock) {
 	    String stockKey = "coupon:stock:" + couponId;
 	    stringRedisTemplate.opsForValue().set(stockKey, String.valueOf(stock));

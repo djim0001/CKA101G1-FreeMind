@@ -22,7 +22,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/course")
+@RequestMapping("/admin/course")
 public class CourseCategoriesController {
 	
 	@Autowired

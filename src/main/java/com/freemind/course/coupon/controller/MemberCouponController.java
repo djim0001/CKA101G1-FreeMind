@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.course.coupon.model.Coupon;
+import com.freemind.course.coupon.model.CouponService;
 import com.freemind.course.coupon.model.MemberCoupon;
 import com.freemind.course.coupon.model.MemberCouponService;
 import com.freemind.course.order.model.CartItemDTO;
@@ -24,20 +26,23 @@ import com.freemind.login.member.model.MemberService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/course/member/coupon")
+@RequestMapping("/member/coupon")
 public class MemberCouponController {
 	
 private final MemberCouponService memCouponSvc;
+private final CouponService couponSvc;
 private final MemberService memberSvc;
 private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	
 	public MemberCouponController(
 			ShoppingCartRedisService ShoppingCartRedisSvc,
 			MemberService memberSvc,
+			CouponService couponSvc,
 			MemberCouponService memCouponSvc) {
 		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
 		this.memCouponSvc = memCouponSvc;
 		this.memberSvc = memberSvc;
+		this.couponSvc = couponSvc;
 	}
 
 	@ModelAttribute("member")
@@ -62,8 +67,16 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 		return "front-end/member/course/myCoupon";
 	}
 	
-	
-	@PostMapping("/claim/{couponId}")
+	@GetMapping("/available_coupons")
+	public String showAvailableCoupons(ModelMap model) {
+
+	    List<Coupon> coupons = couponSvc.getAvailableCoupons();
+
+	    model.addAttribute("coupons", coupons);
+
+	    return "member/coupons";
+	}
+	@PostMapping("/claim")
 	public String claimCoupon(
 	        @PathVariable Integer couponId,
 	        HttpSession session,
@@ -78,6 +91,8 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	}
 	@PostMapping("/coupon_model_box")
 	public String couponModelBox(ModelMap model, HttpSession session,
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			RedirectAttributes redirectAttributes,
 			@ModelAttribute("member") Member member) {
 		
 		List<MemberCoupon> memCoupons = memCouponSvc.getAllMyValidCoupon(member);
@@ -87,12 +102,15 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 		if(!cartList.isEmpty())
 			cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 	    
-		model.addAttribute("memCoupons", memCoupons);
-		model.addAttribute("chooseCouponMsg", "show");
+		redirectAttributes.addFlashAttribute("memCoupons", memCoupons);
+		redirectAttributes.addFlashAttribute("chooseCouponMsg", "show");
+//		model.addAttribute("memCoupons", memCoupons);
+//		model.addAttribute("chooseCouponMsg", "show");
 		model.addAttribute("orderCoupon", orderCoupon);
 		model.addAttribute("cartList", cartList);
 		model.addAttribute("cartTotal", cartTotal);
-		return "front-end/member/course/shoppingCartCheckOut";
+//		return "front-end/member/course/shoppingCartCheckOut";
+		return "redirect:" + returnUrl;
 	}
 	
 	@PostMapping("/choose_coupon")

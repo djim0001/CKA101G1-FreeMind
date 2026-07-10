@@ -54,11 +54,11 @@
 <body>
 	<h3>
 		<a th:href="@{/course_index}">課程index</a>
-		<a th:href="@{/course/member/my_courses}">個人課程空間</a>
+		<a th:href="@{/member/course/my_courses}">個人課程空間</a>
 	</h3>
 	<h5>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
-		<a th:href="@{/course/member/my_bookmarks}">收藏課程</a>
+		<a th:href="@{/member/course/shopping_cart}">購物車</a>
+		<a th:href="@{/member/course/my_bookmarks}">收藏課程</a>
 	</h5>
 	<span>會員名稱:</span>
 	<span th:text=${memberName}></span>
@@ -66,24 +66,24 @@
 	<table>
 		<thead>
 			<tr>
-				<th><a th:href="@{/course/member/select_course}">課程名稱</a></th>
+				<th><a th:href="@{/member/course/select_course}">課程名稱</a></th>
 				<th>心理師名稱</th>
-				<th><a th:href="@{/course/member/select_course(page=1,
+				<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
 						    			)}">課程分類名稱</a>
-				<th><a th:href="@{/course/member/select_course(page=1,
+				<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
 						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
 						    			)}">平均星數</a></th>
-					<th><a th:href="@{/course/member/select_course/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
 						    			)}">評價次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
 						    			)}">提問次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
 						    			)}">課程定價</a></th>
 				<th>功能</th>
@@ -137,7 +137,7 @@
 			</th:block>
 		</tbody>
 	</table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/select_course', ${orderBy})}"></div>	
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>	
 		
 	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
 	    <div class="cart-modal-content">

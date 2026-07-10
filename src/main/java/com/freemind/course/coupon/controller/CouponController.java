@@ -27,7 +27,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/course/admin/coupon")
+@RequestMapping("/admin/coupon")
 public class CouponController {
 	
 	private final CouponService couponSvc;
@@ -105,8 +105,9 @@ public class CouponController {
 	public String distributeCoupons(
 			@RequestParam(name="couponId",required = false) Integer couponId,
 			@RequestParam(name="couponCount",required = false) Integer couponCount,
-			ModelMap model) {
+			ModelMap model, HttpSession session) {
 		couponSvc.initCouponStock(couponId, couponCount);
+		session.setAttribute("distributeCouponId", couponId);
 		System.out.println("成功");
 		
 		return "back-end/course/coupon/listOneCoupon";

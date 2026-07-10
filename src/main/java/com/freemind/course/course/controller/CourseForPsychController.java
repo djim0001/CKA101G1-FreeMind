@@ -39,7 +39,7 @@ import jakarta.validation.Valid;
 
 //@Validated
 @Controller
-@RequestMapping("/course/psych")
+@RequestMapping("/psych/course")
 public class CourseForPsychController {
 
 	private final CourseService courseSvc;
@@ -75,7 +75,7 @@ public class CourseForPsychController {
 			HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
 		
-		return "redirect:/course/psych/select_course";
+		return "redirect:/psych/course/select_course";
 	}
 
 	@GetMapping("/select_course")

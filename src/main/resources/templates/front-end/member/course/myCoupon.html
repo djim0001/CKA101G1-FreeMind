@@ -9,20 +9,19 @@
 	<h1>我的優惠券</h1>
 
 	<h3>
-		<a th:href="@{/course/member/select_course}">課程商城</a>
+		<a th:href="@{/member/course/my_courses}">個人課程空間</a>
 	</h3>
 	<h3>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
+		<a th:href="@{/member/course/shopping_cart}">購物車</a>
 	</h3>
 	<br>
-	<form th:action="@{course/member/coupon/claim/{couponId}(couponId=${coupon.couponId})}"
+	<form th:action="@{/member/coupon/claim}"
 	      method="post">
+	    <input type="hidden"
+	           th:name="${couponId}"
+	           th:value="${session.distributeCouponId}">
 	
-<!-- 	    <input type="hidden" -->
-<!-- 	           th:name="${_csrf.parameterName}" -->
-<!-- 	           th:value="${_csrf.token}"> -->
-	
-	    <button type="submit">領取優惠券</button>
+	    <button th:if="${session.distributeCouponId!=null}" type="submit">領取優惠券</button>
 	</form>
 	<table>
 		<thead>
@@ -60,7 +59,7 @@
 		</tbody>
 
 	</table>
-	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/coupon/member/my_coupon')}"></div>	
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon')}"></div>	
 
 
 
