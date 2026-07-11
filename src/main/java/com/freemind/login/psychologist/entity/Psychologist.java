@@ -35,80 +35,68 @@ public class Psychologist implements java.io.Serializable{
 	
 	
 	//心理師帳號
-	@Column(name = "psych_account",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "psych_account", length = 20,nullable = false)
 	private String psychAccount;
 	
 	
 	//心理師密碼
-	@Column(name = "psych_password",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "psych_password", length = 60,nullable = false)
 	private String psychPassword;
 	
 	
 	//帳號狀態
 	@Column(name = "account_status",nullable = false)
-	@NotNull(message=": 請勿空白")
 	private Byte accountStatus = 0;
 	
 	
 	//姓名
-	@Column(name = "name",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "name", length = 20,nullable = false)
 	private String name;
 	
 	
 	//性別
-	@Column(name = "gender",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "gender", length = 10,nullable = false)
 	
 	private String gender;
 	
 	
 	//手機
-	@Column(name = "phone_number",nullable = false)
-	@NotNull(message=": 請勿空白")
-	@Pattern(regexp = "^[0-9]{10}$" , message = "")
+	@Column(name = "phone_number", length = 10,nullable = false)
 	private String phoneNumber;
 	
 	
 	//信箱
-	@Column(name = "email",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "email", length = 50,nullable = false)
 	private String email;
 	
 	
 	//心理師證照
-	@Column(name = "psych_certificate")
+	@Column(name = "psych_certificate", length = 30,nullable = false)
 	private String psychCertificate;
 	
 	
 	//是否有執業許可
 	@Column(name = "has_practice_license",nullable = false)
-	@NotNull(message=": 請勿空白")
-	private Boolean hasPracticeLicense;
+	private Boolean hasPracticeLicense = false;
 	
 	
 	//心理師工作地點
-	@Column(name = "psych_loc",nullable = false)
-	@NotNull(message=": 請勿空白")
+	@Column(name = "psych_loc", length = 50	,nullable = false)
 	private String psychLoc;
 	
 	
 	//心理師諮詢費
 	@Column(name = "psych_fee",nullable = false)
-	@NotNull(message=": 請勿空白")
 	private Integer psychFee;
 	
 	
 	//心理師可預約時段
-	@Column(name = "weekly_availability")
+	@Column(name = "weekly_availability", length = 168)
 	private String weeklyAvailability;
 	
 	
 	//加入時間
 	@Column(name = "regis_at",nullable = false)
-	@NotNull(message=": 請勿空白")
 	private Timestamp regisAt;
 	
 	
@@ -118,7 +106,7 @@ public class Psychologist implements java.io.Serializable{
 	
 	
 	//銀行帳號
-	@Column(name = "bank_account")
+	@Column(name = "bank_account", length = 20)
 	private String bankAccount;
 	
 	

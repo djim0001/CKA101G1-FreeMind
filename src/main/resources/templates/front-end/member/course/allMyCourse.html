@@ -8,11 +8,11 @@
 </head>
 <body>
 	<h3>
-		<a th:href="@{/course/member/select_course}">課程商城</a>
+		<a th:href="@{/member/course/select_course}">課程商城</a>
 	</h3>
 	<h5>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
-		<a th:href="@{/course/member/coupon/my_coupon}">我的優惠券</a>
+		<a th:href="@{/member/course/shopping_cart}">購物車</a>
+		<a th:href="@{/member/coupon/my_coupon}">我的優惠券</a>
 	</h5>
 	<h1>我的課程</h1>
 	<span>會員名稱:</span>
@@ -21,7 +21,7 @@
 	<table>
     <tr>
     <th>
-	    <a th:href="@{/course/member/my_courses(
+	    <a th:href="@{/member/course/my_courses(
 	        page=${currentPage},
 	        orderBy=${orderBy == 'courseIdAsc' ? 'courseIdDesc' : 'courseIdAsc'}
 	    )}">課程名稱
@@ -29,7 +29,7 @@
 	</th>
 	
 	<th>
-	    <a th:href="@{/course/member/my_courses(
+	    <a th:href="@{/member/course/my_courses(
 	        page=${currentPage},
 	        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
 	    )}">價格
@@ -37,7 +37,7 @@
 	</th>
 	
 	<th>
-	    <a th:href="@{/course/member/my_courses(
+	    <a th:href="@{/member/course/my_courses(
 	        page=${currentPage},
 	        orderBy=${orderBy == 'discountedPriceAsc' ? 'discountedPriceDesc' : 'discountedPriceAsc'}
 	    )}">折扣後價格
@@ -45,7 +45,7 @@
 	</th>
 	
 	<th>
-	    <a th:href="@{/course/member/my_courses(
+	    <a th:href="@{/member/course/my_courses(
 	        page=${currentPage},
 	        orderBy=${orderBy == 'courseProgressAsc' ? 'courseProgressDesc' : 'courseProgressAsc'}
 	    )}">進度
@@ -70,7 +70,7 @@
 	    </td>
 	</tr>
 </table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/my_bookmarks', ${orderBy})}"></div>	
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/my_bookmarks', ${orderBy})}"></div>	
 		
 	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
 	    <div class="cart-modal-content">

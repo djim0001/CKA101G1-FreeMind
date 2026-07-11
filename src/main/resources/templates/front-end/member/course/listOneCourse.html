@@ -9,7 +9,7 @@
 <body>
   <div class="app">
     <header class="topbar">
-      <a class="brand" th:href="@{/course/member/select_course}" aria-label="回到課程商城">
+      <a class="brand" th:href="@{/member/course/select_course}" aria-label="回到課程商城">
         <span class="brand-mark">課</span>
         <span>課程商城</span>
       </a>
@@ -166,7 +166,7 @@
             </div>
           </div>
 			<a class="action primary"
-			   th:href="@{/course/member/allQa/{courseId}(courseId=${course.courseId})}">
+			   th:href="@{/member/course/allQa/{courseId}(courseId=${course.courseId})}">
 			    查看課程提問</a>        
 		</section>
       </aside>

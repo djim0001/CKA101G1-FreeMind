@@ -9,20 +9,29 @@
 	<h1>優惠券</h1>
 
 	<h3>
-		<a th:href="@{/course/admin/select_course}">回員工課程管理</a>
+		<a th:href="@{/admin/course/select_course}">回員工課程管理</a>
 	</h3>
 	<h3>
-		<a th:href="@{/course/admin/coupon/add_coupon}">新增優惠券</a>
+		<a th:href="@{/admin/coupon/add_coupon}">新增優惠券</a>
 	</h3>
-	<br>
-	<div th:utext="${errorMessage}">${errorMessage}</div>
-	<br>
-	<form method="post" th:action="@{select_one_coupon}">
-		選擇優惠券: <select name="couponId">
+	<form th:action="@{/admin/coupon/publish}" method="post">
+	    選擇優惠券: <select name="couponId">
 			<option th:each="coupon : ${couponListAll}"
 				th:value="${coupon.couponId}" th:text="${coupon.couponName}" />
-		</select> <input type="submit" value="送出">
+		</select>
+	    <label>發放數量</label>
+	    <input type="number"
+	           name="stock"
+	           min="1"
+	           required>
+	    <label>可領取時數</label>
+	    <input type="number"
+	           name="ttlHours"
+	           min="1"
+	           required>
+	    <button type="submit">發布優惠券</button>
 	</form>
+	<div th:utext="${errorMessage}">${errorMessage}</div>
 	<br>
 
 	<p th:if="${session.couponPageQty > 0}">
@@ -55,7 +64,7 @@
 		</tbody>
 
 	</table>
-	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/course/admin/coupon/select_coupon')}"></div>	
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/coupon/select_coupon')}"></div>	
 
 
 
