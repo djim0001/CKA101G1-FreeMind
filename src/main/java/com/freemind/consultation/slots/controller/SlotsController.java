@@ -285,12 +285,12 @@ public class SlotsController {
 			model.addAttribute("success", "固定範本已更新！之後排程會依此規則自動產生時段。");
 			return "front-end/psych/consultation/slots/templateSuccess";
 		}
-		
-		//心理師可預約時段 14天排成器手動觸發按鈕
-		@PostMapping("triggerGenerate")
-		public String triggerGenerate(@RequestParam("psychId") String psychId, ModelMap model) {
-			slotsSvc.generateNext14DaysForPsych(Integer.valueOf(psychId));
-			model.addAttribute("success", "已手動觸發，未來14天的時段已依範本產生！");
+			
+		// 心理師改完範本後，重新套用範本到未來14天
+		@PostMapping("reapplyTemplate")
+		public String reapplyTemplate(@RequestParam("psychId") String psychId, ModelMap model) {
+			slotsSvc.reapplyTemplateToNext14Days(Integer.valueOf(psychId));
+			model.addAttribute("success", "已將新範本套用到未來14天！已預約的時段不受影響。");
 			return "front-end/psych/consultation/slots/templateSuccess";
 		}
 }

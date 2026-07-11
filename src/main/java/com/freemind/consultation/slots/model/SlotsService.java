@@ -69,8 +69,8 @@ public class SlotsService {
 	
 	private static final java.time.LocalDate TEMPLATE_DATE = java.time.LocalDate.of(2000, 1, 1);
 
-	// 依範本，幫指定心理師產生未來14天的時段（如果那天已有記錄就跳過，不覆蓋）
-	public void generateNext14DaysForPsych(Integer psychId) {
+	// 心理師設定/改變範本後，套用範本到未來14天（保留已預約的小時，其餘依範本覆蓋；沒有記錄的天數直接新增）
+	public void reapplyTemplateToNext14Days(Integer psychId) {
 		Slots template = getOneByPsychAndDate(psychId, TEMPLATE_DATE);
 		if (template == null) {
 			return; // 該心理師還沒設定範本，跳過
@@ -82,22 +82,32 @@ public class SlotsService {
 			java.time.LocalDate targetDate = today.plusDays(i);
 			
 			Slots existing = getOneByPsychAndDate(psychId, targetDate);
-			if (existing != null) {
-				continue; // 該天已經有記錄（可能是心理師手動調整過），不覆蓋
+			
+			if (existing == null) {
+				// 該天還沒有記錄，直接依範本新增
+				Slots newSlot = new Slots();
+				com.freemind.login.psychologist.entity.Psychologist p = new com.freemind.login.psychologist.entity.Psychologist();
+				p.setPsychId(psychId);
+				newSlot.setPsychologist(p);
+				newSlot.setSlotDate(targetDate);
+				newSlot.setConsStatus(fixedHours);
+				addSlots(newSlot);
+				continue;
 			}
 			
-			Slots newSlot = new Slots();
-			com.freemind.login.psychologist.entity.Psychologist p = new com.freemind.login.psychologist.entity.Psychologist();
-			p.setPsychId(psychId);
-			newSlot.setPsychologist(p);
-			newSlot.setSlotDate(targetDate);
-			newSlot.setConsStatus(fixedHours);
-			addSlots(newSlot);
+			// 該天已有記錄：保留已預約的小時(2)，其餘依新範本覆蓋
+			StringBuilder sb = new StringBuilder(existing.getConsStatus());
+			for (int h = 0; h < 24; h++) {
+				if (sb.charAt(h) == '2') continue; // 已預約成立，不可覆蓋
+				sb.setCharAt(h, fixedHours.charAt(h));
+			}
+			existing.setConsStatus(sb.toString());
+			updateSlots(existing);
 		}
 	}
 	
-	// 對所有有設定範本的心理師，批次執行
-	public void generateNext14DaysForAll() {
+	// 對所有有設定範本的心理師，批次執行「套用範本」（供排程器呼叫）
+	public void reapplyTemplateToAll() {
 		List<Slots> allSlots = getAll();
 		java.util.Set<Integer> psychIdsWithTemplate = new java.util.HashSet<>();
 		for (Slots s : allSlots) {
@@ -106,7 +116,8 @@ public class SlotsService {
 			}
 		}
 		for (Integer psychId : psychIdsWithTemplate) {
-			generateNext14DaysForPsych(psychId);
+			reapplyTemplateToNext14Days(psychId);
 		}
 	}
+
 }
