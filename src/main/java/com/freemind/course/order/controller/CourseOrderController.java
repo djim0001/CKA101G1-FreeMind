@@ -3,9 +3,11 @@ package com.freemind.course.order.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -16,7 +18,7 @@ import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
 @Controller
-@RequestMapping("/course/order") 
+@RequestMapping("/member/course/order") 
 public class CourseOrderController {
 
     @Autowired
@@ -24,14 +26,21 @@ public class CourseOrderController {
     @Autowired
     private MemberService memberSvc;
 
+	@ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        return memberSvc.findByAccount(authentication.getName());
+    }
+	
+    
+    
     @GetMapping("acb")
     public String getOrderById(ModelMap model,
-    		@SessionAttribute(name = "memberId", required = false) Integer memberId) {
+    		@ModelAttribute("member") Member member){
         
         // 1. 從 Session 撈出登入時存進去的會員物件 (請確保跟您登入功能存的 Key 一致，這裡假設叫 "member")
 //        Member loginMember = (Member) session.getAttribute("member"); 
     	
-    	Member mem = memberSvc.getOneMember(memberId);
+    	Member mem = memberSvc.getOneMember(member.getMemberId());
         // 安全檢查：如果沒登入，強制踢回登入頁
         if (mem == null) {
             return "redirect:/login"; 
