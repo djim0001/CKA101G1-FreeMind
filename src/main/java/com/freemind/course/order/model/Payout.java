@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "payouts")
@@ -70,7 +71,7 @@ public class Payout {
 		this.admin = admin;
 	}
 
-	@Column(name = "gross_payout_amount ", nullable = false)
+	@Column(name = "gross_payout_amount", nullable = false)
 	public Integer getGrossPayoutAmount() {
 		return grossPayoutAmount;
 	}
@@ -79,7 +80,7 @@ public class Payout {
 		this.grossPayoutAmount = grossPayoutAmount;
 	}
 
-	@Column(name = "platform_commission ", nullable = false)
+	@Column(name = "platform_commission", nullable = false)
 	public Integer getPlatformCommission() {
 		return platformCommission;
 	}
@@ -88,7 +89,7 @@ public class Payout {
 		this.platformCommission = platformCommission;
 	}
 
-	@Column(name = "billing_offset ", nullable = false)
+	@Column(name = "billing_offset", nullable = false)
 	public Integer getBillingOffset() {
 		return billingOffset;
 	}
@@ -97,7 +98,7 @@ public class Payout {
 		this.billingOffset = billingOffset;
 	}
 
-	@Column(name = "net_payout_amount ", nullable = false)
+	@Column(name = "net_payout_amount", nullable = false)
 	public Integer getNetPayoutAmount() {
 		return netPayoutAmount;
 	}
@@ -122,5 +123,25 @@ public class Payout {
 
 	public void setPayoutStatus(Integer payoutStatus) {
 		this.payoutStatus = payoutStatus;
+	}
+
+	// 課程狀態文字版
+
+	@Transient
+	public String getPayoutStatusText() {
+		if (payoutStatus == null) {
+			return "/沒找到";
+		}
+		Integer status = payoutStatus;
+		switch (payoutStatus) {
+		case 0:
+			return "未付款";
+		case 1:
+			return "已付款";
+		case 2:
+			return "撥款異常";
+		default:
+			return "未知狀態";
+		}
 	}
 }
