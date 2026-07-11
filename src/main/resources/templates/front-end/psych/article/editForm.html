@@ -155,13 +155,13 @@ button[value="submit"]:hover {
 </head>
 <body>
 	<h1>
-		<span>編輯文章</span> <a th:href="@{/psych/article/myArticles}">返回</a>
+		<span>編輯文章</span> <a th:href="@{/psych/article/myArticles(page=${currentPage})}">返回</a>
 	</h1>
 
 	<p th:if="${errorMessage}" th:text="${errorMessage}"
 		style="color: red;"></p>
 
-	<form th:action="@{/psych/article/{id}/edit(id=${articleId})}"
+	<form th:action="@{/psych/article/{id}/edit(id=${articleId}, page=${currentPage})}"
 		method="post" enctype="multipart/form-data">
 		<div>
 			<label>標題</label>
@@ -245,7 +245,7 @@ button[value="submit"]:hover {
 		    if (file) {
 		        preview.src = URL.createObjectURL(file);
 		        preview.style.display = 'block';
-		        fileName.textContent = file.name;  // 這行會顯示檔名
+		        fileName.textContent = file.name;  // 顯示檔名
 		    }
 		});
 		

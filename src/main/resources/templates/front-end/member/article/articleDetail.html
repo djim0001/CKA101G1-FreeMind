@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title th:text="${article.title}">文章詳情</title>
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
 * {
 	margin: 0;
@@ -100,6 +104,50 @@ body {
 	font-weight: 500;
 }
 
+.article-actions {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.action-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: 34px;
+	padding: 0 14px;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 20px;
+	font-size: 14px;
+	font-family: inherit;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.action-btn:hover {
+	background-color: #f2dddd;
+	color: #4a3e3e;
+}
+
+.action-btn i {
+	font-size: 16px;
+}
+
+.action-btn .count {
+	font-weight: 600;
+	min-width: 10px;
+}
+
+.action-btn.active {
+	background-color: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+
 .article-content {
 	font-size: 16px;
 	color: #444;
@@ -123,6 +171,139 @@ body {
 	color: #4a3e3e;
 }
 
+.share-modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(255, 255, 255, 0.55);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+	z-index: 1000;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.share-modal-overlay.show {
+	display: flex;
+	opacity: 1;
+}
+
+.share-modal-panel {
+	background: #fff;
+	border-radius: 16px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+	width: 90%;
+	max-width: 420px;
+	padding: 24px;
+	transform: translateY(10px);
+	transition: transform 0.2s ease;
+}
+
+.share-modal-overlay.show .share-modal-panel {
+	transform: translateY(0);
+}
+
+.share-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.share-modal-header span {
+	font-size: 16px;
+	font-weight: 700;
+	color: #4a3e3e;
+}
+
+.share-modal-close {
+	background: none;
+	border: none;
+	font-size: 22px;
+	line-height: 1;
+	color: #aaa;
+	cursor: pointer;
+	padding: 4px;
+}
+
+.share-modal-close:hover {
+	color: #7a6b6b;
+}
+
+.share-modal-options {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.share-option {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
+	flex: 1;
+}
+
+.share-icon {
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 22px;
+	color: #fff;
+	transition: transform 0.15s ease;
+}
+
+.share-option:hover .share-icon {
+	transform: scale(1.08);
+}
+
+.share-label {
+	font-size: 12px;
+	color: #666;
+}
+
+.copy-icon {
+	background-color: #7a6b6b;
+}
+
+.line-icon {
+	background-color: #06C755;
+}
+
+.instagram-icon {
+	background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%,
+		#fd5949 45%, #d6249f 60%, #285AEB 90%);
+}
+
+.facebook-icon {
+	background-color: #1877F2;
+}
+
+.threads-icon {
+	background-color: #000;
+}
+
+.share-toast {
+	margin-top: 16px;
+	text-align: center;
+	font-size: 11px;
+	color: #999;
+	min-height: 16px;
+}
+
 @media ( max-width : 640px) {
 	.article-body {
 		padding: 24px 20px 36px;
@@ -136,16 +317,28 @@ body {
 	.article-meta {
 		flex-direction: column;
 		align-items: flex-start;
-		gap: 8px;
+		gap: 10px;
+	}
+	.article-actions {
+		margin-left: 0;
+		flex-wrap: wrap;
+	}
+	.share-modal-options {
+		gap: 4px;
+	}
+	.share-icon {
+		width: 46px;
+		height: 46px;
+		font-size: 19px;
 	}
 }
-
 </style>
 </head>
 <body>
 	<div class="container">
 
-		<a class="back-link" th:href="@{/article/}">返回文章列表</a>
+		<a class="back-link"
+			th:href="@{/article/(page=${currentPage}, catId=${selectedCatId})}">返回文章列表</a>
 
 		<div class="article-detail">
 
@@ -160,6 +353,37 @@ body {
 					<span class="cat-tag"
 						th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
 					<span th:text="'發布時間：' + ${article.publishedAt}"></span>
+
+					<!-- 互動列：按讚 / 收藏 / 分享（靠右） -->
+					<div class="article-actions">
+
+						<!-- 按讚 -->
+						<button type="button" class="action-btn like-btn"
+							th:classappend="${likedByMe} ? 'active' : ''"
+							th:attr="data-article-id=${article.articleId}"
+							onclick="toggleLike(this)">
+							<i class="fa-regular fa-heart"></i>
+							<span class="count" th:text="${likeCount}">0</span>
+						</button>
+
+						<!-- 收藏 -->
+						<button type="button" class="action-btn bookmark-btn"
+							th:classappend="${savedByMe} ? 'active' : ''"
+							th:attr="data-article-id=${article.articleId}"
+							onclick="toggleBookmark(this)">
+							<i class="fa-regular fa-bookmark"></i>
+							<span class="count" th:text="${bookmarkCount}">0</span>
+						</button>
+
+						<!-- 分享（點擊開啟分享選單彈窗） -->
+						<button type="button" class="action-btn share-btn"
+							th:attr="data-article-id=${article.articleId}"
+							onclick="openShareModal(this)">
+							<i class="fa-regular fa-share-from-square"></i>
+							<span class="count" th:text="${shareCount}">0</span>
+						</button>
+
+					</div>
 				</div>
 
 				<!-- 文章內文 (TinyMCE 存的是 HTML，用 utext 才能渲染) -->
@@ -169,5 +393,217 @@ body {
 		</div>
 
 	</div>
+
+	<!-- ===================== 分享彈出視窗 ===================== -->
+	<div class="share-modal-overlay" id="shareModal" onclick="closeShareModalOutside(event)">
+		<div class="share-modal-panel">
+			<div class="share-modal-header">
+				<span>分享文章</span>
+				<button type="button" class="share-modal-close" onclick="closeShareModal()">&times;</button>
+			</div>
+
+			<div class="share-modal-options">
+				<!-- 複製連結 -->
+				<button type="button" class="share-option" onclick="copyLink()">
+					<span class="share-icon copy-icon" id="copyIconWrap"><i class="fa-regular fa-copy"></i></span>
+					<span class="share-label">複製連結</span>
+				</button>
+
+				<!-- LINE -->
+				<button type="button" class="share-option" onclick="shareToLine()">
+					<span class="share-icon line-icon"><i class="fa-brands fa-line"></i></span>
+					<span class="share-label">LINE</span>
+				</button>
+
+				<!-- Instagram（無官方網頁分享 API，僅複製連結） -->
+				<button type="button" class="share-option" onclick="shareToInstagram()">
+					<span class="share-icon instagram-icon"><i class="fa-brands fa-instagram"></i></span>
+					<span class="share-label">Instagram</span>
+				</button>
+
+				<!-- Facebook -->
+				<button type="button" class="share-option" onclick="shareToFacebook()">
+					<span class="share-icon facebook-icon"><i class="fa-brands fa-facebook"></i></span>
+					<span class="share-label">Facebook</span>
+				</button>
+
+				<!-- Threads -->
+				<button type="button" class="share-option" onclick="shareToThreads()">
+					<span class="share-icon threads-icon"><i class="fa-brands fa-at"></i></span>
+					<span class="share-label">Threads</span>
+				</button>
+			</div>
+
+			<div class="share-toast" id="shareToast"></div>
+		</div>
+	</div>
+
+	<script>
+		var currentShareBtn = null;
+		var currentShareArticleId = null;
+
+		function getCsrfHeaders() {
+			var token = document.querySelector('meta[name="_csrf"]').content;
+			var header = document.querySelector('meta[name="_csrf_header"]').content;
+			var headers = {};
+			headers[header] = token;
+			return headers;
+		}
+
+		function toggleLike(btn) {
+			var articleId = btn.getAttribute('data-article-id');
+
+			fetch('/member/article/' + articleId + '/like', {
+				method: 'POST',
+				headers: getCsrfHeaders(),
+				redirect: 'manual'   // 不要自動跟隨重導向
+			})
+			.then(function(res) {
+		        // opaqueredirect 要求登入, 被導向了
+				if (res.type === 'opaqueredirect' || res.status === 0) {
+		            alert('請先登入才能按讚');
+		            window.location.href = '/front-end/login';
+		            return null;
+		        }
+				
+				if (res.status === 401) {
+					alert('請先登入才能按讚');
+					return null;
+				}
+				return res.json();
+			})
+			.then(function(data) {
+				if (!data) return;
+				btn.querySelector('.count').textContent = data.likeCount;
+				btn.classList.toggle('active', data.likedByMe);
+			})
+			.catch(function(err) {
+				console.error('操作失敗', err);
+			});
+		}
+
+		function toggleBookmark(btn) {
+			var articleId = btn.getAttribute('data-article-id');
+
+			fetch('/member/article/' + articleId + '/bookmark', {
+				method: 'POST',
+				headers: getCsrfHeaders(),
+				redirect: 'manual'   // 不要自動跟隨重導向
+			})
+			.then(function(res) {
+				// opaqueredirect 要求登入, 被導向了
+				if (res.type === 'opaqueredirect' || res.status === 0) {
+		            alert('請先登入才能收藏');
+		            window.location.href = '/front-end/login';
+		            return null;
+		        }
+				
+				if (res.status === 401) {
+					alert('請先登入才能收藏');
+					return null;
+				}
+				return res.json();
+			})
+			.then(function(data) {
+				if (!data) return;
+				btn.querySelector('.count').textContent = data.bookmarkCount;
+				btn.classList.toggle('active', data.savedByMe);
+			})
+			.catch(function(err) {
+				console.error('操作失敗', err);
+			});
+		}
+
+		/* ===================== share post ===================== */
+
+		function openShareModal(btn) {
+			currentShareBtn = btn;
+			currentShareArticleId = btn.getAttribute('data-article-id');
+			document.getElementById('shareToast').textContent = '';
+			document.getElementById('shareModal').classList.add('show');
+		}
+
+		function closeShareModal() {
+			document.getElementById('shareModal').classList.remove('show');
+		}
+
+		// 點擊面板以外的區域時關閉
+		function closeShareModalOutside(event) {
+			if (event.target.id === 'shareModal') {
+				closeShareModal();
+			}
+		}
+
+		function incrementShareCount() {
+			return fetch('/article/' + currentShareArticleId + '/share', {
+				method: 'POST',
+				headers: getCsrfHeaders()
+			})
+			.then(function(res) { return res.json(); })
+			.then(function(data) {
+				if (currentShareBtn) {
+					currentShareBtn.querySelector('.count').textContent = data.shareCount;
+				}
+				return data;
+			})
+			.catch(function(err) {
+				console.error('分享次數更新失敗', err);
+			});
+		}
+
+		function copyLink() {
+			incrementShareCount().then(function() {
+				return navigator.clipboard.writeText(window.location.href);
+			}).then(function() {
+				document.getElementById('shareToast').textContent = '連結已複製！';
+			}).catch(function(err) {
+				console.error('複製失敗', err);
+				document.getElementById('shareToast').textContent = '複製失敗，請手動複製網址';
+			});
+		}
+
+		function openSharePopup(url) {
+			var w = 600, h = 500;
+			var left = (window.screen.width - w) / 2;
+			var top = (window.screen.height - h) / 2;
+			window.open(url, '_blank',
+				'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top +
+				',noopener,noreferrer');
+		}
+
+		function shareToLine() {
+			var url = encodeURIComponent(window.location.href);
+			var text = encodeURIComponent(document.title);
+			incrementShareCount().then(function() {
+				openSharePopup('https://social-plugins.line.me/lineit/share?url=' + url + '&text=' + text);
+			});
+		}
+
+		// Instagram 官方並未提供網頁版的「分享連結」端點（不像 Facebook / Threads）
+		function shareToInstagram() {
+			incrementShareCount().then(function() {
+				return navigator.clipboard.writeText(window.location.href);
+			}).then(function() {
+				document.getElementById('shareToast').textContent =
+					'Instagram 不支援直接分享連結，已複製連結，請至 Instagram App 貼上';
+			}).catch(function(err) {
+				console.error('複製失敗', err);
+			});
+		}
+
+		function shareToFacebook() {
+			var url = encodeURIComponent(window.location.href);
+			incrementShareCount().then(function() {
+				openSharePopup('https://www.facebook.com/sharer/sharer.php?u=' + url);
+			});
+		}
+
+		function shareToThreads() {
+			var text = encodeURIComponent(document.title + ' ' + window.location.href);
+			incrementShareCount().then(function() {
+				openSharePopup('https://www.threads.net/intent/post?text=' + text);
+			});
+		}
+	</script>
 </body>
 </html>
