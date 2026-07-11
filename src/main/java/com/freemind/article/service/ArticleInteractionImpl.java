@@ -3,10 +3,17 @@ package com.freemind.article.service;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.freemind.article.entity.Article;
+import com.freemind.article.entity.ArticleBookmark;
+import com.freemind.article.entity.ArticleBookmarkId;
 import com.freemind.article.entity.ArticleLike;
 import com.freemind.article.entity.ArticleLikeId;
 import com.freemind.article.repository.ArticleBookmarkRepository;
@@ -18,6 +25,9 @@ import com.freemind.login.member.model.MemberRepository;
 
 @Service
 public class ArticleInteractionImpl implements ArticleInteractionService{
+	
+	@Value("${app.article.page-size}")
+	private int artPageSize;
 	
 	@Autowired
 	private ArticleRepository articleRepository;
@@ -41,7 +51,25 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 		} else {
 			Article article = articleRepository.getReferenceById(articleId);
 			Member member = memberRepository.getReferenceById(memberId);
-			articleLikeRepository.save(new ArticleLike(article, member, LocalDateTime.now()));
+			
+			ArticleLike articleLike = new ArticleLike(article, member, LocalDateTime.now());
+			articleLikeRepository.save(articleLike);
+		}
+	}
+	
+	@Override
+	@Transactional
+	public void toggleBookmark(Integer articleId, Integer memberId) {
+		ArticleBookmarkId bookmarkId = new ArticleBookmarkId(articleId, memberId);
+		
+		if (articleBookmarkRepository.existsById(bookmarkId)) {
+			articleBookmarkRepository.deleteById(bookmarkId);
+		} else {
+			Article article = articleRepository.getReferenceById(articleId);
+			Member member = memberRepository.getReferenceById(memberId);
+			
+			ArticleBookmark articleBookmark = new ArticleBookmark(article, member, LocalDateTime.now());
+			articleBookmarkRepository.save(articleBookmark);
 		}
 	}
 	
@@ -52,11 +80,47 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 		
 		return articleLikeRepository.existsById(new ArticleLikeId(articleId, memberId));
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public boolean isSavedByMember(Integer articleId, Integer memberId) {
+		if (memberId == null) return false;
+		
+		return articleBookmarkRepository.existsById(new ArticleBookmarkId(articleId, memberId));
+	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public long getLikeCount(Integer articleId) {
 		return articleLikeRepository.countByArticleId(articleId);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public long getBookmarkCount(Integer articleId) {
+		return articleBookmarkRepository.countByArticleId(articleId);
+	}
+
+	@Override
+	public Page<Article> getLikedArticles(Integer memberId, Integer page) {
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("likedAt").descending());
+		Page<ArticleLike> likePage = articleLikeRepository.findByMemberId(memberId, pageable);
+		
+		return likePage.map(ArticleLike::getArticle);
+	}
+
+	@Override
+	public Page<Article> getSavedArticles(Integer memberId, Integer page) {
+	    Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("savedAt").descending());
+	    Page<ArticleBookmark> bookmarkPage = articleBookmarkRepository.findByMemberId(memberId, pageable);
+		
+		return bookmarkPage.map(ArticleBookmark::getArticle);
+	}
+
+	@Override
+	public Page<Article> getViewHistory(Integer memberId, Integer page) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

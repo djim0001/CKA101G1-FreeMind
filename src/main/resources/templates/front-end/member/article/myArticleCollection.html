@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>專欄文章</title>
+<title>我的收藏-文章</title>
 <style>
 * {
 	margin: 0;
@@ -11,8 +11,7 @@
 }
 
 body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
 	background-color: #f5f5f5;
 	color: #333;
 	line-height: 1.6;
@@ -39,7 +38,7 @@ body {
 	color: #4a3e3e;
 }
 
-.page-header a {
+.page-header .btn-back {
 	display: inline-block;
 	padding: 8px 20px;
 	background-color: #e8b4b4;
@@ -50,36 +49,41 @@ body {
 	transition: background-color 0.2s;
 }
 
-.page-header a:hover {
+.page-header .btn-back:hover {
 	background-color: #d39393;
 }
 
-.category-filter {
+.tabs {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
+	gap: 8px;
 	margin-bottom: 28px;
-	padding: 18px 22px;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+	border-bottom: 1px solid #f2dddd;
+	padding-bottom: 1px;
 }
 
-.category-filter a {
+.tabs a {
 	display: inline-block;
-	padding: 6px 18px;
-	background-color: #fbf2f2;
+	padding: 10px 24px;
 	color: #7a6b6b;
 	text-decoration: none;
-	border-radius: 20px;
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 500;
+	border-radius: 8px 8px 0 0;
 	transition: all 0.2s;
+	border: 1px solid transparent;
+	margin-bottom: -1px;
 }
 
-.category-filter a:hover, .category-filter a.active {
-	background-color: #e8b4b4;
-	color: #fff;
+.tabs a:hover {
+	color: #e8b4b4;
+	background-color: #fbf2f2;
+}
+
+.tabs a.active {
+	background-color: #fff;
+	color: #e8b4b4;
+	border-color: #f2dddd #f2dddd transparent #f2dddd;
+	font-weight: 600;
 }
 
 .article-list {
@@ -230,8 +234,16 @@ body {
 	border: 1px solid #e0e0e0;
 }
 
-/* RWD */
-@media ( max-width : 640px) {
+@media (max-width: 640px) {
+	.tabs {
+		gap: 4px;
+	}
+	.tabs a {
+		padding: 8px 12px;
+		font-size: 14px;
+		flex: 1;
+		text-align: center;
+	}
 	.article-card {
 		flex-direction: column;
 	}
@@ -246,78 +258,66 @@ body {
 	<div class="container">
 
 		<div class="page-header">
-			<h1>專欄文章</h1>
-			<a th:href="@{/}">回首頁</a>
+			<h1>我的收藏/文章</h1>
+			<a th:href="@{/member/dashboard}" class="btn-back">我的療癒足跡</a>
 		</div>
 
-		<div class="category-filter">
-			<a th:href="@{/article/}"
-				th:classappend="${selectedCatId == null} ? 'active' : ''">全部</a> <a
-				th:each="cat : ${articleCats}"
-				th:href="@{/article/(catId=${cat.articleCatId})}"
-				th:text="${cat.articleCatName}"
-				th:classappend="${selectedCatId != null && selectedCatId == cat.articleCatId} ? 'active' : ''"></a>
+		<div class="tabs">
+			<a th:href="@{/member/dashboard/myCollection/article(type='bookmark')}"
+			   th:classappend="${activeTab == 'bookmark'} ? 'active'">已收藏文章</a>
+			<a th:href="@{/member/dashboard/myCollection/article(type='like')}"
+			   th:classappend="${activeTab == 'like'} ? 'active'">已按讚文章</a>
+			<a th:href="@{/member/dashboard/myCollection/article(type='history')}"
+			   th:classappend="${activeTab == 'history'} ? 'active'">瀏覽紀錄</a>
 		</div>
 
-		<div class="article-list"
-			th:if="${articlePage.content != null && !articlePage.content.isEmpty()}">
+		<div class="article-list" th:if="${articlePage != null && !articlePage.content.isEmpty()}">
 			<div class="article-card" th:each="article : ${articlePage.content}">
 
 				<div class="article-cover">
 					<img th:if="${article.coverImage != null}"
-						th:src="@{/article/{id}/cover(id=${article.articleId})}" /> <span
-						class="no-image" th:if="${article.coverImage == null}">無封面</span>
+						 th:src="@{/article/{id}/cover(id=${article.articleId})}" /> 
+					<span class="no-image" th:if="${article.coverImage == null}">無封面</span>
 				</div>
 
 				<div class="article-info">
 					<h2 th:text="${article.title}"></h2>
 					<div class="article-meta">
 						<span class="cat-tag"
-							th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
+							  th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
 						<span th:text="${article.publishedAt}"></span>
 					</div>
 					<div class="article-action">
-					    <a th:if="${selectedCatId != null}"
-					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage}, catId=${selectedCatId})}">查看詳情</a>
-					    <a th:unless="${selectedCatId != null}"
-					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage})}">查看詳情</a>
+						<a th:href="@{/article/{id}(id=${article.articleId})}" target="_blank">查看詳情</a>
 					</div>
 				</div>
 
 			</div>
 		</div>
 
-		<div class="empty-state"
-			th:if="${articlePage.content == null || articlePage.content.isEmpty()}">
-			目前沒有文章</div>
-
-		<div class="pagination" th:if="${articlePage.totalPages > 1}">
-			<!-- 上一頁 -->
-			<a th:if="${currentPage > 1 && selectedCatId != null}"
-			   th:href="@{/article/(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
-			<a th:if="${currentPage > 1 && selectedCatId == null}"
-			   th:href="@{/article/(page=${currentPage - 1})}">上一頁</a>
-			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
-			
-			<!-- 頁碼 -->
-			<th:block th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
-			    <a th:if="${i != currentPage && selectedCatId != null}"
-			       th:href="@{/article/(page=${i}, catId=${selectedCatId})}"
-			       th:text="${i}"></a>
-			    <a th:if="${i != currentPage && selectedCatId == null}"
-			       th:href="@{/article/(page=${i})}"
-			       th:text="${i}"></a>
-			    <span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
-			</th:block>
-			
-			<!-- 下一頁 -->
-			<a th:if="${currentPage < articlePage.totalPages && selectedCatId != null}"
-			   th:href="@{/article/(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
-			<a th:if="${currentPage < articlePage.totalPages && selectedCatId == null}"
-			   th:href="@{/article/(page=${currentPage + 1})}">下一頁</a>
-			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
-				
+		<div th:if="${articlePage == null || articlePage.content.isEmpty()}">
+			<div class="empty-state" th:if="${activeTab == 'bookmark'}">尚無收藏文章</div>
+			<div class="empty-state" th:if="${activeTab == 'like'}">尚無按讚文章</div>
+			<div class="empty-state" th:if="${activeTab == 'history'}">尚無瀏覽紀錄</div>
 		</div>
+
+		<div class="pagination" th:if="${articlePage != null && articlePage.totalPages > 1}">
+			<a th:if="${currentPage > 1}"
+			   th:href="@{/member/dashboard/myCollection/article(type=${activeTab}, page=${currentPage - 1})}">上一頁</a>
+			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
+
+			<th:block th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
+				<a th:if="${i != currentPage}"
+				   th:href="@{/member/dashboard/myCollection/article(type=${activeTab}, page=${i})}"
+				   th:text="${i}"></a>
+				<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
+			</th:block>
+
+			<a th:if="${currentPage < articlePage.totalPages}"
+			   th:href="@{/member/dashboard/myCollection/article(type=${activeTab}, page=${currentPage + 1})}">下一頁</a>
+			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
+		</div>
+
 	</div>
 </body>
 </html>

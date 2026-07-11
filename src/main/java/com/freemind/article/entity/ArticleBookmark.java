@@ -44,6 +44,7 @@ public class ArticleBookmark implements Serializable{
 		this.article = article;
 		this.member = member;
 		this.savedAt = savedAt;
+		this.bookmarkId = new ArticleBookmarkId();
 	}
 	
 	public void setSavedAt(LocalDateTime savedAt) {

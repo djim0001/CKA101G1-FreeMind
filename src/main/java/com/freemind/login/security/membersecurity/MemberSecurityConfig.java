@@ -32,7 +32,7 @@ public class MemberSecurityConfig {
         
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**","/member/**","/course/member/**","/article/**")
+        	.securityMatcher("/","/front-end/**","/member/**", "/article/**", "/member/article/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
@@ -41,6 +41,7 @@ public class MemberSecurityConfig {
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
                 .requestMatchers("/article/**").permitAll()   
+                .requestMatchers("/member/article/**").permitAll() // spring security 待修改
                 .anyRequest().authenticated()
             )
 

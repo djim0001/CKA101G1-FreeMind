@@ -13,6 +13,7 @@ public class IndexController {
            
         return "index"; //view
     }
+    
     @GetMapping("/course_index")
     public String selectCourse() {
     	return "back-end/course/courseIndex"; //view
