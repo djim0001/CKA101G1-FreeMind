@@ -9,9 +9,10 @@
 	<a th:href="@{/slots/templateForm}">繼續設定其他心理師</a>
 	<br><br>
 
-	<form method="post" th:action="@{/slots/triggerGenerate}">
+	<form method="post" th:action="@{/slots/reapplyTemplate}">
 		<input type="text" name="psychId" placeholder="輸入心理師編號">
-		<input type="submit" value="立即依範本產生未來14天時段（測試用）">
+		<input type="submit" value="套用範本到未來14天"
+			onclick="return confirm('確定要用最新的範本規則套用到未來14天嗎？已被預約的時段不受影響，但您先前手動調整過、尚未被預約的時段會被覆蓋成範本內容。')">
 	</form>
 
 </body>
