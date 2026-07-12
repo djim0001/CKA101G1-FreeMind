@@ -71,6 +71,15 @@ public class CourseForMemberController {
 		return "front-end/member/course/selectCourse";
 	}
 	
+	@GetMapping("/select_course_order")
+	public String memberSelectCourseOrder(
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			@ModelAttribute("member") Member member,
+			ModelMap model, HttpSession session) {
+		
+		return "";
+	}
 	@GetMapping("/get_one_course")
 	public String memberGetOneCourse(
 			@RequestParam("courseId") Integer courseId,
@@ -83,6 +92,7 @@ public class CourseForMemberController {
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";
 	}
+	
 	@GetMapping("/my_bookmarks")
 	public String myBookmarks(
 			@ModelAttribute("member") Member member,
