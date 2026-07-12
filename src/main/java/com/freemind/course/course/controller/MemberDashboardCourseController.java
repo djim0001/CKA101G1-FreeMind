@@ -6,8 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseService;
@@ -76,6 +78,34 @@ public class MemberDashboardCourseController {
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
 		return "front-end/member/course/allMyCourse";
+	}
+	
+	@PostMapping("/favorite/toggle")
+	public String favoriteToggle(
+			@ModelAttribute("member") Member member,
+	        @RequestParam(name = "currentPage", required = false, defaultValue = "1") Integer page,
+	        @RequestParam(name = "orderBy", required = false) String orderBy,
+	        @RequestParam(name = "courseId") Integer courseId,
+	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
+	        RedirectAttributes redirectAttributes) {
+
+	    if (member == null) {
+	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");
+	        redirectAttributes.addFlashAttribute("page", page);
+	        redirectAttributes.addFlashAttribute("orderBy", orderBy);
+	        return "redirect:/member/course/select_course";
+	    }
+
+	    if (!courseSvc.isCourseInBookmark(member.getMemberId(), courseId)) {
+	        courseSvc.addCourseBookmark(member.getMemberId(), courseId);
+	    } else {
+	        courseSvc.removeCourseBookmark(member.getMemberId(), courseId);
+	    }
+
+	    redirectAttributes.addFlashAttribute("page", page);
+	    redirectAttributes.addFlashAttribute("orderBy", orderBy);
+
+	    return "redirect:" + returnUrl;
 	}
 	
 
