@@ -88,11 +88,15 @@ public class ShoppingCartController {
 		}
 		Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
-		if (orderCoupon != null) {
+		if (orderCoupon != null
+				&& orderCoupon.getMember().getMemberId() == member.getMemberId()) {
 			model.addAttribute("couponName", orderCoupon.getCoupon().getCouponName());
 			cartTotal = BigDecimal.valueOf(cartTotal)
 						.multiply(orderCoupon.getCoupon().getDiscount())
 						.intValue();
+			model.addAttribute("orderCoupon", orderCoupon);
+		}else {
+			session.removeAttribute("orderCoupon");
 		}
 		if(cartList.isEmpty()){
 			redirectAttributes.addFlashAttribute("mError", "請先加入課程至購物車");
@@ -100,7 +104,6 @@ public class ShoppingCartController {
 		}
 		model.addAttribute("cartList", cartList);
 		model.addAttribute("cartTotal", cartTotal);
-	    model.addAttribute("orderCoupon", orderCoupon);
 		
 		return "front-end/member/course/shoppingCartCheckOut";
 	}
