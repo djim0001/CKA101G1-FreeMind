@@ -14,6 +14,6 @@ public class SlotsScheduler {
 
 	@Scheduled(fixedRate = 1209600000) //14天 × 24小時 × 60分 × 60秒 × 1000毫秒
 	public void autoGenerateSlots() {
-		slotsSvc.generateNext14DaysForAll();
+		slotsSvc.reapplyTemplateToAll();
 	}
 }

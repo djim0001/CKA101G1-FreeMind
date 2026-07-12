@@ -13,10 +13,12 @@ import com.freemind.login.psychologist.repository.PsychologistNoticeRepository;
 public class PsychologistNoticeService {
 
 	@Autowired
-	PsychologistNoticeRepository repository;
+	private final PsychologistNoticeRepository repository;
 	
-	@Autowired
-	private SessionFactory sessionFactory;
+	public PsychologistNoticeService(PsychologistNoticeRepository repository) {
+		this.repository=repository;
+	}
+	
 	
 	public void addPsychologistNotice(PsychologistNotice psychologistNotice) {
 		repository.save(psychologistNotice);

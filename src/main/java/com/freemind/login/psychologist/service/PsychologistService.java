@@ -13,12 +13,12 @@ import com.freemind.login.psychologist.repository.PsychologistRepository;
 @Service
 public class PsychologistService {
 	
-	@Autowired
-	PsychologistRepository repository;
-
-	@Autowired
-	private SessionFactory sessionFactory;
+	private final PsychologistRepository repository;
 	
+	public PsychologistService(PsychologistRepository repository) {
+		this.repository = repository;
+	}
+
 	public void addPsychologist(Psychologist psychologist) {
 		repository.save(psychologist);
 	}
@@ -26,11 +26,7 @@ public class PsychologistService {
 	public void updatePsychologist(Psychologist psychologist) {
 		repository.save(psychologist);
 	}
-	
-	public void daletePstchologist(Integer psychologist) {
-		if(repository.existsById(psychologist))
-			repository.deleteByPsychologist(psychologist);	
-	}
+
 	
 	public Psychologist getOnePsychologist(Integer psychologist) {
 		Optional<Psychologist> optional = repository.findById(psychologist);

@@ -30,7 +30,13 @@ public class PsychologistExpertise {
 	@JoinColumn(name = "expertise_id")
 	private Expertise expertise;
 	
+	public CompositeExpertiseDetail getCompositeExpertiseDetail() {
+		return compositeExpertiseDetail;
+	}
 	
+	public void setCompositeExpertiseDetail(CompositeExpertiseDetail compositeExpertiseDetail) {
+		this.compositeExpertiseDetail = compositeExpertiseDetail;
+	}
 	
 	public Psychologist getPsychologist() {
 		return psychologist;
@@ -53,7 +59,7 @@ public class PsychologistExpertise {
 	@Embeddable
 	public static class CompositeExpertiseDetail implements Serializable{
 		
-		@Column(name  = "psych_id")
+		@Column(name = "psych_id")
 		private Integer psychId;
 		
 		@Column(name = "expertise_id")
@@ -65,20 +71,20 @@ public class PsychologistExpertise {
 			super();
 		}
 		
-		public CompositeExpertiseDetail(Integer pstchId,Integer expertiseId) {
+		public CompositeExpertiseDetail(Integer psychId,Integer expertiseId) {
 			super();
 			this.expertiseId = expertiseId;
-			this.psychId = pstchId;
+			this.psychId = psychId;
 		}
 		
 		
 		
-		public Integer getPsychID() {
+		public Integer getPsychId() {
 			return psychId;
 		}
 
-		public void setPsychID(Integer psychID) {
-			this.psychId = psychID;
+		public void setPsychId(Integer psychId) {
+			this.psychId = psychId;
 		}
 
 		public Integer getExpertiseId() {
@@ -105,14 +111,10 @@ public class PsychologistExpertise {
 		}
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
+		@Override
+		public int hashCode() {
+			return Objects.hash(psychId,expertiseId);
+		}
 		
 		
 		

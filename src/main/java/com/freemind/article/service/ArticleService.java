@@ -46,5 +46,7 @@ public interface ArticleService {
 	void unPublishArticle(Integer articleId, Integer adminId);
 
 	Page<Article> getReviewedArticles(Integer status, Integer page);
+
+	long incrementAndGetShareCount(Integer articleId);
 	
 }

@@ -28,11 +28,11 @@ public class MemberSecurityConfig {
     @Bean
     @Order(2)
     public SecurityFilterChain memberFilterChain(HttpSecurity http) throws Exception {
-        RequestCache requestCache = new HttpSessionRequestCache();
-
+    	RequestCache requestCache = new HttpSessionRequestCache();
+        
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**","/member/**")
+            .securityMatcher("/","/front-end/**","/member/**", "/article/**", "/member/article/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
@@ -40,6 +40,8 @@ public class MemberSecurityConfig {
 //                .requestMatchers("/front-end/**").authenticated()
 //                .requestMatchers("/member/**").authenticated()
 //                .requestMatchers("/course/").permitAll()
+                .requestMatchers("/article/**").permitAll() 
+                .requestMatchers("/member/article/**").permitAll() 
                 .anyRequest().hasRole("MEMBER")
             )
 
