@@ -142,6 +142,22 @@ public class OrderDetail {
 	public void setPlaybackPosition(LocalTime playbackPosition) {
 		this.playbackPosition = playbackPosition;
 	}
+	public String getCoursePermissionText() {
+	    if (coursePermission == null) {
+	        return "未知狀態";
+	    }
+	    byte status = coursePermission;
+	    switch (coursePermission) {
+	        case 0:
+	            return "尚未解鎖權限";
+	        case 1:
+	            return "已解鎖";
+	        case 2:
+	            return "審核成功";
+	        default:
+	            return "未知狀態";
+	    }
+	}
 	
 	// =========複合主鍵=====================
 	@Embeddable

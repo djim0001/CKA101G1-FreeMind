@@ -12,12 +12,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.order.model.CourseOrder;
+import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
 
@@ -30,14 +31,17 @@ public class CourseForAdminController {
 	
 	private final CourseService courseSvc;
 	private final AdminService adminSvc;
+	private final CourseOrderService CourseOrderSvc;
 	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForAdminController(
 			CourseService courseSvc,
 			AdminService adminSvc,
+			CourseOrderService CourseOrderSvc,
 			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
 		this.adminSvc = adminSvc;
+		this.CourseOrderSvc = CourseOrderSvc;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
@@ -70,6 +74,31 @@ public class CourseForAdminController {
 			model.addAttribute("orderBy", orderBy);
 
 		return "back-end/course/course/selectCourse";
+	}
+	
+	@GetMapping("/select_course_order")
+	public String admunSelectCourseOrder(
+			@ModelAttribute("admin") Admin admin,
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			ModelMap model, HttpSession session) {
+		if (page < 1)  page = 1;
+		Integer currentPage = page;		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "orderedAt" : orderBy;
+		Page<CourseOrder> allCourseOrder = CourseOrderSvc.getAllOrder(currentPage - 1, orderBy);
+		model.addAttribute("allCourseOrder", allCourseOrder);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", allCourseOrder.getTotalPages());
+		return "back-end/course/course/allCourseOrder";
+	}
+	
+	@GetMapping("/get_one_order")
+	public String adminGetOneOrder(
+			@RequestParam("courseId") Integer courseId,
+			ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		model.addAttribute("course", course);
+		return "back-end/course/course/listOneCourse";
 	}
 	
 	@PostMapping("/get_one_course")
