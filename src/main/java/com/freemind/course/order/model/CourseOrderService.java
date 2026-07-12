@@ -41,6 +41,22 @@ public class CourseOrderService {
     public List<CourseOrder> getOrdersByMember(Member member) {
     	return repository.findByMember(member);
     }
+    public Page<CourseOrder> getOrdersByMember(
+            Member member,
+            Integer page) {
+
+        if (page == null || page < 0) {
+            page = 0;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                PAGE_SIZE,
+                Sort.by("orderedAt").descending()
+        );
+
+        return repository.findByMember(member, pageable);
+    }
     
     public void addOrder(CourseOrder courseOrder) {
     		repository.save(courseOrder);

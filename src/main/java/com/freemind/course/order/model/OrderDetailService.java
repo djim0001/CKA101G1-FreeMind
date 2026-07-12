@@ -10,10 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.freemind.course.course.model.Course;
 import com.freemind.course.order.model.OrderDetail.CompositeOrderDetail;
-import com.freemind.course.util.CourseSortUtil;
-import com.freemind.login.member.model.Member;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderDetailService {
@@ -43,6 +42,13 @@ public class OrderDetailService {
 	public List<OrderDetail> getAllOrderDetail() {
 		return repository.findAll();
 	}
+	
+	@Transactional
+    public List<OrderDetail> getOrderDetailsByCourseOrderId(
+            Integer courseOrderId) {
+
+        return repository.findByCourseOrderCourseOrderId(courseOrderId);
+    }
 
 	public Page<OrderDetail> getMyCourses(Integer memberId, Integer page, String orderBy) {
 

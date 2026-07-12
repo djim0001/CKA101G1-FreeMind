@@ -117,7 +117,7 @@ public class CourseService {
 		Boolean result = stringRedisTemplate.opsForSet().isMember(key, String.valueOf(courseId));
 		return Boolean.TRUE.equals(result);
 	}
-	public Page<Course> getBookmarkCourses(Integer memberId, Integer page, String orderBy) {
+	public Page<Course> getBookmarkCourses(Integer memberId, Integer page) {
 
 	    if (page == null || page < 1) {
 	        page = 0;
@@ -133,8 +133,50 @@ public class CourseService {
 	    List<Integer> courseIds = courseIdSet.stream()
 	            .map(Integer::valueOf)
 	            .toList();
-	    Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+	    Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
 	    return repository.findByCourseIdIn(courseIds, pageable);
 	}
 
+	public Page<Course> getBookmarkCourses(
+	        Integer memberId,
+	        Integer page,
+	        String keyword) {
+
+	    // 前端頁碼從 1 開始，PageRequest 從 0 開始
+	    if (page == null || page < 1) {
+	        page = 1;
+	    }
+
+	    if (keyword == null) {
+	        keyword = "";
+	    }
+
+	    keyword = keyword.trim();
+
+	    String key = "bookmark:member:" + memberId;
+
+	    Set<String> courseIdSet = stringRedisTemplate
+	            .opsForSet()
+	            .members(key);
+
+	    if (courseIdSet == null || courseIdSet.isEmpty()) {
+	        return Page.empty();
+	    }
+
+	    List<Integer> courseIds = courseIdSet.stream()
+	            .map(Integer::valueOf)
+	            .toList();
+
+	    Pageable pageable = PageRequest.of(
+	            page,
+	            coursePageSize,
+	            Sort.by("courseId").descending()
+	    );
+
+	    return repository.searchBookmarkCourses(
+	            courseIds,
+	            keyword,
+	            pageable
+	    );
+	}
 }

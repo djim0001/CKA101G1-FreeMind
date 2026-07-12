@@ -1,5 +1,7 @@
 package com.freemind.course.order.model;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,5 +30,7 @@ public interface OrderDetailRepository
     	    @Param("memberId") Integer memberId,
     	    @Param("courseId") Integer courseId
     	);
+    
+    List<OrderDetail> findByCourseOrderCourseOrderId(Integer courseOrderId);
 
 }

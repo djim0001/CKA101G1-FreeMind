@@ -44,18 +44,41 @@ public class MemberDashboardCourseController {
 	public String courseTabs(
 			@ModelAttribute("member") Member member,
 			@RequestParam(defaultValue = "1") Integer page,
-			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(member.getMemberId(), currentPage - 1, sortField);
+		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(member.getMemberId(), currentPage - 1);
 		model.addAttribute("myBookmarks", myBookmarks);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", myBookmarks.getTotalPages());
-		if(orderBy != null)
-			model.addAttribute("orderBy", orderBy);
 		return "front-end/member/course/myBookmarks";
+	}
+	
+	@GetMapping("/mybookmarks/search")
+	public String mybookmarksSearch(
+	        @ModelAttribute("member") Member member,
+	        @RequestParam(defaultValue = "1") Integer page,
+	        @RequestParam(defaultValue = "") String keyword,
+	        ModelMap model) {
+
+	    if (page == null || page < 1) {
+	        page = 1;
+	    }
+
+	    keyword = keyword == null ? "" : keyword.trim();
+
+	    Page<Course> myBookmarks = courseSvc.getBookmarkCourses(
+	            member.getMemberId(),
+	            page,
+	            keyword
+	    );
+
+	    model.addAttribute("myBookmarks", myBookmarks);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("totalPages", myBookmarks.getTotalPages());
+	    model.addAttribute("keyword", keyword);
+
+	    return "front-end/member/course/myBookmarks";
 	}
 	
 	@GetMapping("/myLearning")
@@ -104,8 +127,20 @@ public class MemberDashboardCourseController {
 
 	    redirectAttributes.addFlashAttribute("page", page);
 	    redirectAttributes.addFlashAttribute("orderBy", orderBy);
-
 	    return "redirect:" + returnUrl;
+	}
+	
+	@GetMapping("/one_my_course")
+	public String oneMyCourse(
+			@RequestParam("courseId") Integer courseId,
+			@ModelAttribute("member") Member member,ModelMap model) {
+		Course course = courseSvc.getOneCourse(courseId);
+		course.setSaved(courseSvc
+				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
+		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
+		model.addAttribute("course", course);
+		model.addAttribute("coursePermission", coursePermission);
+		return "front-end/member/course/listOneCourse";
 	}
 	
 
