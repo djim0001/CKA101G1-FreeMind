@@ -284,8 +284,8 @@ body {
 }
 
 .instagram-icon {
-	background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%,
-		#fd5949 45%, #d6249f 60%, #285AEB 90%);
+	background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%,
+		#d6249f 60%, #285AEB 90%);
 }
 
 .facebook-icon {
@@ -362,8 +362,8 @@ body {
 							th:classappend="${likedByMe} ? 'active' : ''"
 							th:attr="data-article-id=${article.articleId}"
 							onclick="toggleLike(this)">
-							<i class="fa-regular fa-heart"></i>
-							<span class="count" th:text="${likeCount}">0</span>
+							<i class="fa-regular fa-heart"></i> <span class="count"
+								th:text="${likeCount}">0</span>
 						</button>
 
 						<!-- 收藏 -->
@@ -371,16 +371,16 @@ body {
 							th:classappend="${savedByMe} ? 'active' : ''"
 							th:attr="data-article-id=${article.articleId}"
 							onclick="toggleBookmark(this)">
-							<i class="fa-regular fa-bookmark"></i>
-							<span class="count" th:text="${bookmarkCount}">0</span>
+							<i class="fa-regular fa-bookmark"></i> <span class="count"
+								th:text="${bookmarkCount}">0</span>
 						</button>
 
 						<!-- 分享（點擊開啟分享選單彈窗） -->
 						<button type="button" class="action-btn share-btn"
 							th:attr="data-article-id=${article.articleId}"
 							onclick="openShareModal(this)">
-							<i class="fa-regular fa-share-from-square"></i>
-							<span class="count" th:text="${shareCount}">0</span>
+							<i class="fa-regular fa-share-from-square"></i> <span
+								class="count" th:text="${shareCount}">0</span>
 						</button>
 
 					</div>
@@ -395,42 +395,47 @@ body {
 	</div>
 
 	<!-- ===================== 分享彈出視窗 ===================== -->
-	<div class="share-modal-overlay" id="shareModal" onclick="closeShareModalOutside(event)">
+	<div class="share-modal-overlay" id="shareModal"
+		onclick="closeShareModalOutside(event)">
 		<div class="share-modal-panel">
 			<div class="share-modal-header">
 				<span>分享文章</span>
-				<button type="button" class="share-modal-close" onclick="closeShareModal()">&times;</button>
+				<button type="button" class="share-modal-close"
+					onclick="closeShareModal()">&times;</button>
 			</div>
 
 			<div class="share-modal-options">
 				<!-- 複製連結 -->
 				<button type="button" class="share-option" onclick="copyLink()">
-					<span class="share-icon copy-icon" id="copyIconWrap"><i class="fa-regular fa-copy"></i></span>
-					<span class="share-label">複製連結</span>
+					<span class="share-icon copy-icon" id="copyIconWrap"><i
+						class="fa-regular fa-copy"></i></span> <span class="share-label">複製連結</span>
 				</button>
 
 				<!-- LINE -->
 				<button type="button" class="share-option" onclick="shareToLine()">
-					<span class="share-icon line-icon"><i class="fa-brands fa-line"></i></span>
-					<span class="share-label">LINE</span>
+					<span class="share-icon line-icon"><i
+						class="fa-brands fa-line"></i></span> <span class="share-label">LINE</span>
 				</button>
 
 				<!-- Instagram（無官方網頁分享 API，僅複製連結） -->
-				<button type="button" class="share-option" onclick="shareToInstagram()">
-					<span class="share-icon instagram-icon"><i class="fa-brands fa-instagram"></i></span>
-					<span class="share-label">Instagram</span>
+				<button type="button" class="share-option"
+					onclick="shareToInstagram()">
+					<span class="share-icon instagram-icon"><i
+						class="fa-brands fa-instagram"></i></span> <span class="share-label">Instagram</span>
 				</button>
 
 				<!-- Facebook -->
-				<button type="button" class="share-option" onclick="shareToFacebook()">
-					<span class="share-icon facebook-icon"><i class="fa-brands fa-facebook"></i></span>
-					<span class="share-label">Facebook</span>
+				<button type="button" class="share-option"
+					onclick="shareToFacebook()">
+					<span class="share-icon facebook-icon"><i
+						class="fa-brands fa-facebook"></i></span> <span class="share-label">Facebook</span>
 				</button>
 
 				<!-- Threads -->
-				<button type="button" class="share-option" onclick="shareToThreads()">
-					<span class="share-icon threads-icon"><i class="fa-brands fa-at"></i></span>
-					<span class="share-label">Threads</span>
+				<button type="button" class="share-option"
+					onclick="shareToThreads()">
+					<span class="share-icon threads-icon"><i
+						class="fa-brands fa-at"></i></span> <span class="share-label">Threads</span>
 				</button>
 			</div>
 
@@ -455,7 +460,7 @@ body {
 
 			fetch('/member/article/' + articleId + '/like', {
 				method: 'POST',
-				headers: getCsrfHeaders(),
+				headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
 				redirect: 'manual'   // 不要自動跟隨重導向
 			})
 			.then(function(res) {
@@ -468,6 +473,7 @@ body {
 				
 				if (res.status === 401) {
 					alert('請先登入才能按讚');
+					window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);
 					return null;
 				}
 				return res.json();
@@ -487,15 +493,14 @@ body {
 
 			fetch('/member/article/' + articleId + '/bookmark', {
 				method: 'POST',
-				headers: getCsrfHeaders(),
+				headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
 				redirect: 'manual'   // 不要自動跟隨重導向
 			})
 			.then(function(res) {
 				// opaqueredirect 要求登入, 被導向了
 				if (res.type === 'opaqueredirect' || res.status === 0) {
 		            alert('請先登入才能收藏');
-		            window.location.href = '/front-end/login';
-		            return null;
+		            window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);		            return null;
 		        }
 				
 				if (res.status === 401) {
