@@ -442,4 +442,55 @@ public class OrdersController {
 			ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
 			return "redirect:/orders/psychConfirmed?psychId=" + psychId;
 		}
+		
+		@PostMapping("viewDetail")
+		public String viewDetail(@RequestParam("orderId") String orderId, ModelMap model) {
+			Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+			model.addAttribute("orders", orders);
+			return "back-end/consultation/orders/viewOrderDetail";
+		}
+		
+		@PostMapping("search")
+		public String search(@RequestParam(value = "orderId", required = false) String orderId,
+		                      @RequestParam(value = "memberId", required = false) String memberId,
+		                      @RequestParam(value = "psychId", required = false) String psychId,
+		                      @RequestParam(value = "orderStatus", required = false) String orderStatus,
+		                      @RequestParam(value = "govSubsidy", required = false) String govSubsidy,
+		                      @RequestParam(value = "sessionType", required = false) String sessionType,
+		                      @RequestParam(value = "slotDate", required = false) String slotDate,
+		                      ModelMap model) {
+
+			if (orderId != null && !orderId.isBlank()) {
+				Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+				model.addAttribute("orders", orders);
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (memberId != null && !memberId.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getByMemberId(Integer.valueOf(memberId)));
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (psychId != null && !psychId.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getByPsychId(Integer.valueOf(psychId)));
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (orderStatus != null && !orderStatus.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getByOrderStatus(Integer.valueOf(orderStatus)));
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (govSubsidy != null && !govSubsidy.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getByGovSubsidy(Boolean.valueOf(govSubsidy)));
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (sessionType != null && !sessionType.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getBySessionType(Integer.valueOf(sessionType)));
+				return "back-end/consultation/orders/select_Page";
+			}
+			if (slotDate != null && !slotDate.isBlank()) {
+				model.addAttribute("ordersListData", ordersSvc.getBySlotDate(java.time.LocalDate.parse(slotDate)));
+				return "back-end/consultation/orders/select_Page";
+			}
+
+			model.addAttribute("errorMessage", "請至少填寫一個查詢條件");
+			return "back-end/consultation/orders/select_Page";
+		}
 }
