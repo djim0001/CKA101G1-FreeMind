@@ -87,25 +87,25 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        switch (result) {
 	            case SUCCESS ->
 	                redirectAttributes.addFlashAttribute(
-	                    "successMessage",
+	                    "couponMsg",
 	                    "領取成功"
 	                );
 
 	            case SOLD_OUT ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券已領完"
 	                );
 
 	            case ALREADY_CLAIMED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "你已經領取過這張優惠券"
 	                );
 
 	            case NOT_PUBLISHED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券尚未發布或已過期"
 	                );
 	        }

@@ -108,11 +108,11 @@ public class CouponController {
 		try {
 			couponSvc.publishCoupon(couponId, stock, ttlHours);
 
-			redirectAttributes.addFlashAttribute("successMessage", "優惠券發布成功");
+			redirectAttributes.addFlashAttribute("couponMsg", "優惠券發布成功");
 
 		} catch (IllegalArgumentException e) {
 
-			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+			redirectAttributes.addFlashAttribute("couponMsg", e.getMessage());
 		}
 
 		return "redirect:/admin/coupon/select_coupon";

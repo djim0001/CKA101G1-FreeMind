@@ -81,7 +81,7 @@
             <strong th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}">2026年07月09日 10:00</strong>
           </div>
 
-          <div class="actions course-actions" aria-label="課程操作">
+          <div class="actions course-actions" aria-label="課程操作" th:if="${!coursePermission}">
             <form class="add-cart-form" method="post" th:action="@{add_cart}">
               <input type="hidden" name="courseId" th:value="${course.courseId}" />
               <input type="hidden" name="returnUrl" />
@@ -173,7 +173,7 @@
     </main>
   </div>
 
-  <div id="cartModal" class="cart-modal" th:if="${!coursePermission}">
+  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
     <div class="cart-modal-content">
       <p th:text="${cartMsg}">已加入購物車。</p>
       <button type="button" class="action primary" onclick="closeCartModal()">確定</button>
