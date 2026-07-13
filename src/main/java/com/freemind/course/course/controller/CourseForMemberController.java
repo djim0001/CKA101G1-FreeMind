@@ -1,16 +1,15 @@
 package com.freemind.course.course.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -31,6 +30,7 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/member/course")
 public class CourseForMemberController {
+	private final String NEW_COURSE_ORDER = "listedAt";
 
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;
@@ -51,8 +51,12 @@ public class CourseForMemberController {
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
-    @ModelAttribute("member")
+	@ModelAttribute("member")
     public Member currentMember(Authentication authentication) {
+        // 訪客（未登入或匿名）時不放 member 進 model
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
         return memberSvc.findByAccount(authentication.getName());
     }
     @ModelAttribute("courseCategoriesListAll")
@@ -65,18 +69,20 @@ public class CourseForMemberController {
 	public String memberSelectCourse(
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
-			@ModelAttribute("member") Member member,
 			ModelMap model, HttpSession session) {
 
+		Member member = (Member)model.getAttribute("member");
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
-		for(Course course : courseList) {
-			course.setSaved(courseSvc
-					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
+		if(member!=null) {
+			for(Course course : courseList) {
+				course.setSaved(courseSvc
+						.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
+			}
+			model.addAttribute("memberName", member.getName());
 		}
-		model.addAttribute("memberName", member.getName());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseList", courseList);
 		model.addAttribute("totalPages", courseList.getTotalPages());
@@ -137,27 +143,6 @@ public class CourseForMemberController {
 		model.addAttribute("course", course);
 		model.addAttribute("coursePermission", coursePermission);
 		return "front-end/member/course/listOneCourse";
-	}
-	
-	@GetMapping("/get_hot_course")
-	public String getHotCourse(
-			@RequestParam(defaultValue = "1") Integer page,
-			@ModelAttribute("member") Member member,
-			ModelMap model, HttpSession session) {
-
-		if (page < 1)  page = 1;
-		Integer currentPage = page;
-		Page<Course> courseListListed = courseSvc.findPopularListedCourses(currentPage - 1);
-		for(Course course : courseListListed) {
-			course.setSaved(courseSvc
-					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
-		}
-		model.addAttribute("memberName", member.getName());
-		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("courseListListed", courseListListed);
-		model.addAttribute("totalPages", courseListListed.getTotalPages());
-
-		return "front-end/member/course/selectCourse";
 	}
 	
 	@GetMapping("/search-by-category")
