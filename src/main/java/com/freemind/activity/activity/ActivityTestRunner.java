@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.util.HibernateUtil_CompositeQuery_Activity;
 
-@Component
+//@Component
 public class ActivityTestRunner implements CommandLineRunner {
 
     @Autowired

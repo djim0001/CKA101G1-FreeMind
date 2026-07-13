@@ -18,7 +18,7 @@ import com.freemind.activity.activity.model.ActivityService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/admin/activity")
+@RequestMapping("/activity/admin")
 public class ActivityAdminController {
 
     @Autowired

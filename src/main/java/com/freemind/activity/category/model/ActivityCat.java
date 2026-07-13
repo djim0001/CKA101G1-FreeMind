@@ -1,5 +1,6 @@
 package com.freemind.activity.category.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import com.freemind.activity.activity.model.Activity;
@@ -16,7 +17,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="activity_categories")
-public class ActivityCat implements java.io.Serializable{
+public class ActivityCat implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
