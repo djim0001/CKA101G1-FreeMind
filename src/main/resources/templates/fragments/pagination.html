@@ -57,5 +57,30 @@
 
 </nav>
 
+<nav th:fragment="paginationWithkeyword(currentPage, totalPages, baseUrl, keyword)"
+     th:if="${totalPages != null and totalPages > 1}">
+
+    <span th:if="${currentPage > 1}">
+        <a th:href="@{${baseUrl}(page=1, keyword=${keyword})}">至第一頁</a>&nbsp;
+    </span>
+
+    <span th:if="${currentPage > 1}">
+        <a th:href="@{${baseUrl}(page=${currentPage - 1}, keyword=${keyword})}">上一頁</a>&nbsp;
+    </span>
+
+    <span>
+        第 <span th:text="${currentPage}"></span> /
+        <span th:text="${totalPages}"></span> 頁&nbsp;
+    </span>
+
+    <span th:if="${currentPage < totalPages}">
+        <a th:href="@{${baseUrl}(page=${currentPage + 1}, keyword=${keyword})}">下一頁</a>&nbsp;
+    </span>
+
+    <span th:if="${currentPage < totalPages}">
+        <a th:href="@{${baseUrl}(page=${totalPages}, keyword=${keyword})}">至最後一頁</a>&nbsp;
+    </span>
+
+</nav>
 </body>
 </html>

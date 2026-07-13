@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<table border="1">
+    <thead>
+        <tr>
+            <th>撥款編號</th>
+            <th>月份</th>
+            <th>心理師</th>
+            <th>應撥金額</th>
+            <th>平台抽成</th>
+            <th>退款扣除</th>
+            <th>實際撥款</th>
+            <th>撥款時間</th>
+            <th>狀態</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        <tr th:each="onePayout : ${allPayout}">
+            <td th:text="${onePayout.payoutId}"></td>
+            <td th:text="${onePayout.billingMonth}"></td>
+            <td th:text="${onePayout.psychologist.psychId}"></td>
+            <td th:text="${onePayout.grossPayoutAmount}"></td>
+            <td th:text="${onePayout.platformCommission}"></td>
+            <td th:text="${onePayout.billingOffset}"></td>
+            <td th:text="${onePayout.netPayoutAmount}"></td>
+            <td th:text="${onePayout.paidAt}"></td>
+            <td th:text="${onePayout.payoutStatusText}"></td>
+        </tr>
+
+    </tbody>
+</table>
+</body>
+</html>

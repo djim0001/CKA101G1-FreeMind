@@ -10,10 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.freemind.course.order.model.CartItemDTO;
+import com.freemind.course.util.CourseSortUtil;
+import com.freemind.course.util.CourseSpecification;
 
 @Service
 public class CourseService {
@@ -23,6 +25,7 @@ public class CourseService {
 	
 	@Value("${app.course.page-size:5}")
 	private int coursePageSize;
+	private static final Byte COURSE_STATUS_LISTED = 4;
 	
 	public CourseService(
 			CourseRepository repository, 
@@ -50,46 +53,12 @@ public class CourseService {
 		return repository.findAll();
 	}
 	
-	private Sort getCourseSort(String orderBy) {
-		
-		if (orderBy == null || orderBy.isBlank()) {
-			orderBy = "courseId";
-		}
-		
-		return switch (orderBy) {
-		case "courseCategoriesAsc" -> Sort.by("courseCategories.courseCatId").ascending();
-		case "courseCategoriesDesc" -> Sort.by("courseCategories.courseCatId").descending();
-		
-		case "psychIdAsc" -> Sort.by("psychologist.psychId").ascending();
-		case "psychIdDesc" -> Sort.by("psychologist.psychId").descending();
-		
-		case "courseStatusAsc" -> Sort.by("courseStatus").ascending();
-		case "courseStatusDesc" -> Sort.by("courseStatus").descending();
-		
-		case "saveCountAsc" -> Sort.by("saveCount").ascending();
-		case "saveCountDesc" -> Sort.by("saveCount").descending();
-		
-		case "starCountAsc" -> Sort.by("starCount").ascending();
-		case "starCountDesc" -> Sort.by("starCount").descending();
-		
-		case "reviewCountAsc" -> Sort.by("reviewCount").ascending();
-		case "reviewCountDesc" -> Sort.by("reviewCount").descending();
-		
-		case "commentCountAsc" -> Sort.by("commentCount").ascending();
-		case "commentCountDesc" -> Sort.by("commentCount").descending();
-		
-		case "priceAsc" -> Sort.by("price").ascending();
-		case "priceDesc" -> Sort.by("price").descending();
-		
-		default -> Sort.by("courseId").descending();
-		};
-	}
 	
 	public Page<Course> findCoursesExcludeStatus(Byte courseStatus, int page, String orderBy){
 		Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );		
 		return repository.findByCourseStatusNot(courseStatus, pageable);
 	}
@@ -98,10 +67,35 @@ public class CourseService {
 		Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );	
 		return repository.findByCourseStatus(courseStatus, pageable);
 	}
+	
+	 public Page<Course> findPopularListedCourses(int page) {
+
+	        if (page < 0) {
+	            page = 0;
+	        }
+
+	        Sort popularSort = Sort.by(
+	                Sort.Order.desc("saveCount"),
+	                Sort.Order.desc("reviewCount"),
+	                Sort.Order.desc("starCount"),
+	                Sort.Order.desc("courseId")
+	        );
+
+	        Pageable pageable = PageRequest.of(
+	                page,
+	                coursePageSize,
+	                popularSort
+	        );
+
+	        return repository.findByCourseStatus(
+	                COURSE_STATUS_LISTED,
+	                pageable
+	        );
+	    }
 	
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
@@ -117,7 +111,7 @@ public class CourseService {
 	    Pageable pageable = PageRequest.of(
 	            page,
 	            coursePageSize,
-	            getCourseSort(orderBy)
+	            CourseSortUtil.getCourseSort(orderBy)
 	    );
 
 	    return repository.findByPsychologistPsychId(psychId, pageable);
@@ -151,7 +145,7 @@ public class CourseService {
 		Boolean result = stringRedisTemplate.opsForSet().isMember(key, String.valueOf(courseId));
 		return Boolean.TRUE.equals(result);
 	}
-	public Page<Course> getBookmarkCourses(Integer memberId, Integer page, String orderBy) {
+	public Page<Course> getBookmarkCourses(Integer memberId, Integer page) {
 
 	    if (page == null || page < 1) {
 	        page = 0;
@@ -167,8 +161,106 @@ public class CourseService {
 	    List<Integer> courseIds = courseIdSet.stream()
 	            .map(Integer::valueOf)
 	            .toList();
-	    Pageable pageable = PageRequest.of(page, coursePageSize, getCourseSort(orderBy));
+	    Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
 	    return repository.findByCourseIdIn(courseIds, pageable);
 	}
 
+	public Page<Course> getBookmarkCourses(
+	        Integer memberId,
+	        Integer page,
+	        String keyword) {
+
+	    // 前端頁碼從 1 開始，PageRequest 從 0 開始
+	    if (page == null || page < 1) {
+	        page = 1;
+	    }
+
+	    if (keyword == null) {
+	        keyword = "";
+	    }
+
+	    keyword = keyword.trim();
+
+	    String key = "bookmark:member:" + memberId;
+
+	    Set<String> courseIdSet = stringRedisTemplate
+	            .opsForSet()
+	            .members(key);
+
+	    if (courseIdSet == null || courseIdSet.isEmpty()) {
+	        return Page.empty();
+	    }
+
+	    List<Integer> courseIds = courseIdSet.stream()
+	            .map(Integer::valueOf)
+	            .toList();
+
+	    Pageable pageable = PageRequest.of(
+	            page,
+	            coursePageSize,
+	            Sort.by("courseId").descending()
+	    );
+
+	    return repository.searchBookmarkCourses(
+	            courseIds,
+	            keyword,
+	            pageable
+	    );
+	}
+	
+	public Page<Course> findCoursesByMinimumCounts(
+	        Byte courseStatus,
+	        Integer minSaveCount,
+	        Integer minStarCount,
+	        Integer minReviewCount,
+	        Integer minCommentCount,
+	        int page,
+	        String orderBy) {
+
+	    if (page < 0) {
+	        page = 0;
+	    }
+
+	    Pageable pageable = PageRequest.of(
+	        page,
+	        coursePageSize,
+	        CourseSortUtil.getCourseSort(orderBy)
+	    );
+
+	    Specification<Course> specification =
+	        CourseSpecification.searchByCounts(
+	            courseStatus,
+	            minSaveCount,
+	            minStarCount,
+	            minReviewCount,
+	            minCommentCount
+	        );
+
+	    return repository.findAll(specification, pageable);
+	}
+	
+	 public Page<Course> findListedCoursesByCategory(
+	            Integer courseCatId,
+	            int page,
+	            String orderBy) {
+
+	        if (page < 0) {
+	            page = 0;
+	        }
+
+	        Pageable pageable = PageRequest.of(
+	                page,
+	                coursePageSize,
+	                CourseSortUtil.getCourseSort(orderBy)
+	        );
+
+	        return repository
+	                .findByCourseStatusAndCourseCategories_CourseCatId(
+	                        COURSE_STATUS_LISTED,
+	                        courseCatId,
+	                        pageable
+	                );
+	    }
+	
+	
 }

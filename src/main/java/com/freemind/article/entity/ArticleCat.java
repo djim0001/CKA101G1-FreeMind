@@ -32,6 +32,9 @@ public class ArticleCat implements Serializable{
 
 	@Column(name = "article_cat_name", length = 50, nullable = false)
 	private String articleCatName;
+	
+	@Column(name = "article_cat_status")
+	private Boolean articleCatStatus = true;
 
 	@OneToMany(mappedBy = "articleCat")
 	private Set<Article> articles;

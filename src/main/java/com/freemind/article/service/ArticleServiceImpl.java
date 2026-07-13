@@ -389,6 +389,11 @@ public class ArticleServiceImpl implements ArticleService{
 		article.setArticleStatus(3);
 		article.setReviewedAt(LocalDateTime.now());
 		article.setRejectReason(rejectReason);
+		
+		if (rejectNote != null && rejectNote.length() >200) {
+		    throw new IllegalArgumentException("退回說明不可超過200字");
+		}
+		
 		article.setRejectNote(rejectNote);
 		articleRepository.save(article);
 	}
@@ -421,6 +426,25 @@ public class ArticleServiceImpl implements ArticleService{
 		 }
 		
 		return articleRepository.findByStatuses(statuses, pageable);
+	}
+
+	@Override
+	@Transactional
+	public long incrementAndGetShareCount(Integer articleId) {
+		int updatedRows = articleRepository.incrementShareCount(articleId);
+		
+		if (updatedRows == 0) {
+	        throw new IllegalArgumentException("查無此文章，articleId=" + articleId);
+	    }
+		
+		Article article = articleRepository.findById(articleId).orElse(null);
+
+		if (article == null) {
+		    return 0;
+		} else {
+			return (long)article.getShareCount();
+		}
+
 	}
 
 }

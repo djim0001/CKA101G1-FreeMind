@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import com.freemind.course.order.model.OrderDetail;
+import com.freemind.login.admin.model.Admin;
 import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.persistence.CascadeType;
@@ -48,8 +49,9 @@ public class Course {
 //	@Column(name = "psych_id")
 //	private Integer psychId;
 	
-	@Column(name = "admin_id")
-	private Integer adminId;
+	@ManyToOne
+	@JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
+	private Admin admin;
 	
 	@ManyToOne
 	@JoinColumn(name = "course_cat_id", referencedColumnName = "course_cat_id")
@@ -145,11 +147,11 @@ public class Course {
 	public void setPsychologist(Psychologist psychologist) {
 		this.psychologist = psychologist;
 	}
-	public Integer getAdminId() {
-		return adminId;
+	public Admin getAdmin() {
+		return admin;
 	}
-	public void setAdminId(Integer adminId) {
-		this.adminId = adminId;
+	public void setAdmin(Admin admin) {
+		this.admin = admin;
 	}
 	public CourseCategories getCourseCategories() {
 		return courseCategories;
@@ -276,7 +278,6 @@ public class Course {
 	    if (courseStatus == null) {
 	        return "未知狀態";
 	    }
-	    byte status = courseStatus;
 	    switch (courseStatus) {
 	        case 0:
 	            return "草稿";

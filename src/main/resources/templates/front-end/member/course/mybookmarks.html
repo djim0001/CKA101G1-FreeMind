@@ -1,151 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>會員課程一覽頁面</title>
-<style>
-	.favorite-btn {
-	    border: none;
-	    background: none;
-	    font-size: 28px;
-	    cursor: pointer;
-	    color: #ccc;
-	    transition: 0.2s;
-	}
-	
-	.favorite-btn.active {
-	    color: red;
-	}
-	
-	.favorite-btn:hover {
-	    transform: scale(1.15);
-	}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的收藏課程</title>
+  <link rel="stylesheet" th:href="@{/css/course/mybookmarks.css}"/>
 </head>
 <body>
-	<h3>
-		<a th:href="@{/course_index}">課程商城</a>
-	</h3>
-	<h5>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
-	</h5>
-	<h1>我的收藏課程</h1>
-	<span>session會員編號:</span>
-	<span th:text=${session.memberId}></span>
-	<br>
-	<table>
-		<thead>
-			<tr>
-				<th><a th:href="@{/course/member/my_bookmarks}">課程名稱</a></th>
-				<th>心理師名稱</th>
-				<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
-						    			)}">課程分類名稱</a>
-				<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
-						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
-						    			)}">平均星數</a></th>
-					<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
-						    			)}">評價次數</a></th>
-					<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
-						    			)}">提問次數</a></th>
-					<th><a th:href="@{/course/member/my_bookmarks(page=1,
-							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
-						    			)}">課程定價</a></th>
-				<th>功能</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="course : ${myBookmarks}">
-				<tr>
-					<td th:text="${course.courseName}"></td>
-					<td th:text="${course.psychologist.name}"></td>
-					<td th:text="${course.courseCategories.courseCatName}"></td>
-					<td th:text="${course.saveCount}"></td>
-					<td
-						th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
-					<td th:text="${course.reviewCount}"></td>
-					<td th:text="${course.commentCount}"></td>
-					<td th:text="${course.price}"></td>
-					<td>
-						<form method="get" th:action="@{get_one_course}">
-							<input type="hidden" name="courseId"
-								th:value="${course.courseId}">
-							<button type="submit">查看詳情</button>
-						</form>
-						<form method="post" th:action="@{addCart}" >
-							<input type="hidden" name="courseId"
-								th:value="${course.courseId}">
-							<input type="hidden" name="returnUrl">
-							<button type="submit" id="addCart">加入購物車</button>
-						</form>
-						<form th:action="@{/course/favorite/toggle}" method="post">
-						    <input type="hidden" name="courseId" th:value="${course.courseId}">
-						    <input type="hidden" name="returnUrl">
-						    <button type="submit"
-						            class="favorite-btn active">
-						        ♥
-						    </button>
-						</form>	
-					</td>	
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/my_bookmarks', ${orderBy})}"></div>	
-		
-	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
-	    <div class="cart-modal-content">
-	        <p th:text="${cartMsg}"></p>
-	        <button type="button" onclick="closeCartModal()">確定</button>
-	    </div>
-	</div>
-	<script>
-	    function closeCartModal() {
-	        document.getElementById("cartModal").style.display = "none";
-	    }
-	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-	        input.value = window.location.pathname + window.location.search;
-	    });
-	    document.addEventListener("DOMContentLoaded", function () {
+  <main class="container">
+    <header class="page-header">
+      <div>
+        <p class="page-kicker">我的收藏</p>
+        <h1>我的收藏／課程</h1>
+      </div>
+      <div class="header-actions">
+        <a th:href="@{/member/course/select_course}" class="btn-back">課程商城</a>
+        <a th:href="@{/member/course/shopping_cart}" class="btn-back btn-soft">購物車</a>
+        <a th:href="@{/member/dashboard}" class="btn-back">我的療癒足跡</a>
+      </div>
+    </header>
 
-	        document.querySelectorAll(".favorite-btn").forEach(function (btn) {
+    <nav class="tabs" aria-label="收藏分類">
+      <button type="button" class="active" data-filter="all">已收藏課程</button>
+      <button type="button" data-filter="high-rating">高評價課程</button>
+      <button type="button" data-filter="popular">熱門收藏</button>
+    </nav>
 
-	            btn.addEventListener("click", function () {
+    <section class="toolbar" aria-label="課程搜尋">
+      <div class="search-box">
+        <label for="courseSearch">搜尋課程</label>
+        <input id="courseSearch" type="search" placeholder="輸入課程名稱、心理師或分類" />
+      </div>
+      <div class="summary-pill">
+        <span>目前顯示</span>
+        <strong id="visibleCount">0</strong>
+      </div>
+    </section>
 
-	                const courseId = this.dataset.courseId;
-	                const button = this;
+    <section class="course-list" id="courseList" th:if="${myBookmarks != null && !myBookmarks.isEmpty()}">
+      <article
+        class="course-card"
+        th:each="course : ${myBookmarks}"
+        th:attr="data-rating=${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount},data-save-count=${course.saveCount},data-category=${course.courseCategories.courseCatName}">
+        <div class="course-cover">
+          <span class="cover-text" th:text="${course.courseCategories.courseCatName}">心理健康</span>
+        </div>
 
-	                fetch("/course/favorite/toggle", {
-	                    method: "POST",
-	                    headers: {
-	                        "Content-Type": "application/x-www-form-urlencoded"
-	                    },
-	                    body: "courseId=" + encodeURIComponent(courseId)
-	                })
-	                .then(response => response.json())
-	                .then(data => {
-	                    if (data.saved) {
-	                        button.classList.add("active");
-	                    } else {
-	                        button.classList.remove("active");
-	                    }
-	                })
-	                .catch(error => {
-	                    console.error("收藏失敗", error);
-	                    alert("收藏失敗，請稍後再試");
-	                });
+        <div class="course-info">
+          <h2 th:text="${course.courseName}">情緒覺察與壓力調節入門</h2>
 
-	            });
+          <div class="course-meta">
+            <span class="cat-tag" th:text="${course.courseCategories.courseCatName}">心理健康</span>
+            <span>心理師 <strong th:text="${course.psychologist.name}">林庭安</strong></span>
+            <span>收藏 <strong th:text="${course.saveCount}">0</strong></span>
+            <span>平均星數 <strong th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}">0</strong></span>
+            <span>評價 <strong th:text="${course.reviewCount}">0</strong></span>
+            <span>提問 <strong th:text="${course.commentCount}">0</strong></span>
+            <span>定價 <strong th:text="${course.price}">0</strong></span>
+          </div>
 
-	        });
+          <div class="course-action">
+            <form method="get" th:action="@{/member/course/get_one_course}">
+              <input type="hidden" name="courseId" th:value="${course.courseId}" />
+              <button type="submit">查看詳情</button>
+            </form>
 
-	    });
-	</script>
-</body>
+            <form method="post" th:action="@{/member/course/add_cart}">
+              <input type="hidden" name="courseId" th:value="${course.courseId}" />
+              <input type="hidden" name="returnUrl" />
+              <button type="submit" class="btn-cart">加入購物車</button>
+            </form>
+
+            <form method="post" th:action="@{/member/dashboard/favorite/toggle}">
+              <input type="hidden" name="courseId" th:value="${course.courseId}" />
+              <input type="hidden" name="returnUrl" />
+              <button type="submit" class="favorite-btn active" aria-label="取消收藏">♥</button>
+            </form>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="emptyState" class="empty-state is-hidden">
+      尚無收藏課程
+    </section>
+
+    <div class="pagination-wrap" id="paginationWrap" data-page-size="5">
+      <div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/myCollection/course')}"></div>
+    </div>
+  </main>
+
+  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+    <div class="cart-modal-content">
+      <p th:text="${cartMsg}">已加入購物車。</p>
+      <button type="button" onclick="closeCartModal()">確定</button>
+    </div>
+  </div>
+
+<script th:src="@{/js/course/mybookmarks.js}"></script></body>
 </html>

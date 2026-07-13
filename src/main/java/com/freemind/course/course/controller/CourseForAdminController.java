@@ -2,54 +2,72 @@ package com.freemind.course.course.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.order.model.CourseOrder;
+import com.freemind.course.order.model.CourseOrderService;
+import com.freemind.course.order.model.OrderDetail;
+import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/course/admin")
+@RequestMapping("/admin/course")
 public class CourseForAdminController {
 	
 	private final CourseService courseSvc;
+	private final AdminService adminSvc;
+	private final CourseOrderService courseOrderSvc;
+	private final OrderDetailService orderDetailSvc;
+	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForAdminController(
-			CourseService courseSvc) {
+			CourseService courseSvc,
+			AdminService adminSvc,
+			CourseOrderService courseOrderSvc,
+			OrderDetailService orderDetailSvc,
+			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
+		this.adminSvc = adminSvc;
+		this.courseOrderSvc = courseOrderSvc;
+		this.orderDetailSvc = orderDetailSvc;
+		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
+	@ModelAttribute("admin")
+    public Admin currentAdmin(Authentication authentication) {
+        return adminSvc.findByAccount(authentication.getName());
+    }
 	
-	@PostMapping("set_adminId_session")
-	public String setAdminIdSession(@RequestParam(name = "adminIdSession") Integer adminIdSession, ModelMap model,
-			HttpSession session) {
-		session.setAttribute("adminId", adminIdSession);
-		return "redirect:/course/admin/select_course";
-	}
 	@PostMapping("/listed")
 	public String listed() {
 		courseSvc.checkAllCourseStatus();
-		return "redirect:/course/admin/select_course";
+		return "redirect:/admin/course/select_course";
 	}
 	@GetMapping("/select_course")
 	public String admunSelectCourse(
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
-
-		if (adminId == null) 
-			return "back-end/course/course/selectCourse";
 		
 		if (page < 1)  page = 1;
 		Integer currentPage = page;		
@@ -61,9 +79,39 @@ public class CourseForAdminController {
 		model.addAttribute("totalPages", courseListSubmit.getTotalPages());
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
-		
 
 		return "back-end/course/course/selectCourse";
+	}
+	
+	@GetMapping("/select_course_order")
+	public String adminSelectCourseOrder(
+			@ModelAttribute("admin") Admin admin,
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			ModelMap model, HttpSession session) {
+		if (page < 1)  page = 1;
+		Integer currentPage = page;		
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "orderedAt" : orderBy;
+		Page<CourseOrder> allCourseOrder = courseOrderSvc.getAllOrder(currentPage - 1, sortField);
+		model.addAttribute("allCourseOrder", allCourseOrder);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", allCourseOrder.getTotalPages());
+		return "back-end/course/course/allCourseOrder";
+	}
+	
+	@GetMapping("/order/detail/{orderId}")
+	public String adminOrderDetail(
+			@PathVariable("orderId") Integer orderId,
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			ModelMap model,
+			RedirectAttributes redirectAttributes) {
+		List<OrderDetail> details = orderDetailSvc.getOrderDetailsByCourseOrderId(orderId);
+		
+		redirectAttributes.addFlashAttribute("details", details);
+		redirectAttributes.addFlashAttribute("detailsMsg", "show");
+		
+		
+		return "redirect:/admin/course/select_course_order";
 	}
 	
 	@PostMapping("/get_one_course")
@@ -77,14 +125,40 @@ public class CourseForAdminController {
 	public String adminExamineCourse(
 			@RequestParam("courseId") Integer courseId, 
 			@RequestParam("courseStatus") Byte courseStatus, 
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
 			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus(courseStatus);
-		course.setAdminId(adminId);
+		course.setAdmin(admin);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 		return "back-end/course/course/listOneCourse";
+	}
+	
+	
+	
+	//課程分類
+	@GetMapping("/select_course_categories")
+	public String selectCourseCategories(ModelMap model) {
+		CourseCategories courseCategories = new CourseCategories();
+		model.addAttribute("courseCategories", courseCategories);
+		return "back-end/course/course/selectCourseCategories";
+	}
+	@PostMapping("/insert_course_categories")
+	public String insertCourseCategories(
+			@Valid @ModelAttribute("courseCategories")CourseCategories courseCategories, 
+			BindingResult result, ModelMap model) {
+		if(result.hasErrors()) {
+			return "back-end/course/course/selectCourseCategories";
+		}
+		courseCategoriesSvc.addCourseCategories(courseCategories);
+		return "redirect:/admin/course/select_course_categories";
+	}
+
+	@ModelAttribute("courseCategoriesListAll")
+	public List<CourseCategories> courseCategoriesListAll(){
+		List<CourseCategories> courseCategoriesListAll = courseCategoriesSvc.getAllCourseCategories();
+		return courseCategoriesListAll;
 	}
 	
 	

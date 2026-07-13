@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>系統公告列表</title>
+</head>
+<body>
+	<h3>系統公告列表</h3>
+
+	<a th:href="@{/admin/notifications/addNotification}">新增公告</a>
+
+	<table border="1">
+		<tr>
+			<th>公告編號</th><th>員工姓名</th><th>內容</th><th>建立時間</th><th>公告狀態</th><th>操作</th>
+		</tr>
+		<tr th:each="notification : ${notificationListData}">
+			<td th:text="${notification.noticeId}"></td>
+			<td th:text="${notification.admin != null ? notification.admin.name : notification.adminId}"></td>
+			<td th:text="${notification.systemContent}"></td>
+			<td th:text="${#dates.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+			<td th:text="${noticeStatusMap.get(notification.noticeStatus)}"></td>
+			<td>
+				<form method="post" th:action="@{/admin/notifications/getOne_For_Update}" style="display:inline;">
+					<input type="hidden" name="noticeId" th:value="${notification.noticeId}">
+					<input type="submit" value="修改">
+				</form>
+				<form method="post" th:action="@{/admin/notifications/delete}" style="display:inline;">
+					<input type="hidden" name="noticeId" th:value="${notification.noticeId}">
+					<input type="submit" value="刪除">
+				</form>
+			</td>
+		</tr>
+	</table>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>文章分類詳情</title>
+<style>
+.btn-action {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    color: #000000;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-disabled {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    color: #999;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.detail-table {
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.detail-table th, .detail-table td {
+    border: 1px solid #ccc;
+    padding: 10px 16px;
+    text-align: left;
+}
+
+.detail-table th {
+    background-color: #f2f2f2;
+    width: 120px;
+}
+
+.edit-input {
+    padding: 6px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: none;
+}
+
+.success-msg {
+    padding: 4px 10px;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    margin-left: 10px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.error-msg {
+    padding: 4px 10px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-left: 10px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+</style>
+</head>
+<body>
+    <h1>文章分類詳情</h1>
+    <a th:href="@{/admin/article/categories}" class="btn-action">返回分類搜尋</a>
+    <br><br>
+
+    <form th:action="@{/admin/article/categories/{id}/edit(id=${articleCat.articleCatId})}" method="post" id="editForm">
+
+        <div style="display: flex; align-items: flex-start; gap: 20px;">
+            <table class="detail-table">
+                <tr>
+                    <th>分類編號</th>
+                    <td th:text="${articleCat.articleCatId}"></td>
+                </tr>
+                <tr>
+                    <th>分類名稱</th>
+                    <td>
+                        <span id="catNameDisplay" th:text="${articleCat.articleCatName}"></span>
+                        <input type="text" id="catNameInput" name="catName"
+                               class="edit-input"
+                               th:value="${articleCat.articleCatName}" required />
+                    </td>
+                </tr>
+                <tr>
+                    <th>狀態</th>
+                    <td>
+                        <span th:if="${articleCat.articleCatStatus}" style="color: black;">啟用中</span>
+                        <span th:unless="${articleCat.articleCatStatus}" style="color: gray;">已停用</span>
+                    </td>
+                </tr>
+            </table>
+
+            <span id="alertMsg" th:if="${alertMessage}" 
+	              th:classappend="${alertType == 'error'} ? 'error-msg' : 'success-msg'"
+	              th:text="${alertMessage}" style="margin-top: 45px;">
+            </span>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <span id="viewMode">
+                <button type="button" class="btn-action" onclick="enableEdit()">編輯</button>
+
+                <span th:if="${articleCat.articleCatStatus}">
+                    <button type="button" class="btn-action" onclick="confirmDeactivate()">停用</button>
+                </span>
+
+                <button th:unless="${articleCat.articleCatStatus}"
+                        class="btn-disabled" disabled>已停用</button>
+            </span>
+
+            <span id="editMode" style="display: none;">
+                <button type="submit" class="btn-action">儲存</button>
+                <button type="button" class="btn-action" onclick="cancelEdit()">取消</button>
+            </span>
+        </div>
+    </form>
+
+    <form id="deactivateForm" method="post" style="display: none;"
+          th:action="@{/admin/article/categories/{id}/deactivate(id=${articleCat.articleCatId})}">
+    </form>
+
+    <script>
+        const catNameDisplay = document.getElementById('catNameDisplay');
+        const catNameInput = document.getElementById('catNameInput');
+        const viewMode = document.getElementById('viewMode');
+        const editMode = document.getElementById('editMode');
+        const originalName = catNameDisplay.textContent;
+
+        function enableEdit() {
+            catNameDisplay.style.display = 'none';
+            catNameInput.style.display = 'inline-block';
+            catNameInput.focus();
+            viewMode.style.display = 'none';
+            editMode.style.display = 'inline';
+        }
+
+        function cancelEdit() {
+            catNameDisplay.style.display = 'inline';
+            catNameInput.style.display = 'none';
+            catNameInput.value = originalName;
+            viewMode.style.display = 'inline';
+            editMode.style.display = 'none';
+        }
+
+        function confirmDeactivate() {
+            if (confirm('確定要停用此分類嗎？')) {
+                document.getElementById('deactivateForm').submit();
+            }
+        }
+    </script>
+
+    <script th:if="${alertMessage}" th:inline="javascript">
+	    const alertType = /*[[${alertType}]]*/ 'success';
+        setTimeout(function() {
+            const msg = document.getElementById('alertMsg');
+            if (msg) {
+                msg.style.opacity = '0';
+                setTimeout(function() {
+                    msg.style.display = 'none';
+                }, 500);
+            }
+        }, 1500);
+	</script>
+</body>
+</html>

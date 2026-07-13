@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +36,7 @@ public class PsychArticleController {
 
 	@ModelAttribute("articleCats")
 	public List<ArticleCat> articleCatList() {
-		return articleCatService.getAllCats();
+		return articleCatService.getActiveCats();
 	}
 
 	// testing
@@ -65,7 +64,7 @@ public class PsychArticleController {
 	}
 	
 	@GetMapping("/create")
-	public String showCreateForm(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
+	public String getCreateForm(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
 
 		// testing
 		if (psychId == null) {
@@ -132,8 +131,9 @@ public class PsychArticleController {
 	}
 
 	@GetMapping("/{articleId}/edit")
-	public String showEditForm(Model model, 
+	public String getEditForm(Model model, 
 			@PathVariable Integer articleId,
+			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId,
 			RedirectAttributes redirectAttributes) {
 
@@ -149,7 +149,7 @@ public class PsychArticleController {
 			
 			if (article.getArticleStatus() == 2) {
 				Article copy = articleService.createEditCopy(articleId, psychId);
-				return "redirect:/psych/article/" + copy.getArticleId() + "/edit";
+				return "redirect:/psych/article/" + copy.getArticleId() + "/edit?page=" + page;
 			}
 			
 			// 把資料填回 form
@@ -163,18 +163,22 @@ public class PsychArticleController {
 
 			model.addAttribute("form", form);
 			model.addAttribute("articleId", articleId);
+			model.addAttribute("currentPage", page);
 			model.addAttribute("hasCoverImage", article.getCoverImage() != null);
 			return "front-end/psych/article/editForm";
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
-			return "redirect:/psych/article/myArticles";
+			return "redirect:/psych/article/myArticles?page=" + page;
 		}
 
 	}
 
 	@PostMapping("/{articleId}/edit")
-	public String updateArticle(Model model, @ModelAttribute ArticleCreateForm form,
-			@RequestParam("action") String action, @PathVariable Integer articleId,
+	public String updateArticle(Model model, 
+			@ModelAttribute ArticleCreateForm form,
+			@RequestParam("action") String action, 
+			@RequestParam(name = "page", defaultValue = "1") Integer page,
+			@PathVariable Integer articleId,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
 
 		// testing
@@ -193,17 +197,19 @@ public class PsychArticleController {
 			model.addAllAttributes(e.getFieldErrors());
 			model.addAttribute("form", form);
 			model.addAttribute("articleId", articleId);
+			model.addAttribute("currentPage", page);
 			model.addAttribute("hasCoverImage", true);
 			return "front-end/psych/article/editForm";
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			model.addAttribute("errorMessage", e.getMessage());
 			model.addAttribute("form", form);
 			model.addAttribute("articleId", articleId);
+			model.addAttribute("currentPage", page);
 			model.addAttribute("hasCoverImage", true);
 			return "front-end/psych/article/editForm";
 		}
 
-		return "redirect:/psych/article/myArticles";
+		return "redirect:/psych/article/myArticles?page=" + page;
 	}
 	
 	@PostMapping("/{articleId}/unpublish")

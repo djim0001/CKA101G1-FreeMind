@@ -1,5 +1,6 @@
 package com.freemind.course.course.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -37,15 +39,19 @@ import jakarta.validation.Valid;
 
 //@Validated
 @Controller
-@RequestMapping("/course/psych")
+@RequestMapping("/psych/course")
 public class CourseForPsychController {
 
 	private final CourseService courseSvc;
     private final CourseCategoriesService courseCategoriesSvc;
     private final PsychologistService psychologistService;
     
-    @Value("${course.video.upload-path}")
-    private String videoUploadPath;
+//    @Value("${course.video.upload-path}")
+//    private String videoUploadPath;
+    @Value("${course.video.upload.dir}")
+    private String videoUploadDir;
+    @Value("${course.video.url-path}")
+	private String videoUrlPath;
 
     public CourseForPsychController(
             CourseService courseSvc,
@@ -69,7 +75,7 @@ public class CourseForPsychController {
 			HttpSession session) {
 		session.setAttribute("psychId", psychIdSession);
 		
-		return "redirect:/course/psych/select_course";
+		return "redirect:/psych/course/select_course";
 	}
 
 	@GetMapping("/select_course")
@@ -232,18 +238,31 @@ public class CourseForPsychController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
 		String newFileName = LocalDateTime.now().format(formatter) + extension;
 
-		String uploadDir = videoUploadPath;
-
-		Path uploadPath = Paths.get(uploadDir);
-
-		if (!Files.exists(uploadPath)) {
-		    Files.createDirectories(uploadPath);
-		}
-
-		Path savePath = uploadPath.resolve(newFileName);
-		video.transferTo(savePath.toFile());
+//		String uploadDir = videoUploadPath;
+		String uploadDir = videoUploadDir;
+		String urlPath = videoUrlPath;
 		
-		return newFileName;
+		try {
+			File dir = new File(uploadDir);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			File dest = new File(dir, newFileName);
+			video.transferTo(dest.toPath());
+			String basePath = urlPath.replace("**", "");
+			return basePath + newFileName;
+		}catch (Exception e) {
+				return newFileName; // 500
+			}
+//		Path uploadPath = Paths.get(uploadDir);
+//
+//		if (!Files.exists(uploadPath)) {
+//		    Files.createDirectories(uploadPath);
+//		}
+//
+//		Path savePath = uploadPath.resolve(newFileName);
+//		video.transferTo(savePath.toFile());
+		
 	}
 	
 	// 去除BindingResult中某個欄位的FieldError紀錄

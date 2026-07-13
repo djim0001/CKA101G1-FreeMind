@@ -53,49 +53,55 @@
 </head>
 <body>
 	<h3>
-		<a th:href="@{/course_index}">課程商城</a>
-		<a th:href="@{/course/member/my_courses}">個人課程空間</a>
+		<a th:href="@{/course_index}">課程index</a>
+		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
 	</h3>
 	<h5>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
-		<a th:href="@{/course/member/my_bookmarks}">收藏課程</a>
+		<a th:href="@{/member/course/shopping_cart}">購物車</a>
+		<a th:href="@{/member/dashboard/myCollection/course}">我的收藏</a>
 	</h5>
-	<form method="post" th:action="@{set_memberId_session}">
-		<span>會員編號：</span> <input type="text" name="memberIdSession" />
-		<button type="submit" id="submit">送出</button>
-		<br> <span class="error" th:text="${mError}"></span>
-	</form>
-	<span>session會員編號:</span>
-	<span th:text=${session.memberId}></span>
+	<span>會員名稱:</span>
+	<span th:text=${memberName}></span>
 	<br>
+	<form method="get" th:action="@{/member/course/select_course}">
+		<button type="submit" name="orderBy" th:value="popular">熱門課程</button>
+		<button type="submit" name="orderBy" th:value="listedAt">最新課程</button>
+	</form>
+	<form th:action="@{/member/course/search-by-category}" method="get">
+		<th:block th:each="courseCategories : ${courseCategoriesListAll}">
+			<button type="submit" name="courseCatId"
+					th:value="${courseCategories.courseCatId}"
+				    th:text="${courseCategories.courseCatName}"></button>
+		</th:block>
+	</form>
 	<table>
 		<thead>
 			<tr>
-				<th><a th:href="@{/course/member/select_course}">課程名稱</a></th>
+				<th><a th:href="@{/member/course/select_course}">課程名稱</a></th>
 				<th>心理師名稱</th>
-				<th><a th:href="@{/course/member/select_course(page=1,
+				<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
 						    			)}">課程分類名稱</a>
-				<th><a th:href="@{/course/member/select_course(page=1,
+				<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
 						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
 						    			)}">平均星數</a></th>
-					<th><a th:href="@{/course/member/select_course/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
 						    			)}">評價次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
 						    			)}">提問次數</a></th>
-					<th><a th:href="@{/course/member/select_course(page=1,
+					<th><a th:href="@{/member/course/select_course(page=1,
 							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
 						    			)}">課程定價</a></th>
 				<th>功能</th>
 			</tr>
 		</thead>
 		<tbody>
-			<th:block th:each="course : ${courseListListed}">
+			<th:block th:each="course : ${courseList}">
 				<tr>
 					<td th:text="${course.courseName}">
 <!-- 					<span><button type="button" -->
@@ -126,7 +132,7 @@
 							<button type="submit" id="addCart">加入購物車</button>
 						</form>
 						
-						<form th:action="@{favorite/toggle}" method="post">
+						<form th:action="@{/member/dashboard/favorite/toggle}" method="post">
 						    <input type="hidden" name="courseId" th:value="${course.courseId}">
 						    <input type="hidden" name="currentPage" th:value="${currentPage}">
    							<input type="hidden" name="orderBy" th:value="${orderBy}">
@@ -142,7 +148,7 @@
 			</th:block>
 		</tbody>
 	</table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/course/member/select_course', ${orderBy})}"></div>	
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>	
 		
 	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
 	    <div class="cart-modal-content">

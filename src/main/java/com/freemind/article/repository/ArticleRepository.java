@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.freemind.article.entity.Article;
+import com.freemind.article.entity.ArticleCat;
 
 public interface ArticleRepository extends JpaRepository<Article, Integer>{
 
@@ -28,6 +30,10 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
 	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);
 
-	
+	boolean existsByArticleCat(ArticleCat articleCat);
+
+	@Modifying
+	@Query("UPDATE Article a SET a.shareCount = a.shareCount + 1 WHERE a.articleId = :articleId")
+	int incrementShareCount(@Param("articleId")Integer articleId);
 
 }

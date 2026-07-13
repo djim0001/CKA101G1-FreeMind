@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>文章分類搜尋</title>
+<style>
+.btn-action {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #f0f0f0;
+    color: #000000;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    background-color: #e0e0e0;
+}
+
+.search-container {
+    position: relative;
+    width: 300px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    display: none;
+    z-index: 10;
+}
+
+.dropdown-item {
+    padding: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    color: #333;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+}
+
+.result-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.result-table th, .result-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.result-table th {
+    background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+    <h1>文章分類管理</h1>
+    <a th:href="@{/admin/article/categories/create}" class="btn-action">新增文章分類</a>
+    <a th:href="@{/admin/article}" class="btn-action">返回文章管理</a>
+    <br><br>
+
+    <!-- 搜尋 -->
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-input"
+               placeholder="輸入分類編號或名稱搜尋..." autocomplete="off" />
+        <div id="dropdown" class="dropdown"></div>
+    </div>
+
+    <!-- 全部分類資料（隱藏，給 JS 用） -->
+    <script th:inline="javascript">
+        const allCats = /*[[${articleCats}]]*/ [];
+    </script>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const dropdown = document.getElementById('dropdown');
+
+        searchInput.addEventListener('input', function() {
+            const keyword = this.value.trim();
+            dropdown.innerHTML = '';
+
+            if (keyword === '') {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            const matches = allCats.filter(cat =>
+                String(cat.articleCatId).includes(keyword) ||
+                cat.articleCatName.toLowerCase().includes(keyword.toLowerCase())
+            );
+
+            if (matches.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            matches.forEach(cat => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = cat.articleCatId + ' - ' + cat.articleCatName;
+                item.addEventListener('click', function() {
+                    window.location.href = '/admin/article/categories/' + cat.articleCatId;
+                });
+                dropdown.appendChild(item);
+            });
+
+            dropdown.style.display = 'block';
+        });
+
+        // 點擊頁面其他地方關閉 dropdown
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                dropdown.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

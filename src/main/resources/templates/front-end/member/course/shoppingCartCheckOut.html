@@ -40,11 +40,8 @@ span.error {
 <body>
 	<h1>結帳頁面</h1>
 	<h3>
-		<a th:href="@{/course/member/select_course}">會員課程一覽頁面</a>
+		<a th:href="@{/member/course/select_course}">會員課程一覽頁面</a>
 	</h3>
-	<span>session會員編號:</span>
-	<span th:text=${session.memberId}></span>
-	<br>
 	<table>
 		<tr>
 			<th>課程名稱</th>
@@ -62,8 +59,9 @@ span.error {
 			<td th:text="${item.psychDiscount==null?'無折扣':item.psychDiscount}"></td>
 			<td th:text="${item.subtotal}"></td>
 			<td>
-				<form th:action="@{cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
+				<form th:action="@{/member/course/cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
 					<input type="hidden" name="courseId" th:value="${item.courseId}">
+					<input type="hidden" name="returnUrl">
 					<button type="submit">從購物車移除</button>
 				</form>
 			</td>
@@ -71,17 +69,19 @@ span.error {
 	</table>
 	<br>
 
-	<form method="post" th:action="@{/coupon/member/coupon_model_box}">
+	<form method="post" th:action="@{/member/coupon/coupon_model_box}">
 	    <button type="submit">選擇優惠券</button>
-	
+		<input type="hidden" name="returnUrl">
 	    <span th:if="${orderCoupon != null}">
 	        已選擇：
 	        <b th:text="${couponName}"></b>
+	        <b th:text="${couponError}"></b>
 	    </span>
 	</form>
 	<form th:if="${orderCoupon != null}"
 	      method="post"
-	      th:action="@{/coupon/member/remove_coupon}">
+	      th:action="@{/member/coupon/remove_coupon}">
+	    <input type="hidden" name="returnUrl">
 	    <button type="submit">取消優惠券</button>
 	</form>
 	
@@ -124,7 +124,6 @@ span.error {
                     <th>優惠券折扣</th>
                     <th>開始時間</th>
                     <th>結束時間</th>
-                    <th>狀態</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -145,14 +144,12 @@ span.error {
 
                     <td th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy-MM-dd')}"></td>
 
-                    <td th:text="${memberCoupon.couponStatus == null ? '未使用' : memberCoupon.couponStatus}"></td>
-
                     <td>
-                        <form method="post" th:action="@{/coupon/member/choose_coupon}">
+                        <form method="post" th:action="@{/member/coupon/choose_coupon}">
                             <input type="hidden"
                                    name="couponSerialNo"
                                    th:value="${memberCoupon.couponSerialNo}">
-
+							<input type="hidden" name="returnUrl">
                             <button type="submit">使用此優惠券</button>
                         </form>
                     </td>
@@ -172,6 +169,9 @@ function closeCouponModal() {
         modal.style.display = "none";
     }
 }
+document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+    input.value = window.location.pathname + window.location.search;
+});
 </script>	
 </body>
 </html>

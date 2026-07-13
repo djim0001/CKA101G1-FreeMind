@@ -1,7 +1,5 @@
 package com.freemind.article.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import com.freemind.article.dto.ArticleCreateForm;
@@ -48,5 +46,7 @@ public interface ArticleService {
 	void unPublishArticle(Integer articleId, Integer adminId);
 
 	Page<Article> getReviewedArticles(Integer status, Integer page);
+
+	long incrementAndGetShareCount(Integer articleId);
 	
 }

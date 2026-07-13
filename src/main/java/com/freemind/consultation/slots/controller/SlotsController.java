@@ -43,8 +43,7 @@ public class SlotsController {
 			}
 		});
 	}
-	
-	
+
 	@GetMapping("listAllSlots")
 	public String listAllSlots(ModelMap model) {
 		List<Slots> list = slotsSvc.getAll();
@@ -66,7 +65,7 @@ public class SlotsController {
 
 	@PostMapping("insert")
 	public String insert(@Valid Slots slots, BindingResult result, ModelMap model) {
-		if(result.hasErrors()) {
+		if (result.hasErrors()) {
 			return "back-end/consultation/slots/addSlots";
 		}
 		slotsSvc.addSlots(slots);
@@ -82,7 +81,7 @@ public class SlotsController {
 
 	@PostMapping("update")
 	public String update(@Valid Slots slots, BindingResult result, ModelMap model) {
-		if(result.hasErrors()) {
+		if (result.hasErrors()) {
 			return "back-end/consultation/slots/update_slots_input";
 		}
 		slotsSvc.updateSlots(slots);
@@ -109,7 +108,7 @@ public class SlotsController {
 			model.addAttribute("errorMessage", "請輸入時段編號");
 			return "back-end/consultation/slots/select_Page";
 		}
-		
+
 		Slots slots = slotsSvc.getOneSlots(Integer.valueOf(timeslotId));
 		model.addAttribute("slots", slots);
 		return "back-end/consultation/slots/select_Page";
@@ -148,80 +147,150 @@ public class SlotsController {
 		model.addAttribute("slotsListData", list);
 		return "back-end/consultation/slots/select_Page";
 	}
-	
+
 	// ===== 心理師：查詢/調整某天的可預約時段 =====
+
+	@GetMapping("manageSlotsForm")
+	public String manageSlotsForm(ModelMap model) {
+		return "front-end/psych/consultation/slots/manageSlotsForm"; // ← 改這裡
+	}
+
+	@PostMapping("manageLookup")
+	public String manageLookup(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
+			ModelMap model) {
+		if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入心理師編號與日期");
+			return "front-end/psych/consultation/slots/manageSlotsForm";
+		}
+
+		Integer pid = Integer.valueOf(psychId);
+		LocalDate date = LocalDate.parse(slotDateStr);
+
+		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+		if (slots == null) {
+			// 這一天還沒有任何記錄，建立一筆全新的（預設全部不可預約）
+			slots = new Slots();
+			Psychologist p = new Psychologist();
+			p.setPsychId(pid);
+			slots.setPsychologist(p);
+			slots.setSlotDate(date);
+			slots.setConsStatus("0".repeat(24));
+		}
+
+		model.addAttribute("slots", slots);
+		return "front-end/psych/consultation/slots/manageSlotsInput";
+	}
+
+	@PostMapping("manageSubmit")
+	public String manageSubmit(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
+			@RequestParam(value = "openHours", required = false) List<Integer> openHours, ModelMap model) {
+		Integer pid = Integer.valueOf(psychId);
+		LocalDate date = LocalDate.parse(slotDateStr);
+
+		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+		boolean isNew = (slots == null);
+
+		if (isNew) {
+			slots = new Slots();
+			Psychologist p = new Psychologist();
+			p.setPsychId(pid);
+			slots.setPsychologist(p);
+			slots.setSlotDate(date);
+		}
+
+		String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
+		StringBuilder sb = new StringBuilder(currentStatus);
+
+		for (int h = 0; h < 24; h++) {
+			if (sb.charAt(h) == '2') {
+				continue; // 已預約成立的時段，不可被調整
+			}
+			boolean checked = openHours != null && openHours.contains(h);
+			sb.setCharAt(h, checked ? '1' : '0');
+		}
+		slots.setConsStatus(sb.toString());
+
+		if (isNew) {
+			slotsSvc.addSlots(slots);
+		} else {
+			slotsSvc.updateSlots(slots);
+		}
+
+		model.addAttribute("success", "時段設定已更新！");
+		return "front-end/psych/consultation/slots/manageSlotsSuccess";
+	}
 	
-		@GetMapping("manageSlotsForm")
-		public String manageSlotsForm(ModelMap model) {
-			return "front-end/consultation/slots/manageSlotsForm";
+	// ===== 心理師：設定固定範本（範本日固定為 2000-01-01） =====
+	
+		private static final LocalDate TEMPLATE_DATE = LocalDate.of(2000, 1, 1);
+		
+		@GetMapping("templateForm")
+		public String templateForm(ModelMap model) {
+			return "front-end/psych/consultation/slots/templateForm";
 		}
 		
-		@PostMapping("manageLookup")
-		public String manageLookup(@RequestParam("psychId") String psychId,
-		                            @RequestParam("slotDate") String slotDateStr, ModelMap model) {
-			if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
-				model.addAttribute("errorMessage", "請輸入心理師編號與日期");
-				return "front-end/consultation/slots/manageSlotsForm";
+		@PostMapping("templateLookup")
+		public String templateLookup(@RequestParam("psychId") String psychId, ModelMap model) {
+			if (psychId == null || psychId.isBlank()) {
+				model.addAttribute("errorMessage", "請輸入心理師編號");
+				return "front-end/psych/consultation/slots/templateForm";
 			}
 			
 			Integer pid = Integer.valueOf(psychId);
-			LocalDate date = LocalDate.parse(slotDateStr);
 			
-			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
-			if (slots == null) {
-				// 這一天還沒有任何記錄，建立一筆全新的（預設全部不可預約）
-				slots = new Slots();
+			Slots template = slotsSvc.getOneByPsychAndDate(pid, TEMPLATE_DATE);
+			if (template == null) {
+				template = new Slots();
 				Psychologist p = new Psychologist();
 				p.setPsychId(pid);
-				slots.setPsychologist(p);
-				slots.setSlotDate(date);
-				slots.setConsStatus("0".repeat(24));
+				template.setPsychologist(p);
+				template.setSlotDate(TEMPLATE_DATE);
+				template.setConsStatus("0".repeat(24));
 			}
 			
-			model.addAttribute("slots", slots);
-			return "front-end/consultation/slots/manageSlotsInput";
+			model.addAttribute("slots", template);
+			return "front-end/psych/consultation/slots/templateInput";
 		}
 		
-		@PostMapping("manageSubmit")
-		public String manageSubmit(@RequestParam("psychId") String psychId,
-		                            @RequestParam("slotDate") String slotDateStr,
-		                            @RequestParam(value = "openHours", required = false) List<Integer> openHours,
-		                            ModelMap model) {
+		@PostMapping("templateSubmit")
+		public String templateSubmit(@RequestParam("psychId") String psychId,
+		                              @RequestParam(value = "openHours", required = false) List<Integer> openHours,
+		                              ModelMap model) {
 			Integer pid = Integer.valueOf(psychId);
-			LocalDate date = LocalDate.parse(slotDateStr);
 			
-			Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
-			boolean isNew = (slots == null);
+			Slots template = slotsSvc.getOneByPsychAndDate(pid, TEMPLATE_DATE);
+			boolean isNew = (template == null);
 			
 			if (isNew) {
-				slots = new Slots();
+				template = new Slots();
 				Psychologist p = new Psychologist();
 				p.setPsychId(pid);
-				slots.setPsychologist(p);
-				slots.setSlotDate(date);
+				template.setPsychologist(p);
+				template.setSlotDate(TEMPLATE_DATE);
 			}
 			
-			String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
-			StringBuilder sb = new StringBuilder(currentStatus);
-			
+			StringBuilder sb = new StringBuilder("0".repeat(24));
 			for (int h = 0; h < 24; h++) {
-				if (sb.charAt(h) == '2') {
-					continue; // 已預約成立的時段，不可被調整
-				}
 				boolean checked = openHours != null && openHours.contains(h);
 				sb.setCharAt(h, checked ? '1' : '0');
 			}
-			slots.setConsStatus(sb.toString());
+			template.setConsStatus(sb.toString());
 			
 			if (isNew) {
-				slotsSvc.addSlots(slots);
+				slotsSvc.addSlots(template);
 			} else {
-				slotsSvc.updateSlots(slots);
+				slotsSvc.updateSlots(template);
 			}
 			
-			model.addAttribute("success", "時段設定已更新！");
-			return "front-end/consultation/slots/manageSlotsSuccess";
+			model.addAttribute("success", "固定範本已更新！之後排程會依此規則自動產生時段。");
+			return "front-end/psych/consultation/slots/templateSuccess";
 		}
-		
-
+			
+		// 心理師改完範本後，重新套用範本到未來14天
+		@PostMapping("reapplyTemplate")
+		public String reapplyTemplate(@RequestParam("psychId") String psychId, ModelMap model) {
+			slotsSvc.reapplyTemplateToNext14Days(Integer.valueOf(psychId));
+			model.addAttribute("success", "已將新範本套用到未來14天！已預約的時段不受影響。");
+			return "front-end/psych/consultation/slots/templateSuccess";
+		}
 }

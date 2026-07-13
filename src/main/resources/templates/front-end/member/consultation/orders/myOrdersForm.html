@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>查看我的預約紀錄</title>
+</head>
+<body>
+	<h3>查看我的預約紀錄</h3>
+
+	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+
+	<form method="post" th:action="@{/orders/myOrders}">
+		會員編號：<input type="text" name="memberId">
+		<input type="submit" value="查詢">
+	</form>
+
+</body>
+</html>

@@ -277,7 +277,10 @@ body {
 						<span th:text="${article.publishedAt}"></span>
 					</div>
 					<div class="article-action">
-						<a th:href="@{/article/detail/{id}(id=${article.articleId})}">查看詳情</a>
+					    <a th:if="${selectedCatId != null}"
+					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage}, catId=${selectedCatId})}">查看詳情</a>
+					    <a th:unless="${selectedCatId != null}"
+					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage})}">查看詳情</a>
 					</div>
 				</div>
 
@@ -290,22 +293,28 @@ body {
 
 		<div class="pagination" th:if="${articlePage.totalPages > 1}">
 			<!-- 上一頁 -->
-			<a th:if="${currentPage > 1}"
-				th:href="@{/article/(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
+			<a th:if="${currentPage > 1 && selectedCatId != null}"
+			   th:href="@{/article/(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
+			<a th:if="${currentPage > 1 && selectedCatId == null}"
+			   th:href="@{/article/(page=${currentPage - 1})}">上一頁</a>
 			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
-
+			
 			<!-- 頁碼 -->
-			<th:block
-				th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
-				<a th:if="${i != currentPage}"
-					th:href="@{/article/(page=${i}, catId=${selectedCatId})}"
-					th:text="${i}"></a>
-				<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
+			<th:block th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
+			    <a th:if="${i != currentPage && selectedCatId != null}"
+			       th:href="@{/article/(page=${i}, catId=${selectedCatId})}"
+			       th:text="${i}"></a>
+			    <a th:if="${i != currentPage && selectedCatId == null}"
+			       th:href="@{/article/(page=${i})}"
+			       th:text="${i}"></a>
+			    <span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
 			</th:block>
-
+			
 			<!-- 下一頁 -->
-			<a th:if="${currentPage < articlePage.totalPages}"
-				th:href="@{/article/(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
+			<a th:if="${currentPage < articlePage.totalPages && selectedCatId != null}"
+			   th:href="@{/article/(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
+			<a th:if="${currentPage < articlePage.totalPages && selectedCatId == null}"
+			   th:href="@{/article/(page=${currentPage + 1})}">下一頁</a>
 			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
 				
 		</div>

@@ -9,12 +9,24 @@
 	<h1>我的優惠券</h1>
 
 	<h3>
-		<a th:href="@{/course_index}">課程商城</a>
+		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
 	</h3>
 	<h3>
-		<a th:href="@{/course/member/shopping_cart}">購物車</a>
+		<a th:href="@{/member/course/shopping_cart}">購物車</a>
 	</h3>
 	<br>
+	<div th:each="coupon : ${coupons}">
+	    	<span th:text="${coupon.couponName}"></span>
+	   	<form th:action="@{/member/coupon/claim}"
+	          method="post">
+	        <input type="hidden"
+	               name="couponId"
+	               th:value="${coupon.couponId}">
+	        <button type="submit">
+	            領取優惠券
+	        </button>
+	    </form>
+	</div>
 	<table>
 		<thead>
 			<tr>
@@ -25,7 +37,6 @@
 				<th>使用狀態</th>
 				<th>起始日期</th>
 				<th>結束日期</th>
-				<th>其他功能</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -52,7 +63,7 @@
 		</tbody>
 
 	</table>
-	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/coupon/member/my_coupon')}"></div>	
+	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon')}"></div>	
 
 
 
