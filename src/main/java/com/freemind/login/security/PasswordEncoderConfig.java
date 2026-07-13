@@ -14,4 +14,14 @@ public class PasswordEncoderConfig {
         // 後續可改為 BCryptPasswordEncoder 進行加密
         return NoOpPasswordEncoder.getInstance();
     }
+    
+//    @Bean
+//	public PasswordEncoder passwordEncoder() {
+//		// BCrypt：業界主流、抗暴力破解的密碼加密方案。
+//		// 內建加鹽（Salt），即便兩個使用者明文密碼相同，加密後的密文也不同。
+//		return new BCryptPasswordEncoder();
+//	}
+//
+//	// 註：其他類別（例如 EmpService、UserService、Test_Application_CommandLineRunner）
+//	// 需要使用 PasswordEncoder 時，直接用建構子注入即可，不需要在這裡額外處理。
 }
