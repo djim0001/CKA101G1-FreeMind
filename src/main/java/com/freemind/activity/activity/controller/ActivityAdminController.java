@@ -18,7 +18,7 @@ import com.freemind.activity.activity.model.ActivityService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/activity/admin")
+@RequestMapping("/admin/activity")
 public class ActivityAdminController {
 
     @Autowired
@@ -154,6 +154,12 @@ public class ActivityAdminController {
         
         
         return "back-end/activity/activity/listAllActivity";
+    }
+    
+    // 後台導覽頁
+    @GetMapping("activityAdminIndex")
+    public String activityAdminIndex() {
+        return "back-end/activity/activityAdminIndex";
     }
     
     

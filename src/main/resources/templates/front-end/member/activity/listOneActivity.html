@@ -8,7 +8,7 @@
     <h1 th:text="${activity.activityName}"></h1>
 
     <img th:if="${activity.picture != null}" 
-         th:src="@{/activity/activityImage(activityId=${activity.activityId})}" 
+         th:src="@{/member/activity/activityImage(activityId=${activity.activityId})}" 
          style="max-width: 400px;">
     <img th:unless="${activity.picture != null}" 
          th:src="@{/images/no-image.jpg}" 
@@ -31,7 +31,7 @@
     <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 
-    <a th:href="@{/activity/listAllActivity}">返回活動列表</a>
+    <a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>
 
 </body>
 </html>

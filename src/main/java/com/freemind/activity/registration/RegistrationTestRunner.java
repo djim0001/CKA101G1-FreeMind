@@ -142,8 +142,8 @@ public class RegistrationTestRunner implements CommandLineRunner {
 //		        + ",取消時間:" + cancelled.getCancelledAt());
 		
 		// 測試7
-		System.out.println("----- 測試7:評論 Service -----");
-		// 7-1:成功評論(報名狀態為1、活動已結束)
+//		System.out.println("----- 測試7:評論 Service -----");
+//		// 7-1:成功評論(報名狀態為1、活動已結束)
 //		Registration reviewed = service.review(14, 3, "");
 //		System.out.println("7-1:"+ reviewed.getRating()
 //				+ ",評論時間:" + reviewed.getReviewedAt());

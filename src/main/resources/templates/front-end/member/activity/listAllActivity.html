@@ -27,7 +27,7 @@
     
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 
-    <form th:action="@{/activity/listActivities_ByCompositeQuery}" method="post">
+    <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post">
         <p>
             縣市：<input type="text" name="activityCity">
         </p>
@@ -89,7 +89,7 @@
 	    <tr th:each="a : ${activityListData}">
 	        <td>
 	            <img th:if="${a.picture != null}" 
-	                 th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+	                 th:src="@{/member/activity/activityImage(activityId=${a.activityId})}" 
 	                 style="max-width: 100px;">
 	            <img th:unless="${a.picture != null}" 
 	                 th:src="@{/images/no-image.jpg}" 
@@ -104,7 +104,7 @@
 	        <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
 	        <td th:text="${a.registrationStatusText}"></td>
 			<td>
-			    <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+			    <form th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
 			        <input type="hidden" name="activityId" th:value="${a.activityId}">
 			        <button type="submit">查看詳情</button>
 			    </form>
@@ -112,7 +112,7 @@
 	    </tr>
 	</table>
 	<div>
-	    <form th:action="@{/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+	    <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
 	        <input type="hidden" name="currentPage" th:value="${i}">
 	        <input type="hidden" name="activityCity" th:value="${param.activityCity}">
 	        <input type="hidden" name="activityDist" th:value="${param.activityDist}">

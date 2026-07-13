@@ -9,7 +9,7 @@
 	 
 	<p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 	
-	<form th:action="@{/activity/update}" th:object="${activity}" method="post" enctype="multipart/form-data">
+	<form th:action="@{/member/activity/update}" th:object="${activity}" method="post" enctype="multipart/form-data">
 	
 	<input type="hidden" th:field="*{activityId}">
 	  
@@ -85,6 +85,9 @@
 
 		<p>
 		    活動圖片（選填，不選則維持原圖）：
+		    <img th:if="*{picture != null}"
+     		th:src="@{/member/activity/activityImage(activityId=*{activityId})}"
+     		style="max-width:200px;">
 		    <input type="file" name="pictureFile" onchange="previewImage(event)">
 		    <br>
    		    <img id="preview" src="#" alt="圖片預覽" style="max-width: 200px; display: none;">
