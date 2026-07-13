@@ -128,6 +128,9 @@ public class CourseForMemberController {
 		course.setSaved(courseSvc
 				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
+		String cartMsg = orderDetailSvc.addCourseToCart(member.getMemberId(), courseId);
+		if(cartMsg != "")
+			model.addAttribute("cartMsg", cartMsg);
 		model.addAttribute("coursePermission", coursePermission);
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";

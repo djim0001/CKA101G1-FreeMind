@@ -74,8 +74,25 @@ public class OrderDetailService {
 
         return repository.findByCourseOrderMemberMemberId(memberId, pageable);
     }
+	
 	public boolean hasCoursePermission(Integer memberId, Integer courseId) {
 	    return repository.existsPermission(memberId, courseId);
+	}
+	
+	public String addCourseToCart(Integer memberId, Integer courseId) {
+
+		String addCourseToCart = "";
+	    // 1. 檢查是否已購買
+	    if (repository.existsPaidCourse(memberId, courseId)) {
+	     	addCourseToCart = "您已經購買過這門課程";
+	    }
+
+	    // 2. 檢查是否有未付款訂單
+	    if (repository.existsPendingCourse(memberId, courseId)) {
+	    		addCourseToCart = "這門課程已有尚未完成的訂單";
+	    }
+
+	    	return addCourseToCart;
 	}
 
 }
