@@ -25,7 +25,7 @@
     <main class="layout">
       <section class="main" aria-label="課程觀看主內容">
         <section class="player">
-          <div class="video-frame video-native" th:if="${session.memberId != null and session.memberId > 0}">
+          <div class="video-frame video-native" th:if="${coursePermission}">
             <video id="courseVideo" controls preload="metadata" poster="">
               <source src="" th:src="${course.videoSrc}" type="video/mp4" />
               您的瀏覽器不支援影片播放。
@@ -37,7 +37,7 @@
             </button>
           </div>
 
-          <div class="video-frame video-native" th:if="${session.memberId == null}">
+          <div class="video-frame video-native" th:if="${!coursePermission}">
             <video id="courseVideo" controls preload="metadata" poster="">
               <source src="" th:src="@{${course.videoSrcPre}}" type="video/mp4" />
               您的瀏覽器不支援影片播放。
@@ -57,7 +57,7 @@
               <h1 th:text="${course.courseName}">情緒覺察與壓力調節入門</h1>
             </div>
 
-            <form class="favorite-form" th:action="@{favorite/toggle}" method="post">
+            <form class="favorite-form" th:action="@{/member/dashboard/favorite/toggle}" method="post">
               <input type="hidden" name="courseId" th:value="${course.courseId}" />
               <input type="hidden" name="currentPage" th:value="${currentPage}" />
               <input type="hidden" name="orderBy" th:value="${orderBy}" />
@@ -173,7 +173,7 @@
     </main>
   </div>
 
-  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
+  <div id="cartModal" class="cart-modal" th:if="${!coursePermission}">
     <div class="cart-modal-content">
       <p th:text="${cartMsg}">已加入購物車。</p>
       <button type="button" class="action primary" onclick="closeCartModal()">確定</button>

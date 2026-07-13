@@ -132,18 +132,18 @@ public class CourseForMemberController {
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";
 	}
-	@GetMapping("/one_my_course/{courseId}")
-	public String oneMyCourse(
-			@PathVariable("courseId") Integer courseId,
-			@ModelAttribute("member") Member member,ModelMap model) {
-		Course course = courseSvc.getOneCourse(courseId);
-		course.setSaved(courseSvc
-				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
-		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
-		model.addAttribute("course", course);
-		model.addAttribute("coursePermission", coursePermission);
-		return "front-end/member/course/listOneCourse";
-	}
+//	@GetMapping("/one_my_course/{courseId}")
+//	public String oneMyCourse(
+//			@PathVariable("courseId") Integer courseId,
+//			@ModelAttribute("member") Member member,ModelMap model) {
+//		Course course = courseSvc.getOneCourse(courseId);
+//		course.setSaved(courseSvc
+//				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
+//		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
+//		model.addAttribute("course", course);
+//		model.addAttribute("coursePermission", coursePermission);
+//		return "front-end/member/course/listOneCourse";
+//	}
 	
 	@GetMapping("/search-by-category")
 	public String searchCourseByCategory(

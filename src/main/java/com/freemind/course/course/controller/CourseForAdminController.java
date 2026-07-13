@@ -133,6 +133,7 @@ public class CourseForAdminController {
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 		return "back-end/course/course/listOneCourse";
+		
 	}
 	
 	
