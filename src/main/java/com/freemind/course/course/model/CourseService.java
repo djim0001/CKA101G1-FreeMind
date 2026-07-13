@@ -10,10 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.freemind.course.util.CourseSortUtil;
+import com.freemind.course.util.CourseSpecification;
 
 @Service
 public class CourseService {
@@ -23,6 +25,7 @@ public class CourseService {
 	
 	@Value("${app.course.page-size:5}")
 	private int coursePageSize;
+	private static final Byte COURSE_STATUS_LISTED = 4;
 	
 	public CourseService(
 			CourseRepository repository, 
@@ -68,6 +71,31 @@ public class CourseService {
 	    );	
 		return repository.findByCourseStatus(courseStatus, pageable);
 	}
+	
+	 public Page<Course> findPopularListedCourses(int page) {
+
+	        if (page < 0) {
+	            page = 0;
+	        }
+
+	        Sort popularSort = Sort.by(
+	                Sort.Order.desc("saveCount"),
+	                Sort.Order.desc("reviewCount"),
+	                Sort.Order.desc("starCount"),
+	                Sort.Order.desc("courseId")
+	        );
+
+	        Pageable pageable = PageRequest.of(
+	                page,
+	                coursePageSize,
+	                popularSort
+	        );
+
+	        return repository.findByCourseStatus(
+	                COURSE_STATUS_LISTED,
+	                pageable
+	        );
+	    }
 	
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
@@ -179,4 +207,60 @@ public class CourseService {
 	            pageable
 	    );
 	}
+	
+	public Page<Course> findCoursesByMinimumCounts(
+	        Byte courseStatus,
+	        Integer minSaveCount,
+	        Integer minStarCount,
+	        Integer minReviewCount,
+	        Integer minCommentCount,
+	        int page,
+	        String orderBy) {
+
+	    if (page < 0) {
+	        page = 0;
+	    }
+
+	    Pageable pageable = PageRequest.of(
+	        page,
+	        coursePageSize,
+	        CourseSortUtil.getCourseSort(orderBy)
+	    );
+
+	    Specification<Course> specification =
+	        CourseSpecification.searchByCounts(
+	            courseStatus,
+	            minSaveCount,
+	            minStarCount,
+	            minReviewCount,
+	            minCommentCount
+	        );
+
+	    return repository.findAll(specification, pageable);
+	}
+	
+	 public Page<Course> findListedCoursesByCategory(
+	            Integer courseCatId,
+	            int page,
+	            String orderBy) {
+
+	        if (page < 0) {
+	            page = 0;
+	        }
+
+	        Pageable pageable = PageRequest.of(
+	                page,
+	                coursePageSize,
+	                CourseSortUtil.getCourseSort(orderBy)
+	        );
+
+	        return repository
+	                .findByCourseStatusAndCourseCategories_CourseCatId(
+	                        COURSE_STATUS_LISTED,
+	                        courseCatId,
+	                        pageable
+	                );
+	    }
+	
+	
 }

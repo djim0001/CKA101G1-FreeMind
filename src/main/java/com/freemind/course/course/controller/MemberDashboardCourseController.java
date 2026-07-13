@@ -111,19 +111,17 @@ public class MemberDashboardCourseController {
 	        @RequestParam(name = "courseId") Integer courseId,
 	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
 	        RedirectAttributes redirectAttributes) {
-
-	    if (member == null) {
-	        redirectAttributes.addFlashAttribute("mError", "先登入方可加入收藏");
-	        redirectAttributes.addFlashAttribute("page", page);
-	        redirectAttributes.addFlashAttribute("orderBy", orderBy);
-	        return "redirect:/member/course/select_course";
-	    }
-
+		Course course = courseSvc.getOneCourse(courseId);
+		Integer saveCount = course.getSaveCount();
 	    if (!courseSvc.isCourseInBookmark(member.getMemberId(), courseId)) {
 	        courseSvc.addCourseBookmark(member.getMemberId(), courseId);
+	        course.setSaveCount(saveCount + 1);
 	    } else {
 	        courseSvc.removeCourseBookmark(member.getMemberId(), courseId);
+	        if(saveCount == 0) saveCount = 1;
+	        course.setSaveCount(saveCount - 1);
 	    }
+	    courseSvc.updateCourse(course);
 
 	    redirectAttributes.addFlashAttribute("page", page);
 	    redirectAttributes.addFlashAttribute("orderBy", orderBy);
