@@ -1,5 +1,6 @@
 package com.freemind.activity.activity.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +24,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="activities")
-public class Activity implements java.io.Serializable{
+public class Activity implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	@Id

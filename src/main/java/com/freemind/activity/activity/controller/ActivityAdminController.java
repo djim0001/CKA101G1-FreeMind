@@ -156,5 +156,11 @@ public class ActivityAdminController {
         return "back-end/activity/activity/listAllActivity";
     }
     
+    // 後台導覽頁
+    @GetMapping("activityAdminIndex")
+    public String activityAdminIndex() {
+        return "back-end/activity/activityAdminIndex";
+    }
+    
     
 }

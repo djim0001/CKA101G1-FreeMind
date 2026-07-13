@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,7 @@ import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.category.model.ActivityCat;
 import com.freemind.activity.category.model.ActivityCatService;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,7 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/activity")
+@RequestMapping("/member/activity")
 public class ActivityController {
 
     @Autowired
@@ -56,7 +58,7 @@ public class ActivityController {
         }
         model.addAttribute("totalPages", totalPages);
 
-        return "front-end/activity/listAllActivity";
+        return "front-end/member/activity/listAllActivity";
     }
     
     @PostMapping("listActivities_ByCompositeQuery")  // 這次使用者送出的整個HTTP請求
@@ -85,29 +87,26 @@ public class ActivityController {
             model.addAttribute("errorMessage", "查無符合條件的活動");
         }
         
-        return "front-end/activity/listAllActivity";
+        return "front-end/member/activity/listAllActivity";
     }
     
     @GetMapping("addActivity")
     public String addActivity(ModelMap model) {
         Activity activity = new Activity();
         model.addAttribute("activity", activity);
-        return "front-end/activity/addActivity";
+        return "front-end/member/activity/addActivity";
     }
      
     @PostMapping("insert")
     public String insert(@Valid Activity activity, BindingResult result,
-                          @RequestParam("memberId") Integer memberId,
                           @RequestParam("pictureFile") MultipartFile pictureFile,
+                          @AuthenticationPrincipal MemberUserDetails userDetails,
                           ModelMap model) throws IOException {
         if (result.hasErrors()) {
-            return "front-end/activity/addActivity";
+            return "front-end/member/activity/addActivity";
         }
 
-        // 先把member設定好
-        Member member = new Member();
-        member.setMemberId(memberId);
-        activity.setMember(member);
+        activity.setMember(userDetails.getMember());
 
         // 再把圖片設定好
         if (!pictureFile.isEmpty()) {
@@ -119,11 +118,11 @@ public class ActivityController {
             activitySvc.addActivity(activity);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            return "front-end/activity/addActivity";
+            return "front-end/member/activity/addActivity";
         }
 
         model.addAttribute("success", "- (新增成功，待審核)");
-        return "front-end/activity/addActivitySuccess";
+        return "front-end/member/activity/addActivitySuccess";
     }
     
     @ModelAttribute("activityCatListData")
@@ -136,15 +135,16 @@ public class ActivityController {
         
     	Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
         model.addAttribute("activity", activity);
-        return "front-end/activity/update_activity_input";
+        return "front-end/member/activity/update_activity_input";
     }
     
     @PostMapping("update")
     public String update(@Valid Activity activity, BindingResult result,
                           @RequestParam("pictureFile") MultipartFile pictureFile,
+                          @AuthenticationPrincipal MemberUserDetails userDetails,
                           ModelMap model) throws IOException {
         if (result.hasErrors()) {
-            return "front-end/activity/update_activity_input";
+            return "front-end/member/activity/update_activity_input";
         }
 
         if (!pictureFile.isEmpty()) {
@@ -152,13 +152,17 @@ public class ActivityController {
         }
 
         try {
+        		Activity dbActivity = activitySvc.getOneActivity(activity.getActivityId());
+            if (!dbActivity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
+                throw new IllegalStateException("無權操作此活動");
+            }
             activitySvc.updateActivity(activity);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            return "front-end/activity/update_activity_input";
+            return "front-end/member/activity/update_activity_input";
         }
 
-        Integer memberId = 1;
+        Integer memberId = userDetails.getMember().getMemberId();
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
         List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
@@ -174,14 +178,13 @@ public class ActivityController {
         model.addAttribute("totalPages", totalPages);
 
         model.addAttribute("success", "- (修改成功)");
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
     
     // 查看我發起的活動
     @GetMapping("ownedActivities")
-    public String ownedActivities(ModelMap model) {
-        // 簡化處理：暫時手動指定memberId，之後改成從登入狀態取得
-        Integer memberId = 1;  // 之後要換成真正登入者的ID
+    public String ownedActivities(@AuthenticationPrincipal MemberUserDetails userDetails, ModelMap model) {
+    		Integer memberId = userDetails.getMember().getMemberId();
         
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
@@ -197,15 +200,16 @@ public class ActivityController {
             totalPages = 1;
         }
         model.addAttribute("totalPages", totalPages);
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
  
 
     @PostMapping("ownedActivities_search")
     public String ownedActivitiesSearch(HttpServletRequest req,
     				@RequestParam(value = "currentPage", required = false) Integer currentPage, 
+    				@AuthenticationPrincipal MemberUserDetails userDetails,
     				ModelMap model) {
-        Integer memberId = 1;  // 之後要換成真正登入者的ID
+    		Integer memberId = userDetails.getMember().getMemberId();
         
         if (currentPage == null) {
             currentPage = 1;
@@ -227,20 +231,26 @@ public class ActivityController {
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
         }
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
   
     @PostMapping("cancel")
     public String cancel(@RequestParam("activityId") String activityId,
                          @RequestParam("cancelNote") String cancelNote,
+                         @AuthenticationPrincipal MemberUserDetails userDetails,
                          ModelMap model) {
         try {
+            // 先驗身分:這個活動是不是我的?
+            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
+                throw new IllegalStateException("無權操作此活動");
+            }
             activitySvc.cancelActivity(Integer.valueOf(activityId), cancelNote);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = 1;  // 之後要換成真正登入者的ID
+        Integer memberId = userDetails.getMember().getMemberId();
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
         List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
@@ -255,20 +265,25 @@ public class ActivityController {
         }
         model.addAttribute("totalPages", totalPages);
         
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
     
     @PostMapping("postpone")
     public String postpone(@RequestParam("activityId") String activityId,
                             @RequestParam("postponeNote") String postponeNote,
+                            @AuthenticationPrincipal MemberUserDetails userDetails,
                             ModelMap model) {
         try {
+            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
+                throw new IllegalStateException("無權操作此活動");
+            }
             activitySvc.postponeActivity(Integer.valueOf(activityId), postponeNote);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = 1;
+        Integer memberId = userDetails.getMember().getMemberId();
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
         List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
@@ -283,7 +298,7 @@ public class ActivityController {
         }
         model.addAttribute("totalPages", totalPages);
         
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
     
     @PostMapping("confirmNewSchedule")
@@ -292,14 +307,19 @@ public class ActivityController {
                                       @RequestParam("activityEnd") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime activityEnd,
                                       @RequestParam(value = "regisStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisStart,
                                       @RequestParam(value = "regisEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisEnd,
+                                      @AuthenticationPrincipal MemberUserDetails userDetails,
                                       ModelMap model) {
         try {
+            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
+                throw new IllegalStateException("無權操作此活動");
+            }
             activitySvc.confirmNewSchedule(Integer.valueOf(activityId), activityStart, activityEnd, regisStart, regisEnd);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = 1;
+        Integer memberId = userDetails.getMember().getMemberId();
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
         List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
@@ -314,7 +334,7 @@ public class ActivityController {
         }
         model.addAttribute("totalPages", totalPages);
         
-        return "front-end/activity/ownedActivities";
+        return "front-end/member/activity/ownedActivities";
     }
     
     @GetMapping("activityImage")
@@ -334,17 +354,17 @@ public class ActivityController {
     public String listOneActivity(@RequestParam("activityId") String activityId, ModelMap model) {
         Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
         model.addAttribute("activity", activity);
-        return "front-end/activity/listOneActivity";
+        return "front-end/member/activity/listOneActivity";
     }
     
-    // 活動模組首頁(記得前面要加斜線)
+    // 活動模組首頁
     @GetMapping("/activityIndex")
     public String activityIndex() {
-        return "front-end/activity/activityIndex";
+        return "front-end/member/activity/activityIndex";
     }
     
     @GetMapping("select_page")
     public String selectPage(ModelMap model) {
-        return "front-end/activity/select_page";
+        return "front-end/member/activity/select_page";
     }
 }
