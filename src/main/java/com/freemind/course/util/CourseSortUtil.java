@@ -39,6 +39,14 @@ public final class CourseSortUtil {
             case "priceAsc" -> Sort.by("price").ascending();
             case "priceDesc" -> Sort.by("price").descending();
 
+            case "listedAt" -> Sort.by("listedAt").descending();
+            
+            case "popular" -> Sort.by(
+				                Sort.Order.desc("saveCount"),
+				                Sort.Order.desc("reviewCount"),
+				                Sort.Order.desc("starCount"),
+				                Sort.Order.desc("courseId")
+	        );
             default -> Sort.by("courseId").descending();
         };
     }

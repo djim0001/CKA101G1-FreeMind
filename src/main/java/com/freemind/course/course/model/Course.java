@@ -278,7 +278,6 @@ public class Course {
 	    if (courseStatus == null) {
 	        return "未知狀態";
 	    }
-	    byte status = courseStatus;
 	    switch (courseStatus) {
 	        case 0:
 	            return "草稿";

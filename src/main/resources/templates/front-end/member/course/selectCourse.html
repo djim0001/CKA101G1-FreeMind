@@ -58,22 +58,21 @@
 	</h3>
 	<h5>
 		<a th:href="@{/member/course/shopping_cart}">購物車</a>
-		<a th:href="@{/member/dashboard/myCollection}">我的收藏</a>
+		<a th:href="@{/member/dashboard/myCollection/course}">我的收藏</a>
 	</h5>
 	<span>會員名稱:</span>
 	<span th:text=${memberName}></span>
 	<br>
-	<form method="get" th:action="@{get_hot_course}">
-		<input type="hidden" name="filter_course"
-			th:value="${hot_course}">
-		<button type="submit">熱門課程</button>
+	<form method="get" th:action="@{/member/course/select_course}">
+		<button type="submit" name="orderBy" th:value="popular">熱門課程</button>
+		<button type="submit" name="orderBy" th:value="listedAt">最新課程</button>
 	</form>
 	<form th:action="@{/member/course/search-by-category}" method="get">
-	    選擇課程分類: <select name="courseCatId">
-			<option th:each="courseCategories : ${courseCategoriesListAll}"
-				th:value="${courseCategories.courseCatId}" th:text="${courseCategories.courseCatName}" />
-		</select>
-		<button type="submit">送出</button>
+		<th:block th:each="courseCategories : ${courseCategoriesListAll}">
+			<button type="submit" name="courseCatId"
+					th:value="${courseCategories.courseCatId}"
+				    th:text="${courseCategories.courseCatName}"></button>
+		</th:block>
 	</form>
 	<table>
 		<thead>
