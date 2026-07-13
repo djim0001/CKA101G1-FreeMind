@@ -16,7 +16,7 @@
 			<th>來訪目的</th>
 			<th>來訪目的備註</th>
 			<th>狀態</th>
-			<th>操作</th>
+			<th>晤談筆記</th>
 		</tr>
 		<tr th:each="order : ${ordersListData}">
 			<td th:text="${order.orderId}"></td>
@@ -50,7 +50,6 @@
 					<form method="post" th:action="@{/orders/complete}">
 						<input type="hidden" name="orderId" th:value="${order.orderId}">
 						<input type="hidden" name="psychId" th:value="${psychId}">
-						晤談筆記：<br>
 						<textarea name="psychNote" rows="3" cols="30" style="resize:none;" placeholder="這次諮商的重點記錄，會員將能看到"></textarea><br>
 						<input type="submit" value="標記為已完成"
 							onclick="return confirm('確定這次諮商已經結束了嗎？')">
