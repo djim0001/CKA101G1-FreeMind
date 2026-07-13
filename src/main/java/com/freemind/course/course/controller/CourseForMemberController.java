@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseCategories;
+import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
@@ -34,22 +36,30 @@ public class CourseForMemberController {
 	private final MemberService memberSvc;
 	private final OrderDetailService orderDetailSvc;
 	private final CourseOrderService courseOrderSvc;
+	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForMemberController(
 			CourseService courseSvc, 
 			MemberService memberSvc,
 			CourseOrderService courseOrderSvc,
-			OrderDetailService orderDetailSvc) {
+			OrderDetailService orderDetailSvc,
+			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
+		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
     @ModelAttribute("member")
     public Member currentMember(Authentication authentication) {
         return memberSvc.findByAccount(authentication.getName());
     }
+    @ModelAttribute("courseCategoriesListAll")
+	public List<CourseCategories> courseCategoriesListAll(){
+		List<CourseCategories> courseCategoriesListAll = courseCategoriesSvc.getAllCourseCategories();
+		return courseCategoriesListAll;
+	}
 	
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
@@ -61,15 +71,15 @@ public class CourseForMemberController {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		Page<Course> courseListListed = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
-		for(Course course : courseListListed) {
+		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		for(Course course : courseList) {
 			course.setSaved(courseSvc
 					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		}
 		model.addAttribute("memberName", member.getName());
 		model.addAttribute("currentPage", currentPage);
-		model.addAttribute("courseListListed", courseListListed);
-		model.addAttribute("totalPages", courseListListed.getTotalPages());
+		model.addAttribute("courseList", courseList);
+		model.addAttribute("totalPages", courseList.getTotalPages());
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
 
@@ -129,5 +139,53 @@ public class CourseForMemberController {
 		return "front-end/member/course/listOneCourse";
 	}
 	
+	@GetMapping("/get_hot_course")
+	public String getHotCourse(
+			@RequestParam(defaultValue = "1") Integer page,
+			@ModelAttribute("member") Member member,
+			ModelMap model, HttpSession session) {
+
+		if (page < 1)  page = 1;
+		Integer currentPage = page;
+		Page<Course> courseListListed = courseSvc.findPopularListedCourses(currentPage - 1);
+		for(Course course : courseListListed) {
+			course.setSaved(courseSvc
+					.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
+		}
+		model.addAttribute("memberName", member.getName());
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("courseListListed", courseListListed);
+		model.addAttribute("totalPages", courseListListed.getTotalPages());
+
+		return "front-end/member/course/selectCourse";
+	}
+	
+	@GetMapping("/search-by-category")
+	public String searchCourseByCategory(
+	        @RequestParam Integer courseCatId,
+	        @RequestParam(defaultValue = "1") Integer page,
+	        @RequestParam(defaultValue = "courseIdDesc") String orderBy,
+	        ModelMap model) {
+
+	    if (page == null || page < 1) {
+	        page = 1;
+	    }
+
+	    Page<Course> coursePage =
+	            courseSvc.findListedCoursesByCategory(
+	                    courseCatId,
+	                    page - 1,
+	                    orderBy
+	            );
+
+	    model.addAttribute("courseList", coursePage);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("totalPages", coursePage.getTotalPages());
+
+	    model.addAttribute("courseCatId", courseCatId);
+	    model.addAttribute("orderBy", orderBy);
+
+	    return "front-end/member/course/selectCourse";
+	}
 	
 }
