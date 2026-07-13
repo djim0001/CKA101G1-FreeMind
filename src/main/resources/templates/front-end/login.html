@@ -261,7 +261,8 @@
                     <input type="checkbox" name="remember-me" id="remember-me">
                     <span>記住我</span>
                 </label>
-                <a href="#" class="link-primary">忘記密碼？</a>
+               <!-- 改後 -->
+				<a th:href="@{/front-end/forgot}" class="link-primary">忘記密碼？</a>
             </div>
 
             <button type="submit" class="btn-submit">
@@ -271,7 +272,7 @@
 
         <!-- 底部連結 -->
         <p class="footer-text">
-            還沒有帳號？ <a href="#" class="link-primary weight-bold">註冊一個</a>
+            還沒有帳號？ <a th:href="@{/front-end/register}" class="link-primary weight-bold">註冊一個</a>
         </p>
     </div>
 

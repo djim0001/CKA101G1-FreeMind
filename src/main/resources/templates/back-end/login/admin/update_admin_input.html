@@ -39,12 +39,33 @@
 		<input type="datetime-local" th:field="*{hiredate}">
 		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('hiredate')}" th:errors="*{hiredate}"></span><br>
 
-		照片(不選則保留原圖):
-		<input type="file" name="profilePic"><br>
+		
+		
+		<div>
+			<label>照片:</label>
+			<input type="file" th:field="*{profilePic}" accept="image/*" onchange="previewPic()" />
+            <!-- 可以不修改圖片 <span class="error" th:utext="${errorMessage}" id="upFiles.errors"></span> -->
+			<div id="blob_holder"><img th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" width="150px"></div>
+			</div>
+
 
 		<input type="submit" value="修改">
 	</form>
 
 	<a th:href="@{/admin/listAllAdmin}">回管理員列表</a>
-</body>
+
+	<script>
+		// 選了新照片後立即在頁面上預覽（尚未上傳，只是本機讀檔）；沒選新照片就顯示原本的舊圖
+		function previewPic() {
+			const input = document.getElementById('profilePic'); // th:field 產生 id="profilePic"
+			const file = input.files[0];
+			if (!file) return;
+			const reader = new FileReader();
+			reader.onload = function (e) {
+				document.querySelector('#blob_holder img').src = e.target.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	</script>
+	</body>
 </html>

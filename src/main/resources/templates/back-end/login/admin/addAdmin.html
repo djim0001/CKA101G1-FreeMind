@@ -38,11 +38,27 @@
 		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('hiredate')}" th:errors="*{hiredate}"></span><br>
 
 		照片:
-		<input type="file" name="profilePic"><br>
+		<input type="file" name="profilePic" accept="image/*" onchange="previewPic(this)"><br>
+		<img id="picPreview" width="150" style="display:none"><br>
 
 		<input type="submit" value="新增">
 	</form>
 
 	<a th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+
+	<script>
+		// 選了照片後立即在頁面上預覽（尚未上傳，只是本機讀檔）
+		function previewPic(input) {
+			const file = input.files[0];
+			if (!file) return;
+			const reader = new FileReader();
+			reader.onload = function (e) {
+				const img = document.getElementById('picPreview');
+				img.src = e.target.result;
+				img.style.display = '';
+			};
+			reader.readAsDataURL(file);
+		}
+	</script>
 </body>
 </html>

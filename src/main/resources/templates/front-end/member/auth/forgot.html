@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>忘記密碼</title>
+</head>
+<body>
+
+    <h1>忘記密碼</h1>
+
+    <p>請輸入註冊時使用的信箱，我們會寄送驗證碼給您。</p>
+
+    <p style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
+
+    <form th:action="@{/front-end/forgot}" method="post">
+        <p>
+            <label>信箱：<input type="text" name="email" autofocus></label>
+        </p>
+        <button type="submit">寄送驗證碼</button>
+    </form>
+
+    <p>
+        <a th:href="@{/front-end/login}">回登入頁</a>
+    </p>
+
+</body>
+</html>

@@ -29,7 +29,7 @@
 
 	<table border="1">
 		<tr>
-			<th>編號</th><th>帳號</th><th>密碼</th><th>狀態</th><th>姓名</th><th>手機</th><th>入職日期</th><th>操作</th>
+			<th>編號</th><th>帳號</th><th>密碼</th><th>狀態</th><th>姓名</th><th>手機</th><th>入職日期</th><th>照片</th><th>操作</th>
 		</tr>
 		<tr th:each="adminVO : ${adminListData}">
 			<td th:text="${adminVO.adminId}"></td>
@@ -39,6 +39,7 @@
 			<td th:text="${adminVO.name}"></td>
 			<td th:text="${adminVO.phoneNumber}"></td>
 			<td th:text="${adminVO.hiredate}"></td>
+			<td><img th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" width="150px"></td>
 			<td>
 				<form method="post" th:action="@{/admin/getOne_For_Update}" style="display:inline;">
 					<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
