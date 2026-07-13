@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>信箱驗證</title>
+</head>
+<body>
+
+    <h1>信箱驗證</h1>
+
+    <p>驗證碼已寄至：<b th:text="${email}"></b>（5 分鐘內有效）</p>
+
+    <p style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
+    <p style="color:green;" th:if="${successMessage != null}" th:text="${successMessage}"></p>
+
+    <form th:action="@{/front-end/register/verify}" method="post">
+        <input type="hidden" name="email" th:value="${email}">
+        <p>
+            <label>驗證碼：<input type="text" name="otp" maxlength="6" autocomplete="one-time-code" autofocus></label>
+        </p>
+        <button type="submit">驗證</button>
+    </form>
+
+    <!-- 重寄驗證碼（60 秒冷卻） -->
+    <form th:action="@{/front-end/register/resend}" method="post" style="margin-top:10px;">
+        <input type="hidden" name="email" th:value="${email}">
+        <button type="submit">重寄驗證碼</button>
+    </form>
+
+    <p>
+        <a th:href="@{/front-end/login}">回登入頁</a>
+    </p>
+
+</body>
+</html>

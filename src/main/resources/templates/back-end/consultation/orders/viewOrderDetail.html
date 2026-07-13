@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單詳情</title>
+</head>
+<body>
+    <h3>訂單詳情</h3>
+
+    <table border="1">
+        <tr><th>訂單編號</th><td th:text="${orders.orderId}"></td></tr>
+        <tr><th>會員編號</th><td th:text="${orders.member.memberId}"></td></tr>
+        <tr><th>心理師編號</th><td th:text="${orders.psychologist.psychId}"></td></tr>
+        <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+        <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+        <tr><th>建立時間</th><td th:text="${#temporals.format(orders.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+        <tr><th>心理師工作地點</th><td th:text="${orders.psychLoc}"></td></tr>
+        <tr><th>是否為政府補助</th><td th:text="${orders.govSubsidy ? '是' : '否'}"></td></tr>
+        <tr><th>心理師諮詢費</th><td th:text="${orders.psychFee}"></td></tr>
+        <tr><th>訂單狀態</th>
+            <td th:switch="${orders.orderStatus}">
+                <span th:case="0">待確認</span>
+                <span th:case="1">已確認</span>
+                <span th:case="2">已取消</span>
+                <span th:case="3">未出席</span>
+                <span th:case="4">已完成</span>
+            </td>
+        </tr>
+        <tr><th>來訪目的</th>
+            <td th:switch="${orders.visitPurpose}">
+                <span th:case="'emotion'">情緒困擾</span>
+                <span th:case="'stress'">壓力調適</span>
+                <span th:case="'relationship'">人際關係</span>
+                <span th:case="'family'">家庭問題</span>
+                <span th:case="'career'">職涯困惑</span>
+                <span th:case="'academic'">課業壓力</span>
+                <span th:case="'self_growth'">自我探索</span>
+                <span th:case="'sleep'">睡眠問題</span>
+                <span th:case="'anxiety'">焦慮傾向</span>
+                <span th:case="'other'">其他</span>
+            </td>
+        </tr>
+        <tr><th>來訪目的備註</th><td th:text="${orders.visitPurposeNote}"></td></tr>
+        <tr><th>諮商參與形式</th>
+            <td th:switch="${orders.sessionType}">
+                <span th:case="0">單人諮商</span>
+                <span th:case="1">伴侶諮商</span>
+                <span th:case="2">家庭諮商</span>
+                <span th:case="3">團體諮商</span>
+            </td>
+        </tr>
+        <tr><th>心理師晤談筆記</th><td th:text="${orders.psychNote != null ? orders.psychNote : '尚無筆記'}"></td></tr>
+        <tr><th>會員評分</th><td th:text="${orders.rating != null ? orders.rating : '尚未評論'}"></td></tr>
+        <tr><th>評論內容</th><td th:text="${orders.reviewContent != null ? orders.reviewContent : '-'}"></td></tr>
+        <tr><th>評論時間</th><td th:text="${orders.reviewedAt != null ? #temporals.format(orders.reviewedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td></tr>
+    </table>
+
+    <a th:href="@{/orders/listAllOrders}">回列表</a>
+
+</body>
+</html>

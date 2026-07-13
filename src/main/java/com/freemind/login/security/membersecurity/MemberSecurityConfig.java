@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
 @Configuration
@@ -32,21 +33,23 @@ public class MemberSecurityConfig {
         
         http
 //            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
-            .securityMatcher("/","/front-end/**","/member/**", "/article/**", "/member/article/**")
+            .securityMatcher("/","/front-end/**","/member/**", "/article/**")
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/","/front-end/login").permitAll()
-                .requestMatchers("/member/course/select_course").permitAll()
-//                .requestMatchers("/front-end/**").authenticated()
-//                .requestMatchers("/member/**").authenticated()
-//                .requestMatchers("/course/").permitAll()
+                // 註冊與忘記密碼（含 OTP 驗證）：給未登入的訪客用，開放
+                .requestMatchers("/front-end/register/**", "/front-end/forgot/**").permitAll()
+                .requestMatchers("/member/course/select_course","/member/course/get_one_course").permitAll()
                 .requestMatchers("/article/**").permitAll() 
-                .requestMatchers("/member/article/**").permitAll() 
+//                .requestMatchers("/member/article/**").permitAll() 
                 .anyRequest().hasRole("MEMBER")
             )
 
             .userDetailsService(memberUserDetailsService)
-
+            
+//            .securityContext(context -> context.requireExplicitSave(true))
+//            .requestCache(cache -> cache.requestCache(new NullRequestCache()))
+//          
             .requestCache(cache -> cache.requestCache(requestCache))
 
             .formLogin(form -> form

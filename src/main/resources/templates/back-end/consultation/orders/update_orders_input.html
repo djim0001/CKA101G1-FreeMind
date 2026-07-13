@@ -12,16 +12,7 @@
           th:object="${orders}">
 
         <input type="hidden" th:field="*{orderId}">
-
-        時段選擇：
-        <select name="slot">
-            <option value="">請選擇時段</option>
-            <option th:each="s : ${slotsList}"
-                    th:value="${s.timeslotId}"
-                    th:text="${s.timeslotId} + ' - ' + ${s.slotDate}"
-                    th:selected="${orders.slot != null and orders.slot.timeslotId == s.timeslotId}">
-            </option>
-        </select><br>
+        <input type="hidden" name="slot" th:value="${orders.slot.timeslotId}">
 
         會員編號：
 		<span th:text="${orders.member.memberId}"></span>
