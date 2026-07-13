@@ -3,68 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>查詢諮商訂單</title>
+    <style>
+        .search-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 24px;
+            margin-bottom: 16px;
+        }
+        .search-form-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <h3>查詢諮商訂單</h3>
 
-    <!-- 依訂單編號查詢 -->
-    <form method="post" th:action="@{/orders/getOne_For_Display}">
-        訂單編號：<input type="text" name="orderId">
-        <input type="submit" value="查詢">
-    </form><br>
+    <span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-    <!-- 依會員編號查詢 -->
-    <form method="post" th:action="@{/orders/getByMember}">
-        會員編號：<input type="text" name="memberId">
+    <form method="post" th:action="@{/orders/search}">
+        <div class="search-form-wrap">
+            <span class="search-field">訂單編號：<input type="text" name="orderId"></span>
+            <span class="search-field">會員編號：<input type="text" name="memberId"></span>
+            <span class="search-field">心理師編號：<input type="text" name="psychId"></span>
+        </div>
+        <div class="search-form-wrap">
+            <span class="search-field">
+                訂單狀態：
+                <select name="orderStatus">
+                    <option value="">不限</option>
+                    <option value="0">待確認</option>
+                    <option value="1">已確認</option>
+                    <option value="2">已取消</option>
+                    <option value="3">未出席</option>
+                    <option value="4">已完成</option>
+                </select>
+            </span>
+            <span class="search-field">
+                是否為政府補助：
+                <select name="govSubsidy">
+                    <option value="">不限</option>
+                    <option value="false">否</option>
+                    <option value="true">是</option>
+                </select>
+            </span>
+            <span class="search-field">
+                諮商參與形式：
+                <select name="sessionType">
+                    <option value="">不限</option>
+                    <option value="0">單人諮商</option>
+                    <option value="1">伴侶諮商</option>
+                    <option value="2">家庭諮商</option>
+                    <option value="3">團體諮商</option>
+                </select>
+            </span>
+            <span class="search-field">時段日期：<input type="date" name="slotDate"></span>
+        </div>
         <input type="submit" value="查詢">
-    </form><br>
-
-    <!-- 依心理師編號查詢 -->
-    <form method="post" th:action="@{/orders/getByPsychId}">
-        心理師編號：<input type="text" name="psychId">
-        <input type="submit" value="查詢">
-    </form><br>
-
-    <!-- 依訂單狀態查詢 -->
-    <form method="post" th:action="@{/orders/getByOrderStatus}">
-        訂單狀態：
-        <select name="orderStatus">
-            <option value="0">0：待確認</option>
-            <option value="1">1：已確認</option>
-            <option value="2">2：已取消</option>
-            <option value="3">3：未出席</option>
-            <option value="4">4：已完成</option>
-        </select>
-        <input type="submit" value="查詢">
-    </form><br>
-
-    <!-- 依是否為政府補助查詢 -->
-    <form method="post" th:action="@{/orders/getByGovSubsidy}">
-        是否為政府補助：
-        <select name="govSubsidy">
-            <option value="false">否</option>
-            <option value="true">是</option>
-        </select>
-        <input type="submit" value="查詢">
-    </form><br>
-
-    <!-- 依諮商參與形式查詢 -->
-    <form method="post" th:action="@{/orders/getBySessionType}">
-        諮商參與形式：
-        <select name="sessionType">
-            <option value="0">0：單人諮商</option>
-            <option value="1">1：伴侶諮商</option>
-            <option value="2">2：家庭諮商</option>
-            <option value="3">3：團體諮商</option>
-        </select>
-        <input type="submit" value="查詢">
-    </form><br>
-
-    <!-- 依時段日期查詢 -->
-    <form method="post" th:action="@{/orders/getBySlotDate}">
-        時段日期：<input type="date" name="slotDate">
-        <input type="submit" value="查詢">
-    </form><br>
+    </form>
 
     <!-- 單筆查詢結果 -->
     <div th:if="${orders != null}">
@@ -76,12 +74,46 @@
             <tr><th>心理師編號</th><td th:text="${orders.psychologist.psychId}"></td></tr>
             <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
             <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>建立時間</th><td th:text="${#temporals.format(orders.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
             <tr><th>心理師工作地點</th><td th:text="${orders.psychLoc}"></td></tr>
-            <tr><th>是否為政府補助</th><td th:text="${orders.govSubsidy}"></td></tr>
+            <tr><th>是否為政府補助</th><td th:text="${orders.govSubsidy ? '是' : '否'}"></td></tr>
             <tr><th>心理師諮詢費</th><td th:text="${orders.psychFee}"></td></tr>
-            <tr><th>訂單狀態</th><td th:text="${orders.orderStatus}"></td></tr>
-            <tr><th>來訪目的</th><td th:text="${orders.visitPurpose}"></td></tr>
-            <tr><th>諮商參與形式</th><td th:text="${orders.sessionType}"></td></tr>
+            <tr><th>訂單狀態</th>
+                <td th:switch="${orders.orderStatus}">
+                    <span th:case="0">待確認</span>
+                    <span th:case="1">已確認</span>
+                    <span th:case="2">已取消</span>
+                    <span th:case="3">未出席</span>
+                    <span th:case="4">已完成</span>
+                </td>
+            </tr>
+            <tr><th>來訪目的</th>
+                <td th:switch="${orders.visitPurpose}">
+                    <span th:case="'emotion'">情緒困擾</span>
+                    <span th:case="'stress'">壓力調適</span>
+                    <span th:case="'relationship'">人際關係</span>
+                    <span th:case="'family'">家庭問題</span>
+                    <span th:case="'career'">職涯困惑</span>
+                    <span th:case="'academic'">課業壓力</span>
+                    <span th:case="'self_growth'">自我探索</span>
+                    <span th:case="'sleep'">睡眠問題</span>
+                    <span th:case="'anxiety'">焦慮傾向</span>
+                    <span th:case="'other'">其他</span>
+                </td>
+            </tr>
+            <tr><th>來訪目的備註</th><td th:text="${orders.visitPurposeNote}"></td></tr>
+            <tr><th>諮商參與形式</th>
+                <td th:switch="${orders.sessionType}">
+                    <span th:case="0">單人諮商</span>
+                    <span th:case="1">伴侶諮商</span>
+                    <span th:case="2">家庭諮商</span>
+                    <span th:case="3">團體諮商</span>
+                </td>
+            </tr>
+            <tr><th>心理師晤談筆記</th><td th:text="${orders.psychNote != null ? orders.psychNote : '尚無筆記'}"></td></tr>
+            <tr><th>會員評分</th><td th:text="${orders.rating != null ? orders.rating : '尚未評論'}"></td></tr>
+            <tr><th>評論內容</th><td th:text="${orders.reviewContent != null ? orders.reviewContent : '-'}"></td></tr>
+            <tr><th>評論時間</th><td th:text="${orders.reviewedAt != null ? #temporals.format(orders.reviewedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td></tr>
         </table>
     </div>
 
@@ -106,7 +138,13 @@
                 <td th:text="${order.psychologist.psychId}"></td>
                 <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
                 <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                <td th:text="${order.orderStatus}"></td>
+                <td th:switch="${order.orderStatus}">
+                    <span th:case="0">待確認</span>
+                    <span th:case="1">已確認</span>
+                    <span th:case="2">已取消</span>
+                    <span th:case="3">未出席</span>
+                    <span th:case="4">已完成</span>
+                </td>
                 <td th:text="${order.psychFee}"></td>
             </tr>
         </table>
