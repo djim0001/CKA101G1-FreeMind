@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的活動報名清單</title>
+</head>
+<body>
+
+    <h1>我的活動報名清單</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+
+    <table border="1">
+        <tr>
+            <th>活動名稱</th>
+            <th>活動時間</th>
+            <th>報名時間</th>
+            <th>報名狀態</th>
+            <th></th>
+        </tr>
+        <tr th:each="r : ${regisListData}">
+            <td th:text="${r.activity.activityName}"></td>
+            <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+            <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+            <td th:text="${r.regisStatusText}"></td>
+            <td>
+                <!-- TODO: 取消報名按鈕(狀態0或1才顯示)、評論按鈕(狀態1且活動已結束才顯示),配明天的路由一起做 -->
+            </td>
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
+
+    <a th:href="@{/member/activity/listAllActivity}">前往活動列表</a>
+
+</body>

@@ -109,4 +109,12 @@ public class RegistrationService {
 		
 		return regis;
 	}
+	
+	public List<Registration> getMyRegistrations(Member member) {
+	    return regisRepo.findByMemberWithActivity(member);
+	}
+
+	public List<Registration> getRegistrationsByActivity(Activity activity) {
+	    return regisRepo.findByActivityWithMember(activity);
+	}
 }
