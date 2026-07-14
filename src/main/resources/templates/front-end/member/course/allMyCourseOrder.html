@@ -8,6 +8,7 @@
     th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
     th { background-color: #f2f2f2; }
     .status-paid { color: green; font-weight: bold; }
+    .status-cancel { color: blue; font-weight: bold; }
     .status-unpaid { color: red; font-weight: bold; }
     .modal {
     position: fixed;
@@ -64,17 +65,23 @@
 					<td th:text="${order.netAmount}"></td>
 					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
 					<td>
-						<span th:if="${order.paymentStatus == 2}" class="status-paid">已取消</span>
+						<span th:if="${order.paymentStatus == 2}" class="status-cancel">已取消</span>
 						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
 						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
 					</td>
 					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
 					<td>
-					<form th:action="@{/member/course/order/cancelOrder}" method="post">
+					<form th:action="@{/member/course/order/pay_or_cancel}" method="post">
 						<input type="hidden" name="courseOrderId" th:value="${order.courseOrderId}" />
+<!-- 						<input type="hidden" name="pay" value="pay"> -->
 						<input type="hidden" name="returnUrl">
-						<button type="submit">取消訂單</button>
+						<button type="submit" name="pay" value="pay">付款</button>
+						<button type="submit" name="pay" value="cancel">取消訂單</button>
 					</form>
+<!-- 					<form th:action="@{/member/course/order/cancelOrder}" method="post"> -->
+<!-- 						<input type="hidden" name="courseOrderId" th:value="${order.courseOrderId}" /> -->
+<!-- 						<input type="hidden" name="returnUrl"> -->
+<!-- 					</form> -->
 					</td>
 				</tr>
 			</th:block>
@@ -98,7 +105,7 @@
 	    				<tr th:each="orderDetail : ${details}">
 	    				<td th:text="${orderDetail.courseOrder.courseOrderId}"></td>
 	    				<td>
-					    <a th:href="@{/member/course/one_my_course/{courseId}(courseId=${orderDetail.course.courseId})}"
+					    <a th:href="@{/member/course/get_one_course/{courseId}(courseId=${orderDetail.course.courseId})}"
 					       th:text="${orderDetail.course.courseName}">
 					    </a>
 					</td>
@@ -108,6 +115,13 @@
 	    				</tr>
 	    			</tbody>
 	    		</table><br>
+	    		<button type="button" onclick="closeOrderModal()">關閉</button>
+	    </div>
+    </div>
+	
+	<div id="orderModal" class="modal" th:if="${payMessage != null}">
+	    <div class="modal-content">
+	    <p th:text="${payMessage}"></p>
 	    		<button type="button" onclick="closeOrderModal()">關閉</button>
 	    </div>
     </div>

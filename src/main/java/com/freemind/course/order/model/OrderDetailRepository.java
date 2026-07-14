@@ -5,8 +5,11 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.freemind.login.member.model.Member;
 
 public interface OrderDetailRepository
         extends JpaRepository<OrderDetail, OrderDetail.CompositeOrderDetail> {
@@ -15,6 +18,19 @@ public interface OrderDetailRepository
             Integer memberId,
             Pageable pageable
     );
+    
+    // 已付款且已解鎖的課程
+    @Query("""
+    	    SELECT od
+    	    FROM OrderDetail od
+    	    WHERE od.courseOrder.member = :member
+    	      AND od.courseOrder.paymentStatus = 1
+    	      AND od.coursePermission = 1
+    	""")
+    	Page<OrderDetail> findAccessibleOrderDetailsByMember(
+    	        @Param("member") Member member,
+    	        Pageable pageable
+    	);
     
     // 課程已付款且已解鎖
     @Query("""
@@ -28,10 +44,10 @@ public interface OrderDetailRepository
     	      AND co.paymentStatus = 1
     	      AND od.coursePermission = 1
     	""")
-    	boolean existsPermission(
-    	    @Param("memberId") Integer memberId,
-    	    @Param("courseId") Integer courseId
-    	);
+    boolean existsPermission(
+    		@Param("memberId") Integer memberId,
+    		@Param("courseId") Integer courseId
+    		);
     
     // 課程已付款
     @Query("""
@@ -60,5 +76,16 @@ public interface OrderDetailRepository
     	);
     
     List<OrderDetail> findByCourseOrderCourseOrderId(Integer courseOrderId);
+    
+    // 付款後同步解鎖權限
+    @Modifying
+    @Query("""
+        UPDATE OrderDetail od
+        SET od.coursePermission = 1
+        WHERE od.courseOrder.courseOrderId = :courseOrderId
+    """)
+    int enableCoursePermission(
+            @Param("courseOrderId") Integer courseOrderId
+    );
 
 }

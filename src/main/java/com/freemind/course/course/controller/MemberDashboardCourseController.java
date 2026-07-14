@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.dto.ReviewDTO;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
@@ -26,13 +28,16 @@ public class MemberDashboardCourseController {
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;
 	private final OrderDetailService orderDetailSvc;
+	private final CourseQaCommentService commentService;
 	public MemberDashboardCourseController(
 			CourseService courseSvc, MemberService memberSvc,
 			CourseOrderService courseOrderSvc,
-			OrderDetailService orderDetailSvc) {
+			OrderDetailService orderDetailSvc,
+			CourseQaCommentService commentService) {
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
 		this.orderDetailSvc = orderDetailSvc;
+		this.commentService = commentService;
 	}
 	
 	@ModelAttribute("member")
@@ -85,21 +90,17 @@ public class MemberDashboardCourseController {
 	public String myCourses(
 			@ModelAttribute("member") Member member,
 			@RequestParam(defaultValue = "1") Integer page,
-			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
-		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		
 		Page<OrderDetail> myCoursePage =
-                orderDetailSvc.getMyCourses(member.getMemberId(), currentPage - 1, sortField);
+                orderDetailSvc.getAccessibleOrderDetails(member, currentPage - 1);
 		
 		model.addAttribute("myCoursePage", myCoursePage);
 		model.addAttribute("myCourses", myCoursePage.getContent());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", myCoursePage.getTotalPages());
-		if(orderBy != null)
-			model.addAttribute("orderBy", orderBy);
 		return "front-end/member/course/allMyCourse";
 	}
 	
@@ -128,18 +129,67 @@ public class MemberDashboardCourseController {
 	    return "redirect:" + returnUrl;
 	}
 	
-	@GetMapping("/one_my_course")
-	public String oneMyCourse(
-			@RequestParam("courseId") Integer courseId,
-			@ModelAttribute("member") Member member,ModelMap model) {
-		Course course = courseSvc.getOneCourse(courseId);
-		course.setSaved(courseSvc
-				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
-		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
-		model.addAttribute("course", course);
-		model.addAttribute("coursePermission", coursePermission);
-		return "front-end/member/course/listOneCourse";
+	@PostMapping("/my_course_comment")
+	public String memberCommentCourse(
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			@RequestParam(value = "courseQuestion", required = false) String courseQuestion,
+			@RequestParam(value = "courseId", required = false) Integer courseId,
+			@ModelAttribute("member") Member member,
+			ModelMap model,
+			RedirectAttributes redirectAttributes) {
+		if(courseQuestion == null || courseQuestion.isBlank()) {
+			redirectAttributes.addFlashAttribute(
+	                "courseQuestionMsg",
+	                "提問內容不能為空"
+	        );
+			return "redirect:" + returnUrl;
+		}
+		if(orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId)) 
+			commentService.addQuestion(courseSvc.getOneCourse(courseId), member, courseQuestion);
+		else
+			redirectAttributes.addFlashAttribute(
+	                "courseQuestionMsg",
+	                "您尚未購買此課程"
+	        );
+		return "redirect:" + returnUrl;
 	}
 	
+	@PostMapping("/review_model_box")
+	public String discountModelBox(
+			RedirectAttributes redirectAttributes, 
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			@RequestParam("courseId") Integer courseId,
+			@ModelAttribute("member") Member member) {
+		ReviewDTO review = new ReviewDTO();
+		review.setCourseId(courseId);
+	    
+		redirectAttributes.addFlashAttribute("review", review);
+		redirectAttributes.addFlashAttribute("reviewModelMsg", "show");
+		return "redirect:" + returnUrl;
+	}
 
+	@PostMapping("/review")
+	public String memberReviewCourse(
+			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			@RequestParam(value = "reviewContent", required = false) String reviewContent,
+			@RequestParam(value = "courseId", required = false) Integer courseId,
+			@RequestParam(value = "rating", required = false) Integer rating,
+			@ModelAttribute("member") Member member,
+			RedirectAttributes redirectAttributes) {
+		if(reviewContent == null || reviewContent.isBlank()) {
+			redirectAttributes.addFlashAttribute(
+					"reviewContentMsg",
+					"提問內容不能為空"
+					);
+			return "redirect:" + returnUrl;
+		}
+		if(orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId)) 
+			commentService.addQuestion(courseSvc.getOneCourse(courseId), member, reviewContent);
+		else
+			redirectAttributes.addFlashAttribute(
+					"courseQuestionMsg",
+					"您尚未購買此課程"
+					);
+		return "redirect:" + returnUrl;
+	}
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>我的評價</title>
+</head>
+<body>
+	<h1>我的評價</h1>
+	<h3>
+		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
+	</h3>
+	<div th:if="${course.canAddPsychDiscount()}">
+		<form method="post" th:action="@{review_model_box}">
+			<button type="submit">新增評價</button>
+		</form>
+	</div>
+
+	<p>
+		<font color="red">*</font>表示必填
+	</p>
+	<form th:action="@{/my_review}" method="post"
+		th:object="${orderDetail}">
+
+		<div>
+			選擇課程: <select name="course.courseName">
+				<option th:each="course : ${myCourses}"
+					th:value="${course.courseId}" th:text="${course.courseName}" />
+			</select>
+		</div>
+		<div>
+			<label>我的評價:<font color="red">*</font></label>
+			<textarea name="reviewContent" required></textarea>
+			<br /> <span th:if="${#fields.hasErrors('discountDuration')}"
+				th:errors="*{discountDuration}" class="error"
+				id="discountDuration.errors"></span>
+		</div>
+		<div>
+			<label>課程評分:</label>
+			<select neme="rating" required>
+				<option value="5">★★★★★ 非常有幫助</option>
+				<option value="4">★★★★ 有幫助</option>
+				<option value="3">★★★ 普通</option>
+				<option value="2">★★ 需要改善</option>
+				<option value="1">★ 不符合期待</option>
+			</select>
+		</div>
+		<div>
+			<button type="submit" id="submit">送出評價</button>
+		</div>
+	</form>
+
+</body>
+</html>
