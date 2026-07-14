@@ -16,6 +16,7 @@
 		<tr><th>姓名</th><td th:text="${adminVO.name}"></td></tr>
 		<tr><th>手機號碼</th><td th:text="${adminVO.phoneNumber}"></td></tr>
 		<tr><th>入職日期</th><td th:text="${adminVO.hiredate}"></td></tr>
+		<tr><th>照片</th><td><img th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" width="150px"></td></tr>
 	</table>
 
 	<a th:href="@{/admin/listAllAdmin}">回管理員列表</a>

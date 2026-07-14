@@ -10,10 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.freemind.course.course.model.Course;
 import com.freemind.course.order.model.OrderDetail.CompositeOrderDetail;
-import com.freemind.course.util.CourseSortUtil;
-import com.freemind.login.member.model.Member;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderDetailService {
@@ -43,6 +42,13 @@ public class OrderDetailService {
 	public List<OrderDetail> getAllOrderDetail() {
 		return repository.findAll();
 	}
+	
+	@Transactional
+    public List<OrderDetail> getOrderDetailsByCourseOrderId(
+            Integer courseOrderId) {
+
+        return repository.findByCourseOrderCourseOrderId(courseOrderId);
+    }
 
 	public Page<OrderDetail> getMyCourses(Integer memberId, Integer page, String orderBy) {
 
@@ -68,8 +74,25 @@ public class OrderDetailService {
 
         return repository.findByCourseOrderMemberMemberId(memberId, pageable);
     }
+	
 	public boolean hasCoursePermission(Integer memberId, Integer courseId) {
 	    return repository.existsPermission(memberId, courseId);
+	}
+	
+	public String addCourseToCart(Integer memberId, Integer courseId) {
+
+		String addCourseToCart = "";
+	    // 1. 檢查是否已購買
+	    if (repository.existsPaidCourse(memberId, courseId)) {
+	     	addCourseToCart = "您已經購買過這門課程";
+	    }
+
+	    // 2. 檢查是否有未付款訂單
+	    if (repository.existsPendingCourse(memberId, courseId)) {
+	    		addCourseToCart = "這門課程已有尚未完成的訂單";
+	    }
+
+	    	return addCourseToCart;
 	}
 
 }

@@ -246,6 +246,7 @@
 
         <!-- 登入表單 -->
         <form th:action="@{/front-end/login}" method="post" class="login-form">
+       	 <input type="hidden" name="redirect" th:value="${param.redirect}">
             <div class="form-group">
                 <label for="memberAccount">帳號</label>
                 <input type="text" id="memberAccount" name="memberAccount" required class="form-control" placeholder="請輸入帳號" autofocus>
@@ -261,7 +262,8 @@
                     <input type="checkbox" name="remember-me" id="remember-me">
                     <span>記住我</span>
                 </label>
-                <a href="#" class="link-primary">忘記密碼？</a>
+               <!-- 改後 -->
+				<a th:href="@{/front-end/forgot}" class="link-primary">忘記密碼？</a>
             </div>
 
             <button type="submit" class="btn-submit">
@@ -271,7 +273,7 @@
 
         <!-- 底部連結 -->
         <p class="footer-text">
-            還沒有帳號？ <a href="#" class="link-primary weight-bold">註冊一個</a>
+            還沒有帳號？ <a th:href="@{/front-end/register}" class="link-primary weight-bold">註冊一個</a>
         </p>
     </div>
 

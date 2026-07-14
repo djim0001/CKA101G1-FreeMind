@@ -106,13 +106,6 @@ public class CouponService {
 	            ttlHours,
 	            TimeUnit.HOURS
 	        );
-
-//	        stringRedisTemplate.opsForValue().set(
-//	            publishedKey,
-//	            "1",
-//	            ttlHours,
-//	            TimeUnit.HOURS
-//	        );
 	    }
 	 
 	

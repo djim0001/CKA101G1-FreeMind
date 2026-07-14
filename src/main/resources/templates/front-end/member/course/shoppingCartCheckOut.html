@@ -42,9 +42,6 @@ span.error {
 	<h3>
 		<a th:href="@{/member/course/select_course}">會員課程一覽頁面</a>
 	</h3>
-	<span>session會員編號:</span>
-	<span th:text=${session.memberId}></span>
-	<br>
 	<table>
 		<tr>
 			<th>課程名稱</th>
@@ -127,7 +124,6 @@ span.error {
                     <th>優惠券折扣</th>
                     <th>開始時間</th>
                     <th>結束時間</th>
-                    <th>狀態</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -147,8 +143,6 @@ span.error {
                     <td th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy-MM-dd')}"></td>
 
                     <td th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy-MM-dd')}"></td>
-
-                    <td th:text="${memberCoupon.couponStatus == null ? '未使用' : memberCoupon.couponStatus}"></td>
 
                     <td>
                         <form method="post" th:action="@{/member/coupon/choose_coupon}">

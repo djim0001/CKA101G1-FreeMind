@@ -33,7 +33,7 @@
 
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 
-	<form th:action="@{/activity/ownedActivities_search}" method="post">
+	<form th:action="@{/member/activity/ownedActivities_search}" method="post">
         <p>
             活動狀態：
             <select name="activityStatus">
@@ -65,7 +65,7 @@
         <tr th:each="a : ${activityListData}">
 		    <td>
 		        <img th:if="${a.picture != null}" 
-		             th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+		             th:src="@{/member/activity/activityImage(activityId=${a.activityId})}" 
 		             style="max-width: 100px;">
 		        <img th:unless="${a.picture != null}" 
 		             th:src="@{/images/no-image.jpg}" 
@@ -79,7 +79,7 @@
 		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
 		    <td th:text="${a.registrationStatusText}"></td>
 		    <td>
-		        <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+		        <form th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
 		            <input type="hidden" name="activityId" th:value="${a.activityId}">
 		            <button type="submit">查看詳情</button>
 		        </form>
@@ -87,7 +87,7 @@
 		    
 			<td>
 			    <div class="action-block" th:if="${a.activityStatus == 0 || a.activityStatus == 3}">
-			        <form th:action="@{/activity/getOne_For_Update}" method="post" style="display:inline;">
+			        <form th:action="@{/member/activity/getOne_For_Update}" method="post" style="display:inline;">
 			            <input type="hidden" name="activityId" th:value="${a.activityId}">
 			            <button type="submit">修改</button>
 			        </form>
@@ -98,7 +98,7 @@
 				            th:onclick="'toggleCancelForm(' + ${a.activityId} + ')'">取消活動</button>
 				
 				    <div th:id="'cancelForm' + ${a.activityId}" style="display:none;">
-				        <form th:action="@{/activity/cancel}" method="post"
+				        <form th:action="@{/member/activity/cancel}" method="post"
 				              onsubmit="return confirm('確定要取消這個活動嗎？')">
 				            <input type="hidden" name="activityId" th:value="${a.activityId}">
 				            <input type="text" name="cancelNote" placeholder="請填取消原因" required>
@@ -112,7 +112,7 @@
 			                th:onclick="'togglePostponeForm(' + ${a.activityId} + ')'">延期</button>
 			
 			        <div th:id="'postponeForm' + ${a.activityId}" style="display:none;">
-			            <form th:action="@{/activity/postpone}" method="post"
+			            <form th:action="@{/member/activity/postpone}" method="post"
 			                  onsubmit="return confirm('確定要延期這個活動嗎？')">
 			                <input type="hidden" name="activityId" th:value="${a.activityId}">
 			                <input type="text" name="postponeNote" placeholder="請填延期原因" required>
@@ -126,7 +126,7 @@
 			        			th:onclick="'toggleScheduleForm(' + ${a.activityId} + ')'">確認新時間</button>
 			
 			        <div th:id="'scheduleForm' + ${a.activityId}" style="display:none;">
-			            <form th:action="@{/activity/confirmNewSchedule}" method="post"
+			            <form th:action="@{/member/activity/confirmNewSchedule}" method="post"
 			                  onsubmit="return confirm('確定要送出新的活動時間嗎？')">
 			                <input type="hidden" name="activityId" th:value="${a.activityId}">
 			                <p>新活動開始時間：<input type="datetime-local" name="activityStart" required></p>
@@ -141,7 +141,7 @@
         </tr>
     </table>
     <div>
-	    <form th:action="@{/activity/ownedActivities_search}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+	    <form th:action="@{/member/activity/ownedActivities_search}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
 	        <input type="hidden" name="currentPage" th:value="${i}">
 	        <input type="hidden" name="activityStatus" th:value="${param.activityStatus}">
 	        <button type="submit" th:text="${i}" 

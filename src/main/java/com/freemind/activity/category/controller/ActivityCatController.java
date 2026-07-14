@@ -24,7 +24,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Controller
-@RequestMapping("/activityCat")   // 這個class底下所有方法的網址，都會以/activityCat開頭
+@RequestMapping("/admin/activityCat")
 public class ActivityCatController {
 
 	@Autowired

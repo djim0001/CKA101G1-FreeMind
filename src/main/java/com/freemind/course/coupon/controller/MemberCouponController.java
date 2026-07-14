@@ -87,25 +87,25 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        switch (result) {
 	            case SUCCESS ->
 	                redirectAttributes.addFlashAttribute(
-	                    "successMessage",
+	                    "couponMsg",
 	                    "領取成功"
 	                );
 
 	            case SOLD_OUT ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券已領完"
 	                );
 
 	            case ALREADY_CLAIMED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "你已經領取過這張優惠券"
 	                );
 
 	            case NOT_PUBLISHED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券尚未發布或已過期"
 	                );
 	        }
@@ -150,11 +150,10 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        redirectAttributes.addFlashAttribute("couponError", "找不到此優惠券");
 	        return "redirect:/member/course/goto_checkout";
 	    }
-
-//	    if (!memberCoupon.getMember().getName().equals(member.getAccountStatus())) {
-//	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
-//	        return "redirect:/member/course/goto_checkout";
-//	    }
+	    if (!(memberCoupon.getMember().getMemberId() == member.getMemberId())) {
+	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
+	        return "redirect:/member/course/goto_checkout";
+	    }
 
 	    session.setAttribute("orderCoupon", memberCoupon);
 

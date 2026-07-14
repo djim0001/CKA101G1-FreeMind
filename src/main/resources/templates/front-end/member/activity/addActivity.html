@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <title>新增活動申請</title>
 </head>
 <body>
 
+	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
     <h1>新增活動申請</h1>
     
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 
-    <form th:action="@{/activity/insert}" th:object="${activity}" method="post" enctype="multipart/form-data">
-
-        <p>
-            發起會員編號（暫時簡化，之後改為自動帶入）：
-            <input type="text" name="memberId">
-        </p>
+    <form th:action="@{/member/activity/insert}" th:object="${activity}" method="post" enctype="multipart/form-data">
 
         <p>
             活動名稱：
