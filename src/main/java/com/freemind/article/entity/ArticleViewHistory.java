@@ -19,13 +19,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "article_likes")
-public class ArticleLike implements Serializable{
-
+@Table(name = "article_view_histories")
+public class ArticleViewHistory implements Serializable {
+	
 	private static final long serialVersionUID = 1L;
 	
 	@EmbeddedId
-	private ArticleLikeId likeId;
+	private ArticleViewHistoryId viewHistoryId;
 	
 	@MapsId("articleId")
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -37,18 +37,18 @@ public class ArticleLike implements Serializable{
 	@JoinColumn(name = "member_id")
 	private Member member;
 	
-	@Column(name = "liked_at", nullable = false)
-	private LocalDateTime likedAt;
+	@Column(name = "viewed_at", nullable = false)
+	private LocalDateTime viewedAt;
 	
-	public ArticleLike(Article article, Member member, LocalDateTime likedAt) {
+	public ArticleViewHistory(Article article, Member member, LocalDateTime viewedAt) {
 		this.article = article;
 		this.member = member;
-		this.likedAt = likedAt;
-		this.likeId = new ArticleLikeId();   // 讓 @MapsId 有空物件可填
+		this.viewedAt = viewedAt;
+		this.viewHistoryId = new ArticleViewHistoryId();
 	}
-	
-	public void setLikedAt(LocalDateTime likedAt) {
-		this.likedAt = likedAt;
+
+	public void setViewedAt(LocalDateTime viewedAt) {
+		this.viewedAt = viewedAt;
 	}
 	
 }

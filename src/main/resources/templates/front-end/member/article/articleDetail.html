@@ -338,7 +338,7 @@ body {
 	<div class="container">
 
 		<a class="back-link"
-			th:href="@{/article/(page=${currentPage}, catId=${selectedCatId})}">返回文章列表</a>
+			th:href="@{/article(page=${currentPage}, catId=${selectedCatId})}">返回文章列表</a>
 
 		<div class="article-detail">
 
@@ -352,9 +352,10 @@ body {
 				<div class="article-meta">
 					<span class="cat-tag"
 						th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
-					<span th:text="'發布時間：' + ${article.publishedAt}"></span>
+					<span th:text="'發布日期：' + ${#temporals.format(article.publishedAt, 'yyyy-MM-dd')}"></span>
+					<span th:text="'瀏覽次數：' + ${#numbers.formatInteger(viewCount, 1, 'COMMA')}"></span>
 
-					<!-- 互動列：按讚 / 收藏 / 分享（靠右） -->
+					<!-- 按讚 / 收藏 / 分享 -->
 					<div class="article-actions">
 
 						<!-- 按讚 -->
@@ -584,7 +585,7 @@ body {
 			});
 		}
 
-		// Instagram 官方並未提供網頁版的「分享連結」端點（不像 Facebook / Threads）
+		// Instagram 官方並未提供網頁版的分享連結端點
 		function shareToInstagram() {
 			incrementShareCount().then(function() {
 				return navigator.clipboard.writeText(window.location.href);
@@ -609,6 +610,19 @@ body {
 				openSharePopup('https://www.threads.net/intent/post?text=' + text);
 			});
 		}
+		
+		// To save cookie
+		function getCookieValue(name) {
+			const value = `; ${document.cookie}`;
+			const parts = value.split(`; ${name}=`);
+			if (parts.length === 2) return parts.pop().split(';').shift();
+		}
+
+		const userSession = getCookieValue("visitorId");
+		if (!userSession) {
+			document.cookie = "visitorId=" + crypto.randomUUID();
+		}
+		
 	</script>
 </body>
 </html>

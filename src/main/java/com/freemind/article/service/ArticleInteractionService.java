@@ -11,6 +11,8 @@ public interface ArticleInteractionService {
 	
 	void toggleBookmark(Integer articleId, Integer memberId);
 	
+	void recordView(Integer articleId, Integer memberId);
+	
 	long getLikeCount(Integer articleId);
 	
 	long getBookmarkCount(Integer articleId);
@@ -24,6 +26,7 @@ public interface ArticleInteractionService {
 	Page<Article> getSavedArticles(Integer memberId, Integer page);
 
 	Page<Article> getViewHistory(Integer memberId, Integer page);
-
+	
+	
 	
 }
