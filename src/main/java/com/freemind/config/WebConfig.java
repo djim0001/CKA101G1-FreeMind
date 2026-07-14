@@ -19,11 +19,20 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Value("${article.upload.url-path}")
     private String articleUrlPath;
-   
+	
+
+	@Value("${psych.upload.dir}")
+	private String psychUploadDir;
+
+	@Value("${psych.upload.url-path}")
+	private String psychUrlPath;
+
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler(videoUrlPath).addResourceLocations("file:" + videoUploadDir);
-		registry.addResourceHandler(articleUrlPath).addResourceLocations("file:" + articleUploadDir);
+	    registry.addResourceHandler(videoUrlPath).addResourceLocations("file:" + videoUploadDir);
+	    registry.addResourceHandler(articleUrlPath).addResourceLocations("file:" + articleUploadDir);
+	    registry.addResourceHandler(psychUrlPath).addResourceLocations("file:" + psychUploadDir);
 	}
+   
 	
 }
