@@ -37,14 +37,18 @@ public class CouponController {
 	}
 
 	@GetMapping("/select_coupon")
-	public String selectCoupon(@RequestParam(defaultValue = "1") Integer page, ModelMap model, HttpSession session) {
+	public String selectCoupon(
+			@RequestParam(defaultValue = "1") Integer page, 
+			ModelMap model, HttpSession session) {
 
 		if (page < 1)
 			page = 1;
 		Integer currentPage = page;
 
 		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(currentPage - 1);
-
+		Coupon coupon = new Coupon();
+		
+		model.addAttribute("coupon", coupon);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("couponListAllPages", couponListAllPages);
 		model.addAttribute("totalPages", couponListAllPages.getTotalPages());
@@ -102,8 +106,11 @@ public class CouponController {
 	}
 
 	@PostMapping("/publish")
-	public String publishCoupon(@RequestParam Integer couponId, @RequestParam Integer stock,
-			@RequestParam Long ttlHours, RedirectAttributes redirectAttributes) {
+	public String publishCoupon(
+			@RequestParam Integer couponId, 
+			@RequestParam Integer stock,
+			@RequestParam Long ttlHours, 
+			RedirectAttributes redirectAttributes) {
 
 		try {
 			couponSvc.publishCoupon(couponId, stock, ttlHours);

@@ -38,20 +38,20 @@ public class ShoppingCartController {
 	private final MemberService memberSvc;
 	private final CourseService courseSvc;
 	private final CourseOrderService courseOrderSvc;
-	private final OrderDetailService OrderDetailSvc;
+	private final OrderDetailService orderDetailSvc;
 	private final MemberCouponService memberCouponSvc;
 	
 	public ShoppingCartController(
 			ShoppingCartRedisService ShoppingCartRedisSvc, 
 			MemberCouponService memberCouponSvc,
 			CourseOrderService courseOrderSvc,
-			OrderDetailService OrderDetailSvc,
+			OrderDetailService orderDetailSvc,
 			CourseService courseSvc,
 			MemberService memberSvc) {
 		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
 		this.memberCouponSvc = memberCouponSvc;
 		this.courseOrderSvc = courseOrderSvc;
-		this.OrderDetailSvc = OrderDetailSvc;
+		this.orderDetailSvc = orderDetailSvc;
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
 	}
@@ -64,8 +64,7 @@ public class ShoppingCartController {
 	
 	@GetMapping("/shopping_cart")
 	public String shoppingCart(ModelMap model, 
-			@ModelAttribute("member") Member member,
-			RedirectAttributes redirectAttributes
+			@ModelAttribute("member") Member member
 			) {
 			
 		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
@@ -116,14 +115,23 @@ public class ShoppingCartController {
 			@ModelAttribute("member") Member member,
 	        @RequestParam(value = "returnUrl", required = false) String returnUrl,
 			RedirectAttributes redirectAttributes) {
+		Integer memberId = member.getMemberId();
+		String cartMsg = orderDetailSvc.canCourseToCart(memberId, courseId);
+		boolean cart = ShoppingCartRedisSvc.isCourseInCart(memberId, courseId);
+//		if(cartMsg != "")
+//			redirectAttributes.addFlashAttribute("cartMsg", cartMsg);
+//		if (ShoppingCartRedisSvc.isCourseInCart(member.getMemberId(), courseId)) {
+//		        redirectAttributes.addFlashAttribute("cartMsg", "此課程已在購物車中");
+//		} else {
+//			ShoppingCartRedisSvc.addCourse(member.getMemberId(), courseId);
+//		    redirectAttributes.addFlashAttribute("cartMsg", "成功加入購物車!");
+//		}
+		if (cartMsg == "") 
+			cartMsg = cart ? "此課程已在購物車中" : "成功加入購物車!";
+		if(cartMsg == "成功加入購物車!") 
+			ShoppingCartRedisSvc.addCourse(memberId, courseId);
 		
-//		System.out.println("returnUrl = " + returnUrl);
-		if (ShoppingCartRedisSvc.isCourseInCart(member.getMemberId(), courseId)) {
-		        redirectAttributes.addFlashAttribute("cartMsg", "此課程已在購物車中");
-		} else {
-			ShoppingCartRedisSvc.addCourse(member.getMemberId(), courseId);
-		    redirectAttributes.addFlashAttribute("cartMsg", "成功加入購物車!");
-		}
+		 redirectAttributes.addFlashAttribute("cartMsg", cartMsg);
 		 redirectAttributes.addFlashAttribute("courseId", courseId);
 
 		 return "redirect:" + returnUrl;
@@ -200,7 +208,7 @@ public class ShoppingCartController {
 					.intValue();
 			orderDetail.setPrice(price);
 			orderDetail.setDiscountedPrice(discountedPrice);
-			OrderDetailSvc.addOrderDetail(orderDetail);
+			orderDetailSvc.addOrderDetail(orderDetail);
 		}
 		
 		ShoppingCartRedisSvc.clearCart(member.getMemberId());

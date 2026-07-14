@@ -24,23 +24,23 @@ if (courseVideo && heroPlayButton) {
   syncPlayButton();
 }
 
-if (noteInput && saveNoteButton && saveState) {
-  const courseIdInput = document.querySelector('input[name="courseId"]');
-  const noteKey = `course-note-${courseIdInput?.value || "default"}`;
-  const savedNote = localStorage.getItem(noteKey);
-
-  if (savedNote) {
-    noteInput.value = savedNote;
-  }
-
-  saveNoteButton.addEventListener("click", () => {
-    localStorage.setItem(noteKey, noteInput.value);
-    saveState.textContent = "已儲存";
-    window.setTimeout(() => {
-      saveState.textContent = "";
-    }, 1800);
-  });
-}
+//if (noteInput && saveNoteButton && saveState) {
+//  const courseIdInput = document.querySelector('input[name="courseId"]');
+//  const noteKey = `course-note-${courseIdInput?.value || "default"}`;
+//  const savedNote = localStorage.getItem(noteKey);
+//
+//  if (savedNote) {
+//    noteInput.value = savedNote;
+//  }
+//
+//  saveNoteButton.addEventListener("click", () => {
+//    localStorage.setItem(noteKey, noteInput.value);
+//    saveState.textContent = "已提交";
+//    window.setTimeout(() => {
+//      saveState.textContent = "";
+//    }, 1800);
+//  });
+//}
 
 function closeCartModal() {
   const cartModal = document.querySelector("#cartModal");

@@ -62,51 +62,32 @@ public class CouponService {
         return repository.findAll(pageable);
     }
 	
-	 public void publishCoupon(
-	            Integer couponId,
-	            Integer stock,
-	            Long ttlHours) {
+	public void publishCoupon(Integer couponId, Integer stock, Long ttlHours) {
 
-	        if (couponId == null) {
-	            throw new IllegalArgumentException(
-	                "優惠券編號不能為空"
-	            );
-	        }
+		if (couponId == null) {
+			throw new IllegalArgumentException("優惠券編號不能為空");
+		}
 
-	        if (stock == null || stock <= 0) {
-	            throw new IllegalArgumentException(
-	                "發放數量必須大於 0"
-	            );
-	        }
+		if (stock == null || stock <= 0) {
+			throw new IllegalArgumentException("發放數量必須大於 0");
+		}
 
-	        if (ttlHours == null || ttlHours <= 0) {
-	            throw new IllegalArgumentException(
-	                "有效時數必須大於 0"
-	            );
-	        }
+		if (ttlHours == null || ttlHours <= 0) {
+			throw new IllegalArgumentException("有效時數必須大於 0");
+		}
 
-	        boolean exists =
-	            repository.existsById(couponId);
+		boolean exists = repository.existsById(couponId);
 
-	        if (!exists) {
-	            throw new IllegalArgumentException(
-	                "找不到指定優惠券"
-	            );
-	        }
+		if (!exists) {
+			throw new IllegalArgumentException("找不到指定優惠券");
+		}
 
-	        String stockKey =
-	            "coupon:stock:" + couponId;
+		String stockKey = "coupon:stock:" + couponId;
 
-	        String publishedKey =
-	            "coupon:published:" + couponId;
+		String publishedKey = "coupon:published:" + couponId;
 
-	        stringRedisTemplate.opsForValue().set(
-	            stockKey,
-	            stock.toString(),
-	            ttlHours,
-	            TimeUnit.HOURS
-	        );
-	    }
+		stringRedisTemplate.opsForValue().set(stockKey, stock.toString(), ttlHours, TimeUnit.HOURS);
+	}
 	 
 	
 	

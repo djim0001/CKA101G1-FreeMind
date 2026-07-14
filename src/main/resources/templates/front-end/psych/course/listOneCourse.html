@@ -93,7 +93,7 @@
 	<br>
 	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
 	<div th:if="${course.canAddPsychDiscount()}">
-	<form method="post" th:action="@{discount_model_box}">
+		<form method="post" th:action="@{discount_model_box}">
 			<input type="hidden" name="courseId" th:value="${course.courseId}">
 			<button type="submit">添加心理師折扣</button>
 		</form>

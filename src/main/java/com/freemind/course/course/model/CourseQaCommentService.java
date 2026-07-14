@@ -13,6 +13,8 @@ public class CourseQaCommentService {
 
     @Autowired
     private CourseQaCommentRepository repository;
+    @Autowired
+    private CourseRepository courseRepository;
 
     // 會員新增提問
     public CourseQaComment addQuestion(
@@ -41,6 +43,7 @@ public class CourseQaCommentService {
         comment.setMember(member);
         comment.setCourseQuestion(courseQuestion);
         comment.setAskedAt(LocalDateTime.now());
+        course.setCommentCount(course.getCommentCount()+1);
 
         return repository.save(comment);
     }

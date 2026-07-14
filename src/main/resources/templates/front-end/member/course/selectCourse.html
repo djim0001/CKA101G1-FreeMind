@@ -120,9 +120,7 @@
 					<td th:text="${course.commentCount}"></td>
 					<td th:text="${course.price}"></td>
 					<td>
-						<form method="get" th:action="@{get_one_course}">
-							<input type="hidden" name="courseId"
-								th:value="${course.courseId}">
+						<form method="get" th:action="@{get_one_course/{courseId}(courseId=${course.courseId})}">
 							<button type="submit">查看詳情</button>
 						</form>
 						<form method="post" th:action="@{add_cart}" >
