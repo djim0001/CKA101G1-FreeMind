@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +16,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleService;
-
-import jakarta.servlet.http.HttpSession;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
 
 @Controller
@@ -36,22 +35,9 @@ public class AdminArticleController {
 	@Autowired
 	private ArticleCatService articleCatService;
 	
-	// testing
-	@PostMapping("/set_adminId_session")
-	public String setAdminIdSession(@RequestParam(name = "adminIdSession", required = false) Integer adminIdSession, HttpSession session) {
-		session.setAttribute("adminId", adminIdSession);
-		return "redirect:/admin/article";
-	}
-	
-	@GetMapping({"", "/"})
+	@GetMapping
     public String articleAdmin(Model model,
-    		@SessionAttribute(name="adminId", required = false) Integer adminId) {
-		
-		// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
 		
 		return "back-end/article/articleAdmin";
     }
@@ -59,14 +45,8 @@ public class AdminArticleController {
     @GetMapping("/pending")
     public String getPendingArticles(Model model, 
     		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@SessionAttribute(name="adminId", required = false) Integer adminId) {
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
 		
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
-    	
 		Page<Article> articlePage = articleService.getPendingArticles(page);
         model.addAttribute("articlePage", articlePage);
         model.addAttribute("currentPage", page);
@@ -78,14 +58,8 @@ public class AdminArticleController {
     public String getReviewedArticles(Model model,
     		@RequestParam(name = "status", required = false) Integer status,
     		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId) {
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
 		
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
-    	
 		Page<Article> articlePage = articleService.getReviewedArticles(status, page);
 		model.addAttribute("articlePage", articlePage);
 	    model.addAttribute("currentPage", page);
@@ -96,15 +70,9 @@ public class AdminArticleController {
     @GetMapping("/{articleId}/review")
     public String getReviewDetail(Model model, 
 			@PathVariable Integer articleId,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
 			RedirectAttributes redirectAttributes) {
     	
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
-		
 		try {
 			Article article = articleService.getArticleForReview(articleId);
 			model.addAttribute("article", article);
@@ -120,13 +88,7 @@ public class AdminArticleController {
     public String getCatSearch(Model model,
     		@RequestParam(name = "catId", required = false) Integer catId,
     		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId) {
-		
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
 		
 //    	Page<ArticleCat> articleCatPage = articleCatService.getAllCats(catId, page);
 //    	model.addAttribute("articleCatPage", articleCatPage);
@@ -148,13 +110,7 @@ public class AdminArticleController {
     
     @GetMapping("/categories/create")
     public String getCreateForm(Model model,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId) {
-		
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
 		
     	return "back-end/article/createCatForm";
     }
@@ -162,14 +118,8 @@ public class AdminArticleController {
     @GetMapping("/categories/{catId}")
     public String getCatDetail(Model model,
     		@PathVariable Integer catId,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
-		
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
 		
 		try {
 			ArticleCat articleCat = articleCatService.getCatById(catId);
@@ -185,14 +135,8 @@ public class AdminArticleController {
     @PostMapping("/categories/create")
     public String createCat(Model model,
     		@RequestParam(name = "catName") String catName,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
-			
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
     	
 		try {
 			ArticleCat articleCat = articleCatService.createCat(catName);
@@ -211,14 +155,8 @@ public class AdminArticleController {
     public String editArticleCat(Model model,
     		@PathVariable(name = "catId") Integer catId,
     		@RequestParam(name = "catName") String catName,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
-	 
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
     	
 		try {
 			articleCatService.updateCat(catId, catName);
@@ -235,14 +173,8 @@ public class AdminArticleController {
     @PostMapping("/categories/{catId}/deactivate")
     public String deactivateArticleCat(Model model,
     		@PathVariable Integer catId,
-    		@SessionAttribute(name = "adminId", required = false) Integer adminId,
+    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
-    	
-    	// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
     	
 		try {
 			articleCatService.deactivateCat(catId);
@@ -262,14 +194,10 @@ public class AdminArticleController {
 			@RequestParam(name = "action") String action,
 			@RequestParam(value = "rejectReason", required = false) Integer rejectReason,
 			@RequestParam(value = "rejectNote", required = false) String rejectNote,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
 			RedirectAttributes redirectAttributes) {
 		
-		// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
+		Integer adminId = prinUserDetails.getAdmin().getAdminId();
 		
 		try {
 			if ("approve".equals(action)) {
@@ -289,14 +217,9 @@ public class AdminArticleController {
 	@PostMapping("/{articleId}/unpublish")
 	public String unpublishArticle(Model model,
 			@PathVariable(name = "articleId") Integer articleId,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
 			RedirectAttributes redirectAttributes) {
-		
-		// testing
-		if (adminId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "back-end/article/test-login";
-		}
+		Integer adminId = prinUserDetails.getAdmin().getAdminId();
 		
 		try {
 			articleService.unPublishArticle(articleId, adminId);

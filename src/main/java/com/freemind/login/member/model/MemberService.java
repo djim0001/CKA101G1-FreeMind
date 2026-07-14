@@ -31,7 +31,7 @@ public class MemberService {
 		Optional<Member> optional = repository.findById(memberId);
 		return repository.findById(memberId).orElse(null);
 	}
-
+	
 	public List<Member> getAll() {
 		return repository.findAll();
 	}

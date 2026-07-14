@@ -1,6 +1,7 @@
 package com.freemind.article.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +17,14 @@ import com.freemind.article.entity.ArticleBookmark;
 import com.freemind.article.entity.ArticleBookmarkId;
 import com.freemind.article.entity.ArticleLike;
 import com.freemind.article.entity.ArticleLikeId;
+import com.freemind.article.entity.ArticleViewHistory;
 import com.freemind.article.repository.ArticleBookmarkRepository;
 import com.freemind.article.repository.ArticleLikeRepository;
 import com.freemind.article.repository.ArticleRepository;
+import com.freemind.article.repository.ArticleViewHistoryRepository;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberRepository;
+import com.freemind.login.member.model.MemberService;
 
 
 @Service
@@ -30,6 +34,12 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 	private int artPageSize;
 	
 	@Autowired
+	private ArticleService articleService;
+	
+	@Autowired
+	private MemberService memberService;
+	
+	@Autowired
 	private ArticleRepository articleRepository;
 	
 	@Autowired
@@ -37,6 +47,9 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 	
 	@Autowired
     private ArticleBookmarkRepository articleBookmarkRepository;
+	
+	@Autowired
+	private ArticleViewHistoryRepository articleViewHistoryRepository;
 	
 	@Autowired
 	private MemberRepository memberRepository;
@@ -119,8 +132,24 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 
 	@Override
 	public Page<Article> getViewHistory(Integer memberId, Integer page) {
-		// TODO Auto-generated method stub
-		return null;
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("viewedAt").descending());
+		Page<ArticleViewHistory> historyPage = articleViewHistoryRepository.findByMemberId(memberId, pageable);
+		
+		return historyPage.map(ArticleViewHistory::getArticle);
 	}
 
+	@Override
+	@Transactional
+	public void recordView(Integer articleId, Integer memberId) {
+		 Optional<ArticleViewHistory> history = articleViewHistoryRepository.findByMemberIdAndArticleId(memberId, articleId);
+	
+		 if (history.isPresent()) {
+			 history.get().setViewedAt(LocalDateTime.now());
+		 } else {
+			 Article article = articleService.getPublishedArticle(articleId);
+			 Member member = memberService.getOneMember(memberId);
+			 ArticleViewHistory newHistory = new ArticleViewHistory(article, member, LocalDateTime.now());
+			 articleViewHistoryRepository.save(newHistory);
+		 }
+	}
 }

@@ -431,11 +431,7 @@ public class ArticleServiceImpl implements ArticleService{
 	@Override
 	@Transactional
 	public long incrementAndGetShareCount(Integer articleId) {
-		int updatedRows = articleRepository.incrementShareCount(articleId);
-		
-		if (updatedRows == 0) {
-	        throw new IllegalArgumentException("查無此文章，articleId=" + articleId);
-	    }
+		articleRepository.incrementShareCount(articleId);
 		
 		Article article = articleRepository.findById(articleId).orElse(null);
 

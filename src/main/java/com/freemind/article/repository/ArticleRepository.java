@@ -34,6 +34,10 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 
 	@Modifying
 	@Query("UPDATE Article a SET a.shareCount = a.shareCount + 1 WHERE a.articleId = :articleId")
-	int incrementShareCount(@Param("articleId")Integer articleId);
+	void incrementShareCount(@Param("articleId")Integer articleId);
+	
+	@Modifying
+	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count WHERE a.articleId = :articleId")
+	void incrementViewCount(@Param("articleId")Integer articleId, long count);
 
 }

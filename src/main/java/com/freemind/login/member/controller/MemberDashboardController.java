@@ -1,4 +1,4 @@
-package com.freemind.article.controller;
+package com.freemind.login.member.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import com.freemind.article.entity.Article;
 import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
-//To be moved to member package
 
 @Controller      
 @RequestMapping("/member/dashboard")
@@ -37,13 +36,13 @@ public class MemberDashboardController {
 	public String articleTabs(Model model,
 			 @RequestParam(defaultValue = "bookmark") String type,
 			 @RequestParam(defaultValue = "1") Integer page,
-			 @AuthenticationPrincipal MemberUserDetails principal) {
+			 @AuthenticationPrincipal MemberUserDetails prinUserDetails) {
 		
-		if (principal == null) {
+		if (prinUserDetails == null) {
 		    return "redirect:/front-end/login";
 		}
 		
-		Integer memberId = principal.getMember().getMemberId();
+		Integer memberId = prinUserDetails.getMember().getMemberId();
 	
 		Page<Article> articlePage;
 		switch(type) {
