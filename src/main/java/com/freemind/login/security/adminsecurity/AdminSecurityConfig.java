@@ -82,7 +82,7 @@ public class AdminSecurityConfig {
                 })
                 // 已登入但不是管理員（例如會員）闖入後台 → 導向後台登入頁
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.sendRedirect("/back-end/login");
+                    response.sendRedirect("/back-end/login?unauthorized");
                 })
             );
 
