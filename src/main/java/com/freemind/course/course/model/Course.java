@@ -105,10 +105,8 @@ public class Course {
 	@DecimalMax(value = "1", message = "心理師折扣: 不能超過{value}")
 	private BigDecimal psychDiscount;
 	@Column(name = "discount_start")
-	@Future
 	private LocalDateTime discountStart;
 	@Column(name = "discount_end")
-	@Future
 	private LocalDateTime discountEnd;
 	@Column(name = "price")
 	@NotNull(message="課程價格：請勿空白")

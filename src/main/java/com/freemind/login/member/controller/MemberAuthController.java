@@ -145,6 +145,10 @@ public class MemberAuthController {
 			model.addAttribute("errorMessage", "查無此信箱的會員");
 			return "front-end/member/auth/forgot";
 		}
+		if (member.getAccountStatus() == 2) {
+		    model.addAttribute("errorMessage", "此帳號已停權，無法重設密碼，請聯繫客服");
+		    return "front-end/member/auth/forgot";
+		}
 		if (!sendOtpMail("reset", email, "重設密碼")) {
 			model.addAttribute("errorMessage", "驗證碼寄送過於頻繁，請 60 秒後再試");
 			return "front-end/member/auth/forgot";
@@ -181,11 +185,18 @@ public class MemberAuthController {
 			model.addAttribute("errorMessage", "查無此信箱的會員");
 			return "front-end/member/auth/forgot";
 		}
+		if (member.getAccountStatus() == 2) {
+		    model.addAttribute("errorMessage", "此帳號已停權，無法重設密碼，請聯繫客服");
+		    return "front-end/member/auth/forgot";
+		}
 		member.setMemberPassword(passwordEncoder.encode(newPassword)); // BCrypt
-		memberService.updateMember(member);
-		return "redirect:/front-end/login?resetSuccess";
+	    if (member.getAccountStatus() == 0) {
+	        member.setAccountStatus(1); // 未啟用帳號：OTP 已證明信箱所有權，順便啟用
+	    }
+	    memberService.updateMember(member);
+	    return "redirect:/front-end/login?resetSuccess";
 	}
-
+	
 	/** 產生 OTP 並寄出；回傳 false 代表仍在冷卻時間內 */
 	private boolean sendOtpMail(String purpose, String email, String purposeText) {
 		String otp = otpService.generateOtp(purpose, email);

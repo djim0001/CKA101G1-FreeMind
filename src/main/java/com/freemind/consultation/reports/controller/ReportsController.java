@@ -216,14 +216,14 @@ public class ReportsController {
 
 	@PostMapping("myReports")
 	public String myReports(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/reports/myReportsForm";
-		}
-		List<Reports> list = reportsSvc.getByMemberId(Integer.valueOf(memberId));
-		model.addAttribute("reportsListData", list);
-		model.addAttribute("memberId", memberId);
-		return "front-end/member/consultation/reports/myReportsList";
+	    if (memberId == null || memberId.isBlank()) {
+	        model.addAttribute("errorMessage", "請輸入會員編號");
+	        return "front-end/member/consultation/reports/myReportsForm";
+	    }
+	    List<Reports> list = reportsSvc.getByMemberId(Integer.valueOf(memberId));
+	    model.addAttribute("reportsListData", list);
+	    model.addAttribute("memberId", memberId);
+	    return "front-end/member/consultation/reports/myReportsForm";   // ← 改這行
 	}
 
 	// 後台：查看問題回報
@@ -274,32 +274,24 @@ public class ReportsController {
 
 	@PostMapping("reportLookup")
 	public String reportLookup(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/reports/reportLookupForm";
-		}
-
-		Integer mid = Integer.valueOf(memberId);
-
-		List<Orders> allReportableOrders = ordersSvc.getConfirmedOrCompletedByMemberId(mid);
-		List<Reports> myReports = reportsSvc.getByMemberId(mid);
-
-		// 找出已經回報過的訂單編號
-		java.util.Set<Integer> reportedOrderIds = myReports.stream().filter(r -> r.getOrders() != null)
-				.map(r -> r.getOrders().getOrderId()).collect(java.util.stream.Collectors.toSet());
-
-		// 篩掉已經回報過的訂單，只留下還沒回報過的
-		List<Orders> list = allReportableOrders.stream().filter(o -> !reportedOrderIds.contains(o.getOrderId()))
-				.collect(java.util.stream.Collectors.toList());
-
-		if (list.isEmpty()) {
-			model.addAttribute("errorMessage", "查無可回報的諮商紀錄（可能都已經回報過了）。");
-			return "front-end/member/consultation/reports/reportLookupForm";
-		}
-
-		model.addAttribute("ordersListData", list);
-		model.addAttribute("memberId", memberId);
-		return "front-end/member/consultation/reports/reportOrderList";
+	    if (memberId == null || memberId.isBlank()) {
+	        model.addAttribute("errorMessage", "請輸入會員編號");
+	        return "front-end/member/consultation/reports/reportLookupForm";
+	    }
+	    Integer mid = Integer.valueOf(memberId);
+	    List<Orders> allReportableOrders = ordersSvc.getConfirmedOrCompletedByMemberId(mid);
+	    List<Reports> myReports = reportsSvc.getByMemberId(mid);
+	    java.util.Set<Integer> reportedOrderIds = myReports.stream().filter(r -> r.getOrders() != null)
+	            .map(r -> r.getOrders().getOrderId()).collect(java.util.stream.Collectors.toSet());
+	    List<Orders> list = allReportableOrders.stream().filter(o -> !reportedOrderIds.contains(o.getOrderId()))
+	            .collect(java.util.stream.Collectors.toList());
+	    if (list.isEmpty()) {
+	        model.addAttribute("errorMessage", "查無可回報的諮商紀錄（可能都已經回報過了）。");
+	        return "front-end/member/consultation/reports/reportLookupForm";
+	    }
+	    model.addAttribute("ordersListData", list);
+	    model.addAttribute("memberId", memberId);
+	    return "front-end/member/consultation/reports/reportLookupForm";   // ← 改這行
 	}
 
 	@PostMapping("reportSelect")

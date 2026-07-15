@@ -32,9 +32,12 @@ public class RegistrationTestRunner implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("測試");
-		// 先撈測試主角(會員1)
+		// 先撈測試主角(會員1,2,3,4)
 		                                // 沒有傳入資料則會丟出例外
 		Member m1 = memberRepo.findById(1).orElseThrow();
+		Member m2 = memberRepo.findById(2).orElseThrow();
+		Member m3 = memberRepo.findById(3).orElseThrow();
+		Member m4 = memberRepo.findById(4).orElseThrow();
 		Activity a1 = activityRepo.findById(1).orElseThrow(); // 會員1有報名的活動(活動1)
 		Activity a2 = activityRepo.findById(2).orElseThrow(); // 會員1已取消報名(活動2)
 		Activity a4 = activityRepo.findById(4).orElseThrow(); // 會員1沒有報名(活動4)
@@ -92,7 +95,7 @@ public class RegistrationTestRunner implements CommandLineRunner {
 //		System.out.println("----- 測試5:審核 Service -----");
 //		// 5-1:亂給的報名編號 → 預期 IllegalArgumentException
 //		try {
-//		    service.approve(999);
+//		    service.approve(999, m1);
 //		    System.out.println("5-1:無效編號未被擋下(預期:IllegalArgumentException)");
 //		} catch (IllegalArgumentException e) {
 //		    System.out.println("5-1:正確擋下,訊息:" + e.getMessage());
@@ -100,7 +103,7 @@ public class RegistrationTestRunner implements CommandLineRunner {
 //
 //		// 5-2:審核一筆狀態不是0的 → 預期 IllegalStateException
 //		try {
-//			service.approve(5);  //此筆申請紀錄：狀態3已取消報名
+//			service.approve(5, m2);  //此筆申請紀錄：狀態3已取消報名
 //			System.out.println("5-2:非待審核狀態未被擋下(預期:IllegalStateException)");
 //		} catch (IllegalStateException e) {
 //			System.out.println("5-2:正確擋下,訊息:" + e.getMessage());
@@ -108,35 +111,35 @@ public class RegistrationTestRunner implements CommandLineRunner {
 //		
 //		// 5-3:審一筆狀態0的 → 預期回傳狀態=已報名成功
 //		// 在交易內,受託管實體靠 dirty checking 自動同步(save 主要是給新建實體用的)
-//		Registration approved = service.approve(1); //此筆申請紀錄：狀態0待審核
+//		Registration approved = service.approve(1, m1); //此筆申請紀錄：狀態0待審核
 //		System.out.println("5-3:審核結果:" + approved.getRegisStatusText()
 //		        + ",活動目前人數:" + approved.getActivity().getRegisCount());
 //
 //		// 5-4:審一筆「活動已滿」的狀態0報名 → 預期回傳狀態=報名失敗
 //		// (要先照上面說的把某活動弄滿,再插一筆對它的狀態0報名,或用現有資料組合)
-//		Registration approved = service.approve(12);
-//		System.out.println("5-4:審核結果:"+approved.getRegisStatusText()
-//				+ ",活動目前人數:" + approved.getActivity().getRegisCount());
+//		Registration full = service.approve(11, m2);
+//		System.out.println("5-4:審核結果:"+full.getRegisStatusText()
+//				+ ",活動目前人數:" + full.getActivity().getRegisCount());
 		
 		// 測試6
 //		System.out.println("----- 測試6:取消 Service -----");
 //
 //		// 6-1:取消一筆狀態1的 → 預期 狀態變3、活動人數-1
-//		Registration cancelled = service.cancel(2, 0, "臨時有事");
+//		Registration cancelled = service.cancel(7, 0, "臨時有事", m1);
 //		System.out.println("6-1:" + cancelled.getRegisStatusText()
 //		        + ",取消原因:" + cancelled.getCancelReasonText()
 //		        + ",活動目前人數:" + cancelled.getActivity().getRegisCount());
 
 		// 6-2:對同一筆再取消一次(現在已是狀態3) → 預期 IllegalStateException
 //		try {
-//		    service.cancel(2, 0, "再取消一次");
+//		    service.cancel(7, 0, "再取消一次", m1);
 //		    System.out.println("6-2:非有效狀態未被擋下(預期:IllegalStateException)");
 //		} catch (IllegalStateException e) {
 //		    System.out.println("6-2:正確擋下,訊息:" + e.getMessage());
 //		}
 
 		// 6-3:取消一筆狀態0的 → 預期 狀態變3、人數「不變」(驗證待審核不佔名額所以不-1)
-//		Registration cancelled = service.cancel(11, 1, "腸胃炎");
+//		Registration cancelled = service.cancel(1, 1, "腸胃炎", m4);
 //		System.out.println("6-3:" + cancelled.getRegisStatusText()
 //		        + ",取消原因:" + cancelled.getCancelReasonText()
 //		        + ",取消時間:" + cancelled.getCancelledAt());

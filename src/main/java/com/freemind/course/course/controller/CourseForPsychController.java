@@ -2,9 +2,7 @@ package com.freemind.course.course.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,7 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -20,17 +19,24 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
+import com.freemind.course.course.model.CourseQaComment;
+import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
-import com.freemind.course.course.model.PsychDiscountForm;
+import com.freemind.course.dto.PsychDiscountFormDTO;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.dto.PsychologistSelfRes;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
@@ -45,6 +51,7 @@ public class CourseForPsychController {
 	private final CourseService courseSvc;
     private final CourseCategoriesService courseCategoriesSvc;
     private final PsychologistService psychologistService;
+    private final CourseQaCommentService courseQaCommentSvc;
     
 //    @Value("${course.video.upload-path}")
 //    private String videoUploadPath;
@@ -56,11 +63,13 @@ public class CourseForPsychController {
     public CourseForPsychController(
             CourseService courseSvc,
             CourseCategoriesService courseCategoriesSvc,
-            PsychologistService psychologistService) {
+            PsychologistService psychologistService,
+            CourseQaCommentService courseQaCommentSvc) {
 
         this.courseSvc = courseSvc;
         this.courseCategoriesSvc = courseCategoriesSvc;
         this.psychologistService = psychologistService;
+        this.courseQaCommentSvc = courseQaCommentSvc;
     }
 	
 
@@ -70,32 +79,22 @@ public class CourseForPsychController {
 	}
 
 	
-	@PostMapping("set_psychId_session")
-	public String setPsychIdSession(@RequestParam(name = "psychIdSession") Integer psychIdSession, ModelMap model,
-			HttpSession session) {
-		session.setAttribute("psychId", psychIdSession);
-		
-		return "redirect:/psych/course/select_course";
-	}
-
 	@GetMapping("/select_course")
 	public String psychSelectCourse(
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 
-		if(psychId == null)
-			return "front-end/psych/course/selectCourse";
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		
-		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
+		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
 		
 		Page<Course> courseListAllPages = 
-				courseSvc.getCoursesByPsychId(psychId, currentPage - 1, sortField);
+				courseSvc.getCoursesByPsychId(psych.getPsychId(), currentPage - 1, sortField);
 		
 		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("courseListAllPages", courseListAllPages);
@@ -108,15 +107,43 @@ public class CourseForPsychController {
 	}
 
 	@GetMapping("/add_course")
-	public String psychAddCourse(ModelMap model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
+	public String psychAddCourse(ModelMap model,
+			@ModelAttribute("psych") PsychologistSelfRes psych){
 		Course course = new Course();
-		if(psychId == null) {
-			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/psych/course/selectCourse";
-		}
-		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		course.setPsychologist(psychologistService.getOnePsychologist(psych.getPsychId()));
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
+	}
+	
+	@PostMapping("/answer_course")
+	public String psychAnswerdCourse(
+			ModelMap model,
+			@RequestParam("questionId") Integer questionId,
+			@RequestParam("courseId") Integer courseId,
+			@RequestParam("courseAnswer") String courseAnswer,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
+			RedirectAttributes redirectAttributes) {
+		try {
+			courseQaCommentSvc.answerQuestion(questionId, psych.getPsychId(), courseAnswer);
+			model.addAttribute(
+	                "answerMsg",
+	                "回復成功"
+	        );
+	    } catch (IllegalArgumentException e) {
+	    		model.addAttribute(
+	                "answerMsg",
+	                e.getMessage()
+	        );
+	    }
+		
+		Course course = courseSvc.getOneCourse(courseId);
+		
+		List<CourseQaComment> courseQuestions = 
+				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+		model.addAttribute("courseQuestions", courseQuestions);
+		model.addAttribute("course", course);
+		
+		return "front-end/psych/course/listOneCourse";
 	}
 	
 	@PostMapping("/insert_or_update_course")
@@ -124,7 +151,7 @@ public class CourseForPsychController {
 			@RequestParam(name="video") MultipartFile video,
 			@RequestParam(name="videoPre") MultipartFile videoPre,
 			@Valid Course course, BindingResult result, 
-			@SessionAttribute(name = "psychId") Integer psychId,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
 			ModelMap model) throws IOException{
 		result = removeFieldError(course, result, "video");
 		result = removeFieldError(course, result, "videoPre");
@@ -154,7 +181,7 @@ public class CourseForPsychController {
 			course.setVideoSrcPre(videoSrcPre);
 		}
 		// 新增課程
-		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		course.setPsychologist(psychologistService.getOnePsychologist(psych.getPsychId()));
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 
@@ -163,7 +190,7 @@ public class CourseForPsychController {
 	
 	@PostMapping("/update_psych_discount")
 	public String updatePsychDiscount(
-	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountForm form,
+	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountFormDTO form,
 	        BindingResult result, ModelMap model,
 	        @RequestParam(name = "courseId") Integer courseId) {
 		
@@ -187,20 +214,30 @@ public class CourseForPsychController {
 		return "front-end/psych/course/listOneCourse";
 	}
 
-	@PostMapping("/get_one_course")
-	public String psychGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	@GetMapping("/get_one_course/{courseId}")
+	public String psychGetOneCourse(
+			@PathVariable("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
+		
+		List<CourseQaComment> courseQuestions = 
+				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+		model.addAttribute("courseQuestions", courseQuestions);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
 	@PostMapping("/update_course")
-	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	public String psychUpdateCourse(
+			@RequestParam("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
 	@PostMapping("/submit_course")
-	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	public String psychSubmitCourse(
+			@RequestParam("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus((byte)1);
 		courseSvc.updateCourse(course);
@@ -210,13 +247,9 @@ public class CourseForPsychController {
 	@PostMapping("/discount_model_box")
 	public String discountModelBox(ModelMap model, 
 			@RequestParam("courseId") Integer courseId,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
-		if(psychId == null) {
-			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/psych/course/selectCourse";
-		}
+			@ModelAttribute("psych") PsychologistSelfRes psych) {
 		Course course = courseSvc.getOneCourse(courseId);
-		PsychDiscountForm form = new PsychDiscountForm();
+		PsychDiscountFormDTO form = new PsychDiscountFormDTO();
 	    form.setCourseId(courseId);
 	    
 		model.addAttribute("course", course);
@@ -251,20 +284,10 @@ public class CourseForPsychController {
 			video.transferTo(dest.toPath());
 			String basePath = urlPath.replace("**", "");
 			return basePath + newFileName;
-		}catch (Exception e) {
+			}catch (Exception e) {
 				return newFileName; // 500
 			}
-//		Path uploadPath = Paths.get(uploadDir);
-//
-//		if (!Files.exists(uploadPath)) {
-//		    Files.createDirectories(uploadPath);
-//		}
-//
-//		Path savePath = uploadPath.resolve(newFileName);
-//		video.transferTo(savePath.toFile());
-		
-	}
-	
+		}
 	// 去除BindingResult中某個欄位的FieldError紀錄
 	public BindingResult removeFieldError(
 			Course course, BindingResult result, 

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseRepository;
+import com.freemind.course.dto.CartItemDTO;
 
 @Service
 public class ShoppingCartRedisService {

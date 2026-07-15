@@ -1,4 +1,4 @@
-package com.freemind.course.course.model;
+package com.freemind.course.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,11 +6,12 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class PsychDiscountForm {
+public class PsychDiscountFormDTO {
 
     @NotNull(message = "課程編號不能空白")
     private Integer courseId;
@@ -27,6 +28,7 @@ public class PsychDiscountForm {
     private Integer discountMonth;
 
     @NotNull(message = "折扣開始時間不能空白")
+    @Future
     private LocalDate discountStart;
 
 	public Integer getCourseId() {

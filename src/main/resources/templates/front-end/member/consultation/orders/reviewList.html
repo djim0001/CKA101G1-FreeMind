@@ -3,20 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <title>選擇要評論的訂單</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        margin: 30px;
+        color: #333;
+    }
+    h3 {
+        margin-bottom: 20px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 </head>
 <body>
 	<h3>會員編號 <span th:text="${memberId}"></span> 可評論的諮商紀錄</h3>
 
-	<table border="1">
+	<table>
 		<tr>
 			<th>訂單編號</th>
 			<th>心理師編號</th>
+			<th>姓名</th>
 			<th>諮商時間</th>
 			<th>操作</th>
 		</tr>
 		<tr th:each="order : ${ordersListData}">
 			<td th:text="${order.orderId}"></td>
 			<td th:text="${order.psychologist.psychId}"></td>
+			<td th:text="${order.psychologist.name}"></td>
 			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 			<td>
 				<form method="post" th:action="@{/orders/reviewSelect}">

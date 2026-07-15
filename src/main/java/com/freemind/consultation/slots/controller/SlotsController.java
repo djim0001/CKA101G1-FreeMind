@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.psychologist.entity.Psychologist;
@@ -27,6 +28,9 @@ public class SlotsController {
 
 	@Autowired
 	private SlotsService slotsSvc;
+	
+	@Autowired
+	private OrdersService ordersSvc;
 
 	@InitBinder
 	public void initBinder(WebDataBinder binder) {
@@ -46,9 +50,11 @@ public class SlotsController {
 
 	@GetMapping("listAllSlots")
 	public String listAllSlots(ModelMap model) {
-		List<Slots> list = slotsSvc.getAll();
-		model.addAttribute("slotsListData", list);
-		return "back-end/consultation/slots/listAllSlots";
+	    List<Slots> list = slotsSvc.getAll().stream()
+	            .filter(s -> !s.getSlotDate().equals(TEMPLATE_DATE))
+	            .collect(java.util.stream.Collectors.toList());
+	    model.addAttribute("slotsListData", list);
+	    return "back-end/consultation/slots/listAllSlots";
 	}
 
 	@GetMapping("addSlots")
@@ -183,44 +189,47 @@ public class SlotsController {
 
 	@PostMapping("manageSubmit")
 	public String manageSubmit(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
-			@RequestParam(value = "openHours", required = false) List<Integer> openHours, ModelMap model) {
-		Integer pid = Integer.valueOf(psychId);
-		LocalDate date = LocalDate.parse(slotDateStr);
-
-		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
-		boolean isNew = (slots == null);
-
-		if (isNew) {
-			slots = new Slots();
-			Psychologist p = new Psychologist();
-			p.setPsychId(pid);
-			slots.setPsychologist(p);
-			slots.setSlotDate(date);
-		}
-
-		String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
-		StringBuilder sb = new StringBuilder(currentStatus);
-
-		for (int h = 0; h < 24; h++) {
-			if (sb.charAt(h) == '2') {
-				continue; // 已預約成立的時段，不可被調整
-			}
-			boolean checked = openHours != null && openHours.contains(h);
-			sb.setCharAt(h, checked ? '1' : '0');
-		}
-		slots.setConsStatus(sb.toString());
-
-		if (isNew) {
-			slotsSvc.addSlots(slots);
-		} else {
-			slotsSvc.updateSlots(slots);
-		}
-
-		model.addAttribute("success", "時段設定已更新！");
-		return "front-end/psych/consultation/slots/manageSlotsSuccess";
+	        @RequestParam(value = "openHours", required = false) List<Integer> openHours, ModelMap model) {
+	    Integer pid = Integer.valueOf(psychId);
+	    LocalDate date = LocalDate.parse(slotDateStr);
+	    Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+	    boolean isNew = (slots == null);
+	    if (isNew) {
+	        slots = new Slots();
+	        Psychologist p = new Psychologist();
+	        p.setPsychId(pid);
+	        slots.setPsychologist(p);
+	        slots.setSlotDate(date);
+	    }
+	    String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
+	    StringBuilder sb = new StringBuilder(currentStatus);
+	    List<Integer> blockedHours = new java.util.ArrayList<>();
+	    for (int h = 0; h < 24; h++) {
+	        if (sb.charAt(h) == '2') {
+	            continue; // 已預約成立的時段，不可被調整
+	        }
+	        boolean checked = openHours != null && openHours.contains(h);
+	        if (!checked && (sb.charAt(h) == '1' || sb.charAt(h) == '4') && !isNew
+	                && ordersSvc.hasPendingOrder(slots.getTimeslotId(), date.atTime(h, 0))) {
+	            blockedHours.add(h);
+	            continue;
+	        }
+	        sb.setCharAt(h, checked ? '4' : '3'); // 手動調整過的時段，用3/4標記
+	    }
+	    slots.setConsStatus(sb.toString());
+	    if (isNew) {
+	        slotsSvc.addSlots(slots);
+	    } else {
+	        slotsSvc.updateSlots(slots);
+	    }
+	    if (!blockedHours.isEmpty()) {
+	        model.addAttribute("warningMessage", "以下小時有待確認的訂單，暫時無法關閉：" + blockedHours);
+	    }
+	    model.addAttribute("success", "時段設定已更新！");
+	    return "front-end/psych/consultation/slots/manageSlotsSuccess";
 	}
 	
-	// ===== 心理師：設定固定範本（範本日固定為 2000-01-01） =====
+	//心理師：設定固定範本（範本日固定為 2000-01-01)
 	
 		private static final LocalDate TEMPLATE_DATE = LocalDate.of(2000, 1, 1);
 		

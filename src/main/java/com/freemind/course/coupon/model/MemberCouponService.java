@@ -15,7 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
-import com.freemind.course.coupon.dto.CouponClaimResult;
+import com.freemind.course.dto.CouponClaimResult;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberRepository;
 

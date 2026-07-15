@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.course.coupon.model.MemberCoupon;
+import com.freemind.course.coupon.model.MemberCouponService;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.login.member.model.Member;
@@ -27,6 +29,8 @@ public class CourseOrderController {
 	private CourseOrderService courseOrderService;
 	@Autowired
 	private MemberService memberSvc;
+	@Autowired
+	private MemberCouponService memberCouponSvc;;
 
 	@ModelAttribute("member")
 	public Member currentMember(Authentication authentication) {
@@ -70,16 +74,52 @@ public class CourseOrderController {
 		return "front-end/course/CourseOrder";
 	}
 
-	@PostMapping("/cancelOrder")
+	@PostMapping("/pay_or_cancel")
 	public String cancelOrder(
 			@ModelAttribute("member") Member member,
 			@RequestParam("courseOrderId") Integer courseOrderId,
 			@RequestParam(value = "returnUrl", required = false) String returnUrl,
+			@RequestParam(value = "pay", required = false) String pay,
 			RedirectAttributes redirectAttributes,
 			ModelMap model) {
+		if(pay == null) pay = "";
+		if(pay.equals("pay")) {
+			try {
+		        courseOrderService.paymentSuccess(courseOrderId);
 
-		CourseOrder order = courseOrderService.getOrderById(courseOrderId);
-		order.setPaymentStatus(2);
+		        redirectAttributes.addFlashAttribute(
+		                "payMessage",
+		                "付款成功，課程權限已開通"
+		        );
+
+		    } catch (RuntimeException e) {
+
+		        redirectAttributes.addFlashAttribute(
+		                "payMessage",
+		                e.getMessage()
+		        );
+		    }
+		}else {
+			try {
+				MemberCoupon memCoupon = 
+						courseOrderService.getMemberCouponByOrderId(courseOrderId);
+				if(memCoupon != null) {
+					memCoupon.setCouponStatus((byte)0);
+					memberCouponSvc.updateCoupon(memCoupon);
+				}
+				courseOrderService.cancelOrder(courseOrderId);
+		        redirectAttributes.addFlashAttribute(
+		                "payMessage",
+		                "訂單已取消，課程已還原為可購買"
+		        );
+
+		    } catch (RuntimeException e) {
+		        redirectAttributes.addFlashAttribute(
+		                "payMessage",
+		                e.getMessage()
+		        );
+		    }
+		}
 		return "redirect:" + returnUrl;
 	}
 

@@ -114,6 +114,18 @@
             align-items: center;
         }
 
+    	 /* 未授權提示 */
+        .unauthorized-message {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            color: #171414;
+            background-color: #fcdce6;
+            border: 1px solid #ed0505;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
         /* 表單區域 */
         .login-form > * + * {
             margin-top: 1.25rem;
@@ -220,6 +232,11 @@
         <!-- 標題區域 -->
         <div class="title-area">
             <h2>⚙️ 管理員登入系統</h2>
+        </div>
+        
+         <!-- 未授權 -->
+        <div th:if="${param.unauthorized}" class="unauthorized-message">
+            沒有權限
         </div>
 
         <!-- 錯誤訊息 -->

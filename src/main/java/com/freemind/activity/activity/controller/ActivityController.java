@@ -23,6 +23,7 @@ import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.category.model.ActivityCat;
 import com.freemind.activity.category.model.ActivityCatService;
+import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
@@ -36,10 +37,13 @@ import jakarta.validation.Valid;
 public class ActivityController {
 
     @Autowired
-    ActivityService activitySvc;
+    private ActivityService activitySvc;
     
     @Autowired
-    ActivityCatService activityCatSvc;
+    private ActivityCatService activityCatSvc;
+    
+    @Autowired
+    private RegistrationService regisSvc;
 
     @GetMapping("listAllActivity")
     public String listAllActivity(ModelMap model) {
@@ -131,9 +135,9 @@ public class ActivityController {
     }
     
     @PostMapping("getOne_For_Update")
-    public String getOneForUpdate(@RequestParam("activityId") String activityId, ModelMap model) {
+    public String getOneForUpdate(@RequestParam("activityId") Integer activityId, ModelMap model) {
         
-    	Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+    	Activity activity = activitySvc.getOneActivity(activityId);
         model.addAttribute("activity", activity);
         return "front-end/member/activity/update_activity_input";
     }
@@ -235,17 +239,17 @@ public class ActivityController {
     }
   
     @PostMapping("cancel")
-    public String cancel(@RequestParam("activityId") String activityId,
+    public String cancel(@RequestParam("activityId") Integer activityId,
                          @RequestParam("cancelNote") String cancelNote,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          ModelMap model) {
         try {
             // 先驗身分:這個活動是不是我的?
-            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
             }
-            activitySvc.cancelActivity(Integer.valueOf(activityId), cancelNote);
+            activitySvc.cancelActivity(activityId, cancelNote);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -269,16 +273,16 @@ public class ActivityController {
     }
     
     @PostMapping("postpone")
-    public String postpone(@RequestParam("activityId") String activityId,
+    public String postpone(@RequestParam("activityId") Integer activityId,
                             @RequestParam("postponeNote") String postponeNote,
                             @AuthenticationPrincipal MemberUserDetails userDetails,
                             ModelMap model) {
         try {
-            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
             }
-            activitySvc.postponeActivity(Integer.valueOf(activityId), postponeNote);
+            activitySvc.postponeActivity(activityId, postponeNote);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -302,7 +306,7 @@ public class ActivityController {
     }
     
     @PostMapping("confirmNewSchedule")
-    public String confirmNewSchedule(@RequestParam("activityId") String activityId,
+    public String confirmNewSchedule(@RequestParam("activityId") Integer activityId,
                                       @RequestParam("activityStart") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime activityStart,
                                       @RequestParam("activityEnd") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime activityEnd,
                                       @RequestParam(value = "regisStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisStart,
@@ -310,11 +314,11 @@ public class ActivityController {
                                       @AuthenticationPrincipal MemberUserDetails userDetails,
                                       ModelMap model) {
         try {
-            Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+            Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
             }
-            activitySvc.confirmNewSchedule(Integer.valueOf(activityId), activityStart, activityEnd, regisStart, regisEnd);
+            activitySvc.confirmNewSchedule(activityId, activityStart, activityEnd, regisStart, regisEnd);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -338,12 +342,12 @@ public class ActivityController {
     }
     
     @GetMapping("activityImage")
-    public void activityImage(@RequestParam("activityId") String activityId, HttpServletResponse res)
+    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
             throws IOException {
         res.setContentType("image/jpeg");
         ServletOutputStream out = res.getOutputStream();
 
-        Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+        Activity activity = activitySvc.getOneActivity(activityId);
 
         if (activity != null && activity.getPicture() != null) {
             out.write(activity.getPicture());
@@ -351,9 +355,10 @@ public class ActivityController {
     }
     
     @GetMapping("listOneActivity")
-    public String listOneActivity(@RequestParam("activityId") String activityId, ModelMap model) {
-        Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+    public String listOneActivity(@RequestParam("activityId") Integer activityId, ModelMap model) {
+        Activity activity = activitySvc.getOneActivity(activityId);
         model.addAttribute("activity", activity);
+        model.addAttribute("reviewListData", regisSvc.getReviewsByActivity(activity));
         return "front-end/member/activity/listOneActivity";
     }
     

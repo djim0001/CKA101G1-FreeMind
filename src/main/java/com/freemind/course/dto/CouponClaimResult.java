@@ -1,4 +1,4 @@
-package com.freemind.course.coupon.dto;
+package com.freemind.course.dto;
 
 public enum CouponClaimResult {
 

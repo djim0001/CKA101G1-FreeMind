@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
+import com.freemind.course.course.model.CourseQaComment;
+import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
@@ -30,12 +32,12 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/member/course")
 public class CourseForMemberController {
-	private final String NEW_COURSE_ORDER = "listedAt";
 
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;
 	private final OrderDetailService orderDetailSvc;
 	private final CourseOrderService courseOrderSvc;
+	private final CourseQaCommentService commentService;
 	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForMemberController(
@@ -43,11 +45,13 @@ public class CourseForMemberController {
 			MemberService memberSvc,
 			CourseOrderService courseOrderSvc,
 			OrderDetailService orderDetailSvc,
+			CourseQaCommentService commentService,
 			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
+		this.commentService = commentService;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
@@ -65,6 +69,7 @@ public class CourseForMemberController {
 		return courseCategoriesListAll;
 	}
 	
+    // 全部課程相關
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
 			@RequestParam(defaultValue = "1") Integer page,
@@ -92,6 +97,7 @@ public class CourseForMemberController {
 		return "front-end/member/course/selectCourse";
 	}
 	
+	// 我的課程相關
 	@GetMapping("/my_course_order")
 	public String memberSelectCourseOrder(
 			@RequestParam(defaultValue = "1") Integer page,
@@ -106,6 +112,7 @@ public class CourseForMemberController {
 		
 		return "front-end/member/course/allMyCourseOrder";
 	}
+	
 	@GetMapping("/myOrder/detail/{orderId}")
 	public String memberOrderDetail(
 			@PathVariable("orderId") Integer orderId,
@@ -120,33 +127,31 @@ public class CourseForMemberController {
 		
 		return "redirect:/member/course/my_course_order";
 	}
-	@GetMapping("/get_one_course")
+	
+	// 某一課程相關
+	@GetMapping("/get_one_course/{courseId}")
 	public String memberGetOneCourse(
-			@RequestParam("courseId") Integer courseId,
+			@PathVariable("courseId") Integer courseId,
 			@ModelAttribute("member") Member member,ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setSaved(courseSvc
 				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
-		String cartMsg = orderDetailSvc.addCourseToCart(member.getMemberId(), courseId);
-		if(cartMsg != "")
-			model.addAttribute("cartMsg", cartMsg);
 		model.addAttribute("coursePermission", coursePermission);
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";
 	}
-//	@GetMapping("/one_my_course/{courseId}")
-//	public String oneMyCourse(
-//			@PathVariable("courseId") Integer courseId,
-//			@ModelAttribute("member") Member member,ModelMap model) {
-//		Course course = courseSvc.getOneCourse(courseId);
-//		course.setSaved(courseSvc
-//				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
-//		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
-//		model.addAttribute("course", course);
-//		model.addAttribute("coursePermission", coursePermission);
-//		return "front-end/member/course/listOneCourse";
-//	}
+	
+	@GetMapping("/get_all_qa/{courseId}")
+	public String CourseAllQa(
+			@PathVariable("courseId") Integer courseId,
+			@ModelAttribute("member") Member member,
+			RedirectAttributes redirectAttributes) {
+		List<CourseQaComment> comments = commentService.getAllCourseQaByCourseId(courseId);
+		redirectAttributes.addFlashAttribute("comments", comments);
+		redirectAttributes.addFlashAttribute("courseId", courseId);
+		return "redirect:/member/course/get_one_course/{courseId}";
+	}
 	
 	@GetMapping("/search-by-category")
 	public String searchCourseByCategory(

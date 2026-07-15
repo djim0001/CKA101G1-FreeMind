@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>我的評價</title>
+<style>
+span.error{
+	font-size: 12px;
+	color: red;
+}
+.modal-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-overlay.show {
+	display: flex;
+}
+
+.modal-box {
+	position: relative;
+	width: 90%;
+	max-width: 500px;
+	padding: 24px;
+	background-color: white;
+	border-radius: 12px;
+}
+
+.modal-close {
+	position: absolute;
+	top: 10px;
+	right: 14px;
+	border: none;
+	background: none;
+	font-size: 28px;
+	cursor: pointer;
+}
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay.show {
+    display: flex;
+}
+</style>
+</head>
+<body>
+	<h1>我的評價</h1>
+	<h3>
+		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
+	</h3>
+<!-- 	<div> -->
+<!-- 		<form method="post" th:action="@{review_model_box}"> -->
+<!-- 			<input type="hidden" name="returnUrl" id="returnUrl" /> -->
+<!-- 			<button type="submit">新增評價</button> -->
+<!-- 		</form> -->
+<!-- 	</div> -->
+	<button type="button" onclick="openReviewModal()">新增評價</button>
+	<div>
+	    <article style="border:solid 5px black" th:each="item : ${myCourses}">
+	    		<div>
+	    		<div><span th:text="${item.course.courseName}">不被焦慮綁架：日常穩定練習</span>
+		    		<h3 th:text="${item.rating}+'★'">★★★★★</h3>
+		    		<p th:text="${item.reviewContent}">練習很具體，焦慮出現時終於知道可以先做什麼。</p>
+		    		<p th:text="${'評價時間：' + #temporals.format(item.reviewedAt, 'yyyy年MM月dd日 HH:mm')}">2026/07/10 20:16</p>
+	    		</div><span style="color:blue;">已評價</span></div>
+	    		<button class="btn secondary" type="button" disabled>此課程已完成評價</button>
+	    	</article>
+	  </div>
+	
+	
+	<div class="modal-overlay" id="reviewModal">
+
+		<div class="modal-box">
+		<button type="button" class="modal-close" onclick="closeReviewModal()">×</button>
+	
+		<p>
+			<font color="red">*</font>表示必填
+		</p>
+		<form th:action="@{review}" method="post"
+			th:object="${review}" onsubmit="closeReviewModal()">
+	
+			<div>
+				選擇課程: <select th:field="*{courseId}">
+					<option th:if="${unreviewedCourses == null or #lists.isEmpty(unreviewedCourses)}"
+				            value="">
+				        無課程
+				    </option>
+					<option th:each="item : ${unreviewedCourses}"
+						th:value="${item.course.courseId}" th:text="${item.course.courseName}" />
+				</select>
+			</div>
+			<div>
+				<label>我的評價:<font color="red">*</font></label>
+				<textarea  th:field="*{reviewContent}" required></textarea>
+				<br /> <span th:if="${#fields.hasErrors('reviewContent')}"
+					th:errors="*{reviewContent}" class="error"
+					id="reviewContent.errors"></span>
+			</div>
+			<div>
+				<label>課程評分:</label>
+				<select th:field="*{rating}" required>
+					<option value="5">★★★★★ 非常有幫助</option>
+					<option value="4">★★★★ 有幫助</option>
+					<option value="3">★★★ 普通</option>
+					<option value="2">★★ 需要改善</option>
+					<option value="1">★ 不符合期待</option>
+				</select>
+			</div>
+			<div>
+				<button type="button" onclick="closeReviewModal()">取消</button>
+				<input type="hidden" name="returnUrl" id="returnUrl" />
+				<button type="submit" id="submit"
+						th:if="${!(unreviewedCourses == null or #lists.isEmpty(unreviewedCourses))}">
+						送出評價
+				</button>
+			</div>
+		</form>
+	</div></div>
+	
+	<div
+		th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/my_review')}"></div>
+	
+
+
+<script>
+//顯示評價視窗
+function openReviewModal() {
+	const reviewModal = document.getElementById("reviewModal");
+
+	if (reviewModal) {
+		reviewModal.classList.add("show");
+	}
+}
+
+// 關閉評價視窗
+function closeReviewModal() {
+	const reviewModal = document.getElementById("reviewModal");
+
+	if (reviewModal) {
+		reviewModal.classList.remove("show");
+	}
+}
+
+// 點擊 Modal 外面的半透明區域時關閉
+document.getElementById("reviewModal")?.addEventListener("click", function (event) {
+	if (event.target === this) {
+		closeReviewModal();
+	}
+});
+
+// 按下 Esc 鍵時關閉
+document.addEventListener("keydown", function (event) {
+	if (event.key === "Escape") {
+		closeReviewModal();
+	}
+});
+document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+    input.value = window.location.pathname + window.location.search;
+});
+</script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const reviewModalMsg = /*[[${reviewModalMsg}]]*/ null;
+
+        if (reviewModalMsg === "show") {
+            openReviewModal();
+        }
+    });
+
+    function openReviewModal() {
+        const modal = document.getElementById("reviewModal");
+
+        if (modal) {
+            modal.classList.add("show");
+        }
+    }
+
+    function closeReviewModal() {
+        const modal = document.getElementById("reviewModal");
+
+        if (modal) {
+            modal.classList.remove("show");
+        }
+    }
+</script>
+</body>
+</html>

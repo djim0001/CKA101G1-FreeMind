@@ -14,4 +14,5 @@ public interface ExpertiseRepository extends JpaRepository<Expertise, Integer>{
 	@Modifying
 	@Query(value = "delete from expertise where expertise_id = ?1" , nativeQuery = true)
 	void deleteByexpertise(int expertise_id);
+	
 }

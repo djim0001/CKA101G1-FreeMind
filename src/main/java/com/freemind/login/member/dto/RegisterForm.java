@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Size;
  * 註冊表單專用物件（DTO）。
  *
  * 不直接用 Member 實體綁定表單的原因：
- * 1. 實體的 memberPassword 存的是 BCrypt 密文（60 字元），長度驗證已放寬到 255；
+ * 1. 實體的 memberPassword 存的是 BCrypt ；
  *    「原始密碼」的強度規則要在這裡驗。
  * 2. 實體有 regisAt、accountStatus 等 @NotNull 欄位不在表單上，直接 @Valid 會誤報錯誤。
  */
@@ -24,6 +24,7 @@ public class RegisterForm {
 
 	@NotEmpty(message = "會員帳號: 請勿空白")
 	@Size(max = 20, message = "會員帳號: 長度不可超過20字元")
+	@Pattern(regexp = "^[^@]+$", message = "會員帳號: 不可包含 @ 字元")
 	private String memberAccount;
 
 	@NotEmpty(message = "會員密碼: 請勿空白")

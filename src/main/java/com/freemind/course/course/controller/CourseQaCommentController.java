@@ -114,14 +114,14 @@ public class CourseQaCommentController {
 
             return "front-end/member/course/memberCourseQa";
         }
-    //查看此課程的全部QA
-    @GetMapping("/course/member/allQa/{courseId}")
-    public String showCourseQa(@PathVariable Integer courseId, ModelMap model) {
-    		List<CourseQaComment> listcourseQa = commentService.getAllCourseQaByCourseId(courseId);
-    		model.addAttribute("listcourseQa", listcourseQa);
-
-    		return "front-end/member/course/allCourseQa";
-    }
+//    //查看此課程的全部QA
+//    @GetMapping("/course/member/allQa/{courseId}")
+//    public String showCourseQa(@PathVariable Integer courseId, ModelMap model) {
+//    		List<CourseQaComment> listcourseQa = commentService.getAllCourseQaByCourseId(courseId);
+//    		model.addAttribute("listcourseQa", listcourseQa);
+//
+//    		return "front-end/member/course/allCourseQa";
+//    }
         
    
  // 心理師查看自己課程收到的提問

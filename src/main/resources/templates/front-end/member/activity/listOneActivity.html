@@ -31,6 +31,25 @@
     <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 
+	<form th:if="${activity.registrable && activity.member.memberId != #authentication.principal.member.memberId}"
+	      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+	    <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	    <button type="submit">報名</button>
+	</form>
+	<br>
+	<h3>活動評價</h3>
+		<div th:each="rv : ${reviewListData}">
+		    <p>
+		        <b th:text="${#strings.isEmpty(rv.member.nickname) ? rv.member.name : rv.member.nickname}"></b>
+		        <span th:text="'★' + ${rv.rating}"></span>
+		        <span th:text="${#temporals.format(rv.reviewedAt, 'yyyy/MM/dd')}" style="color:gray;"></span>
+		    </p>
+		    <p th:text="${rv.reviewContent}"></p>
+		    <hr>
+		</div>
+	<p th:if="${#lists.isEmpty(reviewListData)}">尚無評價。</p>
+	<br>
+	<br>
     <a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>
 
 </body>

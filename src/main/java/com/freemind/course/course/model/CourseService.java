@@ -22,19 +22,15 @@ public class CourseService {
 
 	private final CourseRepository repository;
 	private final StringRedisTemplate stringRedisTemplate;
-	
+
 	@Value("${app.course.page-size:5}")
 	private int coursePageSize;
 	private static final Byte COURSE_STATUS_LISTED = 4;
-	
-	public CourseService(
-			CourseRepository repository, 
-			StringRedisTemplate stringRedisTemplate) {
+
+	public CourseService(CourseRepository repository, StringRedisTemplate stringRedisTemplate) {
 		this.repository = repository;
 		this.stringRedisTemplate = stringRedisTemplate;
 	}
-
-
 
 	public void addCourse(Course course) {
 		repository.save(course);
@@ -52,215 +48,160 @@ public class CourseService {
 	public List<Course> getAllCourse() {
 		return repository.findAll();
 	}
-	
-	
-	public Page<Course> findCoursesExcludeStatus(Byte courseStatus, int page, String orderBy){
-		Pageable pageable = PageRequest.of(
-	            page,
-	            coursePageSize,
-	            CourseSortUtil.getCourseSort(orderBy)
-	    );		
+
+	public Page<Course> findCoursesExcludeStatus(Byte courseStatus, int page, String orderBy) {
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 		return repository.findByCourseStatusNot(courseStatus, pageable);
 	}
 
-	public Page<Course> findCourseByCourseStstus(Byte courseStatus, int page, String orderBy){
-		Pageable pageable = PageRequest.of(
-	            page,
-	            coursePageSize,
-	            CourseSortUtil.getCourseSort(orderBy)
-	    );	
+	public Page<Course> findCourseByCourseStstus(Byte courseStatus, int page, String orderBy) {
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 		return repository.findByCourseStatus(courseStatus, pageable);
 	}
-	
-	 public Page<Course> findPopularListedCourses(int page) {
 
-	        if (page < 0) {
-	            page = 0;
-	        }
+	public Page<Course> findPopularListedCourses(int page) {
 
-	        Sort popularSort = Sort.by(
-	                Sort.Order.desc("saveCount"),
-	                Sort.Order.desc("reviewCount"),
-	                Sort.Order.desc("starCount"),
-	                Sort.Order.desc("courseId")
-	        );
+		if (page < 0) {
+			page = 0;
+		}
 
-	        Pageable pageable = PageRequest.of(
-	                page,
-	                coursePageSize,
-	                popularSort
-	        );
+		Sort popularSort = Sort.by(Sort.Order.desc("saveCount"), Sort.Order.desc("reviewCount"),
+				Sort.Order.desc("starCount"), Sort.Order.desc("courseId"));
 
-	        return repository.findByCourseStatus(
-	                COURSE_STATUS_LISTED,
-	                pageable
-	        );
-	    }
-	
+		Pageable pageable = PageRequest.of(page, coursePageSize, popularSort);
+
+		return repository.findByCourseStatus(COURSE_STATUS_LISTED, pageable);
+	}
+
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
 
-	    if (psychId == null) {
-	        throw new IllegalArgumentException("psychId 不可為 null");
-	    }
+		if (psychId == null) {
+			throw new IllegalArgumentException("psychId 不可為 null");
+		}
 
-	    if (page == null || page < 0) {
-	        page = 0;
-	    }
+		if (page == null || page < 0) {
+			page = 0;
+		}
 
-	    Pageable pageable = PageRequest.of(
-	            page,
-	            coursePageSize,
-	            CourseSortUtil.getCourseSort(orderBy)
-	    );
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 
-	    return repository.findByPsychologistPsychId(psychId, pageable);
+		return repository.findByPsychologistPsychId(psychId, pageable);
 	}
-	
 
 	// admin_function
-	
+	public void delistCourse(Integer courseId, DelistReason delistReason) {
+
+		Course course = repository.findById(courseId)
+				.orElseThrow(() -> new IllegalArgumentException("找不到課程，課程編號：" + courseId));
+		course.setDelistReason(delistReason);
+		course.setDelistedAt(LocalDateTime.now());
+		course.setCourseStatus((byte) 5);
+		repository.save(course);
+	}
+
 	// member_function
 	public void checkAllCourseStatus() {
 		List<Course> allCourse = getAllCourse();
-		for(Course course : allCourse) {
-			if(course.getCourseStatus() == 2) {
-				course.setCourseStatus((byte)4);
+		for (Course course : allCourse) {
+			if (course.getCourseStatus() == 2) {
+				course.setCourseStatus((byte) 4);
 				course.setListedAt(LocalDateTime.now());
 				repository.save(course);
 			}
 		}
 	}
+	
+	public Page<Course> findCoursesByMinimumCounts(
+			Byte courseStatus, Integer minSaveCount, 
+			Integer minStarCount,
+			Integer minReviewCount, 
+			Integer minCommentCount, 
+			int page, String orderBy) {
+		if (page < 0) {
+			page = 0;
+		}
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+		Specification<Course> specification = 
+				CourseSpecification.searchByCounts(
+					courseStatus, minSaveCount,
+					minStarCount, minReviewCount, minCommentCount);
+		return repository.findAll(specification, pageable);
+	}
+
+	public Page<Course> findListedCoursesByCategory(Integer courseCatId, int page, String orderBy) {
+
+		if (page < 0) {
+			page = 0;
+		}
+
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+
+		return repository.findByCourseStatusAndCourseCategories_CourseCatId(COURSE_STATUS_LISTED, courseCatId,
+				pageable);
+	}
+
 	// 收藏課程
 	public void addCourseBookmark(Integer memberId, Integer courseId) {
 		String key = "bookmark:member:" + memberId;
 		stringRedisTemplate.opsForSet().add(key, String.valueOf(courseId));
 	}
+
 	public void removeCourseBookmark(Integer memberId, Integer courseId) {
 		String key = "bookmark:member:" + memberId;
 		stringRedisTemplate.opsForSet().remove(key, String.valueOf(courseId));
 	}
+
 	public boolean isCourseInBookmark(Integer memberId, Integer courseId) {
 		String key = "bookmark:member:" + memberId;
 		Boolean result = stringRedisTemplate.opsForSet().isMember(key, String.valueOf(courseId));
 		return Boolean.TRUE.equals(result);
 	}
+
 	public Page<Course> getBookmarkCourses(Integer memberId, Integer page) {
 
-	    if (page == null || page < 1) {
-	        page = 0;
-	    }
-	    String key = "bookmark:member:" + memberId;
+		if (page == null || page < 1) {
+			page = 0;
+		}
+		String key = "bookmark:member:" + memberId;
 
-	    Set<String> courseIdSet = stringRedisTemplate
-	            .opsForSet()
-	            .members(key);
-	    if (courseIdSet == null || courseIdSet.isEmpty()) {
-	        return Page.empty();
-	    }
-	    List<Integer> courseIds = courseIdSet.stream()
-	            .map(Integer::valueOf)
-	            .toList();
-	    Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
-	    return repository.findByCourseIdIn(courseIds, pageable);
+		Set<String> courseIdSet = stringRedisTemplate.opsForSet().members(key);
+		if (courseIdSet == null || courseIdSet.isEmpty()) {
+			return Page.empty();
+		}
+		List<Integer> courseIds = courseIdSet.stream().map(Integer::valueOf).toList();
+		Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
+		return repository.findByCourseIdIn(courseIds, pageable);
 	}
 
-	public Page<Course> getBookmarkCourses(
-	        Integer memberId,
-	        Integer page,
-	        String keyword) {
+	public Page<Course> getBookmarkCourses(Integer memberId, Integer page, String keyword) {
 
-	    // 前端頁碼從 1 開始，PageRequest 從 0 開始
-	    if (page == null || page < 1) {
-	        page = 1;
-	    }
+		// 前端頁碼從 1 開始，PageRequest 從 0 開始
+		if (page == null || page < 1) {
+			page = 1;
+		}
 
-	    if (keyword == null) {
-	        keyword = "";
-	    }
+		if (keyword == null) {
+			keyword = "";
+		}
 
-	    keyword = keyword.trim();
+		keyword = keyword.trim();
 
-	    String key = "bookmark:member:" + memberId;
+		String key = "bookmark:member:" + memberId;
 
-	    Set<String> courseIdSet = stringRedisTemplate
-	            .opsForSet()
-	            .members(key);
+		Set<String> courseIdSet = stringRedisTemplate.opsForSet().members(key);
 
-	    if (courseIdSet == null || courseIdSet.isEmpty()) {
-	        return Page.empty();
-	    }
+		if (courseIdSet == null || courseIdSet.isEmpty()) {
+			return Page.empty();
+		}
 
-	    List<Integer> courseIds = courseIdSet.stream()
-	            .map(Integer::valueOf)
-	            .toList();
+		List<Integer> courseIds = courseIdSet.stream().map(Integer::valueOf).toList();
 
-	    Pageable pageable = PageRequest.of(
-	            page,
-	            coursePageSize,
-	            Sort.by("courseId").descending()
-	    );
+		Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
 
-	    return repository.searchBookmarkCourses(
-	            courseIds,
-	            keyword,
-	            pageable
-	    );
+		return repository.searchBookmarkCourses(courseIds, keyword, pageable);
 	}
+
 	
-	public Page<Course> findCoursesByMinimumCounts(
-	        Byte courseStatus,
-	        Integer minSaveCount,
-	        Integer minStarCount,
-	        Integer minReviewCount,
-	        Integer minCommentCount,
-	        int page,
-	        String orderBy) {
 
-	    if (page < 0) {
-	        page = 0;
-	    }
-
-	    Pageable pageable = PageRequest.of(
-	        page,
-	        coursePageSize,
-	        CourseSortUtil.getCourseSort(orderBy)
-	    );
-
-	    Specification<Course> specification =
-	        CourseSpecification.searchByCounts(
-	            courseStatus,
-	            minSaveCount,
-	            minStarCount,
-	            minReviewCount,
-	            minCommentCount
-	        );
-
-	    return repository.findAll(specification, pageable);
-	}
-	
-	 public Page<Course> findListedCoursesByCategory(
-	            Integer courseCatId,
-	            int page,
-	            String orderBy) {
-
-	        if (page < 0) {
-	            page = 0;
-	        }
-
-	        Pageable pageable = PageRequest.of(
-	                page,
-	                coursePageSize,
-	                CourseSortUtil.getCourseSort(orderBy)
-	        );
-
-	        return repository
-	                .findByCourseStatusAndCourseCategories_CourseCatId(
-	                        COURSE_STATUS_LISTED,
-	                        courseCatId,
-	                        pageable
-	                );
-	    }
-	
-	
 }

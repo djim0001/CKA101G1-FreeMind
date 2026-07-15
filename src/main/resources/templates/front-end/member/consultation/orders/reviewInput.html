@@ -3,6 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <title>撰寫心得評論</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        margin: 30px;
+        color: #333;
+    }
+    .star-rating {
+        display: inline-flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+    .star-rating label {
+        font-size: 2rem;
+        line-height: 1;
+        color: #ccc;
+        cursor: pointer;
+        padding: 0 2px;
+    }
+    .star-rating input[type="radio"]:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+        color: gold;
+    }
+</style>
 </head>
 <body>
 	<h3>撰寫心得評論</h3>
@@ -15,13 +42,14 @@
 		<input type="hidden" name="orderId" th:value="${orders.orderId}">
 
 		評分：
-		<select name="rating">
-			<option value="5">5分</option>
-			<option value="4">4分</option>
-			<option value="3">3分</option>
-			<option value="2">2分</option>
-			<option value="1">1分</option>
-		</select><br>
+		<div class="star-rating">
+			<input type="radio" id="star5" name="rating" value="5" checked><label for="star5">★</label>
+			<input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+			<input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+			<input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+			<input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+		</div>
+		<br><br>
 
 		心得內容：<br>
 		<textarea name="reviewContent" rows="5" cols="40"></textarea><br>

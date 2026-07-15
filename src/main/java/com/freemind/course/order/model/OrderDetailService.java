@@ -11,8 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.freemind.course.order.model.OrderDetail.CompositeOrderDetail;
-
-import jakarta.transaction.Transactional;
+import com.freemind.login.member.model.Member;
 
 @Service
 public class OrderDetailService {
@@ -34,7 +33,7 @@ public class OrderDetailService {
 		repository.save(orderDetail);
 	}
 
-	public OrderDetail getOneOrderDetail(CompositeOrderDetail compositeOrderDetail) {
+	public OrderDetail getOneOrderDetailByPK(CompositeOrderDetail compositeOrderDetail) {
 		Optional<OrderDetail> optional = repository.findById(compositeOrderDetail);
 		return optional.orElse(null);
 	}
@@ -43,7 +42,6 @@ public class OrderDetailService {
 		return repository.findAll();
 	}
 	
-	@Transactional
     public List<OrderDetail> getOrderDetailsByCourseOrderId(
             Integer courseOrderId) {
 
@@ -70,7 +68,7 @@ public class OrderDetailService {
             default -> Sort.by("course.courseId").descending();
         };
 
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, coursePageSize, sort);
 
         return repository.findByCourseOrderMemberMemberId(memberId, pageable);
     }
@@ -79,7 +77,7 @@ public class OrderDetailService {
 	    return repository.existsPermission(memberId, courseId);
 	}
 	
-	public String addCourseToCart(Integer memberId, Integer courseId) {
+	public String canCourseToCart(Integer memberId, Integer courseId) {
 
 		String addCourseToCart = "";
 	    // 1. 檢查是否已購買
@@ -94,5 +92,74 @@ public class OrderDetailService {
 
 	    	return addCourseToCart;
 	}
+	
+	public Page<OrderDetail> getAccessibleOrderDetails(
+	        Member member,
+	        int page) {
+		if(page < 0) page = 0;
 
+	    Pageable pageable = PageRequest.of(
+	            page,
+	            coursePageSize,
+	            Sort.by("course.courseId").descending()
+	    );
+
+	    return repository
+	            .findAccessibleOrderDetailsByMember(member, pageable);
+	}
+	
+	public OrderDetail getAccessibleOrderDetail(
+	        Integer courseId,
+	        Member member
+	) {
+	    return repository
+	            .findFirstByCourseCourseIdAndCourseOrderMemberAndCourseOrderPaymentStatusAndCoursePermissionOrderByCourseOrderOrderedAtDesc(
+	                    courseId,
+	                    member,
+	                    (byte) 1,
+	                    (byte) 1
+	            )
+	            .orElse(null);
+	}
+	
+	public List<OrderDetail> getReviewableCoursesByMemberId(Integer memberId) {
+
+	    if (memberId == null) {
+	        throw new IllegalArgumentException("會員編號不能為空");
+	    }
+
+	    byte paid = 1;
+	    byte unlocked = 1;
+
+	    return repository
+	            .findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtIsNull(
+	                    memberId,
+	                    paid,
+	                    unlocked
+	            );
+	}
+
+	public Page<OrderDetail> getReviewCoursesByMemberId(Integer memberId, int page) {
+		
+		if (memberId == null) {
+			throw new IllegalArgumentException("會員編號不能為空");
+		}
+		if(page < 0) page = 0;
+		byte paid = 1;
+		byte unlocked = 1;
+		
+		Pageable pageable = PageRequest.of(
+	            page,
+	            coursePageSize,
+	            Sort.by("reviewedAt").descending()
+	    );
+		
+		return repository
+				.findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtNotNull(
+						memberId,
+						paid,
+						unlocked,
+						pageable
+						);
+	}
 }
