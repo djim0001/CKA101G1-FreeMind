@@ -44,10 +44,22 @@ public class OtpService {
 			return null; // 冷卻中
 		}
 
-		String otp = String.format("%06d", random.nextInt(1000000)); // 000000 ~ 999999
+		String otp = randomAlphanumeric(8); // 8 位英數混合，例：aK3x9Qm2
 		String otpKey = "otp:" + purpose + ":" + email;
 		stringRedisTemplate.opsForValue().set(otpKey, otp, OTP_TTL);
 		return otp;
+	}
+	
+	/** 驗證碼字元集（大寫+小寫+數字） */
+	private static final String OTP_CHARS =
+	        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+	private String randomAlphanumeric(int length) {
+	    StringBuilder sb = new StringBuilder(length);
+	    for (int i = 0; i < length; i++) {
+	        sb.append(OTP_CHARS.charAt(random.nextInt(OTP_CHARS.length())));
+	    }
+	    return sb.toString();
 	}
 
 	/**

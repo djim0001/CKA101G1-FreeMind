@@ -22,7 +22,11 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 
+//告訴 Spring 容器「這是一個組態設定類別」
+//Spring 在啟動時會掃描這個類別，並將內部所有標記 @Bean 的方法註冊到 IoC 容器中
 @Configuration
+
+//啟用 Spring Security
 @EnableWebSecurity
 public class MemberSecurityConfig {
 
@@ -38,20 +42,30 @@ public class MemberSecurityConfig {
     @Order(2)
     public SecurityFilterChain memberFilterChain(HttpSecurity http) throws Exception {
     	HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-    	requestCache.setRequestMatcher(request -> "GET".equals(request.getMethod())); // POST(按讚/收藏)不保存，避免登入後被重放成JSON頁        
+    	requestCache.setRequestMatcher(request -> "GET".equals(request.getMethod()));
+    	// 請求方法是 GET 時，RequestCache 才會存入 Session
+    	// POST(按讚/收藏)不保存，避免登入後被重放成JSON頁        
        
     	http
-//            .securityMatcher("/","/front-end/**", "/member/**", "/course/**")
             .securityMatcher("/","/front-end/**","/member/**", "/article/**")
-
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/","/front-end/login").permitAll()
-                // 註冊與忘記密碼（含 OTP 驗證）：給未登入的訪客用，開放
-                .requestMatchers("/front-end/register/**", "/front-end/forgot/**").permitAll()
-                .requestMatchers("/member/course/select_course","/member/course/get_one_course").permitAll()
-                .requestMatchers("/article/**").permitAll() 
+            		
+            		//登入頁面
+                .requestMatchers("/","/front-end/login").permitAll()//登入頁面
+                
+                	// 註冊與忘記密碼（含 OTP 驗證）給未登入的訪客
+                .requestMatchers("/front-end/register/**",
+                		"/front-end/forgot/**").permitAll()
+                
+                	//課程相關
+                .requestMatchers("/member/course/select_course",
+                		"/member/course/get_one_course").permitAll()
+                
+                	//文章相關
+                .requestMatchers("/article/**").permitAll()
 //                .requestMatchers("/member/article/**").permitAll() 
                 
+                	//活動相關
                 .requestMatchers(
                 	    "/member/activity/activityIndex",
                 	    "/member/activity/select_page",
@@ -60,6 +74,7 @@ public class MemberSecurityConfig {
                 	    "/member/activity/listOneActivity",
                 	    "/member/activity/activityImage"
                 	).permitAll()
+                
                 .anyRequest().hasRole("MEMBER")
             )
 
@@ -71,9 +86,9 @@ public class MemberSecurityConfig {
             .requestCache(cache -> cache.requestCache(requestCache))
 
             .formLogin(form -> form
-                .loginPage("/front-end/login")
-                .loginProcessingUrl("/front-end/login")
-                .usernameParameter("memberAccount")
+                .loginPage("/front-end/login")                    // 未登入訪問受保護頁面時導向此頁
+                .loginProcessingUrl("/front-end/login")           // 對應 login.html 的 name="username"
+                .usernameParameter("memberAccount")               // 對應 login.html 的 name="password"
                 .passwordParameter("memberPassword")
                 .successHandler(memberLoginSuccessHandler(requestCache))
                 .failureHandler((request, response, exception) -> {
@@ -90,46 +105,49 @@ public class MemberSecurityConfig {
 
             .logout(logout -> logout
                 .logoutUrl("/front-end/logout")
-                .logoutSuccessUrl("/front-end/login?logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "remember-me-member")
+                .logoutSuccessUrl("/front-end/login?logout")			 //login.html 會去偵測網址中是否有 logout 參數
+                .invalidateHttpSession(true)							 //是否要在登出時刪除當前的 HTTP Session
+                .deleteCookies("JSESSIONID", "remember-me-member")		 //登出時，瀏覽器刪除哪些 Cookie
                 .permitAll()
             )
 
             .rememberMe(remember -> remember
-                .key("memberSecretKeyUnique")
-                .rememberMeCookieName("remember-me-member")
-                .tokenRepository(memberPersistentTokenRepository())
-                .tokenValiditySeconds(604800)
+                .key("memberSecretKeyUnique")                   		 // 後台專屬簽署私鑰
+                .rememberMeCookieName("remember-me-member")     		 // 與前台 Cookie 名稱區隔
+                .tokenRepository(memberPersistentTokenRepository())      // 用資料庫 persistent_logins 表存 token
+                .tokenValiditySeconds(604800)                    		 // 7 天
                 .userDetailsService(memberUserDetailsService)
-                .rememberMeParameter("remember-me")
+                .rememberMeParameter("remember-me")              		 // 對應 login.html 的 checkbox name
             )
 
             .exceptionHandling(ex -> ex
+            		
+            		//未登入處理
             	    .authenticationEntryPoint((request, response, authException) -> {
             	        // fetch/AJAX（文章按讚收藏，前端帶 X-Requested-With）：回 401 給 JS 處理
             	        if (isAjax(request)) {
-            	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);			//回傳 401 
             	            return;
             	        }
             	        // 頁面瀏覽(GET)與傳統表單(課程收藏的POST)：導去登入頁
-            	        requestCache.saveRequest(request, response); // 只有 GET 會真的被存
+            	        requestCache.saveRequest(request, response); 							// 只有 GET 會真的被存
             	        response.sendRedirect(buildLoginRedirectUrl(request));
             	    })
+            	    
+            	    //權限不足處理
             	    .accessDeniedHandler((request, response, accessDeniedException) -> {
             	        if (isAjax(request)) {
-            	            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            	            response.setStatus(HttpServletResponse.SC_FORBIDDEN); 				// 回傳 403
             	            return;
             	        }
-            	        response.sendRedirect("/front-end/login");
+            	        response.sendRedirect("/front-end/login"); 								//當權限不足時到這個網頁
             	    })
             	);
-           
-
-   
 
         return http.build();
     }
+    
+    
     /** 判斷是否為前端 fetch/AJAX 請求 */
     private static boolean isAjax(HttpServletRequest request) {
         return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
@@ -149,12 +167,13 @@ public class MemberSecurityConfig {
         if ("GET".equals(request.getMethod())) {
             return "/front-end/login";
         }
-        String referer = request.getHeader("Referer");
+        String referer = request.getHeader("Referer"); 										//Referer : 瀏覽器自動帶上的 HTTP 標頭，記錄了「使用者是在哪一個頁面發起這個請求的」。
         if (referer == null) {
             return "/front-end/login";
         }
-        URI uri = URI.create(referer);
-        String path = uri.getPath() + (uri.getQuery() != null ? "?" + uri.getQuery() : "");
+        URI uri = URI.create(referer);				   										//將 Referer 字串轉為 Java URI 物件
+        //uri.getPath() : 提取相對路徑去除 http://localhost:8080，只留下 "/back-end/login"
+        String path = uri.getPath() + (uri.getQuery() != null ? "?" + uri.getQuery() : ""); //getQuery() : 如果使用者當前的網址有攜帶參數如 : /login?unauthorized，一併擷取下來拼回網址
         if (!isSafeRedirect(path)) {
             return "/front-end/login";
         }
@@ -177,6 +196,9 @@ public class MemberSecurityConfig {
             savedRequestHandler.onAuthenticationSuccess(request, response, authentication);
         };
     }
+    
+    // 用 PersistentTokenRepository（series + token 雙欄位）取代純 Cookie 雜湊，
+    // 一旦偵測到 token 異常（被竊取後重放），系統會強制該使用者的所有 Remember-Me 連線失效。
     @Bean
     public PersistentTokenRepository memberPersistentTokenRepository() {
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
@@ -184,4 +206,7 @@ public class MemberSecurityConfig {
 //        tokenRepository.setCreateTableOnStartup(true);
         return tokenRepository;
     }
+    
+    // 註：PasswordEncoder 已在 com.securityConfig.passwordEncoder.PasswordEncoderConfig 全域宣告一次，
+    // 這裡不重複宣告，避免 bean 衝突。
 }
