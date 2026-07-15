@@ -12,13 +12,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.coupon.model.MemberCoupon;
 import com.freemind.course.coupon.model.MemberCouponService;
 import com.freemind.course.course.model.CourseService;
-import com.freemind.course.order.model.CartItemDTO;
+import com.freemind.course.dto.CartItemDTO;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;

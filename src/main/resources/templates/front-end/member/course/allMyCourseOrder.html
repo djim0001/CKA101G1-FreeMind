@@ -73,15 +73,10 @@
 					<td>
 					<form th:action="@{/member/course/order/pay_or_cancel}" method="post">
 						<input type="hidden" name="courseOrderId" th:value="${order.courseOrderId}" />
-<!-- 						<input type="hidden" name="pay" value="pay"> -->
 						<input type="hidden" name="returnUrl">
 						<button type="submit" name="pay" value="pay">付款</button>
 						<button type="submit" name="pay" value="cancel">取消訂單</button>
 					</form>
-<!-- 					<form th:action="@{/member/course/order/cancelOrder}" method="post"> -->
-<!-- 						<input type="hidden" name="courseOrderId" th:value="${order.courseOrderId}" /> -->
-<!-- 						<input type="hidden" name="returnUrl"> -->
-<!-- 					</form> -->
 					</td>
 				</tr>
 			</th:block>

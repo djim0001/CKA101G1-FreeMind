@@ -1,4 +1,4 @@
-package com.freemind.course.order.model;
+package com.freemind.course.dto;
 
 import java.math.BigDecimal;
 

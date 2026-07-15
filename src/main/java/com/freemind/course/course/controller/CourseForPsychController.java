@@ -2,9 +2,6 @@ package com.freemind.course.course.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -30,7 +26,7 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
-import com.freemind.course.course.model.PsychDiscountForm;
+import com.freemind.course.dto.PsychDiscountFormDTO;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
@@ -163,7 +159,7 @@ public class CourseForPsychController {
 	
 	@PostMapping("/update_psych_discount")
 	public String updatePsychDiscount(
-	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountForm form,
+	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountFormDTO form,
 	        BindingResult result, ModelMap model,
 	        @RequestParam(name = "courseId") Integer courseId) {
 		
@@ -216,7 +212,7 @@ public class CourseForPsychController {
 			return "front-end/psych/course/selectCourse";
 		}
 		Course course = courseSvc.getOneCourse(courseId);
-		PsychDiscountForm form = new PsychDiscountForm();
+		PsychDiscountFormDTO form = new PsychDiscountFormDTO();
 	    form.setCourseId(courseId);
 	    
 		model.addAttribute("course", course);
