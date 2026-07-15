@@ -79,14 +79,6 @@ public class CourseForPsychController {
 	}
 
 	
-	@PostMapping("set_psychId_session")
-	public String setPsychIdSession(@RequestParam(name = "psychIdSession") Integer psychIdSession, ModelMap model,
-			HttpSession session) {
-		session.setAttribute("psychId", psychIdSession);
-		
-		return "redirect:/psych/course/select_course";
-	}
-
 	@GetMapping("/select_course")
 	public String psychSelectCourse(
 			@ModelAttribute("psych") PsychologistSelfRes psych,
@@ -116,13 +108,9 @@ public class CourseForPsychController {
 
 	@GetMapping("/add_course")
 	public String psychAddCourse(ModelMap model,
-			@SessionAttribute("psychId") Integer psychId){
+			@ModelAttribute("psych") PsychologistSelfRes psych){
 		Course course = new Course();
-		if(psychId == null) {
-			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/psych/course/selectCourse";
-		}
-		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		course.setPsychologist(psychologistService.getOnePsychologist(psych.getPsychId()));
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
@@ -133,14 +121,10 @@ public class CourseForPsychController {
 			@RequestParam("questionId") Integer questionId,
 			@RequestParam("courseId") Integer courseId,
 			@RequestParam("courseAnswer") String courseAnswer,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
 			RedirectAttributes redirectAttributes) {
-		if(psychId == null) {
-			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/psych/course/selectCourse";
-		}
 		try {
-			courseQaCommentSvc.answerQuestion(questionId, psychId, courseAnswer);
+			courseQaCommentSvc.answerQuestion(questionId, psych.getPsychId(), courseAnswer);
 			model.addAttribute(
 	                "answerMsg",
 	                "回復成功"
@@ -167,7 +151,7 @@ public class CourseForPsychController {
 			@RequestParam(name="video") MultipartFile video,
 			@RequestParam(name="videoPre") MultipartFile videoPre,
 			@Valid Course course, BindingResult result, 
-			@SessionAttribute(name = "psychId") Integer psychId,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
 			ModelMap model) throws IOException{
 		result = removeFieldError(course, result, "video");
 		result = removeFieldError(course, result, "videoPre");
@@ -197,7 +181,7 @@ public class CourseForPsychController {
 			course.setVideoSrcPre(videoSrcPre);
 		}
 		// 新增課程
-		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
+		course.setPsychologist(psychologistService.getOnePsychologist(psych.getPsychId()));
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 
@@ -232,7 +216,6 @@ public class CourseForPsychController {
 
 	@GetMapping("/get_one_course/{courseId}")
 	public String psychGetOneCourse(
-//			@RequestParam("courseId") Integer courseId, 
 			@PathVariable("courseId") Integer courseId, 
 			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
@@ -244,13 +227,17 @@ public class CourseForPsychController {
 		return "front-end/psych/course/listOneCourse";
 	}
 	@PostMapping("/update_course")
-	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	public String psychUpdateCourse(
+			@RequestParam("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
 	@PostMapping("/submit_course")
-	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	public String psychSubmitCourse(
+			@RequestParam("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setCourseStatus((byte)1);
 		courseSvc.updateCourse(course);
@@ -260,11 +247,7 @@ public class CourseForPsychController {
 	@PostMapping("/discount_model_box")
 	public String discountModelBox(ModelMap model, 
 			@RequestParam("courseId") Integer courseId,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
-		if(psychId == null) {
-			model.addAttribute("pError", "請先登入心理師編號");
-			return "front-end/psych/course/selectCourse";
-		}
+			@ModelAttribute("psych") PsychologistSelfRes psych) {
 		Course course = courseSvc.getOneCourse(courseId);
 		PsychDiscountFormDTO form = new PsychDiscountFormDTO();
 	    form.setCourseId(courseId);
@@ -301,20 +284,10 @@ public class CourseForPsychController {
 			video.transferTo(dest.toPath());
 			String basePath = urlPath.replace("**", "");
 			return basePath + newFileName;
-		}catch (Exception e) {
+			}catch (Exception e) {
 				return newFileName; // 500
 			}
-//		Path uploadPath = Paths.get(uploadDir);
-//
-//		if (!Files.exists(uploadPath)) {
-//		    Files.createDirectories(uploadPath);
-//		}
-//
-//		Path savePath = uploadPath.resolve(newFileName);
-//		video.transferTo(savePath.toFile());
-		
-	}
-	
+		}
 	// 去除BindingResult中某個欄位的FieldError紀錄
 	public BindingResult removeFieldError(
 			Course course, BindingResult result, 

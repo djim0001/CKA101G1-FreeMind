@@ -18,15 +18,7 @@ font-size: 12px;
 	<h3>
 		<a th:href="@{/psych/course/add_course}">心理師新增修改課程</a>
 	</h3>
-	<form method="post" th:action="@{set_psychId_session}">
-		<span>心理師編號：</span> <input type="text" name="psychIdSession" />
-		<button type="submit" id="submit">送出</button><br>
-		<span class="error" th:text="${pError}"></span>
-	</form>
 
-	<div th:if="${session.psychId > 0}">
-		<span>session心理師編號:</span><span th:text=${session.psychId}></span><br>
-		<span>心理師名稱:</span><span th:text=${psychologist.name}></span><br>
 		<table>
 			<thead>
 				<tr>
@@ -87,7 +79,6 @@ font-size: 12px;
 		
 		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/psych/course/select_course', ${orderBy})}"></div>	
 		
-	</div>
 	
 </body>
 </html>

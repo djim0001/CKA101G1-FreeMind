@@ -1,94 +1,236 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>員工課程頁面</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程發布管理｜管理後台</title>
+<link rel="stylesheet" th:href="@{/css/course/style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+
 </head>
-<body>
-	<h1>員工課程頁面</h1>
-	<h3>
-		<a th:href="@{/}">首頁</a>
-	</h3>
-	<h3>
-		<a th:href="@{/admin/coupon/select_coupon}">優惠券</a>
-		<a th:href="@{/admin/course/select_course_categories}">課程分類</a>
-		<a th:href="@{/admin/course/select_course_order}">查看所有訂單</a>
-		<a th:href="@{/admin/course/goto_delisted}">下架處理</a>
-	</h3>
-	<span>員工姓名：</span><b th:text="${admin.name}"></b>
-		<form method="post" th:action="@{listed}">
-			<button type="submit" id="submit">一鍵上架</button>
-		</form>
-		<table>
-			<thead>
-				<tr>
-					<th></th>
-					<th><a th:href="@{/admin/course/select_course}">課程名稱</a></th>
-					<th>心理師名稱</th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
-						    			)}">課程分類名稱</a>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'courseStatusAsc' ? 'courseStatusDesc' : 'courseStatusAsc'}
-						    			)}">課程狀態</a></th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
-						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
-						    			)}">平均星數</a></th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
-						    			)}">評價次數</a></th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
-						    			)}">提問次數</a></th>
-					<th>心理師折扣</th>
-					<th><a th:href="@{/admin/course/select_course(page=1,
-							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
-						    			)}">課程定價</a></th>
-					<th>審核員工</th>
-					<th>功能</th>
-				</tr>
-			</thead>
-			<tbody>
-				<th:block th:each="course : ${courseListSubmit}">
-					<tr>
-						<td><font color="#17aee6" th:if="${course.courseStatus}==1">●</font>	</td>
-						<td th:text="${course.courseName}"></td>
-						<td th:text="${course.psychologist.name}"></td>
-						<td th:text="${course.courseCategories.courseCatName}"></td>
-						<td th:text="${course.courseStatusText}"></td>
-						<td th:text="${course.saveCount}"></td>
-						<td th:text="${course.reviewCount == null || course.reviewCount == 0
-							? '0.0'
-							: #numbers.formatDecimal(
-								course.reviewCount * 1.0 / course.starCount,
-								1,
-								1
-							)}">
-						</td>
-						<td th:text="${course.reviewCount}"></td>
-						<td th:text="${course.commentCount}"></td>
-						<td th:text="${course.psychDiscount}"></td>
-						<td th:text="${course.price}"></td>
-						<td th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}"></td>
-						<td>
-							<form method="post" th:action="@{get_one_course}">
-								<input type="hidden" name="courseId"
-									th:value="${course.courseId}">
-								<button type="submit" 
-									th:text="${course.courseStatus}==1?'前往審核':'查看詳情'"></button>
-							</form>
-						</td>
-					</tr>
-				</th:block>
-			</tbody>
-		</table>
-		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course', ${orderBy})}"></div>	
-		
-
-
+<body class="thy2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+					CONSOLE</small></a>
+			<p class="nav-label">課程商城管理</p>
+			<nav class="nav">
+				<a class="active" th:href="@{/admin/course/select_course}">課程發布管理</a><a
+					th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
+					th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a><a
+					th:href="@{/admin/course/select_course_categories}">課程分類</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<span>後台管理／課程商城</span>
+				<div class="admin-id">
+					<span class="avatar">管</span><b
+						th:text="${admin != null ? admin.name : '系統管理員'}">系統管理員</b>
+				</div>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>課程發布管理</h1>
+						<p>審核上架申請、查看發布狀態，並由管理員決定課程下架。</p>
+					</div>
+					<button class="btn ghost" type="button" data-toast="審核紀錄已匯出">匯出紀錄</button>
+				</div>
+				<section class="stats">
+					<div class="stat">
+						<span>待審核</span><strong data-thymeleaf-pending>—</strong><em>待後端統計欄位</em>
+					</div>
+					<div class="stat">
+						<span>已排程上架</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>已上架</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>本月已下架</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+				</section>
+				<div class="tabs" data-tabs>
+					<button class="active" data-tab="review">上架排程與審核</button>
+					<button data-tab="status">發布狀態</button>
+					<button data-tab="take-down">課程下架管理</button>
+				</div>
+				<section class="tab-panel" data-panel="review">
+					<div class="toolbar">
+						<input class="field" type="search" placeholder="搜尋課程或心理師……"><select
+							class="field"><option>全部主題</option>
+							<option>情緒照護</option>
+							<option>自我成長</option></select><select class="field"><option>申請時間新至舊</option></select>
+						<button class="btn secondary" type="button" data-toast="已套用篩選條件">篩選</button>
+					</div>
+					<div class="table-wrap">
+						<table class="compact-table">
+							<thead>
+								<tr>
+									<th>課程／心理師</th>
+									<th>申請時間</th>
+									<th>建議上架</th>
+									<th>狀態</th>
+									<th>審核操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									th:if="${courseListSubmit == null || courseListSubmit.isEmpty()}">
+									<td class="empty-state" colspan="5">目前沒有課程資料</td>
+								</tr>
+								<tr th:each="course : ${courseListSubmit}">
+									<td><div class="course-summary">
+											<strong th:text="${course.courseName}">課程名稱</strong><span
+												class="meta"><span
+												th:text="${course.psychologist.name}">心理師</span> 心理師・<span
+												th:text="${course.courseCategories.courseCatName}">分類</span></span>
+										</div></td>
+									<td><span class="pending-data" data-thymeleaf-pending>待送審時間欄位</span></td>
+									<td><span class="pending-data" data-thymeleaf-pending>待排程欄位</span></td>
+									<td><span class="status"
+										th:text="${course.courseStatusText}">狀態</span></td>
+									<td><div class="inline-actions">
+											<form class="inline-form" method="post"
+												th:action="@{get_one_course}">
+												<input type="hidden" name="courseId"
+													th:value="${course.courseId}">
+												<button class="btn secondary" type="submit">預覽</button>
+											</form>
+											<form class="inline-form" th:if="${course.courseStatus == 1}"
+												method="post" th:action="@{examine_course}"
+												data-confirm-form="確定核准此課程？">
+												<input type="hidden" name="courseId"
+													th:value="${course.courseId}"><input type="hidden"
+													name="courseStatus" value="2">
+												<button class="btn" type="submit">核准</button>
+											</form>
+											<form class="inline-form" th:if="${course.courseStatus == 1}"
+												method="post" th:action="@{examine_course}"
+												data-confirm-form="確定退回此課程？">
+												<input type="hidden" name="courseId"
+													th:value="${course.courseId}"><input type="hidden"
+													name="courseStatus" value="3">
+												<button class="btn danger" type="submit">退回</button>
+											</form>
+										</div></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div
+						th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course', ${orderBy})}"></div>
+				</section>
+				<section class="tab-panel" data-panel="status" hidden>
+					<div class="table-wrap">
+						<table class="compact-table">
+							<thead>
+								<tr>
+									<th>課程</th>
+									<th>心理師</th>
+									<th>目前狀態</th>
+									<th>上架日期</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="course : ${courseListSubmit}">
+									<td><strong th:text="${course.courseName}">課程名稱</strong></td>
+									<td th:text="${course.psychologist.name}">心理師</td>
+									<td><span class="status"
+										th:text="${course.courseStatusText}">狀態</span></td>
+									<td><span th:if="${course.courseStatus == 4}"
+										th:text="${#temporals.format(course.listedAt,'yyyy/MM/dd')}">日期</span><span
+										th:unless="${course.courseStatus == 4}">—</span></td>
+									<td><form class="inline-form" method="post"
+											th:action="@{get_one_course}">
+											<input type="hidden" name="courseId"
+												th:value="${course.courseId}">
+											<button class="btn ghost" type="submit">發布歷程</button>
+										</form></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+				<section class="tab-panel" data-panel="take-down" hidden>
+					<div class="panel">
+						<div class="panel-heading">
+							<div>
+								<h2>選擇要下架的課程</h2>
+								<p class="meta">
+									保留管理員下架功能；此區需由 Controller 同時提供
+									<code>courseList</code>
+									與
+									<code>delistReasons</code>
+									。
+								</p>
+							</div>
+						</div>
+						<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益。</div>
+						<div class="table-wrap" style="margin-top: 16px">
+							<table class="compact-table">
+								<thead>
+									<tr>
+										<th>課程</th>
+										<th>心理師</th>
+										<th>主題</th>
+										<th>狀態</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${courseList == null}">
+										<td class="empty-state" colspan="5"><span
+											class="pending-data">待 Controller 提供 courseList</span></td>
+									</tr>
+									<tr th:each="course : ${courseList}">
+										<td><strong th:text="${course.courseName}">課程名稱</strong></td>
+										<td th:text="${course.psychologist.name}">心理師</td>
+										<td th:text="${course.courseCategories.courseCatName}">分類</td>
+										<td><span class="status"
+											th:text="${course.courseStatusText}">狀態</span></td>
+										<td><button class="btn danger" type="button"
+												data-open-take-down th:data-course-id="${course.courseId}"
+												th:data-course-name="${course.courseName}">下架課程</button></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+			</main>
+		</div>
+	</div>
+	<dialog class="admin-dialog" data-take-down-dialog>
+	<form method="post" th:action="@{delisted_course}">
+		<div class="dialog-head">
+			<div>
+				<span class="dialog-kicker">管理員操作</span>
+				<h2>確認下架課程</h2>
+			</div>
+			<button class="dialog-close" type="button" data-close-take-down>×</button>
+		</div>
+		<p>
+			即將下架：<strong data-take-down-course></strong>
+		</p>
+		<input type="hidden" name="courseId" data-take-down-course-id>
+		<div class="form-group">
+			<label for="delistReason">下架原因</label><select id="delistReason"
+				class="field" name="delistReason" required data-take-down-reason><option
+					value="">請選擇</option>
+				<option th:each="reason : ${delistReasons}" th:value="${reason}"
+					th:text="${reason.label}"></option></select>
+		</div>
+		<div class="dialog-actions">
+			<button class="btn ghost" type="button" data-close-take-down>取消</button>
+			<button class="btn danger" type="submit">確認下架</button>
+		</div>
+	</form>
+	</dialog>
+<script th:src="@{/js/course/app.js}"></script>
 </body>
 </html>
