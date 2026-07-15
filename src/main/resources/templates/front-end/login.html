@@ -246,6 +246,7 @@
 
         <!-- 登入表單 -->
         <form th:action="@{/front-end/login}" method="post" class="login-form">
+       	 <input type="hidden" name="redirect" th:value="${param.redirect}">
             <div class="form-group">
                 <label for="memberAccount">帳號</label>
                 <input type="text" id="memberAccount" name="memberAccount" required class="form-control" placeholder="請輸入帳號" autofocus>

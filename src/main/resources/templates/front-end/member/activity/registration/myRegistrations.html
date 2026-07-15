@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的活動報名清單</title>
+</head>
+<body>
+
+    <h1>我的活動報名清單</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+	
+    <table border="1">
+        <tr>
+            <th>活動名稱</th>
+            <th>活動時間</th>
+            <th>報名時間</th>
+            <th>報名狀態</th>
+            <th>活動狀態</th>
+            <th>我的評價</th> 
+            <th></th>
+        </tr>
+        <tr th:each="r : ${regisListData}" th:style="${r.regisStatus == 3} ? 'color:gray;' : ''">
+            <td th:text="${r.activity.activityName}"></td>
+            <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+            <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+            <td th:text="${r.regisStatusText}"></td>
+            <td th:text="${r.activity.memberViewStatusText}"></td>
+            <td>   
+		        <span th:if="${r.reviewedAt != null}"
+		              th:text="'★' + ${r.rating}"
+		              th:title="${r.reviewContent}"></span>
+		        <span th:if="${r.reviewedAt == null}">—</span>
+		    </td>
+            <td> 
+			    <div th:if="${r.cancellable}" style="display:inline;">
+			        <button type="button" th:id="'cancelBtn' + ${r.regisId}"
+			                th:onclick="'toggleCancelForm(' + ${r.regisId} + ')'">取消報名</button>
+			
+			        <div th:id="'cancelForm' + ${r.regisId}" style="display:none;">
+			            <form th:action="@{/member/activity/registration/cancel}" method="post"
+			                  onsubmit="return confirm('確定要取消報名嗎？')">
+			                <input type="hidden" name="regisId" th:value="${r.regisId}">
+			                <select name="cancelReason">
+			                        <option value="0">行程衝突</option>
+								    <option value="1">身體不適</option>
+								    <option value="2">其他</option>
+			                </select>
+			                <input type="text" name="cancelNote" placeholder="補充說明(選填)">
+			                <button type="submit">確認取消</button>
+			            </form>
+			        </div>
+			    </div>
+			    
+			    <div th:if="${r.regisStatus == 1 && r.activity.ended && r.reviewedAt == null}" style="display:inline;">
+			        <button type="button" th:id="'reviewBtn' + ${r.regisId}"
+			                th:onclick="'toggleReviewForm(' + ${r.regisId} + ')'">填寫心得評論</button>
+			
+			        <div th:id="'reviewForm' + ${r.regisId}" style="display:none;">
+			            <form th:action="@{/member/activity/registration/review}" method="post"
+			                  onsubmit="return confirm('確定要送出評論嗎？')">
+			                <input type="hidden" name="regisId" th:value="${r.regisId}">
+			                
+			                評分(滿分5分):
+			                <select name="rating">
+			                        <option value="1">1</option>
+								    <option value="2">2</option>
+								    <option value="3">3</option>
+								    <option value="4">4</option>
+								    <option value="5">5</option>
+			                </select>
+			                <br>
+			                <textarea name="reviewContent" rows="5" cols="40" placeholder="分享活動心得"></textarea>
+			                <button type="submit">送出評論</button>
+			            </form>
+			        </div>
+			    </div>
+			    
+			</td>
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
+
+    <a th:href="@{/member/activity/listAllActivity}">前往活動列表</a>
+
+
+<script>
+function toggleCancelForm(regisId) {
+    const form = document.getElementById('cancelForm' + regisId);
+    const button = document.getElementById('cancelBtn' + regisId);
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+
+function toggleReviewForm(regisId) {
+    const form = document.getElementById('reviewForm' + regisId);
+    const button = document.getElementById('reviewBtn' + regisId);
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+</script>
+</body>
+</html>

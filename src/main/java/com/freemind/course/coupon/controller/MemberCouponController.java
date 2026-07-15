@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.freemind.course.coupon.dto.CouponClaimResult;
 import com.freemind.course.coupon.model.Coupon;
 import com.freemind.course.coupon.model.CouponService;
 import com.freemind.course.coupon.model.MemberCoupon;
 import com.freemind.course.coupon.model.MemberCouponService;
-import com.freemind.course.order.model.CartItemDTO;
+import com.freemind.course.dto.CartItemDTO;
+import com.freemind.course.dto.CouponClaimResult;
 import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
@@ -87,25 +86,25 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        switch (result) {
 	            case SUCCESS ->
 	                redirectAttributes.addFlashAttribute(
-	                    "successMessage",
+	                    "couponMsg",
 	                    "領取成功"
 	                );
 
 	            case SOLD_OUT ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券已領完"
 	                );
 
 	            case ALREADY_CLAIMED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "你已經領取過這張優惠券"
 	                );
 
 	            case NOT_PUBLISHED ->
 	                redirectAttributes.addFlashAttribute(
-	                    "errorMessage",
+	                    "couponMsg",
 	                    "優惠券尚未發布或已過期"
 	                );
 	        }

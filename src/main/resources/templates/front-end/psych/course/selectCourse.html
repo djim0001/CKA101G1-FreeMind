@@ -74,7 +74,7 @@ font-size: 12px;
 						<td th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></td>
 						<td th:text="${course.price}"></td>
 						<td>
-							<form method="post" th:action="@{get_one_course}">
+							<form method="get" th:action="@{get_one_course/{courseId}(courseId=${course.courseId})}">
 								<input type="hidden" name="courseId"
 									th:value="${course.courseId}">
 								<button type="submit">查看詳情</button>

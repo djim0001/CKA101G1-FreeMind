@@ -1,5 +1,6 @@
 package com.freemind.activity.activity.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +24,7 @@ import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="activities")
-public class Activity implements java.io.Serializable{
+public class Activity implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -375,5 +376,28 @@ public class Activity implements java.io.Serializable{
 	
 	public boolean isEnded() {
 	    return this.activityEnd != null && LocalDateTime.now().isAfter(this.activityEnd);
+	}
+	
+	public boolean isStarted() {
+		return this.activityStart !=null && LocalDateTime.now().isAfter(this.activityStart);
+	}
+	
+	public boolean isRegistrable() {
+	    if (this.activityStatus == null || this.activityStatus != 2) {
+	        return false;
+	    }
+	    LocalDateTime now = LocalDateTime.now();
+	    return !now.isBefore(this.regisStart) && !now.isAfter(this.regisEnd);
+	}
+	
+	// (報名清單)會員視角的活動狀態:取消/延期優先,再看是否結束,否則顯示原狀態
+	public String getMemberViewStatusText() {
+	    if (this.activityStatus != null && (this.activityStatus == 4 || this.activityStatus == 5)) {
+	        return getActivityStatusText();   // 「取消」「延期」
+	    }
+	    if (isEnded()) {
+	        return "已結束";
+	    }
+	    return getActivityStatusText();
 	}
 }

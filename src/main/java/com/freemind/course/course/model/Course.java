@@ -25,6 +25,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -37,7 +38,7 @@ public class Course {
 	@Column(name = "course_id")
 	private Integer courseId;
 	@Column(name = "course_name")
-	@NotEmpty(message="課程名稱：請勿空白")
+	@NotBlank(message="課程名稱：請勿空白")
 //	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", 
 //		message = "課程名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到10之間")
 	private String courseName;
@@ -65,7 +66,7 @@ public class Course {
 //	@NotEmpty(message="課程預覽影片: 請勿空白")
 	private String videoSrcPre;
 	@Column(name = "outline")
-	@NotEmpty(message="課程預覽影片大綱: 請勿空白")
+	@NotBlank(message="課程預覽影片大綱: 請勿空白")
 	private String outline;
 	@Column(name = "listed_at")
 	private LocalDateTime listedAt;
@@ -104,10 +105,8 @@ public class Course {
 	@DecimalMax(value = "1", message = "心理師折扣: 不能超過{value}")
 	private BigDecimal psychDiscount;
 	@Column(name = "discount_start")
-	@Future
 	private LocalDateTime discountStart;
 	@Column(name = "discount_end")
-	@Future
 	private LocalDateTime discountEnd;
 	@Column(name = "price")
 	@NotNull(message="課程價格：請勿空白")

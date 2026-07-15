@@ -12,10 +12,10 @@
 
     <h3>資料查詢</h3>
     <ul>
-        <li><a th:href="@{/activity/listAllActivity}">查看全部活動列表</a></li>
+        <li><a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a></li>
 
         <li>
-			<form method="post" th:action="@{/activity/listActivities_ByCompositeQuery}">
+			<form method="post" th:action="@{/member/activity/listActivities_ByCompositeQuery}">
 			    <p>縣市：<input type="text" name="activityCity"></p>
 			    <p>區域：<input type="text" name="activityDist"></p>
 			    <p>活動名稱關鍵字：<input type="text" name="activityName"></p>
@@ -59,8 +59,8 @@
 
     <h3>活動管理</h3>
     <ul>
-        <li><a th:href="@{/activity/addActivity}">新增活動申請</a></li>
-        <li><a th:href="@{/activity/ownedActivities}">查看我發起的活動</a></li>
+        <li><a th:href="@{/member/activity/addActivity}">新增活動申請</a></li>
+        <li><a th:href="@{/member/activity/ownedActivities}">查看我發起的活動</a></li>
     </ul>
 
 </body>

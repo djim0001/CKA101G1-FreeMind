@@ -24,11 +24,11 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Controller
-@RequestMapping("/activityCat")   // 這個class底下所有方法的網址，都會以/activityCat開頭
+@RequestMapping("/admin/activityCat")
 public class ActivityCatController {
 
 	@Autowired
-	ActivityCatService activityCatSvc;
+	private ActivityCatService activityCatSvc;
 	
 	@GetMapping("listAllActivityCat")
 	public String listAllActivityCat(ModelMap model) {  //Spring幫忙準備的「資料袋子」，把資料放進去，Thymeleaf頁面才能拿到這些資料顯示出來

@@ -8,10 +8,10 @@
     <h3>諮商問題回報列表</h3>
 
 	<span style="color:green;" th:if="${success != null}" th:text="${success}"></span>
-	
+
 	<a th:href="@{/reports/addReports}">新增回報</a>
     <a th:href="@{/reports/select_Page}">查詢</a>
-    
+
     <table border="1">
         <tr>
             <th>編號</th>
@@ -26,7 +26,11 @@
             <td th:text="${report.member.memberId}"></td>
             <td th:text="${report.issueDesc}"></td>
             <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td th:text="${report.reportStatus}"></td>
+            <td th:switch="${report.reportStatus}">
+                <span th:case="0">待處理</span>
+                <span th:case="1">處理中</span>
+                <span th:case="2">已解決</span>
+            </td>
             <td>
                 <form method="post" th:action="@{/reports/getOne_For_Reply}">
 					<input type="hidden" name="reportId" th:value="${report.reportId}">
@@ -34,14 +38,14 @@
 				</form>
                 <form method="post" th:action="@{/reports/delete}">
 				    <input type="hidden" name="reportId" th:value="${report.reportId}">
-				    <input type="submit" value="刪除" 
+				    <input type="submit" value="刪除"
 				           onclick="return confirm('確定要刪除此筆資料嗎？')">
 				</form>
             </td>
         </tr>
     </table>
 
-    
+
 
 </body>
 </html>

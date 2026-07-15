@@ -14,6 +14,7 @@
 		<a th:href="@{/member/course/shopping_cart}">購物車</a> <a
 			th:href="@{/member/coupon/my_coupon}">我的優惠券</a> <a
 			th:href="@{/member/course/my_course_order}">我的訂單</a>
+		<a th:href="@{/member/dashboard/my_review}">我的評價</a>
 	</h5>
 	<h1>我的課程</h1>
 	<span>會員名稱:</span>
@@ -22,33 +23,24 @@
 	<table>
 		<tr>
 			<th>課程名稱</th>
-
-			<th>價格</th>
-
-			<th>折扣後價格</th>
-
 			<th>進度</th>
 			<th>上次播放時間點</th>
 			<th>功能</th>
 		</tr>
 
-		<tr th:each="orderDetail : ${myCourses}">
-			<td th:text="${orderDetail.course.courseName}"></td>
-			<td th:text="${orderDetail.price}"></td>
-			<td th:text="${orderDetail.discountedPrice}"></td>
-			<td th:text="${orderDetail.courseProgress}+'/100'"></td>
-			<td th:text="${orderDetail.playbackPosition}"></td>
+		<tr th:each="item : ${myCoursePage}">
+			<td th:text="${item.course.courseName}"></td>
+			<td th:text="${item.courseProgress}+'/100'"></td>
+			<td th:text="${item.playbackPosition}"></td>
 			<td>
-				<form method="get" th:action="@{one_my_course}">
-					<input type="hidden" name="courseId"
-						th:value="${orderDetail.course.courseId}">
+				<form method="get" th:action="@{/member/course/get_one_course/{courseId}(courseId=${item.course.courseId})}">
 					<button type="submit">查看詳情</button>
 				</form>
 			</td>
 		</tr>
 	</table>
 	<div
-		th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/my_bookmarks', ${orderBy})}"></div>
+		th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/course/my_bookmarks')}"></div>
 
 	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
 		<div class="cart-modal-content">

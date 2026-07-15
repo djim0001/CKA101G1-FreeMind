@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>查看單一活動詳情</title>
+</head>
+<body>
+    <h1 th:text="${activity.activityName}"></h1>
+
+    <img th:if="${activity.picture != null}" 
+         th:src="@{/admin/activity/activityImage(activityId=${activity.activityId})}" 
+         style="max-width: 400px;">
+    <img th:unless="${activity.picture != null}" 
+         th:src="@{/images/no-image.jpg}" 
+         style="max-width: 400px;">
+
+    <p>活動分類：<span th:text="${activity.activityCat.activityCatName}"></span></p>
+    <p>地點：<span th:text="${activity.activityCity} + ${activity.activityDist} + ${activity.activityLoc}"></span></p>
+
+    <p>活動內容：</p>
+    <p th:text="${activity.activityContent}" style="white-space: pre-wrap;"></p>
+
+    <p>報名時間：
+        <span th:text="${#temporals.format(activity.regisStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
+        <span th:text="${#temporals.format(activity.regisEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
+    </p>
+    <p>活動時間：
+        <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
+        <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
+    </p>
+    <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+    <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
+
+    <a th:href="@{/admin/activity/listAllActivity}">返回活動列表</a>
+
+</body>
+</html>

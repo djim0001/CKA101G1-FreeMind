@@ -38,8 +38,8 @@ span.error {
 	</div>
 	<div th:if="${course.courseStatus}==5">
 		<span>下架時間： </span>
-		<span th:text="${#temporals.format(course.delistedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
-		<span>下架原因： </span><span th:text="${course.delistReason}"></span> 
+		<span th:text="${#temporals.format(course.delistedAt, 'yyyy年MM月dd日 HH:mm')}"></span><br>
+		<span>下架原因： </span><span th:text="${course.delistReason.label}"></span> 
 	</div>
 	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
 	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 

@@ -78,7 +78,7 @@
         <tr th:each="a : ${activityListData}">
              <td>
 		        <img th:if="${a.picture != null}" 
-		             th:src="@{/activity/activityImage(activityId=${a.activityId})}" 
+		             th:src="@{/admin/activity/activityImage(activityId=${a.activityId})}"
 		             style="max-width: 100px;">
 		        <img th:unless="${a.picture != null}" 
 		             th:src="@{/images/no-image.jpg}" 
@@ -94,7 +94,7 @@
 		    <td th:text="${a.registrationStatusText}"></td>
 		    	<td th:text="${a.activityStatusText}"></td>
 		    <td>
-		        <form th:action="@{/activity/listOneActivity}" method="get" style="display:inline;">
+		        <form th:action="@{/admin/activity/listOneActivity}" method="get" style="display:inline;">
 		            <input type="hidden" name="activityId" th:value="${a.activityId}">
 		            <button type="submit">查看詳情</button>
 		        </form>

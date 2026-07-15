@@ -3,16 +3,102 @@
 <head>
 <meta charset="UTF-8">
 <title>查看我的評價</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        margin: 30px;
+        color: #333;
+    }
+    h3 {
+        margin-bottom: 20px;
+    }
+    .search-form {
+        margin-bottom: 20px;
+    }
+    .search-form input[type="text"] {
+        padding: 4px 8px;
+    }
+    .search-form input[type="submit"] {
+        padding: 5px 14px;
+        cursor: pointer;
+    }
+    table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+        word-wrap: break-word;
+    }
+    th {
+        background-color: #f2f2f2;
+        white-space: nowrap;
+    }
+    .review-content {
+        text-align: left;
+    }
+</style>
 </head>
 <body>
-	<h3>查看會員評價</h3>
+	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
 
-	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
-
-	<form method="post" th:action="@{/orders/psychReviews}">
-		心理師編號：<input type="text" name="psychId">
+	<form class="search-form" method="post" th:action="@{/orders/psychReviews}">
+		心理師編號：<input type="text" name="psychId" th:value="${psychId}">
 		<input type="submit" value="查詢">
 	</form>
+
+	<!-- 查詢後，評價清單直接顯示在同一頁的下方 -->
+	<div th:if="${ordersListData != null}">
+
+		<table>
+			<colgroup>
+				<col style="width:8%;">
+				<col style="width:8%;">
+				<col style="width:10%;">
+				<col style="width:12%;">
+				<col style="width:12%;">
+				<col style="width:6%;">
+				<col style="width:26%;">
+				<col style="width:18%;">
+			</colgroup>
+			<tr>
+				<th>訂單編號</th>
+				<th>會員編號</th>
+				<th>姓名</th>
+				<th>諮商日期</th>
+				<th>來訪目的</th>
+				<th>評分</th>
+				<th>心得內容</th>
+				<th>評論時間</th>
+			</tr>
+			<tr th:each="order : ${ordersListData}">
+				<td th:text="${order.orderId}"></td>
+				<td th:text="${order.member.memberId}"></td>
+				<td th:text="${order.member.name}"></td>
+				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd')}"></td>
+				<td th:switch="${order.visitPurpose}">
+					<span th:case="'emotion'">情緒困擾</span>
+					<span th:case="'stress'">壓力調適</span>
+					<span th:case="'relationship'">人際關係</span>
+					<span th:case="'family'">家庭問題</span>
+					<span th:case="'career'">職涯困惑</span>
+					<span th:case="'academic'">課業壓力</span>
+					<span th:case="'self_growth'">自我探索</span>
+					<span th:case="'sleep'">睡眠問題</span>
+					<span th:case="'anxiety'">焦慮傾向</span>
+					<span th:case="'other'">其他</span>
+					<span th:case="*" th:text="${order.visitPurpose}"></span>
+				</td>
+				<td th:text="${order.rating}"></td>
+				<td class="review-content" th:text="${order.reviewContent}"></td>
+				<td th:text="${#temporals.format(order.reviewedAt, 'yyyy-MM-dd HH:mm')}"></td>
+			</tr>
+		</table>
+	</div>
 
 </body>
 </html>

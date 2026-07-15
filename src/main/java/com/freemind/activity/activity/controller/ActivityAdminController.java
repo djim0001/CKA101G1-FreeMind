@@ -1,5 +1,6 @@
 package com.freemind.activity.activity.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/admin/activity")
@@ -76,9 +79,9 @@ public class ActivityAdminController {
     
     // 後台審核申請活動
     @PostMapping("approve")
-    public String approve(@RequestParam("activityId") String activityId, ModelMap model) {
+    public String approve(@RequestParam("activityId") Integer activityId, ModelMap model) {
         try {
-            activitySvc.approveActivity(Integer.valueOf(activityId));
+            activitySvc.approveActivity(activityId);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -102,12 +105,12 @@ public class ActivityAdminController {
     
     // 後台退回申請活動
     @PostMapping("reject")
-    public String reject(@RequestParam("activityId") String activityId,
+    public String reject(@RequestParam("activityId") Integer activityId,
                           @RequestParam("rejectReason") Integer rejectReason,
                           @RequestParam("rejectNote") String rejectNote,
                           ModelMap model) {
         try {
-            activitySvc.rejectActivity(Integer.valueOf(activityId), rejectReason, rejectNote);
+            activitySvc.rejectActivity(activityId, rejectReason, rejectNote);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -131,9 +134,9 @@ public class ActivityAdminController {
     
     // 後台手動發布活動
     @PostMapping("publish")
-    public String publish(@RequestParam("activityId") String activityId, ModelMap model) {
+    public String publish(@RequestParam("activityId") Integer activityId, ModelMap model) {
         try {
-            activitySvc.publishActivity(Integer.valueOf(activityId));
+            activitySvc.publishActivity(activityId);
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
         }
@@ -156,5 +159,30 @@ public class ActivityAdminController {
         return "back-end/activity/activity/listAllActivity";
     }
     
+    // 後台導覽頁
+    @GetMapping("activityAdminIndex")
+    public String activityAdminIndex() {
+        return "back-end/activity/activityAdminIndex";
+    }
+    
+    // 圖片
+    @GetMapping("activityImage")
+    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
+            throws IOException {
+        res.setContentType("image/jpeg");
+        ServletOutputStream out = res.getOutputStream();
+        Activity activity = activitySvc.getOneActivity(activityId);
+        if (activity != null && activity.getPicture() != null) {
+            out.write(activity.getPicture());
+        }
+    }
+    
+    // 詳情
+    @GetMapping("listOneActivity")
+    public String listOneActivity(@RequestParam("activityId") Integer activityId, ModelMap model) {
+        Activity activity = activitySvc.getOneActivity(activityId);
+        model.addAttribute("activity", activity);
+        return "back-end/activity/activity/listOneActivity";   
+    }
     
 }

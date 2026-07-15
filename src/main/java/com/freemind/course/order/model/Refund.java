@@ -174,7 +174,13 @@ public class Refund {
 	    }
 	}
 		
-		
+	public CompositeRefund getCompositeRefund() {
+	    return compositeRefund;
+	}
+
+	public void setCompositeRefund(CompositeRefund compositeRefund) {
+	    this.compositeRefund = compositeRefund;
+	}
 	
 
 	

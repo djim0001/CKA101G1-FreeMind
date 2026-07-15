@@ -82,24 +82,31 @@
           </div>
 
           <div class="actions course-actions" aria-label="課程操作">
-            <form class="add-cart-form" method="post" th:action="@{add_cart}">
+            <form class="add-cart-form" method="post" th:action="@{/member/course/add_cart}" th:if="${!coursePermission}">
               <input type="hidden" name="courseId" th:value="${course.courseId}" />
               <input type="hidden" name="returnUrl" />
-              <button th:if="${!coursePermission}" type="submit" id="addCart" class="action primary">加入購物車</button>
+              <button type="submit" id="addCart" class="action primary">加入購物車</button>
             </form>
-            <button class="action" type="button">學習紀錄</button>
-            <button class="action" type="button">課程討論</button>
           </div>
         </section>
 
         <section class="notes" aria-label="筆記與教材">
           <div class="note-editor">
             <h2 class="section-title">我的課堂提問</h2>
-            <textarea id="noteInput" placeholder="建議把影片中的問題、想法與疑問記錄下來，方便後續提問與複習。"></textarea>
-            <div class="note-actions">
-              <button class="action primary" id="saveNoteButton" type="button">交出提問</button>
-              <span class="save-state" id="saveState" aria-live="polite"></span>
-            </div>
+            <form th:action="@{/member/dashboard/my_course_comment}" method="post">
+	            <textarea 
+	            		name="courseQuestion" 
+	            		id="noteInput" 
+	            		th:placeholder="${courseQuestionMsg==null
+	            							?'建議把影片中的問題、想法與疑問記錄下來，方便後續提問與複習。'
+	            							:courseQuestionMsg}" required></textarea>
+	            <div class="note-actions">
+	              <input type="hidden" name="returnUrl">
+	              <input type="hidden" name="courseId" th:value="${course.courseId}"/>
+	              <button class="action primary" id="saveNoteButton" type="submit">交出提問</button>
+	              <span class="save-state" id="saveState" aria-live="polite"></span>
+	            </div>
+			</form>
           </div>
           <aside class="materials" aria-label="課程資訊">
             <h2 class="section-title">課程資訊</h2>
@@ -132,7 +139,7 @@
             </div>
             <div class="stat-card">
               <span>評價次數</span>
-              <strong th:text="${course.starCount}">0</strong>
+              <strong th:text="${course.reviewCount}">0</strong>
             </div>
             <div class="stat-card">
               <span>平均星數</span>
@@ -166,14 +173,24 @@
             </div>
           </div>
 			<a class="action primary"
-			   th:href="@{/member/course/allQa/{courseId}(courseId=${course.courseId})}">
+			   th:href="@{/member/course/get_all_qa/{courseId}(courseId=${course.courseId})}">
 			    查看課程提問</a>        
+		</section>
+		<section class="side-panel mentor" th:if="${comments!=null}">
+			<div th:each="comment : ${comments}">
+				<p th:text="${comment.member.name} + ':'"></p>
+				<p th:text="${comment.courseQuestion}"></p>
+				<div th:if="${comment.courseAnswer!=null}">
+					<p style="text-align: right;" th:text="${comment.course.psychologist.name} + '心理師回覆:'"></p>
+					<p style="text-align: right;" th:text="${comment.courseAnswer}"></p>
+				</div>
+			</div>
 		</section>
       </aside>
     </main>
   </div>
 
-  <div id="cartModal" class="cart-modal" th:if="${!coursePermission}">
+  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
     <div class="cart-modal-content">
       <p th:text="${cartMsg}">已加入購物車。</p>
       <button type="button" class="action primary" onclick="closeCartModal()">確定</button>

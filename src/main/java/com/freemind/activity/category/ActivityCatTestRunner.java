@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component  // 用@Component才能被掃描到，不要用@SpringBootApplication，避免跟專案裡原本的Application.java衝突
+//@Component  // 用@Component才能被掃描到，不要用@SpringBootApplication，避免跟專案裡原本的Application.java衝突
 public class ActivityCatTestRunner implements CommandLineRunner {
 
 //    	@Autowired

@@ -8,22 +8,26 @@
      <h1>諮商預約</h1>
     <h3><a th:href="@{/}">回首頁</a></h3>
 
-    <h2>後台管理</h2>
-    <h3><a th:href="@{/orders/listAllOrders}">諮詢訂單</a></h3>
-    <h3><a th:href="@{/slots/listAllSlots}">後台_預約時段表</a></h3>
-    <h3><a th:href="@{/reports/listAllReports}">諮商問題回報</a></h3>
+    <h2>後台管理_諮商預約管理</h2>
+    <h3><a th:href="@{/orders/listAllOrders}">查看諮商預約紀錄與詳情</a></h3>
+    <h3><a th:href="@{/reports/listAllReports}">會員回報與問題處理</a></h3>
+    <h3><a th:href="@{/slots/listAllSlots}">預約時段表調整</a></h3>
 
-    <h2>會員（前台）</h2>
-    <h3><a th:href="@{/orders/bookForm}">會員_預約諮商</a></h3>
-    <h3><a th:href="@{/orders/myOrdersForm}">會員_查看預約紀錄</a></h3>
-    <h3><a th:href="@{/orders/reviewForm}">會員_撰寫心得評論</a></h3>
-    <h3><a th:href="@{/reports/reportLookupForm}">會員_新增問題回報</a></h3>
-    <h3><a th:href="@{/reports/myReportsForm}">會員_查看問題回報處理進度</a></h3>
+    <h2>會員_我的療癒足跡_我的預約</h2>
+    <h3><a th:href="@{/orders/bookForm}">預約諮商</a></h3>
+    <h3><a th:href="@{/orders/myOrdersForm}">查看預約紀錄</a></h3>
 
-    <h2>心理師（前台）</h2>
+    <h2>會員_諮商服務反饋</h2>
+    <h3><a th:href="@{/orders/reviewForm}">心得評論</a></h3>
+    <h3><a th:href="@{/reports/reportLookupForm}">問題回報</a></h3>
+    <h3><a th:href="@{/reports/myReportsForm}">查看問題回報處理進度</a></h3>
+
+    <h2>心理師</h2>
     <h3><a th:href="@{/slots/manageSlotsForm}">心理師_預約時段表（單日調整）</a></h3>
     <h3><a th:href="@{/slots/templateForm}">心理師_設定固定範本</a></h3>
-    <h3><a th:href="@{/orders/psychOrdersForm}">心理師_我的訂單管理（待確認+已確認）</a></h3>
-    <h3><a th:href="@{/orders/psychReviews}">心理師_查看評價</a></h3>
+    <h3><a th:href="@{/orders/psychOrdersForm}">預約狀態</a></h3>
+    <h3><a th:href="@{/orders/psychHistoryForm}">歷史諮商紀錄</a></h3>
+    <h3><a th:href="@{/orders/psychCancelledForm}">取消紀錄</a></h3>
+    <h3><a th:href="@{/orders/psychReviews}">查看評價</a></h3>
 </body>
 </html>

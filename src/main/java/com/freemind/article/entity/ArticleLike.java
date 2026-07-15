@@ -27,13 +27,13 @@ public class ArticleLike implements Serializable{
 	@EmbeddedId
 	private ArticleLikeId likeId;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("articleId")
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "article_id")
 	private Article article;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
 	@MapsId("memberId")
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 	

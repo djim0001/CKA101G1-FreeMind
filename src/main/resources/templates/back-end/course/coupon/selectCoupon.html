@@ -4,6 +4,32 @@
 <head>
 <meta charset="UTF-8">
 <title>優惠券搜尋頁面</title>
+<style>
+.coupon-modal {
+       position: fixed;
+       inset: 0;
+       background-color: rgba(0, 0, 0, 0.4);
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       z-index: 9999;
+   }
+
+ .coupon-modal-content {
+     background-color: white;
+     padding: 24px 36px;
+     border-radius: 8px;
+     text-align: center;
+     min-width: 280px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+ }
+
+ .coupon-modal-content button {
+     margin-top: 16px;
+     padding: 8px 24px;
+     cursor: pointer;
+ }
+</style>
 </head>
 <body>
 	<h1>優惠券</h1>
@@ -24,6 +50,8 @@
 	           name="stock"
 	           min="1"
 	           required>
+	           <label for="coupon-start">可使用起始時間</label>
+	           <input id="coupon-start" class="field" type="datetime-local" required data-admin-start>
 	    <label>可領取時數</label>
 	    <input type="number"
 	           name="ttlHours"
@@ -66,8 +94,18 @@
 	</table>
 	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/coupon/select_coupon')}"></div>	
 
+	<div id="couponModal" class="coupon-modal" th:if="${couponMsg != null}">
+	    <div class="coupon-modal-content">
+	        <p th:text="${couponMsg}"></p>
+	        <button type="button" onclick="closeCouponModal()">確定</button>
+	    </div>
+	</div>
 
-
-
+	<script>
+	    function closeCouponModal() {
+	        document.getElementById("couponModal").style.display = "none";
+	    }
+	    
+	</script>
 </body>
 </html>
