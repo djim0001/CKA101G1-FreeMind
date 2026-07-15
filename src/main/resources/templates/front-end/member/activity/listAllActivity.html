@@ -88,7 +88,7 @@
 	        <th>報名狀態</th>
 	        <th></th>
 	    </tr>
-	    <tr th:each="a : ${activityListData}">
+	    <tr th:each="a : ${activityListData}" th:style="${a.ended} ? 'color:gray;' : ''">
 	        <td>
 	            <img th:if="${a.picture != null}" 
 	                 th:src="@{/member/activity/activityImage(activityId=${a.activityId})}" 
