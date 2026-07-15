@@ -87,7 +87,8 @@ public class RefundService {
         Refund refund = getRefundById(id);
 
         if (refund != null) {
-            refund.setRefundStatus(1); // 審核成功
+            refund.setRefundStatus(3); // 已退款
+            refund.setRefundedAt(LocalDateTime.now());
             repository.save(refund);
         }
     }
@@ -104,23 +105,6 @@ public class RefundService {
 
         if (refund != null) {
             refund.setRefundStatus(2); // 審核失敗
-            repository.save(refund);
-        }
-    }
-
-    // ==========================
-    // 完成退款
-    // ==========================
-    public void completeRefund(Integer courseOrderId, Integer memberId) {
-
-        Refund.CompositeRefund id =
-                new Refund.CompositeRefund(courseOrderId, memberId);
-
-        Refund refund = getRefundById(id);
-
-        if (refund != null) {
-            refund.setRefundStatus(3); // 已退款
-            refund.setRefundedAt(LocalDateTime.now());
             repository.save(refund);
         }
     }

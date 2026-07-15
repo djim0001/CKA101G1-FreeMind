@@ -32,6 +32,11 @@ textarea{
     resize:none;
 }
 
+.detail-table th,
+.detail-table td{
+    text-align:center;
+}
+
 .btn{
     padding:8px 18px;
     margin-right:10px;
@@ -111,6 +116,34 @@ textarea{
 
 <br>
 
+<h3>退款課程明細</h3>
+
+<table class="detail-table">
+    <thead>
+        <tr>
+            <th>課程編號</th>
+            <th>課程名稱</th>
+            <th>課程原價</th>
+            <th>折扣後價格</th>
+            <th>課程權限</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:if="${orderDetails == null || orderDetails.isEmpty()}">
+            <td colspan="5">查無課程明細</td>
+        </tr>
+        <tr th:each="detail : ${orderDetails}">
+            <td th:text="${detail.course.courseId}"></td>
+            <td th:text="${detail.course.courseName}"></td>
+            <td th:text="${detail.price}"></td>
+            <td th:text="${detail.discountedPrice == null ? '--' : detail.discountedPrice}"></td>
+            <td th:text="${detail.coursePermissionText}"></td>
+        </tr>
+    </tbody>
+</table>
+
+<br>
+
 <form th:action="@{/admin/refund/approve/{orderId}/{memberId}
 (orderId=${refund.courseOrder.courseOrderId},
 memberId=${refund.member.memberId})}"
@@ -136,18 +169,6 @@ style="display:inline;">
 
 </form>
 
-
-<form th:action="@{/admin/refund/complete/{orderId}/{memberId}
-(orderId=${refund.courseOrder.courseOrderId},
-memberId=${refund.member.memberId})}"
-method="post"
-style="display:inline;">
-
-<button class="btn" type="submit">
-確認退款
-</button>
-
-</form>
 
 <a th:href="@{/admin/refund/list}">
 <button class="btn" type="button">
