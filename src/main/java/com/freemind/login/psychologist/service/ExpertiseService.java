@@ -2,11 +2,9 @@ package com.freemind.login.psychologist.service;
 
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.freemind.login.psychologist.dto.ExpertiseRes;
 import com.freemind.login.psychologist.entity.Expertise;
 import com.freemind.login.psychologist.repository.ExpertiseRepository;
 import com.freemind.login.psychologist.repository.PsychologistExpertiseRepository;
@@ -36,9 +34,17 @@ public class ExpertiseService {
 	}
 
 	
-	public List<Expertise> getAll(){
-		return repository.findAll();
+	public List<String> getAllExpertiseNames() {
+	    return repository.findAll().stream()
+	            .map(Expertise::getExpertiseName)
+	            .toList();
 	}
 	
+	
+	public List<ExpertiseRes> getAllExpertise(){
+		return repository.findAll().stream()
+				.map(e -> new ExpertiseRes(e.getExpertiseId() , e.getExpertiseName()))
+				.toList();
+	}
 	
 }

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我的資料</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+	padding: 40px 20px;
+}
+
+h1 {
+	max-width: 860px;
+	margin: 0 auto 28px;
+	font-size: 28px;
+	font-weight: 700;
+	color: #4a3e3e;
+	padding-bottom: 16px;
+	border-bottom: 2px solid #e8b4b4;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.header-links a {
+	display: inline-block;
+	padding: 8px 20px;
+	background-color: #e8b4b4;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	transition: background-color 0.2s;
+	margin-left: 8px;
+}
+.header-links a:hover { background-color: #d39393; }
+.header-links a.secondary {
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+}
+.header-links a.secondary:hover { background-color: #e8b4b4; color: #fff; }
+
+.card {
+	max-width: 860px;
+	margin: 0 auto 24px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	padding: 40px;
+}
+
+.success-msg {
+	max-width: 860px;
+	margin: 0 auto 16px;
+	padding: 12px 16px;
+	background-color: #eaf6ec;
+	color: #2e7d43;
+	border: 1px solid #cdead4;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.profile-top {
+	display: flex;
+	gap: 32px;
+	align-items: flex-start;
+	margin-bottom: 24px;
+}
+
+.avatar {
+	width: 140px;
+	height: 140px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 3px solid #f2dddd;
+	flex-shrink: 0;
+}
+.avatar-placeholder {
+	width: 140px;
+	height: 140px;
+	border-radius: 50%;
+	background: #fbf2f2;
+	color: #d3b6b6;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	border: 3px dashed #f2dddd;
+	flex-shrink: 0;
+}
+
+.name-block h2 { font-size: 24px; color: #4a3e3e; }
+.name-block .account { font-size: 14px; color: #999; margin-top: 2px; }
+
+.badge {
+	display: inline-block;
+	padding: 3px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	margin-top: 8px;
+	margin-right: 6px;
+}
+.badge.ok { background: #eaf6ec; color: #2e7d43; }
+.badge.warn { background: #fdf3e7; color: #b26a00; }
+.badge.bad { background: #fdecea; color: #c0392b; }
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px 32px;
+	margin-bottom: 8px;
+}
+.info-item .label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #7a6b6b;
+	margin-bottom: 2px;
+}
+.info-item .value { font-size: 15px; color: #444; word-break: break-all; }
+
+.section-title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #4a3e3e;
+	margin: 28px 0 12px;
+	padding-left: 10px;
+	border-left: 4px solid #e8b4b4;
+}
+
+.tag {
+	display: inline-block;
+	padding: 4px 14px;
+	background: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 999px;
+	font-size: 14px;
+	margin: 0 6px 6px 0;
+}
+.empty-hint { font-size: 14px; color: #999; }
+
+/* 每週時段(唯讀) */
+.week-grid {
+	display: grid;
+	grid-template-columns: 44px repeat(7, 1fr);
+	gap: 2px;
+	max-width: 560px;
+	font-size: 11px;
+	color: #999;
+}
+.week-grid .head { text-align: center; padding: 2px 0; color: #7a6b6b; font-weight: 600; }
+.week-grid .hour { text-align: right; padding-right: 6px; line-height: 14px; }
+.week-grid .cell { height: 14px; border-radius: 3px; background: #f3eaea; }
+.week-grid .cell.on { background: #e8b4b4; }
+
+@media ( max-width : 640px) {
+	.card { padding: 24px 20px; }
+	.profile-top { flex-direction: column; align-items: center; text-align: center; }
+	.info-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+	<h1>
+		<span>我的資料</span>
+		<span class="header-links">
+			<a class="secondary" th:href="@{/psych/slots}">預約管理</a>
+			<a class="secondary" th:href="@{/psych/profile/password}">修改密碼</a>
+    		<a th:href="@{/psych/profile/edit}">編輯資料</a>
+		</span>
+	</h1>
+
+	<p class="success-msg" th:if="${successMessage}" th:text="${successMessage}"></p>
+
+	<div class="card">
+		<div class="profile-top">
+			<img class="avatar" th:if="${psych.profilePic != null && psych.profilePic != ''}"
+				th:src="@{'/psych-images/' + ${psych.profilePic}}" alt="大頭照" />
+				
+			<div class="avatar-placeholder"
+				th:if="${psych.profilePic == null || psych.profilePic == ''}">尚未上傳照片</div>
+
+			<div class="name-block">
+				<h2 th:text="${psych.name}">王小明</h2>
+				<p class="account" th:text="'帳號:' + ${psych.psychAccount}">帳號:psych01</p>
+
+				<span class="badge ok" th:if="${psych.accountStatus == 1}">帳號已啟用</span>
+				<span class="badge warn" th:if="${psych.accountStatus == 0}">帳號未啟用</span>
+				<span class="badge bad" th:if="${psych.accountStatus == 2}">帳號已停權</span>
+
+				<span class="badge ok" th:if="${psych.hasPracticeLicense}">已取得執業許可</span>
+				<span class="badge warn" th:unless="${psych.hasPracticeLicense}">執業許可審核中</span>
+			</div>
+		</div>
+
+		<div class="info-grid">
+			<div class="info-item">
+				<p class="label">性別</p>
+				<p class="value" th:text="${psych.gender}">男</p>
+			</div>
+			<div class="info-item">
+				<p class="label">手機</p>
+				<p class="value" th:text="${psych.phoneNumber}">0912345678</p>
+			</div>
+			<div class="info-item">
+				<p class="label">信箱</p>
+				<p class="value" th:text="${psych.email}">a@b.c</p>
+			</div>
+			<div class="info-item">
+				<p class="label">心理師證照</p>
+				<p class="value" th:text="${psych.psychCertificate}">心證字第000號</p>
+			</div>
+			<div class="info-item">
+				<p class="label">工作地點</p>
+				<p class="value" th:text="${psych.psychLoc}">台北市</p>
+			</div>
+			<div class="info-item">
+				<p class="label">諮詢費(每次)</p>
+				<p class="value" th:text="'NT$ ' + ${psych.psychFee}">NT$ 1800</p>
+			</div>
+			<div class="info-item">
+				<p class="label">銀行帳號(撥款用)</p>
+				<p class="value"
+					th:text="${psych.bankAccount != null && psych.bankAccount != '' ? psych.bankAccount : '尚未填寫'}">尚未填寫</p>
+			</div>
+			<div class="info-item">
+				<p class="label">加入時間</p>
+				<p class="value"
+					th:text="${psych.regisAt != null ? #dates.format(psych.regisAt, 'yyyy-MM-dd') : '-'}">2026-01-01</p>
+			</div>
+		</div>
+
+		<p class="section-title">我的專長</p>
+		<div>
+			<span class="tag" th:each="e : ${psych.expertiseList}" th:text="${e.expertiseName}">焦慮</span>
+			<span class="empty-hint" th:if="${#lists.isEmpty(psych.expertiseList)}">尚未設定專長,點右上「編輯資料」新增</span>
+		</div>
+
+		<p class="section-title">每週可預約時段</p>
+		<div id="weekGrid" class="week-grid" th:attr="data-avail=${psych.weeklyAvailability}"></div>
+		<p class="empty-hint" id="noAvailHint" style="display:none; margin-top:8px;">尚未設定時段</p>
+	</div>
+
+	<script>
+		// 唯讀時段格子:168碼,index = (星期幾-1)*24 + 小時,週一開頭
+		(function() {
+			const grid = document.getElementById('weekGrid');
+			const avail = grid.dataset.avail || '';
+			const days = ['一', '二', '三', '四', '五', '六', '日'];
+
+			if (avail.length !== 168) {
+				grid.style.display = 'none';
+				document.getElementById('noAvailHint').style.display = 'block';
+				return;
+			}
+
+			// 表頭
+			grid.appendChild(document.createElement('div')); // 左上角空格
+			days.forEach(d => {
+				const h = document.createElement('div');
+				h.className = 'head';
+				h.textContent = '週' + d;
+				grid.appendChild(h);
+			});
+
+			// 24列 x 7欄
+			for (let hour = 0; hour < 24; hour++) {
+				const label = document.createElement('div');
+				label.className = 'hour';
+				label.textContent = String(hour).padStart(2, '0');
+				grid.appendChild(label);
+
+				for (let day = 0; day < 7; day++) {
+					const cell = document.createElement('div');
+					cell.className = 'cell' + (avail.charAt(day * 24 + hour) === '1' ? ' on' : '');
+					grid.appendChild(cell);
+				}
+			}
+		})();
+	</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>心理師管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+	padding: 40px 20px;
+}
+
+h1 {
+	max-width: 1000px;
+	margin: 0 auto 28px;
+	font-size: 28px;
+	font-weight: 700;
+	color: #4a3e3e;
+	padding-bottom: 16px;
+	border-bottom: 2px solid #e8b4b4;
+}
+
+.alert {
+	max-width: 1000px;
+	margin: 0 auto 16px;
+	padding: 12px 16px;
+	background-color: #eaf6ec;
+	color: #2e7d43;
+	border: 1px solid #cdead4;
+	border-radius: 6px;
+	font-size: 14px;
+}
+
+.card {
+	max-width: 1000px;
+	margin: 0 auto;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	padding: 24px;
+	overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f2dddd; }
+th { color: #7a6b6b; font-weight: 600; background: #fbf2f2; }
+tr:hover td { background: #fdf7f7; }
+
+.badge {
+	display: inline-block;
+	padding: 2px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	white-space: nowrap;
+}
+.badge.ok { background: #eaf6ec; color: #2e7d43; }
+.badge.warn { background: #fdf3e7; color: #b26a00; }
+.badge.bad { background: #fdecea; color: #c0392b; }
+
+a.detail-link {
+	display: inline-block;
+	padding: 5px 14px;
+	background-color: #e8b4b4;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 6px;
+	font-size: 13px;
+}
+a.detail-link:hover { background-color: #d39393; }
+
+.empty-hint { color: #999; text-align: center; padding: 24px 0; }
+
+/* 篩選列 */
+.filter-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filter-form input[type="text"], .filter-form select {
+	padding: 8px 12px;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	font-size: 14px;
+	color: #444;
+	outline: none;
+}
+.filter-form input[type="text"]:focus, .filter-form select:focus {
+	border-color: #e8b4b4;
+	box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
+}
+.filter-form button {
+	padding: 8px 20px;
+	background-color: #e8b4b4;
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+}
+.filter-form button:hover { background-color: #d39393; }
+.filter-form .reset-link { font-size: 13px; color: #999; text-decoration: none; }
+.filter-form .reset-link:hover { color: #d39393; }
+</style>
+</head>
+<body>
+	<h1>心理師管理</h1>
+
+	<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
+
+	<!-- 篩選列:全部欄位選填,不填=不篩 -->
+	<div class="card" style="margin-bottom: 16px;">
+		<form th:action="@{/admin/psych}" method="get" class="filter-form">
+			<input type="text" name="name" placeholder="姓名" th:value="${name}" />
+			<select name="gender">
+				<option value="">性別(全部)</option>
+				<option value="男" th:selected="${gender == '男'}">男</option>
+				<option value="女" th:selected="${gender == '女'}">女</option>
+			</select>
+			<input type="text" name="psychLoc" placeholder="工作地點" th:value="${psychLoc}" />
+			<select name="accountStatus">
+				<option value="">帳號狀態(全部)</option>
+				<option value="0" th:selected="${accountStatus == 0}">未啟用</option>
+				<option value="1" th:selected="${accountStatus == 1}">已啟用</option>
+				<option value="2" th:selected="${accountStatus == 2}">停權</option>
+			</select>
+			<select name="hasPracticeLicense">
+				<option value="">執業許可(全部)</option>
+				<option value="true" th:selected="${hasPracticeLicense == true}">已通過</option>
+				<option value="false" th:selected="${hasPracticeLicense == false}">審核中/未通過</option>
+			</select>
+			<select name="orderBy">
+				<option value="">排序:最新加入</option>
+				<option value="regisAsc" th:selected="${orderBy == 'regisAsc'}">最早加入</option>
+				<option value="nameAsc" th:selected="${orderBy == 'nameAsc'}">姓名 A→Z</option>
+				<option value="nameDesc" th:selected="${orderBy == 'nameDesc'}">姓名 Z→A</option>
+				<option value="feeAsc" th:selected="${orderBy == 'feeAsc'}">費用低→高</option>
+				<option value="feeDesc" th:selected="${orderBy == 'feeDesc'}">費用高→低</option>
+			</select>
+			<button type="submit">搜尋</button>
+			<a class="reset-link" th:href="@{/admin/psych}">清除條件</a>
+		</form>
+	</div>
+
+	<div class="card">
+		<table>
+			<thead>
+				<tr>
+					<th>編號</th>
+					<th>姓名</th>
+					<th>帳號</th>
+					<th>帳號狀態</th>
+					<th>執業許可</th>
+					<th>工作地點</th>
+					<th>諮詢費</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="p : ${psychList}">
+					<td th:text="${p.psychId}">1</td>
+					<td th:text="${p.name}">王小明</td>
+					<td th:text="${p.psychAccount}">psych01</td>
+					<td>
+						<span class="badge ok" th:if="${p.accountStatus == 1}">已啟用</span>
+						<span class="badge warn" th:if="${p.accountStatus == 0}">未啟用</span>
+						<span class="badge bad" th:if="${p.accountStatus == 2}">停權</span>
+					</td>
+					<td>
+						<span class="badge ok" th:if="${p.hasPracticeLicense}">已通過</span>
+						<span class="badge warn" th:unless="${p.hasPracticeLicense}">審核中/未通過</span>
+					</td>
+					<td th:text="${p.psychLoc}">台北市</td>
+					<td th:text="'NT$ ' + ${p.psychFee}">NT$ 1800</td>
+					<td>
+						<a class="detail-link" th:href="@{/admin/psych/{id}(id=${p.psychId})}">審核/詳情</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p class="empty-hint" th:if="${#lists.isEmpty(psychList)}">目前沒有心理師資料</p>
+	</div>
+</body>
+</html>

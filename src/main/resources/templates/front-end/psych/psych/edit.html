@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>編輯我的資料</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.6;
+	padding: 40px 20px;
+}
+
+h1 {
+	max-width: 860px;
+	margin: 0 auto 28px;
+	font-size: 28px;
+	font-weight: 700;
+	color: #4a3e3e;
+	padding-bottom: 16px;
+	border-bottom: 2px solid #e8b4b4;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+h1 a {
+	display: inline-block;
+	padding: 8px 20px;
+	background-color: #e8b4b4;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	transition: background-color 0.2s;
+}
+h1 a:hover { background-color: #d39393; }
+
+form.main-form {
+	max-width: 860px;
+	margin: 0 auto;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	padding: 40px;
+}
+
+form.main-form > div { margin-bottom: 24px; }
+
+label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 15px;
+	font-weight: 600;
+	color: #7a6b6b;
+}
+
+input[type="text"], input[type="number"], input[type="email"] {
+	width: 100%;
+	padding: 10px 14px;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	font-size: 15px;
+	color: #444;
+	outline: none;
+	transition: border-color 0.2s;
+}
+input:focus {
+	border-color: #e8b4b4;
+	box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
+}
+
+.field-error { color: #d9534f; font-size: 13px; margin-top: 4px; }
+.error-msg {
+	max-width: 860px;
+	margin: 0 auto 16px;
+	padding: 12px 16px;
+	background-color: #fdecea;
+	color: #c0392b;
+	border: 1px solid #f5c6c1;
+	border-radius: 6px;
+	font-size: 14px;
+}
+.hint { font-size: 13px; color: #999; margin-top: 4px; }
+
+/* 照片 */
+.avatar-preview {
+	width: 140px;
+	height: 140px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 3px solid #f2dddd;
+	display: block;
+	margin-bottom: 10px;
+}
+.btn-soft {
+	padding: 8px 16px;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border: 1px solid #f2dddd;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 14px;
+	transition: background-color 0.2s, color 0.2s;
+}
+.btn-soft:hover { background-color: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+
+/* 專長 checkbox */
+.expertise-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.expertise-list label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	padding: 6px 14px;
+	background: #fbf2f2;
+	border: 1px solid #f2dddd;
+	border-radius: 999px;
+	font-size: 14px;
+	font-weight: 400;
+	color: #7a6b6b;
+	cursor: pointer;
+	user-select: none;
+}
+.expertise-list label:has(input:checked) {
+	background: #e8b4b4;
+	color: #fff;
+	border-color: #e8b4b4;
+}
+.expertise-list input { accent-color: #b96f6f; }
+
+/* 168 時段格子 */
+.week-grid {
+	display: grid;
+	grid-template-columns: 44px repeat(7, 1fr);
+	gap: 2px;
+	max-width: 560px;
+	font-size: 11px;
+	color: #999;
+	user-select: none;
+}
+.week-grid .head { text-align: center; padding: 2px 0; color: #7a6b6b; font-weight: 600; }
+.week-grid .hour { text-align: right; padding-right: 6px; line-height: 18px; }
+.week-grid .cell {
+	height: 18px;
+	border-radius: 3px;
+	background: #f3eaea;
+	cursor: pointer;
+	transition: background-color 0.1s;
+}
+.week-grid .cell:hover { outline: 2px solid #e8b4b4; }
+.week-grid .cell.on { background: #e8b4b4; }
+
+/* 送出按鈕 */
+button[type="submit"] {
+	display: inline-block;
+	padding: 10px 24px;
+	font-size: 15px;
+	font-weight: 500;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	background-color: #e8b4b4;
+	color: #fff;
+	transition: background-color 0.2s;
+}
+button[type="submit"]:hover { background-color: #d39393; }
+
+/* 衝突確認 modal */
+.modal-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+	padding: 20px;
+}
+.modal {
+	background: #fff;
+	border-radius: 12px;
+	max-width: 560px;
+	width: 100%;
+	max-height: 85vh;
+	overflow-y: auto;
+	padding: 28px;
+}
+.modal h2 {
+	font-size: 19px;
+	color: #4a3e3e;
+	margin-bottom: 6px;
+}
+.modal .modal-desc { font-size: 14px; color: #7a6b6b; margin-bottom: 16px; }
+.conflict-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 12px 14px;
+	border: 1px solid #f2dddd;
+	border-radius: 8px;
+	margin-bottom: 10px;
+	font-size: 14px;
+}
+.conflict-row .time { color: #444; font-weight: 600; }
+.conflict-row .status { font-size: 12px; color: #b26a00; }
+.conflict-row .choices { display: flex; gap: 12px; white-space: nowrap; }
+.conflict-row .choices label {
+	display: inline-flex; gap: 4px; align-items: center;
+	margin: 0; font-weight: 400; font-size: 14px; cursor: pointer;
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 18px; }
+.modal-error { color: #d9534f; font-size: 13px; margin-top: 8px; display: none; }
+
+@media ( max-width : 640px) {
+	form.main-form { padding: 24px 20px; }
+	button[type="submit"] { width: 100%; }
+	.conflict-row { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+	<h1>
+		<span>編輯我的資料</span> <a th:href="@{/psych/profile}">返回</a>
+	</h1>
+
+	<p class="error-msg" th:if="${errorMessage}" th:text="${errorMessage}"></p>
+
+	<form class="main-form" id="editForm" th:action="@{/psych/profile/edit}"
+		th:object="${updateReq}" method="post" enctype="multipart/form-data">
+
+		<!-- 照片:選檔即預覽(檔案由 Controller 的 profilePicFile 參數接收) -->
+		<div>
+			<label>大頭照</label>
+			<img id="picPreview" class="avatar-preview"
+				th:src="${psych.profilePic != null && psych.profilePic != ''}
+					? @{'/psych-images/' + ${psych.profilePic}} : ''"
+				th:style="${psych.profilePic == null || psych.profilePic == ''} ? 'display:none;' : ''" />
+			<input type="file" name="profilePicFile" id="picInput"
+				accept="image/*" style="display: none;" />
+			<button type="button" class="btn-soft" id="picBtn">選擇圖片</button>
+			<span class="hint" id="picFileName"></span>
+		</div>
+
+		<div>
+			<label>手機</label>
+			<input type="text" th:field="*{phoneNumber}" />
+			<p class="field-error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></p>
+		</div>
+
+		<div>
+			<label>信箱</label>
+			<input type="text" th:field="*{email}" />
+			<p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+		</div>
+
+		<div>
+			<label>工作地點</label>
+			<input type="text" th:field="*{psychLoc}" />
+			<p class="hint">變更地點後,未來已預約的會員將收到通知</p>
+			<p class="field-error" th:if="${#fields.hasErrors('psychLoc')}" th:errors="*{psychLoc}"></p>
+		</div>
+
+		<div>
+			<label>諮詢費(每次)</label>
+			<input type="number" min="0" th:field="*{psychFee}" />
+			<p class="hint">調整費用只影響新預約,已成立的預約金額不變</p>
+			<p class="field-error" th:if="${#fields.hasErrors('psychFee')}" th:errors="*{psychFee}"></p>
+		</div>
+
+		<div>
+			<label>銀行帳號(撥款用,選填)</label>
+			<input type="text" th:field="*{bankAccount}" />
+			<p class="field-error" th:if="${#fields.hasErrors('bankAccount')}" th:errors="*{bankAccount}"></p>
+		</div>
+
+		<!-- 專長:th:field 綁 List<Integer>,已勾的自動 checked -->
+		<div>
+			<label>我的專長</label>
+			<div class="expertise-list">
+				<label th:each="opt : ${expertiseOptions}">
+					<input type="checkbox" th:field="*{expertiseIds}" th:value="${opt.expertiseId}" />
+					<span th:text="${opt.expertiseName}">焦慮</span>
+				</label>
+			</div>
+		</div>
+
+		<!-- 每週時段:點格子開關,可按住拖曳;實際值同步進隱藏欄位(168碼) -->
+		<div>
+			<label>每週可預約時段(點選格子,可拖曳)</label>
+			<div id="weekGrid" class="week-grid"></div>
+			<input type="hidden" th:field="*{weeklyAvailability}" id="weeklyAvailability" />
+			<p class="field-error" th:if="${#fields.hasErrors('weeklyAvailability')}" th:errors="*{weeklyAvailability}"></p>
+		</div>
+
+		<div>
+			<button type="submit">儲存變更</button>
+		</div>
+	</form>
+
+	<!-- 衝突確認 modal:Controller 有放 conflicts 進 model 才會渲染 -->
+	<div class="modal-backdrop" id="conflictModal"
+		th:if="${conflicts != null && !#lists.isEmpty(conflicts)}">
+		<div class="modal">
+			<h2>新的上班時間與既有預約衝突</h2>
+			<p class="modal-desc">以下預約落在你這次關閉的時段內。請逐筆決定:保留(照常進行會談)或取消(通知後釋放時段)。</p>
+
+			<div class="conflict-row" th:each="c : ${conflicts}"
+				data-order-id="0" th:attr="data-order-id=${c.orderId}">
+				<div>
+					<p class="time"
+						th:text="${#temporals.format(c.consStart, 'yyyy-MM-dd HH:mm')} + ' ~ ' + ${#temporals.format(c.consEnd, 'HH:mm')}">
+						2026-07-20 10:00 ~ 11:00</p>
+					<p class="status"
+						th:text="${c.orderStatus == 1 ? '已確認' : '待確認'}">已確認</p>
+				</div>
+				<div class="choices">
+					<label>
+						<input type="radio" name="decision-demo" th:name="'decision-' + ${c.orderId}" value="keep" /> 保留
+					</label>
+					<label>
+						<input type="radio" name="decision-demo" th:name="'decision-' + ${c.orderId}" value="cancel" /> 取消
+					</label>
+				</div>
+			</div>
+
+			<p class="modal-error" id="modalError">每筆預約都要選「保留」或「取消」才能送出</p>
+
+			<div class="modal-actions">
+				<button type="button" class="btn-soft" id="modalCancelBtn">先不更改</button>
+				<button type="submit" form="editForm" id="modalConfirmBtn"
+					style="padding:10px 24px; font-size:15px; border:none; border-radius:6px; cursor:pointer; background-color:#e8b4b4; color:#fff;">
+					確定送出</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	// ========= 照片選檔即預覽 =========
+	document.getElementById('picBtn').addEventListener('click', function() {
+		document.getElementById('picInput').click();
+	});
+	document.getElementById('picInput').addEventListener('change', function(e) {
+		const file = e.target.files[0];
+		if (file) {
+			const preview = document.getElementById('picPreview');
+			preview.src = URL.createObjectURL(file); // 純瀏覽器端預覽,還沒上傳
+			preview.style.display = 'block';
+			document.getElementById('picFileName').textContent = file.name;
+		}
+	});
+
+	// ========= 168 時段格子 =========
+	// 編碼:index = day*24 + hour,day 0=週一(要跟後端/Slots產生邏輯一致)
+	(function() {
+		const grid = document.getElementById('weekGrid');
+		const hidden = document.getElementById('weeklyAvailability');
+		const days = ['一', '二', '三', '四', '五', '六', '日'];
+
+		// 讀現值;不是合法168碼就當全0開始
+		let bits = (hidden.value && hidden.value.length === 168)
+			? hidden.value.split('')
+			: new Array(168).fill('0');
+
+		function sync() { hidden.value = bits.join(''); }
+		sync();
+
+		grid.appendChild(document.createElement('div'));
+		days.forEach(d => {
+			const h = document.createElement('div');
+			h.className = 'head';
+			h.textContent = '週' + d;
+			grid.appendChild(h);
+		});
+
+		let painting = false;   // 是否拖曳中
+		let paintTo = '1';      // 這次拖曳要塗成開還是關(取決於起點原本的狀態)
+
+		function apply(cell, idx, value) {
+			bits[idx] = value;
+			cell.classList.toggle('on', value === '1');
+			sync();
+		}
+
+		for (let hour = 0; hour < 24; hour++) {
+			const label = document.createElement('div');
+			label.className = 'hour';
+			label.textContent = String(hour).padStart(2, '0');
+			grid.appendChild(label);
+
+			for (let day = 0; day < 7; day++) {
+				const idx = day * 24 + hour;
+				const cell = document.createElement('div');
+				cell.className = 'cell' + (bits[idx] === '1' ? ' on' : '');
+
+				cell.addEventListener('mousedown', function(e) {
+					e.preventDefault();
+					painting = true;
+					paintTo = bits[idx] === '1' ? '0' : '1'; // 起點反轉,拖過去的都跟著
+					apply(cell, idx, paintTo);
+				});
+				cell.addEventListener('mouseover', function() {
+					if (painting) apply(cell, idx, paintTo);
+				});
+
+				grid.appendChild(cell);
+			}
+		}
+		document.addEventListener('mouseup', function() { painting = false; });
+	})();
+
+	// ========= 衝突 modal =========
+	const modal = document.getElementById('conflictModal');
+	if (modal) {
+		// 「先不更改」:關掉視窗,留在編輯頁(什麼都還沒被更新)
+		document.getElementById('modalCancelBtn').addEventListener('click', function() {
+			modal.style.display = 'none';
+		});
+
+		// 「確定送出」:每筆都要有決定,把 keep/cancel 塞成隱藏欄位跟著表單重送
+		document.getElementById('modalConfirmBtn').addEventListener('click', function(e) {
+			const rows = modal.querySelectorAll('.conflict-row');
+			const form = document.getElementById('editForm');
+			const keepIds = [], cancelIds = [];
+
+			for (const row of rows) {
+				const picked = row.querySelector('input[type="radio"]:checked');
+				if (!picked) {
+					e.preventDefault(); // 有沒決定的,擋下送出
+					document.getElementById('modalError').style.display = 'block';
+					return;
+				}
+				(picked.value === 'keep' ? keepIds : cancelIds).push(row.dataset.orderId);
+			}
+
+			// 舊的先清掉再塞,防連按兩次重複
+			form.querySelectorAll('input[name="keepOrderIds"], input[name="cancelOrderIds"]')
+				.forEach(el => el.remove());
+
+			const addHidden = (name, val) => {
+				const input = document.createElement('input');
+				input.type = 'hidden';
+				input.name = name;
+				input.value = val;
+				form.appendChild(input);
+			};
+			keepIds.forEach(id => addHidden('keepOrderIds', id));
+			cancelIds.forEach(id => addHidden('cancelOrderIds', id));
+			// button 有 form="editForm" 屬性,不 preventDefault 就會自然送出表單
+		});
+	}
+	</script>
+</body>
+</html>

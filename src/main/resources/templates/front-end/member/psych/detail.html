@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${psych.name} + ' 心理師 - 詳細資料'"></title>
+    <style>
+    .detail-container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .detail-container img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .expertise-tag {
+        display: inline-block;
+        background: #e8f4f8;
+        color: #2c7a9e;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin: 2px 4px 2px 0;
+    }
+
+    .calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .calendar-day {
+        border-radius: 8px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .calendar-day.available {
+        background: #d4f4dd;
+        border: 1px solid #4caf50;
+    }
+
+    .calendar-day.unavailable {
+        background: #f0f0f0;
+        color: #999;
+        border: 1px solid #ddd;
+    }
+
+    .calendar-day.empty {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+    }
+
+    .day-link {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: 10px 6px;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    .day-link:hover {
+        background: #a8e6b8;
+    }
+
+    .calendar-day.unavailable > div,
+    .calendar-day.empty {
+        padding: 10px 6px;
+        box-sizing: border-box;
+    }
+
+    .day-of-week {
+        display: block;
+        font-size: 12px;
+        font-weight: bold;
+        color: #666;
+        margin-bottom: 4px;
+    }
+
+    .day-date {
+        display: block;
+    }
+
+    .error-message {
+        color: red;
+        margin-bottom: 12px;
+    }
+</style>
+</head>
+<body>
+
+<div class="detail-container" th:if="${psych != null}">
+
+<!--     <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? ${psych.profilePic} : '/images/cp4.png'" alt="大頭照"> -->
+    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/images/cp4.png}" alt="大頭照">
+<!-- 			"${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}}: @{/images/cp4.png}" -->
+    <h2 th:text="${psych.name} + ' 心理師'"></h2>
+
+    <p>
+        性別：<span th:text="${psych.gender}"></span>
+        <span th:if="${psych.hasPracticeLicense}"> | 已通過執業許可 ✓</span>
+    </p>
+    <p>證照：<span th:text="${psych.psychCertificate}"></span></p>
+    <p>地點：<span th:text="${psych.psychLoc}"></span></p>
+    <p>費用：$<span th:text="${psych.psychFee}"></span> / 次</p>
+
+    <p>
+        專長：
+        <span class="expertise-tag" th:each="e : ${psych.expertiseList}" th:text="${e}"></span>
+    </p>
+
+    <h3>未來可預約日期</h3>
+<div class="calendar">
+    <div th:each="d : ${psych.availableDates}"
+         th:class="${d.isEmpty} ? 'calendar-day empty' : (${d.hasAvailability} ? 'calendar-day available' : 'calendar-day unavailable')">
+
+        <!-- 有空的格子：整格包成可點擊連結 -->
+        <a th:if="${!d.isEmpty && d.hasAvailability}"
+		   class="day-link"
+		   th:href="@{/orders/bookLookup(psychId=${psych.psychId}, slotDate=${d.date})}">
+		    <span class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></span>
+		    <span class="day-date" th:text="${d.date}"></span>
+		</a>
+
+        <!-- 沒空的格子：純顯示，不可點擊 -->
+        <div th:if="${!d.isEmpty && !d.hasAvailability}">
+            <div class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></div>
+            <div th:text="${d.date}"></div>
+        </div>
+
+        <!-- 空白格：isEmpty=true，內部不渲染任何東西 -->
+
+    </div>
+</div>
+
+</div>
+
+<div th:if="${errorMessage != null}" th:text="${errorMessage}" style="color:red;"></div>
+
+</body>
+</html>

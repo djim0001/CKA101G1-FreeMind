@@ -1,5 +1,6 @@
 package com.freemind.consultation.orders.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -42,5 +43,14 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 
 	@Query("from Orders where member.memberId = ?1 and (orderStatus = 1 or orderStatus = 4)")
 	List<Orders> findConfirmedOrCompletedByMemberId(Integer memberId);
+	
+	
+	
+	
+	
+	
+	//心理師更新時間後處理已有預約訂單 
+		List<Orders> findByPsychologist_PsychIdAndOrderStatusInAndConsStartGreaterThanEqual(Integer psychId, List<Integer> orderStatuses, LocalDateTime consStart);
+
 }
 

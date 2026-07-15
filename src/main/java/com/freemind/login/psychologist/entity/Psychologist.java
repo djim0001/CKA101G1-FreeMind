@@ -46,7 +46,7 @@ public class Psychologist implements java.io.Serializable{
 	
 	//帳號狀態
 	@Column(name = "account_status",nullable = false)
-	private Byte accountStatus = 0;
+	private Integer accountStatus = 0;
 	
 	
 	//姓名
@@ -102,7 +102,7 @@ public class Psychologist implements java.io.Serializable{
 	
 	//心理師照片
 	@Column(name = "profile_pic")
-	private byte[] profilePic;
+	private String profilePic;
 	
 	
 	//銀行帳號
@@ -110,8 +110,17 @@ public class Psychologist implements java.io.Serializable{
 	private String bankAccount;
 	
 	
-	
-	
+	//心理師有啥專長
+	@OneToMany(mappedBy = "psychologist", cascade = CascadeType.ALL)
+	private Set<PsychologistExpertise> psychologistExpertises;
+
+	public Set<PsychologistExpertise> getPsychologistExpertises() {
+	    return psychologistExpertises;
+	}
+
+	public void setPsychologistExpertises(Set<PsychologistExpertise> psychologistExpertises) {
+	    this.psychologistExpertises = psychologistExpertises;
+	}
 	
 //	//預約訂單
 	@OneToMany(mappedBy = "psychologist" , cascade = CascadeType.ALL)
@@ -219,11 +228,11 @@ public class Psychologist implements java.io.Serializable{
 		this.psychPassword = psychPassword;
 	}
 
-	public Byte getAccountStatus() {
+	public Integer getAccountStatus() {
 		return accountStatus;
 	}
 
-	public void setAccountStatus(Byte accountStatus) {
+	public void setAccountStatus(Integer accountStatus) {
 		this.accountStatus = accountStatus;
 	}
 
@@ -307,11 +316,11 @@ public class Psychologist implements java.io.Serializable{
 		this.regisAt = regisAt;
 	}
 
-	public byte[] getProfilePic() {
+	public String getProfilePic() {
 		return profilePic;
 	}
 
-	public void setProfilePic(byte[] profilePic) {
+	public void setProfilePic(String profilePic) {
 		this.profilePic = profilePic;
 	}
 
