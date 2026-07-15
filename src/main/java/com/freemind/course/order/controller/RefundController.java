@@ -1,7 +1,9 @@
 package com.freemind.course.order.controller;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -68,6 +70,7 @@ public class RefundController {
         model.addAttribute("courseOrderId", courseOrderId);
         model.addAttribute("details", details);
         model.addAttribute("detailsMsg", "show");
+        addRefundStatusMap(member, model);
 
         return "front-end/member/course/Refund";
     }
@@ -81,14 +84,20 @@ public class RefundController {
 
         CourseOrder order = courseOrderSvc.getOrderById(courseOrderId);
 
-        Refund refund = new Refund();
-
-        refund.setCompositeRefund(
+        Refund.CompositeRefund id =
                 new Refund.CompositeRefund(
                         order.getCourseOrderId(),
                         member.getMemberId()
-                )
-        );
+                );
+
+        if (refundService.getRefundById(id) != null) {
+            redirectAttributes.addFlashAttribute("errorMsg", "此訂單已經申請過退款");
+            return "redirect:/member/refund/orderlist";
+        }
+
+        Refund refund = new Refund();
+
+        refund.setCompositeRefund(id);
         refund.setCourseOrder(order);
         refund.setMember(member);
         refund.setRefundReason(refundReason);
@@ -100,7 +109,7 @@ public class RefundController {
 
         redirectAttributes.addFlashAttribute("successMsg", "退款申請已送出！");
 
-        return "redirect:/member/course/my_course_order";
+        return "redirect:/member/refund/orderlist";
     }
 
 
@@ -117,8 +126,26 @@ public class RefundController {
         model.addAttribute("allMyCourseOrder", allMyCourseOrder);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", allMyCourseOrder.getTotalPages());
+        addRefundStatusMap(member, model);
 
         return "front-end/member/course/Refund";
+    }
+
+    private void addRefundStatusMap(Member member, ModelMap model) {
+        Map<Integer, Integer> refundStatusMap = new HashMap<>();
+
+        List<Refund> refundList = refundService.getRefundByMember(member);
+
+        for (Refund refund : refundList) {
+            if (refund.getCourseOrder() != null) {
+                refundStatusMap.put(
+                        refund.getCourseOrder().getCourseOrderId(),
+                        refund.getRefundStatus()
+                );
+            }
+        }
+
+        model.addAttribute("refundStatusMap", refundStatusMap);
     }
     
 //    @PostMapping("/apply")

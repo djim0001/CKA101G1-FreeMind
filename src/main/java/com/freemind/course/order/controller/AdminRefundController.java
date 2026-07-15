@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.course.order.model.OrderDetailService;
 import com.freemind.course.order.model.Refund;
 import com.freemind.course.order.model.RefundService;
 
@@ -18,6 +19,9 @@ public class AdminRefundController {
 
     @Autowired
     private RefundService refundService;
+
+    @Autowired
+    private OrderDetailService orderDetailService;
 
 
     // 退款列表
@@ -42,6 +46,10 @@ public class AdminRefundController {
         Refund refund = refundService.getRefundById(id);
 
         model.addAttribute("refund", refund);
+        model.addAttribute(
+                "orderDetails",
+                orderDetailService.getOrderDetailsByCourseOrderId(courseOrderId)
+        );
 
         return "back-end/course/course/RefundDetail";
     }
@@ -56,7 +64,7 @@ public class AdminRefundController {
 
         refundService.approveRefund(courseOrderId, memberId);
 
-        redirectAttributes.addFlashAttribute("success", "退款已審核成功");
+        redirectAttributes.addFlashAttribute("success", "退款審核成功，已退款");
 
         return "redirect:/admin/refund/list";
     }
@@ -75,22 +83,5 @@ public class AdminRefundController {
 
         return "redirect:/admin/refund/list";
     }
-
-    // ==========================
-    // 已退款
-    // ==========================
-    @PostMapping("/complete/{courseOrderId}/{memberId}")
-    public String complete(@PathVariable Integer courseOrderId,
-                           @PathVariable Integer memberId,
-                           RedirectAttributes redirectAttributes) {
-
-        refundService.completeRefund(courseOrderId, memberId);
-
-        redirectAttributes.addFlashAttribute("success", "退款完成");
-
-        return "redirect:/admin/refund/list";
-    }
-    
-   
 
 }

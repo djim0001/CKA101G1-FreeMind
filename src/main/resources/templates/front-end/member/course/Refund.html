@@ -90,7 +90,8 @@ th {
 					</td>
 					<td
 						th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-					<td><th:block th:if="${order.paymentStatus == 1}">
+					<td th:with="refundStatus=${refundStatusMap[order.courseOrderId]}">
+						<th:block th:if="${order.paymentStatus == 1 && refundStatus == null}">
 
 							<form th:action="@{/member/refund/detail}" method="get">
 
@@ -101,13 +102,20 @@ th {
 
 							</form>
 
-						</th:block> <span th:if="${order.paymentStatus == 0}"> 尚未付款 </span></td>
+						</th:block>
+						<span th:if="${refundStatus == 0}">退款審核中</span>
+						<span th:if="${refundStatus == 1}">退款審核成功</span>
+						<span th:if="${refundStatus == 2}">退款審核失敗</span>
+						<span th:if="${refundStatus == 3}">已退款</span>
+						<span th:if="${refundStatus == 4}">退款異常</span>
+						<span th:if="${order.paymentStatus == 0}"> 尚未付款 </span>
+					</td>
 				</tr>
 			</th:block>
 		</tbody>
 	</table>
 	<div
-		th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/my_course_order', ${orderBy})}"></div>
+		th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/refund/orderlist', ${orderBy})}"></div>
 
 
 	<div id="orderModal" class="modal" th:if="${detailsMsg == 'show'}">
