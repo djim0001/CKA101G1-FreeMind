@@ -21,6 +21,10 @@ public class RegistrationService {
 	    // 1. 查:這個會員對這個活動有沒有有效報名?
 		boolean hasActive = regisRepo.existsByMemberAndActivityAndRegisStatusIn(member, activity, List.of(0, 1));
 		
+		
+		if (activity.getMember().getMemberId().equals(member.getMemberId())) {
+	        throw new IllegalStateException("無法報名自己發起的活動");
+	    }
 	    // 2. 擋:有 → 丟例外
 		if (hasActive) {
 			 throw new IllegalStateException("已報名過此活動，請勿重複報名");
@@ -37,16 +41,20 @@ public class RegistrationService {
 	}
 	
 	@Transactional
-	public Registration approve(Integer regisId) {
+	public Registration approve(Integer regisId, Member currentMember) {
 	    // 1. 撈:findById + orElseThrow(自訂訊息版,lambda語法)
 		Registration regis = regisRepo.findById(regisId).orElseThrow(() -> new IllegalArgumentException("報名紀錄不存在"));
-	    // 2. 驗:狀態不是 0 → throw new IllegalStateException("...")
+	    
+		Activity activity = regis.getActivity();
+		if (!activity.getMember().getMemberId().equals(currentMember.getMemberId())) {
+	        throw new IllegalStateException("無權審核此報名");
+	    }
+		
+		// 2. 驗:狀態不是 0 → throw new IllegalStateException("...")
 		if (regis.getRegisStatus() != 0) {
 			 throw new IllegalStateException("此筆申請非為待審核狀態，無法審核");
 		}
 	    // 3. 判:拿出 activity,比較 regisCount 和 capacity
-		Activity activity = regis.getActivity();   // 先把活動拿出來
-
 		if (activity.getRegisCount() < activity.getCapacity() ) {
 			regis.setRegisStatus(1);
 			activity.setRegisCount(activity.getRegisCount() + 1);  
@@ -60,12 +68,24 @@ public class RegistrationService {
 	
 	
 	@Transactional
-	public Registration cancel(Integer regisId, Integer cancelReason, String cancelNote) {
+	public Registration cancel(Integer regisId, Integer cancelReason, String cancelNote, Member currentMember) {
 		// 1. 撈:findById + orElseThrow
 		Registration regis = regisRepo.findById(regisId).orElseThrow(() -> new IllegalArgumentException("報名紀錄不存在"));
-	    // 2. 驗:狀態不是 0也不是1 
+		
+		if (!regis.getMember().getMemberId().equals(currentMember.getMemberId())) {
+		        throw new IllegalStateException("無權操作此報名");
+		    }
+		// 2. 驗:狀態不是 0也不是1 
 		if (regis.getRegisStatus() != 0 && regis.getRegisStatus() != 1) {
 			 throw new IllegalStateException("此筆報名申請無法取消");
+		}
+		
+		if (LocalDateTime.now().isAfter(regis.getActivity().getActivityStart())) {
+		    throw new IllegalStateException("活動已開始，無法取消報名");
+		}
+		
+		if (regis.getActivity().getActivityStatus() == 4) {
+		    throw new IllegalStateException("活動已取消，無須取消報名");
 		}
 		// 3. 如果狀態是1, regisCount要減1
 		Activity activity = regis.getActivity(); 
@@ -81,11 +101,13 @@ public class RegistrationService {
 	}
 	
 	@Transactional
-	public Registration review(Integer regisId, Integer rating, String reviewContent) {
+	public Registration review(Integer regisId, Integer rating, String reviewContent, Member currentMember) {
 		// 1. 撈:findById + orElseThrow
 		Registration regis = regisRepo.findById(regisId).orElseThrow(() -> new IllegalArgumentException("報名紀錄不存在"));
 		
-		
+		if (!regis.getMember().getMemberId().equals(currentMember.getMemberId())) {
+	        throw new IllegalStateException("無權評論此報名");
+	    }
 		// 2. 驗:報名狀態為1，且活動已結束
 		Activity activity = regis.getActivity();
 		if (regis.getRegisStatus() != 1 || LocalDateTime.now().isBefore(activity.getActivityEnd())) {
@@ -97,16 +119,33 @@ public class RegistrationService {
 			throw new IllegalStateException("此筆報名已填寫過活動評論");
 		}
 		
-		// 4. 填寫
+		// 4.評分必填
+		if (rating == null) {
+			throw new IllegalArgumentException("請填寫評分");
+		}
+		
+		// 5. 填寫
 		regis.setReviewedAt(LocalDateTime.now()); 
 		regis.setRating(rating);
 		regis.setReviewContent(reviewContent);
 		
-		// 5.評分必填
-		if (rating == null) {
-		    throw new IllegalArgumentException("請填寫評分");
-		}
 		
 		return regis;
+	}
+	
+	public List<Registration> getMyRegistrations(Member member) {
+	    return regisRepo.findByMemberWithActivity(member);
+	}
+
+	public List<Registration> getRegistrationsByActivity(Activity activity, Member currentMember) {
+		if (!activity.getMember().getMemberId().equals(currentMember.getMemberId())) {
+	        throw new IllegalStateException("無權查看此活動的報名名單");
+	    }
+	    return regisRepo.findByActivityWithMember(activity);
+	}
+	
+	// 查詢某活動的評論(公開資訊)
+	public List<Registration> getReviewsByActivity(Activity activity) {
+	    return regisRepo.findReviewsByActivity(activity);
 	}
 }

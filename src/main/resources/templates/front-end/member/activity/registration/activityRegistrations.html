@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>單一活動報名清單</title>
+</head>
+<body>
+
+    <h1><span th:text="${activity.activityName}"></span> - 報名清單</h1>
+
+	
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+	
+	
+	<p>活動時間：
+	    <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~
+	    <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
+	</p>
+	<p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	
+    <table border="1">
+        <tr>
+            <th>報名者</th>
+            <th>報名時間</th>
+            <th>報名狀態</th>
+            <th></th>
+        </tr>
+        <tr th:each="r : ${regisListData}">
+            <td th:text="${#strings.isEmpty(r.member.nickname) ? r.member.name : r.member.nickname}"></td>
+            <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+            <td th:text="${r.regisStatusText}"></td>
+            <td>
+				<div th:if="${r.regisStatus == 0}">
+					<form th:action="@{/member/activity/registration/approve}" method="post"
+						  onsubmit="return confirm('確定要審核嗎？')">
+						  <input type="hidden" name="regisId" th:value="${r.regisId}">
+						  <input type="hidden" name="activityId" th:value="${activity.activityId}">
+						  <button type="submit">通過審核</button>
+					</form>
+				</div>
+			</td>
+
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
+	<br>
+    <a th:href="@{/member/activity/ownedActivities}">返回我發起的活動</a>
+
+
+
+</body>
+</html>

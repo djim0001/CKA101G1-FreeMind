@@ -28,7 +28,7 @@ import jakarta.validation.constraints.Size;
 public class ActivityCatController {
 
 	@Autowired
-	ActivityCatService activityCatSvc;
+	private ActivityCatService activityCatSvc;
 	
 	@GetMapping("listAllActivityCat")
 	public String listAllActivityCat(ModelMap model) {  //Spring幫忙準備的「資料袋子」，把資料放進去，Thymeleaf頁面才能拿到這些資料顯示出來

@@ -175,4 +175,15 @@ public class Registration implements Serializable{
 		default: return "未定義的取消原因";
 		}
 	}
+	
+	public boolean isCancellable() {
+	    if (this.regisStatus == null || (this.regisStatus != 0 && this.regisStatus != 1)) {
+	        return false;
+	    }
+	    
+	    if (this.activity == null) {
+	    	return false;
+	    }
+	    return !this.activity.isStarted() && this.activity.getActivityStatus() != 4;
+	}
 }
