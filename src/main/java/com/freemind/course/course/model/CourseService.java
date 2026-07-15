@@ -94,11 +94,8 @@ public class CourseService {
 
 		Course course = repository.findById(courseId)
 				.orElseThrow(() -> new IllegalArgumentException("找不到課程，課程編號：" + courseId));
-
 		course.setDelistReason(delistReason);
 		course.setDelistedAt(LocalDateTime.now());
-
-		// 假設 5 代表已下架
 		course.setCourseStatus((byte) 5);
 		repository.save(course);
 	}
@@ -115,18 +112,20 @@ public class CourseService {
 		}
 	}
 	
-	public Page<Course> findCoursesByMinimumCounts(Byte courseStatus, Integer minSaveCount, Integer minStarCount,
-			Integer minReviewCount, Integer minCommentCount, int page, String orderBy) {
-
+	public Page<Course> findCoursesByMinimumCounts(
+			Byte courseStatus, Integer minSaveCount, 
+			Integer minStarCount,
+			Integer minReviewCount, 
+			Integer minCommentCount, 
+			int page, String orderBy) {
 		if (page < 0) {
 			page = 0;
 		}
-
 		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
-
-		Specification<Course> specification = CourseSpecification.searchByCounts(courseStatus, minSaveCount,
-				minStarCount, minReviewCount, minCommentCount);
-
+		Specification<Course> specification = 
+				CourseSpecification.searchByCounts(
+					courseStatus, minSaveCount,
+					minStarCount, minReviewCount, minCommentCount);
 		return repository.findAll(specification, pageable);
 	}
 

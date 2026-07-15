@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -32,6 +34,9 @@ import com.freemind.course.course.model.CourseQaComment;
 import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.dto.PsychDiscountFormDTO;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.dto.PsychologistSelfRes;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
@@ -84,22 +89,20 @@ public class CourseForPsychController {
 
 	@GetMapping("/select_course")
 	public String psychSelectCourse(
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@ModelAttribute("psych") PsychologistSelfRes psych,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model) {
 
-		if(psychId == null)
-			return "front-end/psych/course/selectCourse";
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		
-		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
+		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
 		
 		Page<Course> courseListAllPages = 
-				courseSvc.getCoursesByPsychId(psychId, currentPage - 1, sortField);
+				courseSvc.getCoursesByPsychId(psych.getPsychId(), currentPage - 1, sortField);
 		
 		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("courseListAllPages", courseListAllPages);
@@ -112,7 +115,8 @@ public class CourseForPsychController {
 	}
 
 	@GetMapping("/add_course")
-	public String psychAddCourse(ModelMap model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
+	public String psychAddCourse(ModelMap model,
+			@SessionAttribute("psychId") Integer psychId){
 		Course course = new Course();
 		if(psychId == null) {
 			model.addAttribute("pError", "請先登入心理師編號");

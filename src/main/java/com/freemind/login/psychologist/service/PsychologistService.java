@@ -22,6 +22,7 @@ import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.orders.model.OrdersRepository;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsRepository;
+import com.freemind.login.member.model.Member;
 import com.freemind.login.psychologist.dto.AvailableDateRes;
 import com.freemind.login.psychologist.dto.ConflictOrderRes;
 import com.freemind.login.psychologist.dto.ExpertiseRes;
@@ -245,7 +246,10 @@ public class PsychologistService {
 	
 	
 	
-	
+	public Psychologist findByAccount(String account) {
+		return psychologistRepository.findByPsychAccount(account);
+	}
+
 	
 	
 	
@@ -523,7 +527,7 @@ public class PsychologistService {
 //			 // 心理師照片
 //		  	private String profilePic;
 //			private String bankAccount;
-			
+			res.setPsychId(p.getPsychId());
 			res.setPsychAccount(p.getPsychAccount());
 			res.setName(p.getName());
 			res.setGender(p.getGender());
