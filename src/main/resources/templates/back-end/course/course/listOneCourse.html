@@ -1,74 +1,161 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>員工審核課程頁面</title>
-<style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程審核預覽｜管理後台</title>
+<link rel="stylesheet" th:href="@{/css/course/style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
 </head>
-<body>
-	<h1>員工審核課程頁面</h1>
-	<h3>
-		<a th:href="@{/admin/course/select_course}">員工課程頁面</a>
-	</h3>
-	<span>session員工編號:</span>
-	<span th:text=${session.adminId}></span><br>
-
-	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
-	<br>
-	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
-	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
-	<span>影片： </span><br>
-	<video width="640" controls>
-    		<source th:src="@{${course.videoSrc}}" type="video/mp4">
-	</video><br>
-	<span>預覽影片： </span><br>
-	<video width="640" controls>
-    		 <source th:src="@{${course.videoSrcPre}}" type="video/mp4">
-	</video><br>
-	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
-	<div th:if="${course.courseStatus}==4">
-		<span>上架時間： </span>
-		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
+<body class="thy2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+					CONSOLE</small></a>
+			<p class="nav-label">課程商城管理</p>
+			<nav class="nav">
+				<a class="active" th:href="@{/admin/course/select_course}">課程發布管理</a><a
+					th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
+					th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<span>課程發布管理／課程預覽</span>
+				<div class="admin-id">
+					<span class="avatar">管</span>員工編號：<b th:text="${session.adminId}">—</b>
+				</div>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1 th:text="${course.courseName}">課程名稱</h1>
+						<p>完整預覽課程內容並完成上架審核。</p>
+					</div>
+					<a class="btn ghost" th:href="@{/admin/course/select_course}">返回課程發布管理</a>
+				</div>
+				<div class="review-shell">
+					<div>
+						<section class="panel">
+							<div class="panel-heading">
+								<div>
+									<h2>課程資料</h2>
+									<p class="meta">
+										<span th:text="${course.courseCategories.courseCatName}">分類</span>・<span
+											th:text="${course.psychologist.name}">心理師</span> 心理師
+									</p>
+								</div>
+								<span class="status" th:text="${course.courseStatusText}">狀態</span>
+							</div>
+							<div class="detail-grid">
+								<dl class="summary-list">
+									<div>
+										<dt>課程名稱</dt>
+										<dd th:text="${course.courseName}">課程</dd>
+									</div>
+									<div>
+										<dt>課程定價</dt>
+										<dd>
+											NT$ <span th:text="${course.price}">0</span>
+										</dd>
+									</div>
+									<div>
+										<dt>收藏／評價／提問</dt>
+										<dd>
+											<span th:text="${course.saveCount}">0</span>／<span
+												th:text="${course.reviewCount}">0</span>／<span
+												th:text="${course.commentCount}">0</span>
+										</dd>
+									</div>
+								</dl>
+								<dl class="summary-list">
+									<div th:if="${course.courseStatus == 4}">
+										<dt>上架時間</dt>
+										<dd
+											th:text="${#temporals.format(course.listedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+									</div>
+									<div th:if="${course.courseStatus == 5}">
+										<dt>下架時間</dt>
+										<dd
+											th:text="${#temporals.format(course.delistedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+									</div>
+									<div th:if="${course.courseStatus == 5}">
+										<dt>下架原因</dt>
+										<dd th:text="${course.delistReason.label}">—</dd>
+									</div>
+									<div th:if="${course.psychDiscount != null}">
+										<dt>心理師折扣</dt>
+										<dd>
+											<span th:text="${course.psychDiscount}">—</span>（<span
+												th:text="${course.discountStart}">—</span> 至 <span
+												th:text="${course.discountEnd}">—</span>）
+										</dd>
+									</div>
+								</dl>
+							</div>
+							<div class="video-grid">
+								<div class="video-card">
+									<h3>完整課程影片</h3>
+									<video controls>
+										<source th:src="@{${course.videoSrc}}" type="video/mp4">
+									</video>
+								</div>
+								<div class="video-card">
+									<h3>課程預覽影片</h3>
+									<video controls>
+										<source th:src="@{${course.videoSrcPre}}" type="video/mp4">
+									</video>
+								</div>
+							</div>
+						</section>
+						<section class="panel" style="margin-top: 20px">
+							<h2>純文字內容大綱</h2>
+							<div class="outline-box" th:text="${course.outline}">課程大綱</div>
+						</section>
+					</div>
+					<aside class="panel review-side">
+						<p class="meta">上架申請審核</p>
+						<h2>審核檢核表</h2>
+						<p>
+							<span class="pending-data" data-thymeleaf-pending>申請時間待後端欄位</span>
+						</p>
+						<div class="check-list">
+							<label><input type="checkbox">心理師資格有效</label><label><input
+								type="checkbox">課程名稱與介紹清楚</label><label><input
+								type="checkbox">內容大綱為純文字</label><label><input
+								type="checkbox">內容符合平台規範</label><label><input
+								type="checkbox">原價設定合理</label>
+						</div>
+						<div class="form-group">
+							<label for="review-note">員工審核備註</label>
+							<textarea id="review-note" class="field"
+								placeholder="此欄尚未有已知後端接收欄位"></textarea>
+							<span class="form-note">畫面功能保留，待 Controller 增加備註欄位後再綁定。</span>
+						</div>
+						<div th:if="${course.courseStatus == 1}" class="page-actions"
+							style="margin-top: 18px">
+							<form class="inline-form" method="post"
+								th:action="@{examine_course}" data-confirm-form="確定退回此課程？">
+								<input type="hidden" name="courseId"
+									th:value="${course.courseId}"><input type="hidden"
+									name="courseStatus" value="3">
+								<button class="btn danger" type="submit">退回修改</button>
+							</form>
+							<form class="inline-form" method="post"
+								th:action="@{examine_course}" data-confirm-form="確定核准此課程？">
+								<input type="hidden" name="courseId"
+									th:value="${course.courseId}"><input type="hidden"
+									name="courseStatus" value="2">
+								<button class="btn" type="submit" data-approve-review>核准課程</button>
+							</form>
+						</div>
+					</aside>
+				</div>
+			</main>
+		</div>
 	</div>
-	<div th:if="${course.courseStatus}==5">
-		<span>下架時間： </span>
-		<span th:text="${#temporals.format(course.delistedAt, 'yyyy年MM月dd日 HH:mm')}"></span><br>
-		<span>下架原因： </span><span th:text="${course.delistReason.label}"></span> 
-	</div>
-	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
-	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
-	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
-	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
-	<div th:if="${course.psychDiscount}!=null">
-		<span>心理師折扣： </span><span th:text="${course.psychDiscount}"></span> <br> 
-		<span>折扣開始時間： </span><span th:text="${course.discountStart}"></span> <br> 
-		<span>折扣結束時間： </span><span th:text="${course.discountEnd}"></span>
-	</div>
-	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<div th:if="${course.courseStatus}==1">
-		<form method="post" th:action="@{examine_course}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<input type="hidden" name="courseStatus"
-				th:value="2">
-			<button type="submit">審核通過</button>
-		</form>
-		<form method="post" th:action="@{examine_course}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<input type="hidden" name="courseStatus"
-				th:value="3">
-			<button type="submit">審核失敗</button>
-		</form>
-		
-	</div>
-	
-
+<script th:src="@{/js/course/app.js}"></script>
 </body>
 </html>

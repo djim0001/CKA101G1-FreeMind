@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程下架管理｜管理後台</title>
+<link rel="stylesheet" th:href="@{/css/course/style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+</head>
+<body class="thy2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+					CONSOLE</small></a>
+			<p class="nav-label">課程商城管理</p>
+			<nav class="nav">
+				<a th:href="@{/admin/course/select_course}">課程發布管理</a><a
+					class="active" th:href="@{/admin/course/goto_delisted}">課程下架管理</a><a
+					th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<span>課程發布管理／課程下架</span>
+				<div class="admin-id">
+					<span class="avatar">管</span>系統管理員
+				</div>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>課程下架管理</h1>
+						<p>由管理員選擇要下架的課程並記錄原因。</p>
+					</div>
+					<a class="btn ghost" th:href="@{/admin/course/select_course}">返回發布管理</a>
+				</div>
+				<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益與學習紀錄。</div>
+				<div class="table-wrap" style="margin-top: 18px">
+					<table class="compact-table">
+						<thead>
+							<tr>
+								<th>課程／心理師</th>
+								<th>分類</th>
+								<th>狀態</th>
+								<th>收藏／評價／提問</th>
+								<th>定價</th>
+								<th>審核員工</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="course : ${courseList}">
+								<td><div class="course-summary">
+										<strong th:text="${course.courseName}">課程名稱</strong><span
+											class="meta" th:text="${course.psychologist.name}">心理師</span>
+									</div></td>
+								<td th:text="${course.courseCategories.courseCatName}">分類</td>
+								<td><span class="status"
+									th:text="${course.courseStatusText}">狀態</span></td>
+								<td><span th:text="${course.saveCount}">0</span>／<span
+									th:text="${course.reviewCount}">0</span>／<span
+									th:text="${course.commentCount}">0</span></td>
+								<td>NT$ <span th:text="${course.price}">0</span></td>
+								<td
+									th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}">—</td>
+								<td><button class="btn danger" type="button"
+										data-open-take-down th:data-course-id="${course.courseId}"
+										th:data-course-name="${course.courseName}">下架課程</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div
+					th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/goto_delisted', ${orderBy})}"></div>
+			</main>
+		</div>
+	</div>
+	<dialog class="admin-dialog" data-take-down-dialog>
+	<form method="post" th:action="@{delisted_course}">
+		<div class="dialog-head">
+			<div>
+				<span class="dialog-kicker">管理員操作</span>
+				<h2>確認下架課程</h2>
+			</div>
+			<button class="dialog-close" type="button" data-close-take-down>×</button>
+		</div>
+		<p>
+			即將下架：<strong data-take-down-course></strong>
+		</p>
+		<input type="hidden" name="courseId" data-take-down-course-id>
+		<div class="form-group">
+			<label for="delistReason">下架原因</label><select id="delistReason"
+				class="field" name="delistReason" required data-take-down-reason><option
+					value="">請選擇</option>
+				<option th:each="reason : ${delistReasons}" th:value="${reason}"
+					th:text="${reason.label}"></option></select>
+		</div>
+		<div class="dialog-actions">
+			<button class="btn ghost" type="button" data-close-take-down>取消</button>
+			<button class="btn danger" type="submit">確認下架</button>
+		</div>
+	</form>
+	</dialog>
+<script th:src="@{/js/course/app.js}"></script>
+</body>
+</html>

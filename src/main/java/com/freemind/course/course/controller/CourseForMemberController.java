@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 @RequestMapping("/member/course")
 public class CourseForMemberController {
-	private final String NEW_COURSE_ORDER = "listedAt";
 
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;

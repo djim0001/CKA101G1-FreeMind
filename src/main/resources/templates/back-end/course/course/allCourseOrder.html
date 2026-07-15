@@ -1,132 +1,185 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>所有課程訂單一覽</title>
-<style>
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background-color: #f2f2f2; }
-    .status-paid { color: green; font-weight: bold; }
-    .status-unpaid { color: red; font-weight: bold; }
-    style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-span.error {
-    font-size: 12px;
-    color: red;
-}
-
-.modal {
-    position: fixed;
-    z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    width: 700px;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-radius: 8px;
-}
-</style>
-    
-</style>
-</head>
-<body>
-
-	<h1>所有課程訂單一覽</h1>
-	<h3>
-		<a th:href="@{/admin/course/select_course}">員工課程頁面</a>
-	</h3>
-	<table>
-		<thead>
-			<tr>
-				<th>訂單編號</th>
-				<th>會員姓名</th>
-				<th>優惠券序號</th>
-				<th>優惠券類型</th>
-				<th>訂單總額</th>
-				<th>折扣金額</th>
-				<th>實付金額</th>
-				<th>付款方式</th>
-				<th>付款狀態</th>
-				<th>訂單時間</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:if="${allCourseOrder != null}">
-				<tr th:each="order : ${allCourseOrder}">
-					<td>
-					    <a th:href="@{/admin/course/order/detail/{orderId}(orderId=${order.courseOrderId})}"
-					       th:text="${order.courseOrderId}">
-					    </a>
-					</td>
-					<td th:text="${order.member.name}"></td>
-					<td th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '--'}"></td>
-					<td th:text="${order.memberCoupon != null ? order.memberCoupon.Coupon.couponName : '無使用優惠券'}"></td>
-					<td th:text="${order.orderTotal}"></td>
-					<td th:text="${order.discountAmount != null ? order.discountAmount : 0}"></td>
-					<td th:text="${order.netAmount}"></td>
-					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
-					<td>
-						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
-						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
-					</td>
-					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course_order', ${orderBy})}"></div>	
-	
-	
-	<div id="orderModal" class="modal" th:if="${detailsMsg == 'show'}">
-	    <div class="modal-content">
-	    		<table>
-	    			<thead>
-	    				<tr>
-	    				<th>訂單編號</th>
-	    				<th>課程名稱</th>
-	    				<th>課程定價</th>
-	    				<th>折扣後價格</th>
-	    				<th>課程權限</th>
-	    				</tr>
-	    			</thead>
-	    			<tbody>
-	    				<tr th:each="orderDetail : ${details}">
-	    				<td th:text="${orderDetail.courseOrder.courseOrderId}"></td>
-	    				<td th:text="${orderDetail.course.courseName}"></td>
-	    				<td th:text="${orderDetail.price}"></td>
-	    				<td th:text="${orderDetail.discountedPrice==null?'--':orderDetail.discountedPrice}"></td>
-	    				<td th:text="${orderDetail.coursePermissionText}"></td>
-	    				</tr>
-	    			</tbody>
-	    		</table><br>
-	    		<button type="button" onclick="closeOrderModal()">關閉</button>
-	    </div>
-    </div>
-	<script>
-		function closeOrderModal() {
-		    const modal = document.getElementById("orderModal");
-		    if (modal) {
-		        modal.style.display = "none";
-		    }
-		}
-		document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-		    input.value = window.location.pathname + window.location.search;
-		});
-	</script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>訂單與退款｜管理後台</title>
+<link rel="stylesheet" th:href="@{/css/course/style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin.css}" /></head>
+<body class="thy2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+					CONSOLE</small></a>
+			<p class="nav-label">課程商城管理</p>
+			<nav class="nav">
+				<a th:href="@{/admin/course/select_course}">課程發布管理</a><a
+					class="active" th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
+					th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<span>後台管理／訂單管理</span>
+				<div class="admin-id">
+					<span class="avatar">管</span>系統管理員
+				</div>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>訂單與退款管理</h1>
+						<p>查詢課程訂單狀態並處理會員退款申請。</p>
+					</div>
+					<button class="btn ghost" type="button" data-toast="訂單明細已匯出">匯出訂單</button>
+				</div>
+				<section class="stats">
+					<div class="stat">
+						<span>今日訂單</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>今日營收</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>退款待處理</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>退款率</span><strong data-thymeleaf-pending>—</strong>
+					</div>
+				</section>
+				<div class="tabs" data-tabs>
+					<button class="active" data-tab="orders">查看訂單狀態</button>
+					<button data-tab="refunds">退款申請處理</button>
+				</div>
+				<section class="tab-panel" data-panel="orders">
+					<div class="toolbar">
+						<input class="field" placeholder="訂單編號、會員或課程……"><select
+							class="field"><option>全部付款狀態</option>
+							<option>已付款</option>
+							<option>等待付款</option>
+							<option>失效</option></select><input class="field" type="date">
+						<button class="btn secondary" type="button" data-toast="已套用查詢條件">查詢</button>
+					</div>
+					<div class="table-wrap">
+						<table class="compact-table">
+							<thead>
+								<tr>
+									<th>訂單編號</th>
+									<th>會員</th>
+									<th>優惠券</th>
+									<th>訂單總額</th>
+									<th>折扣／實付</th>
+									<th>付款方式</th>
+									<th>付款狀態</th>
+									<th>建立時間</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									th:if="${allCourseOrder == null || allCourseOrder.isEmpty()}">
+									<td class="empty-state" colspan="9">目前沒有課程訂單</td>
+								</tr>
+								<tr th:each="order : ${allCourseOrder}">
+									<td><a
+										th:href="@{/admin/course/order/detail/{orderId}(orderId=${order.courseOrderId})}"
+										th:text="${order.courseOrderId}">—</a></td>
+									<td th:text="${order.member.name}">會員</td>
+									<td><span
+										th:text="${order.memberCoupon != null ? order.memberCoupon.Coupon.couponName : '無使用優惠券'}">—</span><br>
+									<span class="meta"
+										th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '--'}">—</span></td>
+									<td>NT$ <span th:text="${order.orderTotal}">0</span></td>
+									<td>－ NT$ <span
+										th:text="${order.discountAmount != null ? order.discountAmount : 0}">0</span><br>
+									<strong>NT$ <span th:text="${order.netAmount}">0</span></strong></td>
+									<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}">—</td>
+									<td><span class="status-paid"
+										th:if="${order.paymentStatus == 1}">已付款</span><span
+										class="status-unpaid" th:if="${order.paymentStatus == 0}">未付款</span></td>
+									<td
+										th:text="${#temporals.format(order.orderedAt,'yyyy-MM-dd HH:mm:ss')}">—</td>
+									<td><a class="btn ghost"
+										th:href="@{/admin/course/order/detail/{orderId}(orderId=${order.courseOrderId})}">明細</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div
+						th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course_order', ${orderBy})}"></div>
+				</section>
+				<section class="tab-panel" data-panel="refunds" hidden>
+					<div class="notice">
+						<span class="pending-data">此分頁需 Controller 同時提供
+							refundList；原退款功能完整保留。</span>
+					</div>
+					<div class="table-wrap" style="margin-top: 16px">
+						<table>
+							<thead>
+								<tr>
+									<th>訂單編號</th>
+									<th>會員</th>
+									<th>申請金額</th>
+									<th>申請時間</th>
+									<th>狀態</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${refundList == null}">
+									<td class="empty-state" colspan="6">待 Controller 提供
+										refundList</td>
+								</tr>
+								<tr th:each="refund : ${refundList}">
+									<td th:text="${refund.courseOrder.courseOrderId}">—</td>
+									<td th:text="${refund.member.memberId}">—</td>
+									<td>NT$ <span th:text="${refund.refundAmount}">0</span></td>
+									<td
+										th:text="${#temporals.format(refund.createdAt,'yyyy-MM-dd HH:mm:ss')}">—</td>
+									<td><span class="status"
+										th:text="${refund.refundStatus == 0 ? '待審核' : refund.refundStatus == 1 ? '審核成功' : refund.refundStatus == 2 ? '審核失敗' : refund.refundStatus == 3 ? '已退款' : '退款異常'}">狀態</span></td>
+									<td><a class="btn secondary"
+										th:href="@{/admin/refund/detail/{courseOrderId}/{memberId}(courseOrderId=${refund.courseOrder.courseOrderId},memberId=${refund.member.memberId})}">查看明細</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</main>
+		</div>
+	</div>
+	<div class="modal" th:if="${detailsMsg == 'show'}">
+		<div class="modal-content">
+			<h2>訂單課程明細</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th>訂單編號</th>
+							<th>課程名稱</th>
+							<th>定價</th>
+							<th>折扣後價格</th>
+							<th>課程權限</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="orderDetail : ${details}">
+							<td th:text="${orderDetail.courseOrder.courseOrderId}">—</td>
+							<td th:text="${orderDetail.course.courseName}">—</td>
+							<td th:text="${orderDetail.price}">—</td>
+							<td
+								th:text="${orderDetail.discountedPrice == null ? '--' : orderDetail.discountedPrice}">—</td>
+							<td th:text="${orderDetail.coursePermissionText}">—</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<button class="btn" type="button" style="margin-top: 16px"
+				data-close-modal>關閉</button>
+		</div>
+	</div>
+<script th:src="@{/js/course/app.js}"></script>
 </body>
 </html>
