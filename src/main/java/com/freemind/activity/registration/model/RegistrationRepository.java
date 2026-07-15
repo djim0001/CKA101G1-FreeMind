@@ -27,6 +27,10 @@ public interface RegistrationRepository extends JpaRepository<Registration, Inte
 		     + "WHERE r.activity = :activity ORDER BY r.regisAt ASC")
 		List<Registration> findByActivityWithMember(@Param("activity") Activity activity);
 	
-	
+	// 4.查詢某活動的所有評論(已留評論的報名紀錄)
+	@Query("SELECT r FROM Registration r JOIN FETCH r.member "
+	     + "WHERE r.activity = :activity AND r.reviewedAt IS NOT NULL "
+	     + "ORDER BY r.reviewedAt DESC")
+	List<Registration> findReviewsByActivity(@Param("activity") Activity activity);
 	
 }

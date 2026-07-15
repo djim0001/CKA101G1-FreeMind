@@ -27,6 +27,8 @@
     
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 
+    <h3><a th:href="@{/member/activity/select_page}">回活動首頁</a></h3>
+
     <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post">
         <p>
             縣市：<input type="text" name="activityCity">
@@ -108,6 +110,11 @@
 			        <input type="hidden" name="activityId" th:value="${a.activityId}">
 			        <button type="submit">查看詳情</button>
 			    </form>
+				<form th:if="${a.registrable && a.member.memberId != #authentication.principal.member.memberId}"
+				      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+				    <input type="hidden" name="activityId" th:value="${a.activityId}">
+				    <button type="submit">報名</button>
+				</form>
 			</td>
 	    </tr>
 	</table>

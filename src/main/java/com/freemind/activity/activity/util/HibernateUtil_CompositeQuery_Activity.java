@@ -108,11 +108,11 @@ public class HibernateUtil_CompositeQuery_Activity {
             for (String key : keys) {
                 String value = map.get(key)[0];
                 if (value != null && value.trim().length() != 0 && !"action".equals(key) && !"currentPage".equals(key)) {
-                    count++; // 除錯用訊息，後續可拿掉
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
-                    // 除錯用訊息，後續可拿掉
-                    System.out.println("有送出查詢資料的欄位數count = " + count);
-                }
+                	 Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                     if (p != null) {
+                         predicateList.add(p);
+                     }
+                 }
             }
             
             // 把籃子裡的查詢條件轉成陣列，套進查詢當作 WHERE 條件
@@ -156,7 +156,10 @@ public class HibernateUtil_CompositeQuery_Activity {
                 String value = map.get(key)[0];
 
                 if (value != null && value.trim().length() != 0 && !"action".equals(key) && !"currentPage".equals(key)) {
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
+                	Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                	if (p != null) {
+                	    predicateList.add(p);
+                		}
                 }
             }
             criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
@@ -192,8 +195,11 @@ public class HibernateUtil_CompositeQuery_Activity {
             for (String key : keys) {
                 String value = map.get(key)[0];
                 if (value != null && value.trim().length() != 0 && !"action".equals(key)&& !"currentPage".equals(key)) {
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
-                }
+                	 Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                     if (p != null) {
+                         predicateList.add(p);
+                     }
+                 }
             }
             criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
             criteriaQuery.orderBy(builder.asc(root.get("activityId")));
@@ -234,7 +240,10 @@ public class HibernateUtil_CompositeQuery_Activity {
                 String value = map.get(key)[0];
 
                 if (value != null && value.trim().length() != 0 && !"action".equals(key) && !"currentPage".equals(key)) {
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
+                	Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                	if (p != null) {
+                	    predicateList.add(p);
+                		}
                 }
             }
             criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
@@ -267,7 +276,10 @@ public class HibernateUtil_CompositeQuery_Activity {
             for (String key : keys) {
                 String value = map.get(key)[0];
                 if (value != null && value.trim().length() != 0 && !"action".equals(key) && !"currentPage".equals(key)) {
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
+                 	Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                	if (p != null) {
+                	    predicateList.add(p);
+                		}
                 }
             }
             criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
@@ -304,7 +316,10 @@ public class HibernateUtil_CompositeQuery_Activity {
             for (String key : keys) {
                 String value = map.get(key)[0];
                 if (value != null && value.trim().length() != 0 && !"action".equals(key) && !"currentPage".equals(key)) {
-                    predicateList.add(get_aPredicate_For_AnyDB(builder, root, key, value.trim()));
+                	Predicate p = get_aPredicate_For_AnyDB(builder, root, key, value.trim());
+                	if (p != null) {
+                	    predicateList.add(p);
+                	}
                 }
             }
             criteriaQuery.where(predicateList.toArray(new Predicate[predicateList.size()]));
