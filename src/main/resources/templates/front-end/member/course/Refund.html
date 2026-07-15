@@ -90,29 +90,18 @@ th {
 					</td>
 					<td
 						th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-					<td>
+					<td><th:block th:if="${order.paymentStatus == 1}">
 
-    <th:block th:if="${order.paymentStatus == 1}">
+							<form th:action="@{/member/refund/detail}" method="get">
 
-        <form th:action="@{/member/refund/detail}" method="get">
+								<input type="hidden" name="courseOrderId"
+									th:value="${order.courseOrderId}" />
 
-            <input type="hidden"
-                   name="courseOrderId"
-                   th:value="${order.courseOrderId}" />
+								<button type="submit">申請退款</button>
 
-            <button type="submit">
-                申請退款
-            </button>
+							</form>
 
-        </form>
-
-    </th:block>
-
-    <span th:if="${order.paymentStatus == 0}">
-        尚未付款
-    </span>
-
-</td>
+						</th:block> <span th:if="${order.paymentStatus == 0}"> 尚未付款 </span></td>
 				</tr>
 			</th:block>
 		</tbody>
@@ -129,8 +118,8 @@ th {
 
 			<form th:action="@{/member/refund/apply}" method="post">
 
-<!-- 				<input type="hidden" name="courseOrderId" -->
-<!-- 					th:value="${details.get(0).courseOrder.courseOrderId}" /> -->
+				<!-- 				<input type="hidden" name="courseOrderId" -->
+				<!-- 					th:value="${details.get(0).courseOrder.courseOrderId}" /> -->
 
 				<table>
 
@@ -161,23 +150,22 @@ th {
 
 							<td th:text="${orderDetail.coursePermissionText}"></td>
 
-<!-- <input type="hidden" name="courseOrderId" value="${orderDetail.courseOrder.courseOrderId}"> -->
-<input type="hidden" name="courseOrderId" th:value="${courseOrderId}">
+							<!-- <input type="hidden" name="courseOrderId" value="${orderDetail.courseOrder.courseOrderId}"> -->
+							<input type="hidden" name="courseOrderId"
+								th:value="${courseOrderId}">
 						</tr>
 
 					</tbody>
 
 				</table>
 
-				<br> <label><b>退款原因</b></label> <br>
-				<br>
+				<br> <label><b>退款原因</b></label> <br> <br>
 
 				<textarea name="refundReason" rows="6"
 					style="width: 100%; resize: none;" maxlength="500"
 					placeholder="請輸入退款原因..." required></textarea>
 
-				<br>
-				<br>
+				<br> <br>
 				<button type="submit">送出退款申請</button>
 
 				<button type="button" onclick="closeOrderModal()">關閉</button>
