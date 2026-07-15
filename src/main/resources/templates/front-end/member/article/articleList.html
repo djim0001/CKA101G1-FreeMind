@@ -54,6 +54,70 @@ body {
 	background-color: #d39393;
 }
 
+.search-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 20px;
+	padding: 18px 22px;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.search-bar input {
+	flex: 1;
+	padding: 10px 16px;
+	border: 1px solid #e8d5d5;
+	border-radius: 20px;
+	font-size: 14px;
+	outline: none;
+	color: #333;
+}
+
+.search-bar input:focus {
+	border-color: #e8b4b4;
+}
+
+.search-bar button {
+	padding: 10px 24px;
+	background-color: #e8b4b4;
+	color: #fff;
+	border: none;
+	border-radius: 20px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	white-space: nowrap;
+}
+
+.search-bar button:hover {
+	background-color: #d39393;
+}
+
+.search-bar .clear-search {
+	font-size: 13px;
+	color: #999;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.search-bar .clear-search:hover {
+	color: #d39393;
+	text-decoration: underline;
+}
+
+/* RWD */
+@media ( max-width : 640px) {
+	.search-bar {
+		flex-wrap: wrap;
+	}
+	.search-bar input {
+		flex-basis: 100%;
+	}
+}
+
 .category-filter {
 	display: flex;
 	flex-wrap: wrap;
@@ -80,6 +144,116 @@ body {
 .category-filter a:hover, .category-filter a.active {
 	background-color: #e8b4b4;
 	color: #fff;
+}
+
+.hot-section {
+	margin-bottom: 28px;
+	padding: 20px 22px;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* .hot-title { */
+/* 	font-size: 17px; */
+/* 	font-weight: 700; */
+/* 	color: #4a3e3e; */
+/* 	margin-bottom: 16px; */
+/* } */
+
+.hot-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+}
+
+.hot-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: #fbf2f2;
+	border-radius: 10px;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.hot-card:hover {
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+	transform: translateY(-2px);
+}
+
+.hot-rank {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	width: 26px;
+	height: 26px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #e8b4b4;
+	color: #fff;
+	font-size: 13px;
+	font-weight: 700;
+	border-radius: 50%;
+	z-index: 1;
+}
+
+.hot-cover {
+	width: 100%;
+	height: 200px;  
+	overflow: hidden;
+	background-color: #f2dddd;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.hot-cover img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.hot-cover .no-image {
+	color: #ccbaba;
+	font-size: 13px;
+}
+
+.hot-info {
+	padding: 12px 14px;
+}
+
+.hot-info h4 {
+	font-size: 15px;
+	font-weight: 600;
+	color: #4a3e3e;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.hot-cat {
+	display: inline-block;
+	padding: 2px 10px;
+	background-color: #fff;
+	color: #7a6b6b;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 500;
+}
+
+/* RWD */
+@media ( max-width : 640px) {
+	.hot-list {
+		grid-template-columns: 1fr;
+	}
+	.hot-cover {
+		height: 160px;
+	}
 }
 
 .article-list {
@@ -249,14 +423,39 @@ body {
 			<h1>專欄文章</h1>
 			<a th:href="@{/}">回首頁</a>
 		</div>
+		
+		<form class="search-bar" th:action="@{/article}" method="get">
+			<input type="text" name="keyword" placeholder="搜尋文章標題或作者..." th:value="${keyword}" />
+			<button type="submit">搜尋</button>
+			<a th:if="${keyword != null && !keyword.isEmpty()}" th:href="@{/article}" class="clear-search">清除搜尋</a>
+		</form>
 
 		<div class="category-filter">
-			<a th:href="@{/article}"
-				th:classappend="${selectedCatId == null} ? 'active' : ''">全部</a> <a
-				th:each="cat : ${articleCats}"
-				th:href="@{/article(catId=${cat.articleCatId})}"
+			<a th:href="@{/article(keyword=${keyword})}"
+				th:classappend="${selectedCatId == null} ? 'active' : ''">全部</a>
+			<a th:each="cat : ${articleCats}"
+				th:href="@{/article(catId=${cat.articleCatId}, keyword=${keyword})}"
 				th:text="${cat.articleCatName}"
 				th:classappend="${selectedCatId != null && selectedCatId == cat.articleCatId} ? 'active' : ''"></a>
+		</div>
+		
+		<div class="hot-section" th:if="${hotArticles != null && !hotArticles.isEmpty()}">
+<!-- 		<h3 class="hot-title">熱門文章</h3> -->
+			<div class="hot-list">
+				<a class="hot-card" th:each="hot, iterStat : ${hotArticles}"
+				   th:href="@{/article/{id}(id=${hot.articleId})}">
+					<span class="hot-rank" th:text="${iterStat.index + 1}"></span>
+					<div class="hot-cover">
+						<img th:if="${hot.coverImage != null}"
+							th:src="@{/article/{id}/cover(id=${hot.articleId})}" />
+						<span class="no-image" th:if="${hot.coverImage == null}">無封面</span>
+					</div>
+					<div class="hot-info">
+						<h4 th:text="${hot.title}"></h4>
+						<span class="hot-cat" th:text="${hot.articleCat != null ? hot.articleCat.articleCatName : '未分類'}"></span>
+					</div>
+				</a>
+			</div>
 		</div>
 
 		<div class="article-list"
@@ -293,30 +492,22 @@ body {
 
 		<div class="pagination" th:if="${articlePage.totalPages > 1}">
 			<!-- 上一頁 -->
-			<a th:if="${currentPage > 1 && selectedCatId != null}"
-			   th:href="@{/article(page=${currentPage - 1}, catId=${selectedCatId})}">上一頁</a>
-			<a th:if="${currentPage > 1 && selectedCatId == null}"
-			   th:href="@{/article(page=${currentPage - 1})}">上一頁</a>
+			<a th:if="${currentPage > 1}"
+			   th:href="@{/article(page=${currentPage - 1}, catId=${selectedCatId}, keyword=${keyword})}">上一頁</a>
 			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
 			
 			<!-- 頁碼 -->
 			<th:block th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
-			    <a th:if="${i != currentPage && selectedCatId != null}"
-			       th:href="@{/article(page=${i}, catId=${selectedCatId})}"
-			       th:text="${i}"></a>
-			    <a th:if="${i != currentPage && selectedCatId == null}"
-			       th:href="@{/article(page=${i})}"
+			    <a th:if="${i != currentPage}"
+			       th:href="@{/article(page=${i}, catId=${selectedCatId}, keyword=${keyword})}"
 			       th:text="${i}"></a>
 			    <span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
 			</th:block>
 			
 			<!-- 下一頁 -->
-			<a th:if="${currentPage < articlePage.totalPages && selectedCatId != null}"
-			   th:href="@{/article(page=${currentPage + 1}, catId=${selectedCatId})}">下一頁</a>
-			<a th:if="${currentPage < articlePage.totalPages && selectedCatId == null}"
-			   th:href="@{/article(page=${currentPage + 1})}">下一頁</a>
+			<a th:if="${currentPage < articlePage.totalPages}"
+			   th:href="@{/article(page=${currentPage + 1}, catId=${selectedCatId}, keyword=${keyword})}">下一頁</a>
 			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
-				
 		</div>
 	</div>
 </body>

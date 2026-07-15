@@ -457,67 +457,55 @@ body {
 		}
 
 		function toggleLike(btn) {
-			var articleId = btn.getAttribute('data-article-id');
+		    var articleId = btn.getAttribute('data-article-id');
 
-			fetch('/member/article/' + articleId + '/like', {
-				method: 'POST',
-				headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
-				redirect: 'manual'   // 不要自動跟隨重導向
-			})
-			.then(function(res) {
-		        // opaqueredirect 要求登入, 被導向了
-				if (res.type === 'opaqueredirect' || res.status === 0) {
-		            alert('請先登入才能按讚');
-		            window.location.href = '/front-end/login';
+		    fetch('/member/article/' + articleId + '/like', {
+		        method: 'POST',
+		        headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
+		        redirect: 'manual'   // 不要自動跟隨重導向
+		    })
+		    .then(function(res) {
+		        // opaqueredirect 或 401(未登入, 直接導向登入頁)
+		        if (res.type === 'opaqueredirect' || res.status === 0 || res.status === 401) {
+		            window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);
 		            return null;
 		        }
-				
-				if (res.status === 401) {
-					alert('請先登入才能按讚');
-					window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);
-					return null;
-				}
-				return res.json();
-			})
-			.then(function(data) {
-				if (!data) return;
-				btn.querySelector('.count').textContent = data.likeCount;
-				btn.classList.toggle('active', data.likedByMe);
-			})
-			.catch(function(err) {
-				console.error('操作失敗', err);
-			});
+		        return res.json();
+		    })
+		    .then(function(data) {
+		        if (!data) return;
+		        btn.querySelector('.count').textContent = data.likeCount;
+		        btn.classList.toggle('active', data.likedByMe);
+		    })
+		    .catch(function(err) {
+		        console.error('操作失敗', err);
+		    });
 		}
 
 		function toggleBookmark(btn) {
-			var articleId = btn.getAttribute('data-article-id');
+		    var articleId = btn.getAttribute('data-article-id');
 
-			fetch('/member/article/' + articleId + '/bookmark', {
-				method: 'POST',
-				headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
-				redirect: 'manual'   // 不要自動跟隨重導向
-			})
-			.then(function(res) {
-				// opaqueredirect 要求登入, 被導向了
-				if (res.type === 'opaqueredirect' || res.status === 0) {
-		            alert('請先登入才能收藏');
-		            window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);		            return null;
+		    fetch('/member/article/' + articleId + '/bookmark', {
+		        method: 'POST',
+		        headers: Object.assign(getCsrfHeaders(), { 'X-Requested-With': 'XMLHttpRequest' }),
+		        redirect: 'manual'   // 不要自動跟隨重導向
+		    })
+		    .then(function(res) {
+		        // opaqueredirect 或 401(未登入, 直接導向登入頁)
+		        if (res.type === 'opaqueredirect' || res.status === 0 || res.status === 401) {
+		            window.location.href = '/front-end/login?redirect=' + encodeURIComponent(location.pathname + location.search);
+		            return null;
 		        }
-				
-				if (res.status === 401) {
-					alert('請先登入才能收藏');
-					return null;
-				}
-				return res.json();
-			})
-			.then(function(data) {
-				if (!data) return;
-				btn.querySelector('.count').textContent = data.bookmarkCount;
-				btn.classList.toggle('active', data.savedByMe);
-			})
-			.catch(function(err) {
-				console.error('操作失敗', err);
-			});
+		        return res.json();
+		    })
+		    .then(function(data) {
+		        if (!data) return;
+		        btn.querySelector('.count').textContent = data.bookmarkCount;
+		        btn.classList.toggle('active', data.savedByMe);
+		    })
+		    .catch(function(err) {
+		        console.error('操作失敗', err);
+		    });
 		}
 
 		/* ===================== share post ===================== */

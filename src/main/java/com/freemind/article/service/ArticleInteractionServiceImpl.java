@@ -28,13 +28,22 @@ import com.freemind.login.member.model.MemberService;
 
 
 @Service
-public class ArticleInteractionImpl implements ArticleInteractionService{
+public class ArticleInteractionServiceImpl implements ArticleInteractionService{
 	
 	@Value("${app.article.page-size}")
 	private int artPageSize;
 	
+	@Value("${app.hot-score.weight.like:3.0}")
+	private double weightLike;
+	
+    @Value("${app.hot-score.weight.bookmark:3.0}")
+	private double weightBookmark;
+	
 	@Autowired
 	private ArticleService articleService;
+	
+	@Autowired
+	private ArticleViewService articleViewService;
 	
 	@Autowired
 	private MemberService memberService;
@@ -61,12 +70,14 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 		
 		if (articleLikeRepository.existsById(likeId)) {
 			articleLikeRepository.deleteById(likeId);
+			articleViewService.adjustHotScore(articleId, -weightLike);
 		} else {
 			Article article = articleRepository.getReferenceById(articleId);
 			Member member = memberRepository.getReferenceById(memberId);
 			
 			ArticleLike articleLike = new ArticleLike(article, member, LocalDateTime.now());
 			articleLikeRepository.save(articleLike);
+			articleViewService.adjustHotScore(articleId, weightLike);
 		}
 	}
 	
@@ -77,12 +88,14 @@ public class ArticleInteractionImpl implements ArticleInteractionService{
 		
 		if (articleBookmarkRepository.existsById(bookmarkId)) {
 			articleBookmarkRepository.deleteById(bookmarkId);
+			articleViewService.adjustHotScore(articleId, -weightBookmark);
 		} else {
 			Article article = articleRepository.getReferenceById(articleId);
 			Member member = memberRepository.getReferenceById(memberId);
 			
 			ArticleBookmark articleBookmark = new ArticleBookmark(article, member, LocalDateTime.now());
 			articleBookmarkRepository.save(articleBookmark);
+			articleViewService.adjustHotScore(articleId, weightBookmark);
 		}
 	}
 	

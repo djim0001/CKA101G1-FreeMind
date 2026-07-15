@@ -35,6 +35,12 @@ public class ArticleServiceImpl implements ArticleService{
 	@Value("${app.article.page-size}")
 	private int artPageSize;
 	
+	@Value("${app.hot-score.weight.share:5.0}")
+    private double weightShare;
+	
+	@Autowired
+	private ArticleViewService articleViewService;
+	
 	@Autowired
 	private ArticleRepository articleRepository;
 	
@@ -53,6 +59,8 @@ public class ArticleServiceImpl implements ArticleService{
 		if (psychId == null) {
 			throw new IllegalArgumentException("心理師資訊未帶入，請確認登入狀態");
 		}
+		
+		validateTitleLength(form.getTitle());
 		
 		Article article = createArticleWithForm(form, psychId);
 		article.setArticleStatus(0); // 建立草稿, 不檢查欄位
@@ -109,20 +117,24 @@ public class ArticleServiceImpl implements ArticleService{
 			throw new IllegalArgumentException("心理師資訊未帶入，請確認登入狀態");
 		}
 		
-		Pageable pageable = PageRequest.of(page - 1, artPageSize);
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("createdAt").descending());
 		return articleRepository.findArticlesByPsychId(psychId, pageable);
 	}
 	
 	@Override
-	public Page<Article> getPublishedArticles(Integer page, Integer catId) {
-		Pageable pageable = PageRequest.of(page - 1, artPageSize);
+	public Page<Article> getPublishedArticles(Integer catId, String keyword, Integer page) {
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("publishedAt").descending());
+		
+		if (keyword != null && !keyword.isEmpty()) {
+			return articleRepository.findByStatusAndTitleOrAuthor(2, keyword, pageable);
+		}
 		
 		if (catId != null ) {
 			return articleRepository.findByStatusAndCatId(2, catId, pageable);
 		}
 		return articleRepository.findByStatus(2, pageable);
 	}
-
+	
 	@Override
 	public Article getArticle(Integer articleId, Integer psychId) {
 		Article article = articleRepository.findById(articleId).orElse(null);
@@ -152,6 +164,26 @@ public class ArticleServiceImpl implements ArticleService{
 	@Override
 	public Article getPublishedArticle(Integer articleId) {
 		return getArticle(articleId, null);
+	}
+	
+	@Override
+	public List<Article> getPublishedArticlesByIds(List<Integer> articleIds) {
+		List<Article> result = new ArrayList<>();
+		
+		if (articleIds == null || articleIds.isEmpty()) return result;
+		
+		List<Article> articles = articleRepository.findAllById(articleIds);
+		
+		for (Integer id : articleIds) {
+			for (Article article : articles) {
+				if (article.getArticleId().equals(id) && article.getArticleStatus() == 2) {
+					result.add(article);
+					break;
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	@Override
@@ -205,6 +237,7 @@ public class ArticleServiceImpl implements ArticleService{
 	@Override
 	public Article updateDraft(Integer articleId, ArticleCreateForm form, Integer psychId) {
 		Article article = getEditableArticle(articleId, psychId);
+		validateTitleLength(form.getTitle());
 		updateArticleWithForm(article, form);
 		article.setArticleStatus(0);
 		return articleRepository.save(article);
@@ -253,6 +286,14 @@ public class ArticleServiceImpl implements ArticleService{
 		return article;
 	}
 	
+	private void validateTitleLength(String title) {
+	    if (title != null && title.length() > 50) {
+	    	Map<String, String> errors = new LinkedHashMap<>();
+	        errors.put("titleError", "標題不可超過 50 字");
+	        throw new ArticleValidationException(errors);
+	    }
+	}
+	
 	private void validateSubmission(Integer articleCatId, String title, String content, boolean hasCoverImage) {
 		Map<String, String> errors = new LinkedHashMap<>();
 		
@@ -262,6 +303,8 @@ public class ArticleServiceImpl implements ArticleService{
 		
 		if (title == null || title.isBlank()) {
 			errors.put("titleError", "請輸入標題");
+		} else if (title.length() > 50) {
+	        errors.put("titleError", "標題不可超過 50 字");
 		}
 		
 		if (content == null || content.isBlank()) {
@@ -438,6 +481,7 @@ public class ArticleServiceImpl implements ArticleService{
 		if (article == null) {
 		    return 0;
 		} else {
+			articleViewService.adjustHotScore(articleId, weightShare);
 			return (long)article.getShareCount();
 		}
 

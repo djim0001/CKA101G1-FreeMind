@@ -18,6 +18,9 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	Page<Article> findArticlesByPsychId(@Param("psychId") Integer psychId, Pageable pageable);
 	
 	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status")
+	List<Article> findByStatus(@Param("status")Integer articleStatus);
+	
+	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status")
 	Page<Article> findByStatus(@Param("status")Integer articleStatus, Pageable pageable);
 	
 	@Query("SELECT a FROM Article a WHERE a.articleStatus IN :statuses")
@@ -26,6 +29,11 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status AND a.articleCat.articleCatId = :catId")
 	Page<Article> findByStatusAndCatId(@Param("status")Integer articleStatus, 
 									   @Param("catId")Integer catId, Pageable pageable);
+	
+	@Query("SELECT a FROM Article a " +
+		   "WHERE a.articleStatus = :status " +
+		   "AND (a.title LIKE %:keyword% OR a.psychologist.name LIKE %:keyword%)")
+	Page<Article> findByStatusAndTitleOrAuthor(@Param("status")Integer articleStatus, @Param("keyword")String keyword, Pageable pageable);
 
 	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
 	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);

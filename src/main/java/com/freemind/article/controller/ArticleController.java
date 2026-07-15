@@ -2,12 +2,9 @@ package com.freemind.article.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -46,9 +43,6 @@ public class ArticleController {
 	private ArticleInteractionService articleInteractionService;
 	
 	@Autowired
-	private StringRedisTemplate redisTemplate;
-	
-	@Autowired
 	private ArticleViewService articleViewService;
 	
 	@ModelAttribute("articleCats")
@@ -58,12 +52,19 @@ public class ArticleController {
 
 	@GetMapping
 	public String getPublishedArticles(Model model, 
-						@RequestParam(name = "page", defaultValue = "1") Integer page, 
-						@RequestParam(name = "catId", required = false) Integer catId) {
-		Page<Article> articlePage = articleService.getPublishedArticles(page, catId);
+						@RequestParam(name = "page", defaultValue = "1") Integer page,
+						@RequestParam(name = "catId", required = false) Integer catId,
+						@RequestParam(name = "keyword", required = false) String keyword) {
+		Page<Article> articlePage = articleService.getPublishedArticles(catId, keyword, page);
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("selectedCatId", catId);
+		model.addAttribute("keyword", keyword);
+		
+		List<Integer> hotIds = articleViewService.getHotArticleIds(3);
+		List<Article> hotArticles = articleService.getPublishedArticlesByIds(hotIds);
+		model.addAttribute("hotArticles", hotArticles);
+		
 		return "front-end/member/article/articleList";
 	}
 	
@@ -94,11 +95,6 @@ public class ArticleController {
 		long realBookmarkCount = articleInteractionService.getBookmarkCount(articleId);
 		long displayBookmarkCount = article.getBookmarkBaseCount() + realBookmarkCount;
 		
-		long dbViewCount = article.getViewCount();
-		String pendingValue = redisTemplate.opsForValue().get("view:pending:" + articleId);
-		long pendingViewCount = (pendingValue != null) ? Long.parseLong(pendingValue) : 0L;
-		long displayViewCount = dbViewCount + pendingViewCount;
-		
 		model.addAttribute("article", article);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("selectedCatId", catId);
@@ -107,7 +103,7 @@ public class ArticleController {
 		model.addAttribute("likeCount", displayLikeCount);
 		model.addAttribute("bookmarkCount", displayBookmarkCount);
 		model.addAttribute("shareCount", article.getShareCount());
-		model.addAttribute("viewCount", displayViewCount);
+		model.addAttribute("viewCount", article.getViewCount());
 		model.addAttribute("likedByMe", articleInteractionService.isLikedByMember(articleId, memberId));
 		model.addAttribute("savedByMe", articleInteractionService.isSavedByMember(articleId, memberId));
 		model.addAttribute("isLoggedIn", memberId != null);
@@ -134,5 +130,14 @@ public class ArticleController {
 		String hash = "ip:" + DigestUtils.md5DigestAsHex(raw.getBytes()); // 固定 32 字元的十六進位字串
 		return hash;
 	}
+	
+	/*
+	@GetMapping("/rebuild-hot-score")
+	@ResponseBody
+	public String rebuildHotScore() {
+	    articleViewService.rebuildHotScoreFromDb();
+	    return "done";
+	}
+	*/
 	
 }

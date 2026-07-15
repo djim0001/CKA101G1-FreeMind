@@ -77,7 +77,8 @@ public class PsychArticleController {
 	}
 
 	@PostMapping("/create")
-	public String createArticle(Model model, @ModelAttribute ArticleCreateForm form,
+	public String createArticle(Model model, 
+			@ModelAttribute ArticleCreateForm form,
 			@RequestParam("action") String action,
 			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
 
@@ -86,7 +87,7 @@ public class PsychArticleController {
 			model.addAttribute("errorMessage", "*請先登入");
 			return "front-end/psych/article/test-login";
 		}
-
+		
 		try {
 			if ("submit".equals(action)) {
 				articleService.createAndSubmit(form, psychId);

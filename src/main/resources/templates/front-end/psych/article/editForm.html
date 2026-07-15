@@ -155,7 +155,7 @@ button[value="submit"]:hover {
 </head>
 <body>
 	<h1>
-		<span>編輯文章</span> <a th:href="@{/psych/article/myArticles(page=${currentPage})}">返回</a>
+		<span>編輯文章</span> <a th:href="@{/psych/article/myArticles(page=${currentPage})}" id="backLink">返回</a>
 	</h1>
 
 	<p th:if="${errorMessage}" th:text="${errorMessage}"
@@ -165,7 +165,8 @@ button[value="submit"]:hover {
 		method="post" enctype="multipart/form-data">
 		<div>
 			<label>標題</label>
-			<input type="text" name="title" th:value="${form.title}" />
+    		<input type="text" name="title" th:value="${form.title}" maxlength="50" id="titleInput" />
+    		<p id="titleCounter" style="font-size: 13px; color: #999; text-align: right;">0/50</p>
 			<p th:if="${titleError}" th:text="${titleError}" class="field-error"></p>
 		</div>
 		<div>
@@ -216,6 +217,39 @@ button[value="submit"]:hover {
 			<button type="submit" name="action" value="submit">儲存並送審</button>
 		</div>
 	</form>
+	
+	<script>
+		// 標題字數計數
+		const titleInput = document.getElementById('titleInput');
+		const titleCounter = document.getElementById('titleCounter');
+	
+		function updateTitleCounter() {
+		    titleCounter.textContent = titleInput.value.length + '/50';
+		}
+	
+		titleInput.addEventListener('input', updateTitleCounter);
+		updateTitleCounter(); // 已帶入舊標題, 需主動呼叫計數器
+	
+		// 編輯過, 點擊返回按鈕確認離開
+		let formChanged = false;
+		document.querySelector('form').addEventListener('input', function() {
+		    formChanged = true;
+		});
+		document.querySelector('form').addEventListener('change', function() {
+		    formChanged = true;
+		});
+	
+		document.getElementById('backLink').addEventListener('click', function(e) {
+		    if (!formChanged) {
+		        return;
+		    }
+		    e.preventDefault();
+		    const confirmLeave = confirm('尚未儲存草稿，確定要離開嗎？');
+		    if (confirmLeave) {
+		        window.location.href = this.href;
+		    }
+		});
+	</script>
 
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
@@ -230,9 +264,16 @@ button[value="submit"]:hover {
 			relative_urls : false,
 			remove_script_host : true,
 			convert_urls : false,
-			content_style: 'body { line-height: 1.4; } p { margin: 0 0 0.5em 0; }'
+			content_css: false,
+			content_style: 'body { line-height: 1.2; margin: 4px; } p { margin: 0 0 0.3em 0; }',
+			setup: function(editor) {
+			    editor.on('input change', function() {
+			        formChanged = true;
+			    });
+			}   
 		});
-		
+	</script>	
+	<script>
 		// 點按鈕觸發檔案選擇
 		document.getElementById('coverBtn').addEventListener('click', function() {
 		    document.getElementById('coverInput').click();
@@ -248,7 +289,6 @@ button[value="submit"]:hover {
 		        fileName.textContent = file.name;  // 顯示檔名
 		    }
 		});
-		
 	</script>
 </body>
 </html>
