@@ -1,6 +1,7 @@
 package com.freemind.course.order.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,6 +50,14 @@ public interface OrderDetailRepository
     		@Param("courseId") Integer courseId
     		);
     
+    Optional<OrderDetail>
+    findFirstByCourseCourseIdAndCourseOrderMemberAndCourseOrderPaymentStatusAndCoursePermissionOrderByCourseOrderOrderedAtDesc(
+            Integer courseId,
+            Member member,
+            Byte paymentStatus,
+            Byte coursePermission
+    );
+    
     // 課程已付款
     @Query("""
     	    SELECT COUNT(od) > 0
@@ -87,5 +96,21 @@ public interface OrderDetailRepository
     int enableCoursePermission(
             @Param("courseOrderId") Integer courseOrderId
     );
+    
+    // 所有可評價的我的課程訂單明細
+    List<OrderDetail>
+    findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtIsNull(
+            Integer memberId,
+            Byte paymentStatus,
+            Byte coursePermission
+    );
 
+    // 所有已評價的我的課程訂單明細
+    Page<OrderDetail>
+    findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtNotNull(
+    		Integer memberId,
+    		Byte paymentStatus,
+    		Byte coursePermission,
+    		Pageable pageable
+    		);
 }

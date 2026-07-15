@@ -68,7 +68,7 @@ public class OrderDetailService {
             default -> Sort.by("course.courseId").descending();
         };
 
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, coursePageSize, sort);
 
         return repository.findByCourseOrderMemberMemberId(memberId, pageable);
     }
@@ -96,6 +96,7 @@ public class OrderDetailService {
 	public Page<OrderDetail> getAccessibleOrderDetails(
 	        Member member,
 	        int page) {
+		if(page < 0) page = 0;
 
 	    Pageable pageable = PageRequest.of(
 	            page,
@@ -106,5 +107,59 @@ public class OrderDetailService {
 	    return repository
 	            .findAccessibleOrderDetailsByMember(member, pageable);
 	}
+	
+	public OrderDetail getAccessibleOrderDetail(
+	        Integer courseId,
+	        Member member
+	) {
+	    return repository
+	            .findFirstByCourseCourseIdAndCourseOrderMemberAndCourseOrderPaymentStatusAndCoursePermissionOrderByCourseOrderOrderedAtDesc(
+	                    courseId,
+	                    member,
+	                    (byte) 1,
+	                    (byte) 1
+	            )
+	            .orElse(null);
+	}
+	
+	public List<OrderDetail> getReviewableCoursesByMemberId(Integer memberId) {
 
+	    if (memberId == null) {
+	        throw new IllegalArgumentException("會員編號不能為空");
+	    }
+
+	    byte paid = 1;
+	    byte unlocked = 1;
+
+	    return repository
+	            .findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtIsNull(
+	                    memberId,
+	                    paid,
+	                    unlocked
+	            );
+	}
+
+	public Page<OrderDetail> getReviewCoursesByMemberId(Integer memberId, int page) {
+		
+		if (memberId == null) {
+			throw new IllegalArgumentException("會員編號不能為空");
+		}
+		if(page < 0) page = 0;
+		byte paid = 1;
+		byte unlocked = 1;
+		
+		Pageable pageable = PageRequest.of(
+	            page,
+	            coursePageSize,
+	            Sort.by("reviewedAt").descending()
+	    );
+		
+		return repository
+				.findByCourseOrderMemberMemberIdAndCourseOrderPaymentStatusAndCoursePermissionAndReviewedAtNotNull(
+						memberId,
+						paid,
+						unlocked,
+						pageable
+						);
+	}
 }

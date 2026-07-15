@@ -114,8 +114,14 @@
 					<td th:text="${course.psychologist.name}"></td>
 					<td th:text="${course.courseCategories.courseCatName}"></td>
 					<td th:text="${course.saveCount}"></td>
-					<td
-						th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
+					<td th:text="${course.reviewCount == null || course.reviewCount == 0
+							? '0.0'
+							: #numbers.formatDecimal(
+								course.reviewCount * 1.0 / course.starCount,
+								1,
+								1
+							)}">
+					</td>
 					<td th:text="${course.reviewCount}"></td>
 					<td th:text="${course.commentCount}"></td>
 					<td th:text="${course.price}"></td>

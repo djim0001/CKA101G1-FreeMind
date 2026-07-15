@@ -19,6 +19,7 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.course.model.DelistReason;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
@@ -56,6 +57,10 @@ public class CourseForAdminController {
     public Admin currentAdmin(Authentication authentication) {
         return adminSvc.findByAccount(authentication.getName());
     }
+	@ModelAttribute("delistReasons")
+	public DelistReason[] getDelistReasons() {
+		return DelistReason.values();
+	}
 	
 	@PostMapping("/listed")
 	public String listed() {
@@ -82,7 +87,39 @@ public class CourseForAdminController {
 
 		return "back-end/course/course/selectCourse";
 	}
+	@GetMapping("/goto_delisted")
+	public String gotoDelisted(
+			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			ModelMap model, HttpSession session) {
+		Integer currentPage = page;
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("courseList", courseList);
+		model.addAttribute("totalPages", courseList.getTotalPages());
+		if(orderBy != null)
+			model.addAttribute("orderBy", orderBy);
+		return "back-end/course/course/detailCourse";
+	}
 	
+	@PostMapping("/delisted_course")
+	public String delistCourse(
+			@RequestParam Integer courseId,
+			@RequestParam DelistReason delistReason,
+			RedirectAttributes redirectAttributes) {
+
+		courseSvc.delistCourse(courseId, delistReason);
+
+		redirectAttributes.addFlashAttribute(
+			"successMessage",
+			"課程下架成功"
+		);
+
+		return "redirect:/admin/course/goto_delisted";
+	}
+
 	@GetMapping("/select_course_order")
 	public String adminSelectCourseOrder(
 			@ModelAttribute("admin") Admin admin,

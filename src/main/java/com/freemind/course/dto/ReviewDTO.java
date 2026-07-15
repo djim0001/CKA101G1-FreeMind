@@ -6,11 +6,13 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class ReviewDTO {
 	@NotNull(message = "請選擇課程")
 	private Integer courseId;
-	@NotBlank(message="評價內容：請勿空白")
+	@NotBlank(message="請輸入評價內容")
+	@Size(max = 200, message = "評價內容不能超過 200 個字")
 	private String reviewContent;
 	@NotNull
 	@DecimalMin(value = "1")

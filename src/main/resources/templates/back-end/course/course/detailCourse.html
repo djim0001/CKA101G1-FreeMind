@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+<meta charset="UTF-8">
+<title>下架處理</title>
+<style>
+	.modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.modal-overlay.show {
+	display: flex;
+}
+
+.modal-box {
+	position: relative;
+	width: 400px;
+	padding: 24px;
+	border-radius: 8px;
+	background-color: white;
+}
+
+.modal-close {
+	position: absolute;
+	top: 8px;
+	right: 12px;
+	border: none;
+	background: none;
+	font-size: 24px;
+	cursor: pointer;
+}
+
+.modal-box select {
+	width: 100%;
+	margin-top: 8px;
+	padding: 8px;
+}
+</style>
+</head>
+<body>
+	<h3>
+		<a th:href="@{/admin/course/select_course}">員工課程頁面</a>
+	</h3>
+	<h1>下架處理</h1>
+	<table>
+		<thead>
+			<tr>
+					<th></th>
+					<th><a th:href="@{/admin/course/goto_delisted}">課程名稱</a></th>
+					<th>心理師名稱</th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
+						    			)}">課程分類名稱</a>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'courseStatusAsc' ? 'courseStatusDesc' : 'courseStatusAsc'}
+						    			)}">課程狀態</a></th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
+						    			)}">收藏次數</a></th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
+						    			)}">平均星數</a></th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
+						    			)}">評價次數</a></th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
+						    			)}">提問次數</a></th>
+					<th>心理師折扣</th>
+					<th><a th:href="@{/admin/course/goto_delisted(page=1,
+							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
+						    			)}">課程定價</a></th>
+					<th>審核員工</th>
+					<th>功能</th>
+				</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="course : ${courseList}">
+	<tr>
+		<td>
+			<font color="#17aee6" th:if="${course.courseStatus == 1}">●</font>
+		</td>
+		<td th:text="${course.courseName}"></td>
+		<td th:text="${course.psychologist.name}"></td>
+		<td th:text="${course.courseCategories.courseCatName}"></td>
+		<td th:text="${course.courseStatusText}"></td>
+		<td th:text="${course.saveCount}"></td>
+		<td th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
+		<td th:text="${course.reviewCount}"></td>
+		<td th:text="${course.commentCount}"></td>
+		<td th:text="${course.psychDiscount}"></td>
+		<td th:text="${course.price}"></td>
+		<td th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}"></td>
+
+		<td>
+			<button type="button"
+					class="delist-button"
+					th:data-course-id="${course.courseId}"
+					th:data-course-name="${course.courseName}">
+				下架處理
+			</button>
+		</td>
+	</tr>
+</th:block>
+		</tbody>
+	</table>
+	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/goto_delisted', ${orderBy})}"></div>	
+		
+	<div id="delistModal" class="modal-overlay">
+	<div class="modal-box">
+
+		<button type="button"
+				class="modal-close"
+				id="closeDelistModal">
+			×
+		</button>
+
+		<h2>課程下架處理</h2>
+
+		<p>
+			課程編號：
+			<span id="modalCourseIdText"></span>
+		</p>
+
+		<p>
+			課程名稱：
+			<span id="modalCourseNameText"></span>
+		</p>
+
+		<form method="post" th:action="@{delisted_course}">
+
+			<!-- 實際傳送給 Controller 的課程編號 -->
+			<input type="hidden"
+				   id="modalCourseId"
+				   name="courseId">
+
+			<div>
+				<label for="delistReason">下架原因：</label>
+
+				<select id="delistReason"
+						name="delistReason"
+						required>
+					<option value="">請選擇下架原因</option>
+
+					<option th:each="reason : ${delistReasons}"
+							th:value="${reason}"
+							th:text="${reason.label}">
+					</option>
+				</select>
+			</div>
+
+			<div>
+				<button type="button" id="cancelDelistButton">
+					取消
+				</button>
+
+				<button type="submit">
+					確認下架
+				</button>
+			</div>
+
+		</form>
+	</div>
+</div>
+		
+	<script>
+	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
+	        input.value = window.location.pathname + window.location.search;
+	    });
+	</script>
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+	const modal = document.getElementById("delistModal");
+	const courseIdInput = document.getElementById("modalCourseId");
+	const courseIdText = document.getElementById("modalCourseIdText");
+	const courseNameText = document.getElementById("modalCourseNameText");
+	const reasonSelect = document.getElementById("delistReason");
+
+	const closeButton = document.getElementById("closeDelistModal");
+	const cancelButton = document.getElementById("cancelDelistButton");
+
+	const delistButtons = document.querySelectorAll(".delist-button");
+
+	delistButtons.forEach(function (button) {
+		button.addEventListener("click", function () {
+			const courseId = button.dataset.courseId;
+			const courseName = button.dataset.courseName;
+
+			// 放入隱藏欄位，送出表單時會傳給 Controller
+			courseIdInput.value = courseId;
+
+			// 顯示在 Modal 上
+			courseIdText.textContent = courseId;
+			courseNameText.textContent = courseName;
+
+			// 每次打開時重新選擇下架原因
+			reasonSelect.value = "";
+
+			modal.classList.add("show");
+		});
+	});
+
+	function closeModal() {
+		modal.classList.remove("show");
+	}
+
+	closeButton.addEventListener("click", closeModal);
+	cancelButton.addEventListener("click", closeModal);
+
+	// 點擊 Modal 外圍時關閉
+	modal.addEventListener("click", function (event) {
+		if (event.target === modal) {
+			closeModal();
+		}
+	});
+
+	// 按 Esc 關閉
+	document.addEventListener("keydown", function (event) {
+		if (event.key === "Escape") {
+			closeModal();
+		}
+	});
+});
+</script>
+</body>
+</html>
