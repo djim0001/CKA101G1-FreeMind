@@ -110,7 +110,7 @@
 			        <input type="hidden" name="activityId" th:value="${a.activityId}">
 			        <button type="submit">查看詳情</button>
 			    </form>
-				<form th:if="${a.registrable && a.member.memberId != #authentication.principal.member.memberId}"
+				<form th:if="${a.registrable && (#authentication.principal == 'anonymousUser' || a.member.memberId != #authentication.principal.member.memberId)}"
 				      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
 				    <input type="hidden" name="activityId" th:value="${a.activityId}">
 				    <button type="submit">報名</button>

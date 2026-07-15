@@ -46,7 +46,7 @@ public class RegistrationController {
                            @AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
     		Member member = userDetails.getMember();
-    		Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+    		Activity activity = activitySvc.getOneActivity(activityId);
     		try {
     			regisSvc.register(member, activity);
     			redirectAttributes.addFlashAttribute("successMessage", "報名成功,等待審核");

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>我的活動報名清單</title>
@@ -7,7 +8,9 @@
 <body>
 
     <h1>我的活動報名清單</h1>
-
+	
+	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
+	
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
 	
@@ -83,7 +86,8 @@
 
     <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
 
-    <a th:href="@{/member/activity/listAllActivity}">前往活動列表</a>
+	<br>
+    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
 
 
 <script>
