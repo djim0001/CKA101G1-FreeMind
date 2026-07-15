@@ -209,12 +209,12 @@ public class SlotsController {
 	            continue; // 已預約成立的時段，不可被調整
 	        }
 	        boolean checked = openHours != null && openHours.contains(h);
-	        if (!checked && sb.charAt(h) == '1' && !isNew
+	        if (!checked && (sb.charAt(h) == '1' || sb.charAt(h) == '4') && !isNew
 	                && ordersSvc.hasPendingOrder(slots.getTimeslotId(), date.atTime(h, 0))) {
-	            blockedHours.add(h); // 有待確認訂單卡著，擋住不讓關閉
+	            blockedHours.add(h);
 	            continue;
 	        }
-	        sb.setCharAt(h, checked ? '1' : '0');
+	        sb.setCharAt(h, checked ? '4' : '3'); // 手動調整過的時段，用3/4標記
 	    }
 	    slots.setConsStatus(sb.toString());
 	    if (isNew) {
