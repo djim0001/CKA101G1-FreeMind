@@ -26,7 +26,7 @@ public class AdminRefundController {
 
         model.addAttribute("refundList", refundService.getAllRefund());
 
-        return "back-end/course/course/Refund";
+        return "back-end/course/course/RefundList";
     }
 
 
