@@ -127,10 +127,10 @@ th {
 
 			<h2>退款申請</h2>
 
-			<form th:action="@{/member/course/refund/apply}" method="post">
+			<form th:action="@{/member/refund/apply}" method="post">
 
-				<input type="hidden" name="courseOrderId"
-					th:value="${details.get(0).courseOrder.courseOrderId}" />
+<!-- 				<input type="hidden" name="courseOrderId" -->
+<!-- 					th:value="${details.get(0).courseOrder.courseOrderId}" /> -->
 
 				<table>
 
@@ -161,6 +161,8 @@ th {
 
 							<td th:text="${orderDetail.coursePermissionText}"></td>
 
+<!-- <input type="hidden" name="courseOrderId" value="${orderDetail.courseOrder.courseOrderId}"> -->
+<input type="hidden" name="courseOrderId" th:value="${courseOrderId}">
 						</tr>
 
 					</tbody>
@@ -176,7 +178,6 @@ th {
 
 				<br>
 				<br>
-
 				<button type="submit">送出退款申請</button>
 
 				<button type="button" onclick="closeOrderModal()">關閉</button>

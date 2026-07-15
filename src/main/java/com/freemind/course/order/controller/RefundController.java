@@ -65,7 +65,7 @@ public class RefundController {
         model.addAttribute("allMyCourseOrder", allMyCourseOrder);
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("totalPages", allMyCourseOrder.getTotalPages());
-        
+        model.addAttribute("courseOrderId", courseOrderId);
         model.addAttribute("details", details);
         model.addAttribute("detailsMsg", "show");
 
@@ -83,6 +83,12 @@ public class RefundController {
 
         Refund refund = new Refund();
 
+        refund.setCompositeRefund(
+                new Refund.CompositeRefund(
+                        order.getCourseOrderId(),
+                        member.getMemberId()
+                )
+        );
         refund.setCourseOrder(order);
         refund.setMember(member);
         refund.setRefundReason(refundReason);
