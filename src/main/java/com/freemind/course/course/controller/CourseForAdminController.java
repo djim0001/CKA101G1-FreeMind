@@ -125,7 +125,7 @@ public class CourseForAdminController {
 			@ModelAttribute("admin") Admin admin,
 			@RequestParam(defaultValue = "1") Integer page,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
-			ModelMap model, HttpSession session) {
+			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;		
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "orderedAt" : orderBy;

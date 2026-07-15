@@ -29,6 +29,7 @@ import lombok.Setter;
 @Getter
 public class PsychologistSelfRes {
 
+	private Integer psychId;
 	private String psychAccount;
 	
     // 帳號狀態 0:未啟用 1:已啟用 2:停權
