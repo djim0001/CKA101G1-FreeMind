@@ -205,7 +205,6 @@ public class MemberDashboardCourseController {
 	                        member.getMemberId(),
 	                        currentPage - 1
 	                );
-	        // 告訴前端：驗證失敗後要重新開啟 Modal
 	        model.addAttribute("reviewModalMsg", "show");
 
 	        model.addAttribute("unreviewedCourses", unreviewedCourses);
@@ -224,7 +223,10 @@ public class MemberDashboardCourseController {
 		orderDetailSvc.updateOrderDetail(item);
 		
 		Course course = courseSvc.getOneCourse(review.getCourseId());
+System.out.println("review+star" + course.getReviewCount() + course.getStarCount());
 		course.setReviewCount(course.getReviewCount() + 1);
+		course.setStarCount(course.getStarCount() + 1);
+System.out.println("review+star" + course.getReviewCount() + course.getStarCount());
 		courseSvc.updateCourse(course);
 		
 		return "redirect:" + returnUrl;
