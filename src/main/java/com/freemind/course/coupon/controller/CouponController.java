@@ -39,17 +39,16 @@ public class CouponController {
 	@GetMapping("/select_coupon")
 	public String selectCoupon(
 			@RequestParam(defaultValue = "1") Integer page, 
-			ModelMap model, HttpSession session) {
+			ModelMap model) {
 
 		if (page < 1)
 			page = 1;
-		Integer currentPage = page;
 
-		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(currentPage - 1);
+		Page<Coupon> couponListAllPages = couponSvc.getCouponPage(page);
 		Coupon coupon = new Coupon();
 		
 		model.addAttribute("coupon", coupon);
-		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("currentPage", page);
 		model.addAttribute("couponListAllPages", couponListAllPages);
 		model.addAttribute("totalPages", couponListAllPages.getTotalPages());
 
@@ -64,7 +63,9 @@ public class CouponController {
 	}
 
 	@PostMapping("/select_one_coupon")
-	public String listOneCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
+	public String listOneCoupon(
+			@RequestParam("couponId") String couponId, 
+			ModelMap model) {
 		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
 		model.addAttribute("coupon", coupon);
 		return "back-end/course/coupon/listOneCoupon";
@@ -79,30 +80,7 @@ public class CouponController {
 
 		couponSvc.addCoupon(coupon);
 		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/listOneCoupon";
-	}
-
-	@PostMapping("/update_coupon")
-	public String updateCoupon(@RequestParam("couponId") String couponId, ModelMap model) {
-
-		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
-
-		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/updateCoupon";
-	}
-
-	@PostMapping("/update")
-	public String update(@Valid Coupon coupon, BindingResult result, ModelMap model) {
-
-		if (result.hasErrors()) {
-			return "back-end/course/coupon/updateCoupon";
-		}
-		couponSvc.updateCoupon(coupon);
-
-		model.addAttribute("success", "修改成功");
-		coupon = couponSvc.getOneCoupon(Integer.valueOf(coupon.getCouponId()));
-		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/listOneCoupon";
+		return "back-end/course/coupon/selectCoupon";
 	}
 
 	@PostMapping("/publish")
@@ -127,7 +105,6 @@ public class CouponController {
 
 	@ModelAttribute("couponListAll")
 	public List<Coupon> couponListAll() {
-//		List<Coupon> couponListAll = couponSvc.getAllCoupon();
 		return couponSvc.getAllCoupon();
 	}
 

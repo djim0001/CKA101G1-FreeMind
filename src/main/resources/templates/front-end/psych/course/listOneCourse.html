@@ -5,6 +5,10 @@
 <meta charset="UTF-8">
 <title>課程詳情查看</title>
 <style>
+span.error {
+	font-size: 12px;
+	color: red;
+}
 	/* 背景遮罩 */
 	.modal-overlay {
 		position: fixed;
@@ -146,6 +150,30 @@
 		</form>
 	</div>
 	
+	<div>
+		<section class="side-panel mentor">
+		心理師回復:
+			<div th:each="comment : ${courseQuestions}">
+				<p th:text="${comment.member.name} + ':'"></p>
+				<p th:text="${comment.courseQuestion}"></p>
+				<div th:if="${comment.courseAnswer!=null}">
+					<p style="text-align: right;" th:text="${comment.course.psychologist.name} + '心理師回覆:'"></p>
+					<p style="text-align: right;" th:text="${comment.courseAnswer}"></p>
+				</div>
+				<div th:if="${comment.courseAnswer==null}">
+					<form method="post"
+						  th:action="@{/psych/course/answer_course}">
+						<label>心理師回復:</label><span class="error" th:text="${answerMsg}"></span>
+						<input name="courseAnswer"></input>
+						<input type="hidden" name="questionId" th:value="${comment.questionId}">
+						<input type="hidden" name="courseId" th:value="${comment.course.courseId}">
+						<input type="hidden" name="returnUrl">
+						<button type="submit">送出新增</button>
+					</form>
+				</div>
+			</div>
+		</section>
+	</div>
 	
 	<div th:if="${psychDiscountMsg == 'show'}" class="modal-overlay" id="psychDiscountModal">
 
@@ -207,30 +235,5 @@
 		</div>
 	</div>
 	
-	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			const discountStart = document.getElementById('discountStart');
-	
-			if (discountStart) {
-				const tomorrow = new Date();
-				tomorrow.setDate(tomorrow.getDate() + 1);
-// 				tomorrow.setDate(tomorrow.getDate());
-	
-				const year = tomorrow.getFullYear();
-				const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-				const day = String(tomorrow.getDate()).padStart(2, '0');
-	
-				const minDate = `${year}-${month}-${day}`;
-				discountStart.min = minDate;
-			}
-		});
-	
-		function closePsychDiscountModal() {
-			const modal = document.getElementById('psychDiscountModal');
-			if (modal) {
-				modal.style.display = 'none';
-			}
-		}
-	</script>
 </body>
 </html>

@@ -2,6 +2,7 @@ package com.freemind.course.course.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -16,15 +17,19 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseCategories;
 import com.freemind.course.course.model.CourseCategoriesService;
+import com.freemind.course.course.model.CourseQaComment;
+import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.dto.PsychDiscountFormDTO;
 import com.freemind.login.psychologist.entity.Psychologist;
@@ -41,6 +46,7 @@ public class CourseForPsychController {
 	private final CourseService courseSvc;
     private final CourseCategoriesService courseCategoriesSvc;
     private final PsychologistService psychologistService;
+    private final CourseQaCommentService courseQaCommentSvc;
     
 //    @Value("${course.video.upload-path}")
 //    private String videoUploadPath;
@@ -52,11 +58,13 @@ public class CourseForPsychController {
     public CourseForPsychController(
             CourseService courseSvc,
             CourseCategoriesService courseCategoriesSvc,
-            PsychologistService psychologistService) {
+            PsychologistService psychologistService,
+            CourseQaCommentService courseQaCommentSvc) {
 
         this.courseSvc = courseSvc;
         this.courseCategoriesSvc = courseCategoriesSvc;
         this.psychologistService = psychologistService;
+        this.courseQaCommentSvc = courseQaCommentSvc;
     }
 	
 
@@ -113,6 +121,41 @@ public class CourseForPsychController {
 		course.setPsychologist(psychologistService.getOnePsychologist(psychId));
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
+	}
+	
+	@PostMapping("/answer_course")
+	public String psychAnswerdCourse(
+			ModelMap model,
+			@RequestParam("questionId") Integer questionId,
+			@RequestParam("courseId") Integer courseId,
+			@RequestParam("courseAnswer") String courseAnswer,
+			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			RedirectAttributes redirectAttributes) {
+		if(psychId == null) {
+			model.addAttribute("pError", "請先登入心理師編號");
+			return "front-end/psych/course/selectCourse";
+		}
+		try {
+			courseQaCommentSvc.answerQuestion(questionId, psychId, courseAnswer);
+			model.addAttribute(
+	                "answerMsg",
+	                "回復成功"
+	        );
+	    } catch (IllegalArgumentException e) {
+	    		model.addAttribute(
+	                "answerMsg",
+	                e.getMessage()
+	        );
+	    }
+		
+		Course course = courseSvc.getOneCourse(courseId);
+		
+		List<CourseQaComment> courseQuestions = 
+				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+		model.addAttribute("courseQuestions", courseQuestions);
+		model.addAttribute("course", course);
+		
+		return "front-end/psych/course/listOneCourse";
 	}
 	
 	@PostMapping("/insert_or_update_course")
@@ -183,9 +226,16 @@ public class CourseForPsychController {
 		return "front-end/psych/course/listOneCourse";
 	}
 
-	@PostMapping("/get_one_course")
-	public String psychGetOneCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
+	@GetMapping("/get_one_course/{courseId}")
+	public String psychGetOneCourse(
+//			@RequestParam("courseId") Integer courseId, 
+			@PathVariable("courseId") Integer courseId, 
+			ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
+		
+		List<CourseQaComment> courseQuestions = 
+				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+		model.addAttribute("courseQuestions", courseQuestions);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}

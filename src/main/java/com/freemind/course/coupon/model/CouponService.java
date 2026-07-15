@@ -38,7 +38,6 @@ public class CouponService {
 	}
 	
 	public Coupon getOneCoupon(Integer couponId) {
-		// 代表回傳直可能為Optional.empty() => 不是 null -- Jpa 用法 --
 		Optional<Coupon> optional = repository.findById(couponId);
 		return optional.orElse(null);
 	}
@@ -47,14 +46,10 @@ public class CouponService {
 		return repository.findAll();
 	}
 	
-	public List<Coupon> getAllCoupon(Map<String, String[]> map){
-		return repository.findAll();
-	}
-	
 	public Page<Coupon> getCouponPage(Integer page) {
 
         Pageable pageable = PageRequest.of(
-            page,
+            page - 1,
             couponPageSize,
             Sort.by("couponId").ascending()
         );
