@@ -44,7 +44,7 @@ public class Slots {
 	@Column(name = "appt_status", nullable = false, length = 24)
 	@NotNull(message = "預約狀態：請勿空白")
 	@Size(min = 24, max = 24, message = "預約狀態長度必須為24") //為String，驗證字串長度一定是24
-	@Pattern(regexp = "[012]{24}", message = "預約狀態只能為0、1或2") //驗證每個字元只能是012
+	@Pattern(regexp = "[01234]{24}", message = "預約狀態只能為0、1、2、3或4") //驗證每個字元只能是0至4
 	private String consStatus; //not null，0：不可預約，1：可預約，2：已預約
 
 	@OneToMany(mappedBy = "slot", fetch = FetchType.LAZY) //一天可以對應多筆訂單，各佔不同小時

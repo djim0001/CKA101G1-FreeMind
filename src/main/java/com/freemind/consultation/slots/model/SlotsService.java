@@ -52,19 +52,25 @@ public class SlotsService {
 		return repository.findByPsychIdAndSlotDate(psychId, slotDate).orElse(null);
 	}
 	
-	// 把某天某個小時的狀態改成指定值(0/1/2)，回傳是否成功（該小時原本狀態符合預期才允許）
+	// 把某天某個小時的狀態改成指定值，要把 3/4 當成 0/1 的等價值來比對，回傳是否成功（該小時原本狀態符合預期才允許）
 	public boolean updateHourStatus(Integer timeslotId, int hour, char fromStatus, char toStatus) {
-		Slots slots = getOneSlots(timeslotId);
-		if (slots == null) return false;
-		
-		StringBuilder sb = new StringBuilder(slots.getConsStatus());
-		if (sb.charAt(hour) != fromStatus) {
-			return false; // 狀態不符（可能已經被別人搶走了）
-		}
-		sb.setCharAt(hour, toStatus);
-		slots.setConsStatus(sb.toString());
-		updateSlots(slots);
-		return true;
+	    Slots slots = getOneSlots(timeslotId);
+	    if (slots == null) return false;
+
+	    StringBuilder sb = new StringBuilder(slots.getConsStatus());
+	    if (normalize(sb.charAt(hour)) != normalize(fromStatus)) {
+	        return false;
+	    }
+	    sb.setCharAt(hour, toStatus);
+	    slots.setConsStatus(sb.toString());
+	    updateSlots(slots);
+	    return true;
+	}
+
+	private char normalize(char c) {
+	    if (c == '3') return '0';
+	    if (c == '4') return '1';
+	    return c;
 	}
 	
 	private static final java.time.LocalDate TEMPLATE_DATE = java.time.LocalDate.of(2000, 1, 1);

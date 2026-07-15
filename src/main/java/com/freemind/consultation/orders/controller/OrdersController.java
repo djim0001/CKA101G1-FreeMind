@@ -224,9 +224,9 @@ public class OrdersController {
 		List<Integer> availableHours = new java.util.ArrayList<>();
 		String status = slots.getConsStatus();
 		for (int h = 0; h < 24; h++) {
-			if (status.charAt(h) == '1') {
-				availableHours.add(h);
-			}
+		    if (status.charAt(h) == '1' || status.charAt(h) == '4') {
+		        availableHours.add(h);
+		    }
 		}
 
 		if (availableHours.isEmpty()) {

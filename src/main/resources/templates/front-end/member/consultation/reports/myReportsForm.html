@@ -3,6 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>查看我的問題回報</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        margin: 30px;
+        color: #333;
+    }
+    h3 {
+        margin-bottom: 20px;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
 </head>
 <body>
 	<h3>查看我的問題回報處理進度</h3>
@@ -10,9 +34,35 @@
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
 	<form method="post" th:action="@{/reports/myReports}">
-		會員編號：<input type="text" name="memberId">
+		會員編號：<input type="text" name="memberId" th:value="${memberId}">
 		<input type="submit" value="查詢">
 	</form>
+
+	<!-- 查詢後，問題回報清單直接顯示在同一頁的下方 -->
+	<div th:if="${reportsListData != null}">
+		<h3>會員編號 <span th:text="${memberId}"></span> 的問題回報</h3>
+
+		<table>
+			<tr>
+				<th>回報編號</th>
+				<th>問題描述</th>
+				<th>回報日期</th>
+				<th>處理狀態</th>
+				<th>處理備註</th>
+			</tr>
+			<tr th:each="report : ${reportsListData}">
+				<td th:text="${report.reportId}"></td>
+				<td th:text="${report.issueDesc}"></td>
+				<td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+				<td th:switch="${report.reportStatus}">
+					<span th:case="0">待處理</span>
+					<span th:case="1">處理中</span>
+					<span th:case="2">已解決</span>
+				</td>
+				<td th:text="${report.reportNote != null ? report.reportNote : '尚無回覆'}"></td>
+			</tr>
+		</table>
+	</div>
 
 </body>
 </html>
