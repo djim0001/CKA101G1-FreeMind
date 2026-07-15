@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>查看我的評價</title>
+<title>取消紀錄</title>
 <style>
     body {
         font-family: "Microsoft JhengHei", Arial, sans-serif;
@@ -24,7 +24,6 @@
     }
     table {
         border-collapse: collapse;
-        table-layout: fixed;
         width: 100%;
     }
     th, td {
@@ -32,54 +31,47 @@
         padding: 10px;
         text-align: center;
         vertical-align: middle;
-        word-wrap: break-word;
     }
     th {
         background-color: #f2f2f2;
-        white-space: nowrap;
     }
-    .review-content {
-        text-align: left;
+    .status-cancelled {
+        color: #c62828;
+        font-weight: bold;
     }
 </style>
 </head>
 <body>
+
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
 
-	<form class="search-form" method="post" th:action="@{/orders/psychReviews}">
+	<form class="search-form" method="post" th:action="@{/orders/psychCancelledForm}">
 		心理師編號：<input type="text" name="psychId" th:value="${psychId}">
 		<input type="submit" value="查詢">
 	</form>
 
-	<!-- 查詢後，評價清單直接顯示在同一頁的下方 -->
+	<!-- 查詢後，取消紀錄直接顯示在同一頁的下方 -->
 	<div th:if="${ordersListData != null}">
 
-		<table>
-			<colgroup>
-				<col style="width:8%;">
-				<col style="width:8%;">
-				<col style="width:10%;">
-				<col style="width:12%;">
-				<col style="width:12%;">
-				<col style="width:6%;">
-				<col style="width:26%;">
-				<col style="width:18%;">
-			</colgroup>
+		<p th:if="${#lists.isEmpty(ordersListData)}">目前沒有已取消的訂單。</p>
+
+		<table th:unless="${#lists.isEmpty(ordersListData)}">
 			<tr>
 				<th>訂單編號</th>
 				<th>會員編號</th>
 				<th>姓名</th>
-				<th>諮商日期</th>
+				<th>開始時間</th>
+				<th>結束時間</th>
 				<th>來訪目的</th>
-				<th>評分</th>
-				<th>心得內容</th>
-				<th>評論時間</th>
+				<th>來訪目的備註</th>
+				<th>狀態</th>
 			</tr>
 			<tr th:each="order : ${ordersListData}">
 				<td th:text="${order.orderId}"></td>
 				<td th:text="${order.member.memberId}"></td>
 				<td th:text="${order.member.name}"></td>
-				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd')}"></td>
+				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+				<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
 				<td th:switch="${order.visitPurpose}">
 					<span th:case="'emotion'">情緒困擾</span>
 					<span th:case="'stress'">壓力調適</span>
@@ -93,9 +85,8 @@
 					<span th:case="'other'">其他</span>
 					<span th:case="*" th:text="${order.visitPurpose}"></span>
 				</td>
-				<td th:text="${order.rating}"></td>
-				<td class="review-content" th:text="${order.reviewContent}"></td>
-				<td th:text="${#temporals.format(order.reviewedAt, 'yyyy-MM-dd HH:mm')}"></td>
+				<td th:text="${order.visitPurposeNote}"></td>
+				<td class="status-cancelled">已取消</td>
 			</tr>
 		</table>
 	</div>

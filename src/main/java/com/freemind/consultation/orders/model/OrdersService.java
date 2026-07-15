@@ -1,5 +1,6 @@
 package com.freemind.consultation.orders.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -140,8 +141,8 @@ public class OrdersService {
 		return repository.findConfirmedOrCompletedByMemberId(memberId);
 
 	}
-	
-	//諮商訂單列表同時查詢一筆以上
+
+	// 諮商訂單列表同時查詢一筆以上
 	public List<Orders> search(Integer memberId, Integer psychId, Integer orderStatus, Boolean govSubsidy,
 			Integer sessionType, java.time.LocalDate slotDate) {
 		List<Orders> list = getAll();
@@ -173,13 +174,56 @@ public class OrdersService {
 
 		return list;
 	}
-	
+
 	// 心理師：合併查看待確認+已確認的訂單
-		public List<Orders> getPendingAndConfirmedByPsychId(Integer psychId) {
-			List<Orders> list = new java.util.ArrayList<>();
-			list.addAll(getPendingOrdersByPsychId(psychId));   // orderStatus = 0
-			list.addAll(getConfirmedOrdersByPsychId(psychId)); // orderStatus = 1
-			list.sort((a, b) -> a.getConsStart().compareTo(b.getConsStart()));
-			return list;
+	public List<Orders> getPendingAndConfirmedByPsychId(Integer psychId) {
+		List<Orders> list = new java.util.ArrayList<>();
+		list.addAll(getPendingOrdersByPsychId(psychId)); // orderStatus = 0
+		list.addAll(getConfirmedOrdersByPsychId(psychId)); // orderStatus = 1
+		list.sort((a, b) -> a.getConsStart().compareTo(b.getConsStart()));
+		return list;
+	}
+
+	// 心理師標記會員未出席
+	public void noShowOrder(Integer orderId) {
+		Orders orders = getOneOrders(orderId);
+		if (orders != null) {
+			orders.setOrderStatus(3);// 未出席
+			updateOrders(orders);
 		}
+	}
+
+	// 心理師查看已取消的訂單
+	public List<Orders> getCancelledOrdersByPsychId(Integer psychId) {
+		return repository.findByPsychIdAndOrderStatus(psychId, 2);
+	}
+
+	// 歷史諮商紀錄
+	public List<Orders> getHistory(Integer psychId, LocalDate slotDate, Integer orderStatus) {
+		List<Orders> list = getAll().stream()
+				.filter(o -> o.getOrderStatus() == 2 || o.getOrderStatus() == 3 || o.getOrderStatus() == 4)
+				.collect(Collectors.toList());
+
+		if (psychId != null) {
+			list = list.stream()
+					.filter(o -> o.getPsychologist() != null && o.getPsychologist().getPsychId().equals(psychId))
+					.collect(Collectors.toList());
+		}
+		if (slotDate != null) {
+			list = list.stream().filter(o -> o.getConsStart().toLocalDate().equals(slotDate))
+					.collect(Collectors.toList());
+		}
+		if (orderStatus != null) {
+			list = list.stream().filter(o -> o.getOrderStatus().equals(orderStatus)).collect(Collectors.toList());
+		}
+		return list;
+	}
+
+	// 保護預約狀態:0改為1, 不讓心理師關掉有 pending 訂單的小時
+
+	public boolean hasPendingOrder(Integer timeslotId, LocalDateTime consStart) {
+
+		return !repository.findPendingBySlotAndConsStart(timeslotId, consStart).isEmpty();
+
+	}
 }

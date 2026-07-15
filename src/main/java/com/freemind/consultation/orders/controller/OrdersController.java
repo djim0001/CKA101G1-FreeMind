@@ -317,14 +317,14 @@ public class OrdersController {
 	public String approve(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			ModelMap model) {
 		ordersSvc.approveOrder(Integer.valueOf(orderId), slotsSvc);
-		return "redirect:/orders/psychOrders?psychId=" + psychId;   // ← 改成這樣
+		return "redirect:/orders/psychOrders?psychId=" + psychId; // ← 改成這樣
 	}
 
 	@PostMapping("reject")
 	public String reject(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			ModelMap model) {
 		ordersSvc.rejectOrder(Integer.valueOf(orderId));
-		return "redirect:/orders/psychOrders?psychId=" + psychId;   // ← 改成這樣
+		return "redirect:/orders/psychOrders?psychId=" + psychId; // ← 改成這樣
 	}
 
 	// ===== 會員：查看自己的訂單記錄 =====
@@ -386,19 +386,19 @@ public class OrdersController {
 			model.addAttribute("errorMessage", "請輸入會員編號");
 			return "front-end/member/consultation/orders/reviewForm";
 		}
-		
+
 		List<Orders> list = ordersSvc.getCompletedUnratedByMemberId(Integer.valueOf(memberId));
-		
+
 		if (list.isEmpty()) {
 			model.addAttribute("errorMessage", "目前沒有可評論的諮商紀錄。");
 			return "front-end/member/consultation/orders/reviewForm";
 		}
-		
+
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/reviewList";
 	}
-	
+
 	@PostMapping("reviewSelect")
 	public String reviewSelect(@RequestParam("orderId") String orderId, ModelMap model) {
 		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
@@ -413,103 +413,157 @@ public class OrdersController {
 		model.addAttribute("success", "感謝您的評價！");
 		return "front-end/member/consultation/orders/reviewSuccess";
 	}
-	
+
 	// ===== 心理師：查看評價（公開頁，尚未串登入）=====
-	
-		@GetMapping("psychReviews")
-		public String psychReviewSearch(ModelMap model) {
+
+	@GetMapping("psychReviews")
+	public String psychReviewSearch(ModelMap model) {
+		return "front-end/psych/consultation/orders/psychReviewSearch";
+	}
+
+	@PostMapping("psychReviews")
+	public String psychReviews(@RequestParam("psychId") String psychId, ModelMap model) {
+		if (psychId == null || psychId.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入心理師編號");
 			return "front-end/psych/consultation/orders/psychReviewSearch";
 		}
-		
-		@PostMapping("psychReviews")
-		public String psychReviews(@RequestParam("psychId") String psychId, ModelMap model) {
-			if (psychId == null || psychId.isBlank()) {
-				model.addAttribute("errorMessage", "請輸入心理師編號");
-				return "front-end/psych/consultation/orders/psychReviewSearch";
-			}
-			List<Orders> list = ordersSvc.getReviewsByPsychId(Integer.valueOf(psychId));
-			model.addAttribute("ordersListData", list);
-			model.addAttribute("psychId", psychId);
-			return "front-end/psych/consultation/orders/psychReviewList";
-		}
-		
-		//諮商師填寫晤談筆記
-		@PostMapping("complete")
-		public String complete(@RequestParam("orderId") String orderId,
-							   @RequestParam("psychId") String psychId,
-							   @RequestParam(value = "psychNote", required = false) String psychNote,
-							   ModelMap model) {
-			ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
-			return "redirect:/orders/psychOrders?psychId=" + psychId;   // ← 改成這樣
-		}
-		
-		@PostMapping("viewDetail")
-		public String viewDetail(@RequestParam("orderId") String orderId, ModelMap model) {
+		List<Orders> list = ordersSvc.getReviewsByPsychId(Integer.valueOf(psychId));
+		model.addAttribute("ordersListData", list);
+		model.addAttribute("psychId", psychId);
+		return "front-end/psych/consultation/orders/psychReviewSearch";
+	}
+
+	// 諮商師填寫晤談筆記
+	@PostMapping("complete")
+	public String complete(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
+			@RequestParam(value = "psychNote", required = false) String psychNote, ModelMap model) {
+		ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
+		return "redirect:/orders/psychOrders?psychId=" + psychId; // ← 改成這樣
+	}
+
+	@PostMapping("viewDetail")
+	public String viewDetail(@RequestParam("orderId") String orderId, ModelMap model) {
+		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+		model.addAttribute("orders", orders);
+		return "back-end/consultation/orders/viewOrderDetail";
+	}
+
+	// 諮商訂單列表同時查詢一筆以上
+	@PostMapping("search")
+	public String search(@RequestParam(value = "orderId", required = false) String orderId,
+			@RequestParam(value = "memberId", required = false) String memberId,
+			@RequestParam(value = "psychId", required = false) String psychId,
+			@RequestParam(value = "orderStatus", required = false) String orderStatus,
+			@RequestParam(value = "govSubsidy", required = false) String govSubsidy,
+			@RequestParam(value = "sessionType", required = false) String sessionType,
+			@RequestParam(value = "slotDate", required = false) String slotDate, ModelMap model) {
+
+		// 訂單編號是唯一識別，若有填，直接查單筆並忽略其他條件
+		if (orderId != null && !orderId.isBlank()) {
 			Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
 			model.addAttribute("orders", orders);
-			return "back-end/consultation/orders/viewOrderDetail";
-		}
-		
-		//諮商訂單列表同時查詢一筆以上
-		@PostMapping("search")
-		public String search(@RequestParam(value = "orderId", required = false) String orderId,
-		                      @RequestParam(value = "memberId", required = false) String memberId,
-		                      @RequestParam(value = "psychId", required = false) String psychId,
-		                      @RequestParam(value = "orderStatus", required = false) String orderStatus,
-		                      @RequestParam(value = "govSubsidy", required = false) String govSubsidy,
-		                      @RequestParam(value = "sessionType", required = false) String sessionType,
-		                      @RequestParam(value = "slotDate", required = false) String slotDate,
-		                      ModelMap model) {
-
-			// 訂單編號是唯一識別，若有填，直接查單筆並忽略其他條件
-			if (orderId != null && !orderId.isBlank()) {
-				Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
-				model.addAttribute("orders", orders);
-				return "back-end/consultation/orders/select_Page";
-			}
-
-			Integer memberIdVal = (memberId != null && !memberId.isBlank()) ? Integer.valueOf(memberId) : null;
-			Integer psychIdVal = (psychId != null && !psychId.isBlank()) ? Integer.valueOf(psychId) : null;
-			Integer orderStatusVal = (orderStatus != null && !orderStatus.isBlank()) ? Integer.valueOf(orderStatus) : null;
-			Boolean govSubsidyVal = (govSubsidy != null && !govSubsidy.isBlank()) ? Boolean.valueOf(govSubsidy) : null;
-			Integer sessionTypeVal = (sessionType != null && !sessionType.isBlank()) ? Integer.valueOf(sessionType) : null;
-			java.time.LocalDate slotDateVal = (slotDate != null && !slotDate.isBlank()) ? java.time.LocalDate.parse(slotDate) : null;
-
-			if (memberIdVal == null && psychIdVal == null && orderStatusVal == null
-					&& govSubsidyVal == null && sessionTypeVal == null && slotDateVal == null) {
-				model.addAttribute("errorMessage", "請至少填寫一個查詢條件");
-				return "back-end/consultation/orders/select_Page";
-			}
-
-			List<Orders> list = ordersSvc.search(memberIdVal, psychIdVal, orderStatusVal, govSubsidyVal, sessionTypeVal, slotDateVal);
-			model.addAttribute("ordersListData", list);
 			return "back-end/consultation/orders/select_Page";
 		}
-		
-		// ===== 心理師：合併查看待確認+已確認訂單 =====
-		
-		@GetMapping("psychOrdersForm")
-		public String psychOrdersForm(ModelMap model) {
+
+		Integer memberIdVal = (memberId != null && !memberId.isBlank()) ? Integer.valueOf(memberId) : null;
+		Integer psychIdVal = (psychId != null && !psychId.isBlank()) ? Integer.valueOf(psychId) : null;
+		Integer orderStatusVal = (orderStatus != null && !orderStatus.isBlank()) ? Integer.valueOf(orderStatus) : null;
+		Boolean govSubsidyVal = (govSubsidy != null && !govSubsidy.isBlank()) ? Boolean.valueOf(govSubsidy) : null;
+		Integer sessionTypeVal = (sessionType != null && !sessionType.isBlank()) ? Integer.valueOf(sessionType) : null;
+		java.time.LocalDate slotDateVal = (slotDate != null && !slotDate.isBlank())
+				? java.time.LocalDate.parse(slotDate)
+				: null;
+
+		if (memberIdVal == null && psychIdVal == null && orderStatusVal == null && govSubsidyVal == null
+				&& sessionTypeVal == null && slotDateVal == null) {
+			model.addAttribute("errorMessage", "請至少填寫一個查詢條件");
+			return "back-end/consultation/orders/select_Page";
+		}
+
+		List<Orders> list = ordersSvc.search(memberIdVal, psychIdVal, orderStatusVal, govSubsidyVal, sessionTypeVal,
+				slotDateVal);
+		model.addAttribute("ordersListData", list);
+		return "back-end/consultation/orders/select_Page";
+	}
+
+	// 心理師：合併查看待確認+已確認訂單
+
+	@GetMapping("psychOrdersForm")
+	public String psychOrdersForm(ModelMap model) {
+		return "front-end/psych/consultation/orders/psychOrdersForm";
+	}
+
+	@PostMapping("psychOrders")
+	public String psychOrders(@RequestParam("psychId") String psychId, ModelMap model) {
+		if (psychId == null || psychId.isBlank()) {
+			model.addAttribute("errorMessage", "請輸入心理師編號");
 			return "front-end/psych/consultation/orders/psychOrdersForm";
 		}
-		
-		@PostMapping("psychOrders")
-		public String psychOrders(@RequestParam("psychId") String psychId, ModelMap model) {
-			if (psychId == null || psychId.isBlank()) {
-				model.addAttribute("errorMessage", "請輸入心理師編號");
-				return "front-end/psych/consultation/orders/psychOrdersForm";
-			}
-			List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(Integer.valueOf(psychId));
-			model.addAttribute("ordersListData", list);
-			model.addAttribute("psychId", psychId);
-			return "front-end/psych/consultation/orders/psychOrdersList";
-		}
-		
-		@GetMapping("psychOrders")
-		public String psychOrdersRedirect(@RequestParam("psychId") String psychId, ModelMap model) {
-			List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(Integer.valueOf(psychId));
-			model.addAttribute("ordersListData", list);
-			model.addAttribute("psychId", psychId);
-			return "front-end/psych/consultation/orders/psychOrdersList";
-		}
+		List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(Integer.valueOf(psychId));
+		model.addAttribute("ordersListData", list);
+		model.addAttribute("psychId", psychId);
+		return "front-end/psych/consultation/orders/psychOrdersForm";
+	}
+
+	@GetMapping("psychOrders")
+	public String psychOrdersRedirect(@RequestParam("psychId") String psychId, ModelMap model) {
+		List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(Integer.valueOf(psychId));
+		model.addAttribute("ordersListData", list);
+		model.addAttribute("psychId", psychId);
+		return "front-end/psych/consultation/orders/psychOrdersForm";
+	}
+
+	@PostMapping("noShow")
+	public String noShow(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
+			ModelMap model) {
+		ordersSvc.noShowOrder(Integer.valueOf(orderId));
+		return "redirect:/orders/psychOrders?psychId=" + psychId;
+	}
+	
+	// 心理師：查看已取消的訂單
+	@GetMapping("psychCancelledForm")
+	public String psychCancelledForm(ModelMap model) {
+	    return "front-end/psych/consultation/orders/psychCancelledForm";
+	}
+
+	@PostMapping("psychCancelledForm")
+	public String psychCancelled(@RequestParam("psychId") String psychId, ModelMap model) {
+	    if (psychId == null || psychId.isBlank()) {
+	        model.addAttribute("errorMessage", "請輸入心理師編號");
+	        return "front-end/psych/consultation/orders/psychCancelledForm";
+	    }
+	    List<Orders> list = ordersSvc.getCancelledOrdersByPsychId(Integer.valueOf(psychId));
+	    model.addAttribute("ordersListData", list);
+	    model.addAttribute("psychId", psychId);
+	    return "front-end/psych/consultation/orders/psychCancelledForm";
+	}
+	
+	//歷史諮商紀錄
+	@GetMapping("psychHistoryForm")
+	public String psychHistoryForm(ModelMap model) {
+	    return "front-end/psych/consultation/orders/psychHistoryForm";
+	}
+
+	@PostMapping("psychHistoryForm")
+	public String psychHistory(@RequestParam(value = "psychId", required = false) String psychId,
+	        @RequestParam(value = "slotDate", required = false) String slotDate,
+	        @RequestParam(value = "orderStatus", required = false) String orderStatus,
+	        ModelMap model) {
+	    boolean psychEmpty = (psychId == null || psychId.isBlank());
+	    boolean dateEmpty = (slotDate == null || slotDate.isBlank());
+	    boolean statusEmpty = (orderStatus == null || orderStatus.isBlank());
+	    if (psychEmpty && dateEmpty && statusEmpty) {
+	        model.addAttribute("errorMessage", "請至少輸入心理師編號、諮商日期、狀態其中一項");
+	        return "front-end/psych/consultation/orders/psychHistoryForm";
+	    }
+	    Integer psychIdVal = psychEmpty ? null : Integer.valueOf(psychId);
+	    java.time.LocalDate dateVal = dateEmpty ? null : java.time.LocalDate.parse(slotDate);
+	    Integer statusVal = statusEmpty ? null : Integer.valueOf(orderStatus);
+	    List<Orders> list = ordersSvc.getHistory(psychIdVal, dateVal, statusVal);
+	    model.addAttribute("ordersListData", list);
+	    model.addAttribute("psychId", psychId);
+	    model.addAttribute("slotDate", slotDate);
+	    model.addAttribute("orderStatus", orderStatus);
+	    return "front-end/psych/consultation/orders/psychHistoryForm";
+	}
 }

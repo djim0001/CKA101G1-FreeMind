@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>查看我的評價</title>
+<title>歷史諮商紀錄</title>
 <style>
     body {
         font-family: "Microsoft JhengHei", Arial, sans-serif;
@@ -12,11 +12,14 @@
     h3 {
         margin-bottom: 20px;
     }
-    .search-form {
-        margin-bottom: 20px;
+    .search-form label {
+        margin-right: 4px;
     }
-    .search-form input[type="text"] {
+    .search-form input[type="text"],
+    .search-form input[type="date"],
+    .search-form select {
         padding: 4px 8px;
+        margin-right: 16px;
     }
     .search-form input[type="submit"] {
         padding: 5px 14px;
@@ -26,6 +29,7 @@
         border-collapse: collapse;
         table-layout: fixed;
         width: 100%;
+        margin-top: 10px;
     }
     th, td {
         border: 1px solid #ddd;
@@ -38,31 +42,39 @@
         background-color: #f2f2f2;
         white-space: nowrap;
     }
-    .review-content {
-        text-align: left;
-    }
+    .status-cancelled { color: #c62828; font-weight: bold; }
+    .status-noshow    { color: #ef6c00; font-weight: bold; }
+    .status-completed { color: #1565c0; font-weight: bold; }
 </style>
 </head>
 <body>
+	
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
 
-	<form class="search-form" method="post" th:action="@{/orders/psychReviews}">
-		心理師編號：<input type="text" name="psychId" th:value="${psychId}">
+	<form class="search-form" method="post" th:action="@{/orders/psychHistoryForm}">
+		<label>心理師編號：</label><input type="text" name="psychId" th:value="${psychId}">
+		<label>諮商日期：</label><input type="date" name="slotDate" th:value="${slotDate}">
+		<label>狀態：</label>
+		<select name="orderStatus">
+			<option value="" th:selected="${orderStatus == null or orderStatus == ''}">不限</option>
+			<option value="2" th:selected="${orderStatus == '2'}">已取消</option>
+			<option value="3" th:selected="${orderStatus == '3'}">未出席</option>
+			<option value="4" th:selected="${orderStatus == '4'}">已完成</option>
+		</select>
 		<input type="submit" value="查詢">
 	</form>
 
-	<!-- 查詢後，評價清單直接顯示在同一頁的下方 -->
+	<!-- 查詢後，歷史紀錄直接顯示在同一頁的下方 -->
 	<div th:if="${ordersListData != null}">
+		<p th:if="${#lists.isEmpty(ordersListData)}">查無符合條件的歷史諮商紀錄。</p>
 
-		<table>
+		<table th:unless="${#lists.isEmpty(ordersListData)}">
 			<colgroup>
-				<col style="width:8%;">
-				<col style="width:8%;">
-				<col style="width:10%;">
 				<col style="width:12%;">
 				<col style="width:12%;">
-				<col style="width:6%;">
-				<col style="width:26%;">
+				<col style="width:16%;">
+				<col style="width:22%;">
+				<col style="width:20%;">
 				<col style="width:18%;">
 			</colgroup>
 			<tr>
@@ -71,15 +83,13 @@
 				<th>姓名</th>
 				<th>諮商日期</th>
 				<th>來訪目的</th>
-				<th>評分</th>
-				<th>心得內容</th>
-				<th>評論時間</th>
+				<th>狀態</th>
 			</tr>
 			<tr th:each="order : ${ordersListData}">
 				<td th:text="${order.orderId}"></td>
 				<td th:text="${order.member.memberId}"></td>
 				<td th:text="${order.member.name}"></td>
-				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd')}"></td>
+				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 				<td th:switch="${order.visitPurpose}">
 					<span th:case="'emotion'">情緒困擾</span>
 					<span th:case="'stress'">壓力調適</span>
@@ -93,9 +103,11 @@
 					<span th:case="'other'">其他</span>
 					<span th:case="*" th:text="${order.visitPurpose}"></span>
 				</td>
-				<td th:text="${order.rating}"></td>
-				<td class="review-content" th:text="${order.reviewContent}"></td>
-				<td th:text="${#temporals.format(order.reviewedAt, 'yyyy-MM-dd HH:mm')}"></td>
+				<td th:switch="${order.orderStatus}">
+					<span th:case="2" class="status-cancelled">已取消</span>
+					<span th:case="3" class="status-noshow">未出席</span>
+					<span th:case="4" class="status-completed">已完成</span>
+				</td>
 			</tr>
 		</table>
 	</div>
