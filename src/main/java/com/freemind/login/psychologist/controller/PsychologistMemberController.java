@@ -19,7 +19,7 @@ import com.freemind.login.psychologist.service.PsychologistService;
 
 
 @Controller
-@RequestMapping("/member/psych")
+@RequestMapping("/search")
 public class PsychologistMemberController {
 
 	private final PsychologistService psychologistService;
@@ -36,7 +36,7 @@ public class PsychologistMemberController {
 		return (s == null || s.isBlank()) ? null : s;
 	}
 	
-	@GetMapping("/search")
+	@GetMapping
 	public String search(
 	        @RequestParam(required = false) String name,
 	        @RequestParam(required = false) String gender,
