@@ -71,7 +71,7 @@
 
 <div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
 
-<form class="search-form" method="get" th:action="@{/member/psych/search}">
+<form class="search-form" method="get" th:action="@{/search}">
     <input type="text" name="name" placeholder="姓名" th:value="${name}">
 
     <select name="gender">
@@ -98,24 +98,24 @@
     <input type="hidden" name="orderBy" th:value="${orderBy}">
 
     <button type="submit">搜尋</button>
-    <a th:href="@{/member/psych/search}" class="clear-btn">清空條件</a>
+    <a th:href="@{/search}" class="clear-btn">清空條件</a>
 </form>
 
 <div class="sort-bar">
     排序：
-    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+    <a th:href="@{search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
             orderBy=${orderBy == 'nameAsc' ? 'nameDesc' : 'nameAsc'})}"
        th:classappend="${orderBy == 'nameAsc' || orderBy == 'nameDesc'} ? 'active'">
        姓名 <span th:text="${orderBy == 'nameAsc' ? '▲' : (orderBy == 'nameDesc' ? '▼' : '')}"></span>
     </a>
 
-    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+    <a th:href="@{/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
             orderBy=${orderBy == 'genderAsc' ? 'genderDesc' : 'genderAsc'})}"
        th:classappend="${orderBy == 'genderAsc' || orderBy == 'genderDesc'} ? 'active'">
        性別 <span th:text="${orderBy == 'genderAsc' ? '▲' : (orderBy == 'genderDesc' ? '▼' : '')}"></span>
     </a>
 
-    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+    <a th:href="@{/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
             orderBy=${orderBy == 'feeAsc' ? 'feeDesc' : 'feeAsc'})}"
        th:classappend="${orderBy == 'feeAsc' || orderBy == 'feeDesc'} ? 'active'">
        費用 <span th:text="${orderBy == 'feeAsc' ? '▲' : (orderBy == 'feeDesc' ? '▼' : '')}"></span>
@@ -138,7 +138,7 @@
             專長：
             <span class="expertise-tag" th:each="e : ${p.expertiseList}" th:text="${e}"></span>
         </p>
-        <a th:href="@{/member/psych/detail/{id}(id=${p.psychId})}">查看詳情 →</a>
+        <a th:href="@{search/detail/{id}(id=${p.psychId})}">查看詳情 →</a>
     </div>
 </div>
 

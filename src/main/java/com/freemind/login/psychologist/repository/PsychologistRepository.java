@@ -15,4 +15,6 @@ public interface  PsychologistRepository extends JpaRepository<Psychologist, Int
 	void deleteByPsychologist(int psych_id);
 	
 	Psychologist findByPsychAccount(String PsychAccount);
+	
+	Psychologist findByEmail(String email);
 }
