@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>心理師搜尋</title>
+    <style>
+        .search-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 16px;
+            background: #f7f7f7;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .search-form input, .search-form select {
+            padding: 6px 10px;
+        }
+        .sort-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .sort-bar a {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+        }
+        .sort-bar a.active {
+            background: #2c7a9e;
+            color: white;
+            border-color: #2c7a9e;
+        }
+        .psych-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .psych-card {
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .psych-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .expertise-tag {
+            display: inline-block;
+            background: #e8f4f8;
+            color: #2c7a9e;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px 4px 2px 0;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>心理師搜尋</h2>
+
+<div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+<form class="search-form" method="get" th:action="@{/member/psych/search}">
+    <input type="text" name="name" placeholder="姓名" th:value="${name}">
+
+    <select name="gender">
+        <option value="">性別（不限）</option>
+        <option value="男" th:selected="${gender == '男'}">男</option>
+        <option value="女" th:selected="${gender == '女'}">女</option>
+    </select>
+
+    <input type="text" name="psychLoc" placeholder="地點" th:value="${psychLoc}">
+    <input type="number" name="minFee" placeholder="最低費用" th:value="${minFee}">
+    <input type="number" name="maxFee" placeholder="最高費用" th:value="${maxFee}">
+
+    <select name="expertiseName">
+        <option value="">專長（不限）</option>
+        <option th:each="e : ${expertiseOptions}"
+                th:value="${e}"
+                th:text="${e}"
+                th:selected="${e == expertiseName}"></option>
+    </select>
+
+    <input type="date" name="slotDate" th:value="${slotDate}">
+
+    <!-- 保留目前排序狀態，避免重新搜尋時被重置 -->
+    <input type="hidden" name="orderBy" th:value="${orderBy}">
+
+    <button type="submit">搜尋</button>
+    <a th:href="@{/member/psych/search}" class="clear-btn">清空條件</a>
+</form>
+
+<div class="sort-bar">
+    排序：
+    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+            orderBy=${orderBy == 'nameAsc' ? 'nameDesc' : 'nameAsc'})}"
+       th:classappend="${orderBy == 'nameAsc' || orderBy == 'nameDesc'} ? 'active'">
+       姓名 <span th:text="${orderBy == 'nameAsc' ? '▲' : (orderBy == 'nameDesc' ? '▼' : '')}"></span>
+    </a>
+
+    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+            orderBy=${orderBy == 'genderAsc' ? 'genderDesc' : 'genderAsc'})}"
+       th:classappend="${orderBy == 'genderAsc' || orderBy == 'genderDesc'} ? 'active'">
+       性別 <span th:text="${orderBy == 'genderAsc' ? '▲' : (orderBy == 'genderDesc' ? '▼' : '')}"></span>
+    </a>
+
+    <a th:href="@{/member/psych/search(name=${name}, gender=${gender}, psychLoc=${psychLoc}, minFee=${minFee}, maxFee=${maxFee}, expertiseName=${expertiseName}, slotDate=${slotDate},
+            orderBy=${orderBy == 'feeAsc' ? 'feeDesc' : 'feeAsc'})}"
+       th:classappend="${orderBy == 'feeAsc' || orderBy == 'feeDesc'} ? 'active'">
+       費用 <span th:text="${orderBy == 'feeAsc' ? '▲' : (orderBy == 'feeDesc' ? '▼' : '')}"></span>
+    </a>
+</div>
+
+<div class="psych-grid">
+    <div class="psych-card" th:each="p : ${psychList}">
+        <img th:src="${p.profilePic != null && !p.profilePic.isEmpty()}? 
+				@{'/psych-images/' + ${p.profilePic}} : @{/images/cp4.png}" alt="大頭照">
+        <h3 th:text="${p.name} + ' 心理師'"></h3>
+        <p>
+            性別：<span th:text="${p.gender}"></span>
+            <span th:if="${p.hasPracticeLicense}"> | 已通過執業許可 ✓</span>
+        </p>
+        <p>證照：<span th:text="${p.psychCertificate}"></span></p>
+        <p>地點：<span th:text="${p.psychLoc}"></span></p>
+        <p>費用：$<span th:text="${p.psychFee}"></span> / 次</p>
+        <p>
+            專長：
+            <span class="expertise-tag" th:each="e : ${p.expertiseList}" th:text="${e}"></span>
+        </p>
+        <a th:href="@{/member/psych/detail/{id}(id=${p.psychId})}">查看詳情 →</a>
+    </div>
+</div>
+
+<p th:if="${psychList != null && psychList.isEmpty()}">找不到符合條件的心理師</p>
+
+</body>
+</html>

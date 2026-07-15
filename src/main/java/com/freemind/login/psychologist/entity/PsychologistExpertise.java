@@ -14,7 +14,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "psychologist_expertise")
+@Table(name = "psych_expertise")
 public class PsychologistExpertise {
 	
 	@EmbeddedId
@@ -59,7 +59,7 @@ public class PsychologistExpertise {
 	@Embeddable
 	public static class CompositeExpertiseDetail implements Serializable{
 		
-		@Column(name = "psych_id")
+		@Column(name  = "psych_id")
 		private Integer psychId;
 		
 		@Column(name = "expertise_id")
@@ -83,8 +83,8 @@ public class PsychologistExpertise {
 			return psychId;
 		}
 
-		public void setPsychId(Integer psychId) {
-			this.psychId = psychId;
+		public void setPsychId(Integer psychID) {
+			this.psychId = psychID;
 		}
 
 		public Integer getExpertiseId() {

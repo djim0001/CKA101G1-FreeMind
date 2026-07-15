@@ -18,4 +18,7 @@ public interface PsychologistExpertiseRepository extends JpaRepository<Psycholog
     // 有某專長的所有心理師(使用者依專長搜尋心理師)
 	@EntityGraph(attributePaths = "psychologist")
     List<PsychologistExpertise> findByExpertiseExpertiseId(Integer expertiseId);
+	
+	void deleteByCompositeExpertiseDetail_PsychId(Integer psychId);
+
 }

@@ -204,7 +204,7 @@ public class OrdersController {
 		return "front-end/member/consultation/orders/bookForm";
 	}
 
-	@PostMapping("bookLookup")
+	@GetMapping("bookLookup")
 	public String bookLookup(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
 			ModelMap model) {
 		if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {

@@ -21,5 +21,11 @@ public class LoginController {
     public String memberLogin() {
         return "front-end/login";
     }
-
+    /**
+     * 心理師登入頁面
+     */
+    @GetMapping("/psych/psychologistLogin")
+    public String psychologistLogin() {
+        return "front-end/psych/psychologistLogin";
+    }
 }

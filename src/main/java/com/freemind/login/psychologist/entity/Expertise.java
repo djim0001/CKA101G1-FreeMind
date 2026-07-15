@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "expertise")
+@Table(name = "psych_all_expertise")
 public class Expertise implements java.io.Serializable{
 	
 	private static final long serialVersionUID = 1L;
