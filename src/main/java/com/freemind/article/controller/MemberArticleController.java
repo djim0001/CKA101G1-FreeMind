@@ -28,12 +28,8 @@ public class MemberArticleController {
 	
 	@PostMapping("/{articleId}/like")
 	public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable Integer articleId,
-														  @AuthenticationPrincipal MemberUserDetails principal) {
-		if (principal == null) {
-			return ResponseEntity.status(401).body(Map.of("errorMessage", "請先登入"));
-		}
-		
-		Integer memberId = principal.getMember().getMemberId();
+														  @AuthenticationPrincipal MemberUserDetails prinUserDetails) {
+		Integer memberId = prinUserDetails.getMember().getMemberId();
 		articleInteractionService.toggleLike(articleId, memberId);
 		
 		Article article = articleService.getPublishedArticle(articleId);
@@ -48,12 +44,8 @@ public class MemberArticleController {
 	
 	@PostMapping("/{articleId}/bookmark")
 	public ResponseEntity<Map<String, Object>> toggleBookmark(@PathVariable Integer articleId,
-            												  @AuthenticationPrincipal MemberUserDetails principal) {
-		if (principal == null) {
-			return ResponseEntity.status(401).body(Map.of("message", "請先登入"));
-		}
-		
-		Integer memberId = principal.getMember().getMemberId();
+            												  @AuthenticationPrincipal MemberUserDetails prinUserDetails) {
+		Integer memberId = prinUserDetails.getMember().getMemberId();
 		articleInteractionService.toggleBookmark(articleId, memberId);
 		
 		Article article = articleService.getPublishedArticle(articleId);

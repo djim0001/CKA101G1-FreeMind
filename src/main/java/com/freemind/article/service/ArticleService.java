@@ -1,5 +1,7 @@
 package com.freemind.article.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.freemind.article.dto.ArticleCreateForm;
@@ -15,7 +17,9 @@ public interface ArticleService {
 	
 	Page<Article> getMyArticles(Integer psychId, Integer page);
 	
-	Page<Article> getPublishedArticles(Integer catId, Integer page);
+	Page<Article> getPublishedArticles(Integer catId, String keyword, Integer page);
+	
+//	Page<Article> searchPublishedArticles(String keyword, Integer page);
 	
 	Page<Article> getPendingArticles(Integer page);
 	
@@ -24,6 +28,8 @@ public interface ArticleService {
 	Article getArticleForAdmin(Integer articleId);
 	
 	Article getPublishedArticle(Integer articleId);
+	
+	List<Article> getPublishedArticlesByIds(List<Integer> articleIds);
 	
 	Article getEditableArticle(Integer articleId, Integer pysch);
 	

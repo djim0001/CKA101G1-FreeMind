@@ -12,7 +12,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
@@ -27,8 +26,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "articles", 
-	   indexes = {@Index(name = "idx_view_count", columnList = "view_count")})
+@Table(name = "articles")
 public class Article implements Serializable {
 	
 	private static final long serialVersionUID = 1L;

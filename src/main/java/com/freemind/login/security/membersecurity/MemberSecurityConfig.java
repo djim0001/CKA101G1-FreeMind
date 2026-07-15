@@ -49,9 +49,8 @@ public class MemberSecurityConfig {
                 // 註冊與忘記密碼（含 OTP 驗證）：給未登入的訪客用，開放
                 .requestMatchers("/front-end/register/**", "/front-end/forgot/**").permitAll()
                 .requestMatchers("/member/course/select_course","/member/course/get_one_course").permitAll()
-                .requestMatchers("/article/**").permitAll() 
-//                .requestMatchers("/member/article/**").permitAll() 
-                
+                .requestMatchers("/article/**").permitAll()
+
                 .requestMatchers(
                 	    "/member/activity/activityIndex",
                 	    "/member/activity/select_page",
