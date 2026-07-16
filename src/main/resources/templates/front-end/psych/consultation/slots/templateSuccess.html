@@ -6,14 +6,6 @@
 </head>
 <body>
 	<h3 th:text="${success}"></h3>
-	<a th:href="@{/psych/slots/templateForm}">繼續設定其他心理師</a>
-	<br><br>
-
-	<form method="post" th:action="@{/psych/slots/reapplyTemplate}">
-		<input type="text" name="psychId" placeholder="輸入心理師編號">
-		<input type="submit" value="套用範本到未來14天"
-			onclick="return confirm('確定要用最新的範本規則套用到未來14天嗎？已被預約的時段不受影響，但您先前手動調整過、尚未被預約的時段會被覆蓋成範本內容。')">
-	</form>
-
+	<a th:href="@{/psych/slots/templateForm}">回固定範本設定</a>
 </body>
 </html>
