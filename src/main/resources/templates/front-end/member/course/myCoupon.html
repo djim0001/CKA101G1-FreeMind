@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,9 +8,8 @@
 </head>
 <body class="thy2-member coupon-tone-page">
 	<header class="site-header">
-		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
-			Free Mind<small>MEMBER CENTER</small>
-		</a>
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>MEMBER
+				CENTER</small></a>
 		<nav class="main-nav">
 			<a th:href="@{/member/course/select_course}">探索課程</a><a
 				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
@@ -81,17 +79,26 @@
 		</section>
 		<section data-panel="claim" hidden>
 			<div class="course-grid">
-				<article class="course-card" th:each="coupon : ${coupons}">
-					<div class="course-cover">限時優惠</div>
+				<article class="course-card claim-coupon-card"
+					th:each="coupon : ${coupons}"
+					th:with="alreadyOwned=${myCoupons != null and #lists.contains(myCoupons.![coupon.couponId], coupon.couponId)}, canClaim=${!alreadyOwned and (unclaimableCouponIds == null or !#lists.contains(unclaimableCouponIds, coupon.couponId))}"
+					th:classappend="${!canClaim} ? ' is-unavailable' : ''">
+					<div class="course-cover" th:text="${canClaim} ? '限時優惠' : '目前不可領取'">限時優惠</div>
 					<div class="course-body">
-						<span class="tag">可領取</span>
+						<span class="tag"
+							th:classappend="${!canClaim} ? ' unavailable' : ''"
+							th:text="${canClaim} ? '可領取' : '不可領取'">可領取</span>
 						<h3 th:text="${coupon.couponName}">優惠券名稱</h3>
-						<form method="post" th:action="@{/member/coupon/claim}"
-							style="margin-top: auto">
+						<p class="meta" th:if="${!canClaim}"
+							th:text="${alreadyOwned} ? '你已領取過這張優惠券' : '目前不符合領取資格'">目前不可領取</p>
+						<form th:if="${canClaim}" method="post"
+							th:action="@{/member/coupon/claim}" style="margin-top: auto">
 							<input type="hidden" name="couponId"
 								th:value="${coupon.couponId}">
 							<button class="btn" type="submit">領取優惠券</button>
 						</form>
+						<button th:unless="${canClaim}" class="btn ghost" type="button"
+							disabled style="margin-top: auto">無法領取</button>
 					</div>
 				</article>
 			</div>

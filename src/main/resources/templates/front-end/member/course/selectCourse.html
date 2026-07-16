@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,9 +8,8 @@
 </head>
 <body class="thy2-member">
 	<header class="site-header">
-		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
-			Free Mind<small>COURSE MARKET</small>
-		</a>
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>COURSE
+				MARKET</small></a>
 		<nav class="main-nav">
 			<a class="active" th:href="@{/member/course/select_course}">探索課程</a><a
 				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
@@ -43,23 +41,25 @@
 				<option value="priceDesc" th:selected="${orderBy == 'priceDesc'}">價格由高至低</option></select>
 			<button class="btn" type="submit">搜尋課程</button>
 		</form>
-		<form class="tabs course-sort-tabs" method="get"
-			th:action="@{/member/course/select_course}" aria-label="課程排序">
-			<button type="submit" name="orderBy" value="popular"
-				th:classappend="${orderBy == 'popular'} ? 'active' : ''">熱門課程</button>
-			<button type="submit" name="orderBy" value="listedAt"
-				th:classappend="${orderBy == null or orderBy == '' or orderBy == 'listedAt'} ? 'active' : ''">最新課程</button>
-		</form>
-		<form class="tabs course-category-tabs" method="get"
-			th:action="@{/member/course/search-by-category}" aria-label="課程分類">
-			<a th:href="@{/member/course/select_course}"
-				th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
-			<button type="submit" name="courseCatId"
-				th:each="courseCategories : ${courseCategoriesListAll}"
-				th:value="${courseCategories.courseCatId}"
-				th:text="${courseCategories.courseCatName}"
-				th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
-		</form>
+		<div class="course-filter-row">
+			<form class="tabs course-sort-tabs" method="get"
+				th:action="@{/member/course/select_course}" aria-label="課程排序">
+				<button type="submit" name="orderBy" value="popular"
+					th:classappend="${orderBy == 'popular'} ? 'active' : ''">熱門課程</button>
+				<button type="submit" name="orderBy" value="listedAt"
+					th:classappend="${orderBy == null or orderBy == '' or orderBy == 'listedAt'} ? 'active' : ''">最新課程</button>
+			</form>
+			<form class="tabs course-category-tabs" method="get"
+				th:action="@{/member/course/search-by-category}" aria-label="課程分類">
+				<a th:href="@{/member/course/select_course}"
+					th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
+				<button type="submit" name="courseCatId"
+					th:each="courseCategories : ${courseCategoriesListAll}"
+					th:value="${courseCategories.courseCatId}"
+					th:text="${courseCategories.courseCatName}"
+					th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
+			</form>
+		</div>
 		<div class="section-head">
 			<div>
 				<p class="eyebrow">Available courses</p>
@@ -76,8 +76,12 @@
 			<article class="course-card" data-course-card
 				th:each="course : ${courseList}"
 				th:attr="data-category=${course.courseCategories.courseCatId}">
-				<div class="course-cover"
-					th:text="${course.courseCategories.courseCatName}">課程分類</div>
+				<div class="course-cover course-video-cover">
+					<video muted playsinline preload="metadata" data-course-thumbnail
+						th:src="${course.videoSrcPre != null and !#strings.isEmpty(course.videoSrcPre) ? course.videoSrcPre : course.videoSrc}"
+						th:attr="aria-label=${course.courseName + '影片預覽圖'}"></video>
+					<span th:text="${course.courseCategories.courseCatName}">課程分類</span>
+				</div>
 				<div class="course-body">
 					<span class="tag"
 						th:text="${course.courseCategories.courseCatName}">分類</span>

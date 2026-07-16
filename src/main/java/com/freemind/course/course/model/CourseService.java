@@ -14,8 +14,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.freemind.course.dto.CourseSearchCondition;
 import com.freemind.course.util.CourseSortUtil;
 import com.freemind.course.util.CourseSpecification;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CourseService {
@@ -72,6 +75,41 @@ public class CourseService {
 
 		return repository.findByCourseStatus(COURSE_STATUS_LISTED, pageable);
 	}
+	@Transactional
+    public Page<Course> searchCourses(
+            CourseSearchCondition condition,
+            Integer page) {
+
+        if (page == null || page < 1) {
+            page = 1;
+        }
+
+        if (condition == null) {
+            condition = new CourseSearchCondition();
+        }
+
+        Specification<Course> spec =
+                CourseSpecification
+                        .keywordContains(condition.getKeyword())
+                        .and(
+                            CourseSpecification.categoryEquals(
+                                condition.getCategoryId()
+                            )
+                        )
+                        .and(
+                            CourseSpecification.courseStatusEquals(
+                                condition.getCourseStatus()
+                            )
+                        );
+
+        Pageable pageable = PageRequest.of(
+                page,
+                coursePageSize,
+                Sort.by("courseId").descending()
+        );
+
+        return repository.findAll(spec, pageable);
+    }
 
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
@@ -165,6 +203,7 @@ public class CourseService {
 		return repository.findByCourseStatusAndCourseCategories_CourseCatId(COURSE_STATUS_LISTED, courseCatId,
 				pageable);
 	}
+	
 
 	// 收藏課程
 	public void addCourseBookmark(Integer memberId, Integer courseId) {

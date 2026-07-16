@@ -16,8 +16,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.coupon.model.MemberCoupon;
 import com.freemind.course.coupon.model.MemberCouponService;
+import com.freemind.course.course.model.Course;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
+import com.freemind.login.admin.model.Admin;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
@@ -121,6 +123,21 @@ public class CourseOrderController {
 		    }
 		}
 		return "redirect:" + returnUrl;
+	}
+	
+	@PostMapping("/order_search")
+	public String courseSearch(
+			@RequestParam("courseId") Integer courseId, 
+			@RequestParam("courseStatus") Byte courseStatus, 
+			@ModelAttribute("admin") Admin admin,
+			ModelMap model) {
+//		Course course = courseSvc.getOneCourse(courseId);
+//		course.setCourseStatus(courseStatus);
+//		course.setAdmin(admin);
+//		courseSvc.updateCourse(course);
+//		model.addAttribute("course", course);
+		return "back-end/course/course/listOneCourse";
+		
 	}
 
 }
