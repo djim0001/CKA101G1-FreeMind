@@ -78,7 +78,20 @@ public class CourseForAdminController {
 		Integer currentPage = page;		
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus((byte)0, currentPage - 1, sortField);
+		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		int wait = courseSvc.countCoursesByStatus((byte)1);
+		int success = courseSvc.countCoursesByStatus((byte)2);
+		int fail = courseSvc.countCoursesByStatus((byte)3);
+		int listed = courseSvc.countCoursesByStatus((byte)4);
+		int delisted = courseSvc.countCoursesByStatus((byte)5);
 		
+		model.addAttribute("courseCountAwait", wait);
+		model.addAttribute("courseCountSuccess", success);
+		model.addAttribute("courseCountFail", fail);
+		model.addAttribute("courseCountListed", listed);
+		model.addAttribute("courseCountDelisted", delisted);
+		
+		model.addAttribute("courseList", courseList);
 		model.addAttribute("courseListSubmit", courseListSubmit);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", courseListSubmit.getTotalPages());
@@ -96,9 +109,9 @@ public class CourseForAdminController {
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		
-		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseList", courseList);
 		model.addAttribute("totalPages", courseList.getTotalPages());
+		model.addAttribute("currentPage", currentPage);
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
 		return "back-end/course/course/detailCourse";
@@ -117,7 +130,7 @@ public class CourseForAdminController {
 			"課程下架成功"
 		);
 
-		return "redirect:/admin/course/goto_delisted";
+		return "redirect:/admin/course/select_course";
 	}
 
 	@GetMapping("/select_course_order")
@@ -130,6 +143,7 @@ public class CourseForAdminController {
 		Integer currentPage = page;		
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "orderedAt" : orderBy;
 		Page<CourseOrder> allCourseOrder = courseOrderSvc.getAllOrder(currentPage - 1, sortField);
+		
 		model.addAttribute("allCourseOrder", allCourseOrder);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", allCourseOrder.getTotalPages());

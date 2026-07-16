@@ -100,6 +100,37 @@ public class CourseService {
 		repository.save(course);
 	}
 
+	public int countCoursesByStatus(Byte courseStatus) {
+		if (courseStatus == null) {
+			throw new IllegalArgumentException("課程狀態不能為空");
+		}
+
+		return repository.countByCourseStatus(courseStatus);
+	}
+
+	 public Page<Course> searchListedCourses(
+	            String keyword,
+	            Integer page,
+	            String orderBy
+	    ) {
+	        if (page == null || page < 0) {
+	            page = 0;
+	        }
+
+	        if (keyword == null) {
+	            keyword = "";
+	        }
+
+	        keyword = keyword.trim();
+
+	        Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+
+	        return repository.searchByCourseOrPsychologist(
+	                keyword,
+	                COURSE_STATUS_LISTED,
+	                pageable
+	        );
+	    }
 	// member_function
 	public void checkAllCourseStatus() {
 		List<Course> allCourse = getAllCourse();
@@ -111,21 +142,15 @@ public class CourseService {
 			}
 		}
 	}
-	
-	public Page<Course> findCoursesByMinimumCounts(
-			Byte courseStatus, Integer minSaveCount, 
-			Integer minStarCount,
-			Integer minReviewCount, 
-			Integer minCommentCount, 
-			int page, String orderBy) {
+
+	public Page<Course> findCoursesByMinimumCounts(Byte courseStatus, Integer minSaveCount, Integer minStarCount,
+			Integer minReviewCount, Integer minCommentCount, int page, String orderBy) {
 		if (page < 0) {
 			page = 0;
 		}
 		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
-		Specification<Course> specification = 
-				CourseSpecification.searchByCounts(
-					courseStatus, minSaveCount,
-					minStarCount, minReviewCount, minCommentCount);
+		Specification<Course> specification = CourseSpecification.searchByCounts(courseStatus, minSaveCount,
+				minStarCount, minReviewCount, minCommentCount);
 		return repository.findAll(specification, pageable);
 	}
 
@@ -201,7 +226,5 @@ public class CourseService {
 
 		return repository.searchBookmarkCourses(courseIds, keyword, pageable);
 	}
-
-	
 
 }

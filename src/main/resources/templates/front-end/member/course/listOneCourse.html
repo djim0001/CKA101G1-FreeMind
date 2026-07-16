@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="_csrf"
+      th:if="${_csrf != null}"
+      th:content="${_csrf.token}">
+
+<meta name="_csrf_header"
+      th:if="${_csrf != null}"
+      th:content="${_csrf.headerName}">
   <title>會員課程一覽頁面</title>
   <link rel="stylesheet" th:href="@{/css/course/listOneCourse.css}"/>
 </head>
@@ -26,7 +33,12 @@
       <section class="main" aria-label="課程觀看主內容">
         <section class="player">
           <div class="video-frame video-native" th:if="${coursePermission}">
-            <video id="courseVideo" controls preload="metadata" poster="">
+            <video id="courseVideo" controls preload="metadata" poster="" 
+		           th:data-course-order-id="${orderDetail.courseOrder.courseOrderId}"
+		           th:data-course-id="${course.courseId}"
+		           th:data-playback-seconds="${orderDetail.playbackPosition != null
+		                ? orderDetail.playbackPosition.toSecondOfDay()
+		                : 0}">
               <source src="" th:src="${course.videoSrc}" type="video/mp4" />
               您的瀏覽器不支援影片播放。
             </video>
@@ -35,6 +47,23 @@
                 <path d="M8 5v14l11-7z"></path>
               </svg>
             </button>
+            <div>
+			    <span>上次播放位置：</span>
+			    <span th:if="${orderDetail.playbackPosition != null}"
+			          th:text="${#temporals.format(
+			              orderDetail.playbackPosition,
+			              'HH:mm:ss'
+			          )}"> 00:00:00
+			    </span>
+			    <span th:unless="${orderDetail.playbackPosition != null}">
+			        尚未觀看
+			    </span>
+			</div>
+			
+			<div>
+			    <span>目前播放位置：</span>
+			    <span id="currentTimeText">00:00:00</span>
+			</div>
           </div>
 
           <div class="video-frame video-native" th:if="${!coursePermission}">
@@ -198,5 +227,198 @@
   </div>
 
   <script th:src="@{/js/course/listOneCourse.js}"></script>
+<script th:if="${coursePermission}"
+        th:inline="javascript">
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const video =
+            document.getElementById("courseVideo");
+
+    const currentTimeText =
+            document.getElementById("currentTimeText");
+
+    if (!video || !currentTimeText) {
+        console.error("找不到影片或播放時間元素");
+        return;
+    }
+
+    const playbackPositionUrl =
+            /*[[@{/member/course/playback-position}]]*/
+            "/member/course/playback-position";
+
+    const courseOrderId =
+            Number(video.dataset.courseOrderId);
+
+    const courseId =
+            Number(video.dataset.courseId);
+
+    const savedPlaybackSeconds =
+            Number(video.dataset.playbackSeconds || 0);
+
+    const csrfTokenElement =
+            document.querySelector('meta[name="_csrf"]');
+
+    const csrfHeaderElement =
+            document.querySelector('meta[name="_csrf_header"]');
+
+    let lastSavedSecond = -1;
+
+    console.log("播放進度初始化：", {
+        playbackPositionUrl,
+        courseOrderId,
+        courseId,
+        savedPlaybackSeconds
+    });
+
+    video.addEventListener("loadedmetadata", function () {
+
+        if (
+            savedPlaybackSeconds > 0 &&
+            savedPlaybackSeconds < video.duration
+        ) {
+            video.currentTime = savedPlaybackSeconds;
+        }
+
+        updateCurrentTimeText();
+    });
+
+    video.addEventListener("timeupdate", function () {
+
+        const currentSecond =
+                Math.floor(video.currentTime);
+
+        updateCurrentTimeText();
+
+        if (
+            currentSecond > 0 &&
+            currentSecond % 10 === 0 &&
+            currentSecond !== lastSavedSecond
+        ) {
+            lastSavedSecond = currentSecond;
+            savePlaybackPosition(currentSecond);
+        }
+    });
+
+    video.addEventListener("pause", function () {
+
+        console.log("影片暫停，準備儲存");
+
+        savePlaybackPosition(
+            Math.floor(video.currentTime)
+        );
+    });
+
+    video.addEventListener("ended", function () {
+        savePlaybackPosition(
+            Math.floor(video.duration)
+        );
+    });
+
+    function savePlaybackPosition(playbackSeconds) {
+
+        if (
+            !Number.isFinite(playbackSeconds) ||
+            playbackSeconds < 0
+        ) {
+            console.log(
+                "播放秒數不合法：",
+                playbackSeconds
+            );
+            return;
+        }
+
+        const requestData = {
+            courseOrderId: courseOrderId,
+            courseId: courseId,
+            playbackSeconds: playbackSeconds
+        };
+
+        const headers = {
+            "Content-Type": "application/json"
+        };
+
+        if (csrfTokenElement && csrfHeaderElement) {
+
+            const csrfToken =
+                    csrfTokenElement.getAttribute("content");
+
+            const csrfHeader =
+                    csrfHeaderElement.getAttribute("content");
+
+            headers[csrfHeader] = csrfToken;
+        }
+
+        console.log(
+            "準備送出播放位置：",
+            requestData
+        );
+
+        fetch(playbackPositionUrl, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(requestData)
+        })
+        .then(async function (response) {
+
+            console.log(
+                "後端回應狀態：",
+                response.status
+            );
+
+            if (!response.ok) {
+
+                const responseText =
+                        await response.text();
+
+                throw new Error(
+                    "播放位置儲存失敗，狀態碼：" +
+                    response.status +
+                    "，內容：" +
+                    responseText
+                );
+            }
+
+            console.log("播放位置儲存成功");
+        })
+        .catch(function (error) {
+            console.error(
+                "儲存播放位置發生錯誤：",
+                error
+            );
+        });
+    }
+
+    function updateCurrentTimeText() {
+
+        const totalSeconds =
+                Math.floor(video.currentTime || 0);
+
+        currentTimeText.textContent =
+                formatPlaybackTime(totalSeconds);
+    }
+
+    function formatPlaybackTime(totalSeconds) {
+
+        const hours =
+                Math.floor(totalSeconds / 3600);
+
+        const minutes =
+                Math.floor(
+                    (totalSeconds % 3600) / 60
+                );
+
+        const seconds =
+                totalSeconds % 60;
+
+        return String(hours).padStart(2, "0")
+                + ":"
+                + String(minutes).padStart(2, "0")
+                + ":"
+                + String(seconds).padStart(2, "0");
+    }
+});
+
+</script>  
 </body>
 </html>
