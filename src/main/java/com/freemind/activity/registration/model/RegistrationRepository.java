@@ -33,4 +33,6 @@ public interface RegistrationRepository extends JpaRepository<Registration, Inte
 	     + "ORDER BY r.reviewedAt DESC")
 	List<Registration> findReviewsByActivity(@Param("activity") Activity activity);
 	
+	
+	
 }

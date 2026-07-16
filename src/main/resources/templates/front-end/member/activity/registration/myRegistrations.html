@@ -11,8 +11,21 @@
 	
 	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
 	
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
+	
+	<!-- 分頁籤 -->
+	<div style="margin-bottom: 15px;">
+	    <a th:href="@{/member/activity/registration/myRegistrations(tab='upcoming')}">
+	        <button type="button" th:style="${currentTab == 'upcoming'} ? 'font-weight:bold; background-color:#333; color:white;' : ''">即將參加</button>
+	    </a>
+	    <a th:href="@{/member/activity/registration/myRegistrations(tab='pending')}">
+	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold; background-color:#333; color:white;' : ''">待審核</button>
+	    </a>
+	    <a th:href="@{/member/activity/registration/myRegistrations(tab='history')}">
+	        <button type="button" th:style="${currentTab == 'history'} ? 'font-weight:bold; background-color:#333; color:white;' : ''">歷史紀錄</button>
+	    </a>
+	</div>
 	
     <table border="1">
         <tr>
@@ -106,8 +119,12 @@
         </tr>
     </table>
 
-    <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
-
+    <p th:if="${#lists.isEmpty(regisListData)}">
+	    <span th:if="${currentTab == 'upcoming'}">目前沒有即將參加的活動。</span>
+	    <span th:if="${currentTab == 'pending'}">目前沒有待審核的報名。</span>
+	    <span th:if="${currentTab == 'history'}">目前沒有歷史紀錄。</span>
+	</p>
+	
 	<br>
     <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/report/myReports}">我的問題回報</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
 

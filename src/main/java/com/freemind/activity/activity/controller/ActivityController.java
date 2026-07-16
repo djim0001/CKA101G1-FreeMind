@@ -24,6 +24,7 @@ import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.category.model.ActivityCat;
 import com.freemind.activity.category.model.ActivityCatService;
 import com.freemind.activity.follow.model.ActivityFollowService;
+import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
@@ -49,7 +50,8 @@ public class ActivityController {
     private ActivityFollowService followSvc;
 
     @GetMapping("listAllActivity")
-    public String listAllActivity(ModelMap model) {
+    public String listAllActivity(@AuthenticationPrincipal MemberUserDetails userDetails,
+    								 ModelMap model) {
         Map<String, String[]> emptyMap = new HashMap<>();
         Integer currentPage = 1;
 
@@ -64,13 +66,14 @@ public class ActivityController {
             totalPages = 1;
         }
         model.addAttribute("totalPages", totalPages);
-
+        model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));
         return "front-end/member/activity/listAllActivity";
     }
     
     @PostMapping("listActivities_ByCompositeQuery")  // 這次使用者送出的整個HTTP請求
     public String listActivities_ByCompositeQuery(HttpServletRequest req,
     						@RequestParam(value = "currentPage", required = false) Integer currentPage,
+    						@AuthenticationPrincipal MemberUserDetails userDetails,
     						ModelMap model) {
         if (currentPage == null) {
             currentPage = 1;
@@ -93,7 +96,7 @@ public class ActivityController {
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
         }
-        
+        model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));
         return "front-end/member/activity/listAllActivity";
     }
     
@@ -371,6 +374,7 @@ public class ActivityController {
         
         model.addAttribute("activity", activity);
         model.addAttribute("reviewListData", regisSvc.getReviewsByActivity(activity));
+        model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));  
         return "front-end/member/activity/listOneActivity";
     }
     
@@ -383,5 +387,23 @@ public class ActivityController {
     @GetMapping("select_page")
     public String selectPage(ModelMap model) {
         return "front-end/member/activity/select_page";
+    }
+    
+    // 建立「我有效報名的<活動ID,報名狀態>集合, 訪客則回傳空Map
+    private Map<Integer, Integer> buildMyRegistrationMap(MemberUserDetails userDetails) {
+        Map<Integer, Integer> map = new HashMap<>();
+        if (userDetails == null) {
+            return map;   // 訪客:回傳空Map, 所有活動一律顯示報名按鈕
+        }
+        
+        // 撈出此會員的所有報名紀錄
+        List<Registration> myRegis = regisSvc.getMyRegistrations(userDetails.getMember());
+        for (Registration r : myRegis) {
+            Integer status = r.getRegisStatus();
+            if (status == 0 || status == 1) {   // 只留下待審核和已報名成功
+                map.put(r.getActivity().getActivityId(), status);
+            }
+        }
+        return map;
     }
 }

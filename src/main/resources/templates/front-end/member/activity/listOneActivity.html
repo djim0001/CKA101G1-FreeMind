@@ -3,9 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>查看單一活動詳情</title>
+    
+    <style>
+    
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    border: 1px solid;
+}
+.status-pending {
+    color: #b8860b;
+    border-color: #b8860b;
+    background-color: #fff8e6;
+}
+.status-confirmed {
+    color: #2e7d32;
+    border-color: #2e7d32;
+    background-color: #e8f5e9;
+}
+    
+    </style>
 </head>
 <body>
     <h1 th:text="${activity.activityName}"></h1>
+
+	<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
 
     <img th:if="${activity.picture != null}" 
          th:src="@{/member/activity/activityImage(activityId=${activity.activityId})}" 
@@ -31,12 +56,17 @@
     <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 
-	<form th:if="${activity.registrable && (#authentication.principal == 'anonymousUser' || activity.member.memberId != #authentication.principal.member.memberId)}"
-	      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-	    <input type="hidden" name="activityId" th:value="${activity.activityId}">
-	    <button type="submit">報名</button>
-	</form>
+	<span th:if="${myRegisMap.get(activity.activityId) == 0}" class="status-badge status-pending">審核中</span>
+	<span th:if="${myRegisMap.get(activity.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
 	
+	<th:block th:if="${myRegisMap.get(activity.activityId) == null}">
+		<form th:if="${activity.registrable && (#authentication.principal == 'anonymousUser' || activity.member.memberId != #authentication.principal.member.memberId)}"
+		      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+		    <input type="hidden" name="activityId" th:value="${activity.activityId}">
+		    <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listOneActivity(activityId=${activity.activityId})}">
+		    <button type="submit">報名</button>
+		</form>
+	</th:block>
 	<!-- (登入版)關注功能 -->
 	<div th:if="${isFollowing != null}" style="display:inline;">
 	
