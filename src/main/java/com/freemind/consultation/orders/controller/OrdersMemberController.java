@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.repository.PsychologistRepository;
+import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 @Controller
 @RequestMapping("/member/orders")
@@ -32,14 +34,50 @@ public class OrdersMemberController {
 	@Autowired
 	private PsychologistRepository psychologistRepository;
 
+	private List<Psychologist> getActivePsychologists() {
+		return psychologistRepository.findAll().stream()
+				.filter(p -> p.getAccountStatus() != null && p.getAccountStatus() == 1)
+				.collect(java.util.stream.Collectors.toList());
+	}
+
 	@GetMapping("bookForm")
-	public String bookForm(ModelMap model) {
+	public String bookForm(@RequestParam(value = "psychId", required = false) String psychId, ModelMap model) {
+		model.addAttribute("todayDate", java.time.LocalDate.now().toString());
+		model.addAttribute("psychologistsList", getActivePsychologists());
+		model.addAttribute("selectedPsychId", psychId);
 		return "front-end/member/consultation/orders/bookForm";
+	}
+
+	@GetMapping("bookLookup")
+	public String bookLookupFromCalendar(@RequestParam("psychId") String psychId,
+			@RequestParam("slotDate") String slotDateStr, ModelMap model) {
+
+		Integer pid = Integer.valueOf(psychId);
+		LocalDate date = LocalDate.parse(slotDateStr);
+
+		Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
+		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
+
+		List<Integer> availableHours = new java.util.ArrayList<>();
+		String status = slots.getConsStatus();
+		for (int h = 0; h < 24; h++) {
+			if (status.charAt(h) == '1' || status.charAt(h) == '4') {
+				availableHours.add(h);
+			}
+		}
+
+		model.addAttribute("slots", slots);
+		model.addAttribute("availableHours", availableHours);
+		model.addAttribute("psychologist", psychologist);
+		return "front-end/member/consultation/orders/bookInput";
 	}
 
 	@PostMapping("bookLookup")
 	public String bookLookup(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
 			ModelMap model) {
+		model.addAttribute("todayDate", java.time.LocalDate.now().toString());
+		model.addAttribute("psychologistsList", getActivePsychologists());
+
 		if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
 			model.addAttribute("errorMessage", "請輸入心理師編號與日期");
 			return "front-end/member/consultation/orders/bookForm";
@@ -47,6 +85,17 @@ public class OrdersMemberController {
 
 		Integer pid = Integer.valueOf(psychId);
 		LocalDate date = LocalDate.parse(slotDateStr);
+
+		if (date.isBefore(LocalDate.now())) {
+			model.addAttribute("errorMessage", "預約日期不能選過去的日期");
+			return "front-end/member/consultation/orders/bookForm";
+		}
+
+		Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
+		if (psychologist == null) {
+			model.addAttribute("errorMessage", "查無此心理師");
+			return "front-end/member/consultation/orders/bookForm";
+		}
 
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 		if (slots == null) {
@@ -67,12 +116,6 @@ public class OrdersMemberController {
 			return "front-end/member/consultation/orders/bookForm";
 		}
 
-		Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
-		if (psychologist == null) {
-			model.addAttribute("errorMessage", "查無此心理師");
-			return "front-end/member/consultation/orders/bookForm";
-		}
-
 		model.addAttribute("slots", slots);
 		model.addAttribute("availableHours", availableHours);
 		model.addAttribute("psychologist", psychologist);
@@ -81,11 +124,18 @@ public class OrdersMemberController {
 
 	@PostMapping("bookSubmit")
 	public String bookSubmit(@RequestParam("timeslotId") String timeslotId, @RequestParam("hour") String hourStr,
-			@RequestParam("memberId") String memberId, @RequestParam("psychId") String psychId,
+			@RequestParam("psychId") String psychId,
 			@RequestParam("psychLoc") String psychLoc, @RequestParam("psychFee") String psychFee,
 			@RequestParam("visitPurpose") String visitPurpose,
 			@RequestParam(value = "visitPurposeNote", required = false) String visitPurposeNote,
-			@RequestParam("sessionType") String sessionType, ModelMap model) {
+			@RequestParam("sessionType") String sessionType,
+			@AuthenticationPrincipal MemberUserDetails prinUserDetails,
+			ModelMap model) {
+
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
+		}
+		Integer memberId = prinUserDetails.getMember().getMemberId();
 
 		int hour = Integer.parseInt(hourStr);
 		Integer tid = Integer.valueOf(timeslotId);
@@ -93,7 +143,7 @@ public class OrdersMemberController {
 		Slots slot = slotsSvc.getOneSlots(tid);
 
 		Member member = new Member();
-		member.setMemberId(Integer.valueOf(memberId));
+		member.setMemberId(memberId);
 
 		Psychologist psychologist = new Psychologist();
 		psychologist.setPsychId(Integer.valueOf(psychId));
@@ -146,14 +196,11 @@ public class OrdersMemberController {
 			model.addAttribute("errorMessage", "請輸入會員編號");
 			return "front-end/member/consultation/orders/reviewForm";
 		}
-
 		List<Orders> list = ordersSvc.getCompletedUnratedByMemberId(Integer.valueOf(memberId));
-
 		if (list.isEmpty()) {
 			model.addAttribute("errorMessage", "目前沒有可評論的諮商紀錄。");
 			return "front-end/member/consultation/orders/reviewForm";
 		}
-
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/reviewList";
@@ -173,4 +220,5 @@ public class OrdersMemberController {
 		model.addAttribute("success", "感謝您的評價！");
 		return "front-end/member/consultation/orders/reviewSuccess";
 	}
+
 }

@@ -155,14 +155,12 @@ public class SlotsPsychController {
 			slotsSvc.updateSlots(template);
 		}
 
-		model.addAttribute("success", "固定範本已更新！之後排程會依此規則自動產生時段。");
+		// 存完範本直接套用到未來14天
+		slotsSvc.reapplyTemplateToNext14Days(pid);
+
+		model.addAttribute("success", "固定範本已更新，並已套用到未來14天！已預約的時段不受影響。");
 		return "front-end/psych/consultation/slots/templateSuccess";
 	}
 
-	@PostMapping("reapplyTemplate")
-	public String reapplyTemplate(@RequestParam("psychId") String psychId, ModelMap model) {
-		slotsSvc.reapplyTemplateToNext14Days(Integer.valueOf(psychId));
-		model.addAttribute("success", "已將新範本套用到未來14天！已預約的時段不受影響。");
-		return "front-end/psych/consultation/slots/templateSuccess";
-	}
+	
 }
