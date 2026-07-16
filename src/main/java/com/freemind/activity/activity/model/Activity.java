@@ -366,7 +366,7 @@ public class Activity implements Serializable{
 	    if (now.isBefore(this.regisStart)) {
 	        return "尚未開放報名";
 	    } else if (!now.isAfter(this.regisEnd)) {
-	        return "可報名中";
+	    		return isFull() ? "已額滿" : "可報名中";
 	    } else if (now.isBefore(this.activityEnd)) {
 	        return "已截止報名";
 	    } else {
@@ -374,20 +374,25 @@ public class Activity implements Serializable{
 	    }
 	}
 	
+	public boolean isStarted() {
+		return this.activityStart !=null && LocalDateTime.now().isAfter(this.activityStart);
+	}
+	
 	public boolean isEnded() {
 	    return this.activityEnd != null && LocalDateTime.now().isAfter(this.activityEnd);
 	}
 	
-	public boolean isStarted() {
-		return this.activityStart !=null && LocalDateTime.now().isAfter(this.activityStart);
-	}
+	public boolean isFull() {
+	    return this.regisCount != null && this.capacity != null
+	            && this.regisCount >= this.capacity;
+	}	
 	
 	public boolean isRegistrable() {
 	    if (this.activityStatus == null || this.activityStatus != 2) {
 	        return false;
 	    }
 	    LocalDateTime now = LocalDateTime.now();
-	    return !now.isBefore(this.regisStart) && !now.isAfter(this.regisEnd);
+	    return !now.isBefore(this.regisStart) && !now.isAfter(this.regisEnd) && !isFull();
 	}
 	
 	// (報名清單)會員視角的活動狀態:取消/延期優先,再看是否結束,否則顯示原狀態

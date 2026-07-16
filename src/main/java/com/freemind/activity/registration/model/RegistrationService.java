@@ -18,17 +18,21 @@ public class RegistrationService {
 	
 	@Transactional
 	public Registration register(Member member, Activity activity) {
+		if (activity.getMember().getMemberId().equals(member.getMemberId())) {
+			throw new IllegalStateException("無法報名自己發起的活動");
+		}
 	    // 1. 查:這個會員對這個活動有沒有有效報名?
 		boolean hasActive = regisRepo.existsByMemberAndActivityAndRegisStatusIn(member, activity, List.of(0, 1));
 		
 		
-		if (activity.getMember().getMemberId().equals(member.getMemberId())) {
-	        throw new IllegalStateException("無法報名自己發起的活動");
-	    }
 	    // 2. 擋:有 → 丟例外
 		if (hasActive) {
 			 throw new IllegalStateException("已報名過此活動，請勿重複報名");
 		}
+		if (activity.isFull()) {
+			throw new IllegalStateException("活動名額已滿");
+		}
+
 	    // 3. 組:new 一個 Registration,填 member、activity、regisStatus=0、regisAt=現在
 		Registration regis = new Registration();
 		regis.setMember(member);   
@@ -128,7 +132,6 @@ public class RegistrationService {
 		regis.setReviewedAt(LocalDateTime.now()); 
 		regis.setRating(rating);
 		regis.setReviewContent(reviewContent);
-		
 		
 		return regis;
 	}

@@ -34,9 +34,9 @@ public class HibernateUtil_CompositeQuery_Activity {
             // 幫我組一條條件：「Activity的活動分類」，要等於剛剛捏造的『只有ID是XX』假分類物件」——效果就是篩選出WHERE activity_cat_id = XX 的活動。
         }
         else if ("activityCity".equals(columnName))
-            predicate = builder.equal(root.get(columnName), value);
+            predicate = builder.like(root.get(columnName), "%" + value + "%");
         else if ("activityDist".equals(columnName))
-            predicate = builder.equal(root.get(columnName), value);
+            predicate = builder.like(root.get(columnName), "%" + value + "%");
         else if ("activityName".equals(columnName))
             predicate = builder.like(root.get(columnName), "%" + value + "%");
         else if ("activityStatus".equals(columnName))
@@ -50,7 +50,8 @@ public class HibernateUtil_CompositeQuery_Activity {
             } else if (status == 1) {  // 可報名中
                 predicate = builder.and(
                     builder.lessThanOrEqualTo(root.get("regisStart"), now),
-                    builder.greaterThanOrEqualTo(root.get("regisEnd"), now)
+                    builder.greaterThanOrEqualTo(root.get("regisEnd"), now),
+                    builder.lessThan(root.get("regisCount"), root.get("capacity"))
                 );
             } else if (status == 2) {  // 已截止報名
                 predicate = builder.and(
