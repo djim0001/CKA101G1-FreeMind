@@ -1,68 +1,88 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>購物車</title>
-<style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>購物車｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h1>購物車</h1>
-	<h3>
-		<a th:href="@{/member/course/select_course}">會員課程一覽頁面</a>
-	</h3>
-	<span>會員名稱:</span>
-	<span th:text=${memberName}></span>
-	<span th:text=${cartMsg} class="error"></span>
-	<br>
-	<table>
-		<tr>
-			<th>課程名稱</th>
-			<th>心理師</th>
-			<th>原價</th>
-			<th>折扣</th>
-			<th>小計</th>
-			<th>操作</th>
-		</tr>
-
-		<tr th:each="item : ${cartList}">
-			<td th:text="${item.courseName}"></td>
-			<td th:text="${item.psychologistName}"></td>
-			<td th:text="${item.price}"></td>
-			<td th:text="${item.psychDiscount==null?'無折扣':item.psychDiscount}"></td>
-			<td th:text="${item.subtotal}"></td>
-			<td>
-				<form th:action="@{cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
-					<input type="hidden" name="courseId" th:value="${item.courseId}">
-					<input type="hidden" name="returnUrl">
-					<button type="submit">從購物車移除</button>
+<body class="thy2-member">
+	<header class="site-header">
+		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
+			Free Mind<small>COURSE MARKET</small>
+		</a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">繼續選課</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Shopping cart</p>
+				<h1 style="font-size: 38px">購物車</h1>
+			</div>
+			<p>確認想帶走的學習旅程</p>
+		</div>
+		<div class="two-col">
+			<section class="panel">
+				<div class="empty-state"
+					th:if="${cartList == null || cartList.isEmpty()}">
+					<h3>購物車目前是空的</h3>
+					<a class="btn" th:href="@{/member/course/select_course}">探索課程</a>
+				</div>
+				<article class="cart-item" th:each="item : ${cartList}">
+					<div class="thumb">課程</div>
+					<div>
+						<span class="tag">線上課程</span>
+						<h3 th:text="${item.courseName}">課程名稱</h3>
+						<p class="meta">
+							<span th:text="${item.psychologistName}">心理師</span> 心理師・<span
+								th:text="${item.psychDiscount == null ? '無折扣' : item.psychDiscount}">無折扣</span>
+						</p>
+					</div>
+					<div>
+						<strong class="price">NT$ <span
+							th:text="${item.subtotal}">0</span></strong>
+						<form method="post" th:action="@{/member/course/cart_remove}"
+							data-confirm-form="確定要從購物車移除此課程嗎？">
+							<input type="hidden" name="courseId" th:value="${item.courseId}"><input
+								type="hidden" name="returnUrl">
+							<button class="btn ghost" type="submit" style="margin-top: 8px">移除</button>
+						</form>
+					</div>
+				</article>
+			</section>
+			<aside class="panel">
+				<h2>訂單摘要</h2>
+				<div class="summary-row">
+					<span>商品小計</span><strong th:text="'NT$ ' + ${cartTotal}">NT$
+						0</strong>
+				</div>
+				<div class="summary-row total">
+					<span>應付金額</span><span class="price"
+						th:text="'NT$ ' + ${cartTotal}">NT$ 0</span>
+				</div>
+				<form method="get" th:action="@{/member/course/goto_checkout}"
+					data-confirm-form="是否前往結帳？">
+					<button class="btn" type="submit"
+						style="width: 100%; margin-top: 16px"
+						th:disabled="${cartList == null || cartList.isEmpty()}">前往結帳</button>
 				</form>
-			</td>
-		</tr>
-	</table>
-	<br>
-	<div>
-	<form th:action="@{cart_clear}" method="post" onsubmit="return confirm('確定要清空購物車嗎？');">
-		<button type="submit">清空購物車</button>
-	</form>
-		<span>總計：</span> <span
-			style="font-weight: bold; color: #d97706; font-size: 20px;"
-			th:text="'NT$ ' + ${cartTotal}"> </span>
-	</div>
-	<form th:action="@{goto_checkout}" method="get" onsubmit="return confirm('是否前往結帳');">
-		<input type="hidden" name="cartList" th:value="${cartList}">
-		<button type="submit">結帳</button>
-	</form>
-	
-	<script>
-	document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-        input.value = window.location.pathname + window.location.search;
-    });
-	</script>
+				<form method="post" th:action="@{/member/course/cart_clear}"
+					data-confirm-form="確定要清空購物車嗎？">
+					<button class="btn ghost" type="submit"
+						style="width: 100%; margin-top: 10px"
+						th:disabled="${cartList == null || cartList.isEmpty()}">清空購物車</button>
+				</form>
+			</aside>
+		</div>
+	</main>
+	<footer class="site-footer">安心付款・個資加密保護</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>
