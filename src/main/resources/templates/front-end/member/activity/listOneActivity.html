@@ -31,11 +31,33 @@
     <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 
-	<form th:if="${activity.registrable && activity.member.memberId != #authentication.principal.member.memberId}"
+	<form th:if="${activity.registrable && (#authentication.principal == 'anonymousUser' || activity.member.memberId != #authentication.principal.member.memberId)}"
 	      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
 	    <input type="hidden" name="activityId" th:value="${activity.activityId}">
 	    <button type="submit">報名</button>
 	</form>
+	
+	<!-- (登入版)關注功能 -->
+	<div th:if="${isFollowing != null}" style="display:inline;">
+	
+	    <form th:if="${!isFollowing}"
+	          th:action="@{/member/activity/follow/follow}" method="post" style="display:inline;">
+	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	        <button type="submit">♡ 關注</button>
+	    </form>
+	
+	    <form th:if="${isFollowing}"
+	          th:action="@{/member/activity/follow/unfollow}" method="post" style="display:inline;">
+	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	        <button type="submit">♥ 已關注</button>
+	    </form>
+	</div>
+	<!-- 關注按鈕(訪客版):點選跳轉至登入,登入後返回此活動頁 -->
+	<a th:if="${isFollowing == null}"
+	   th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
+	    <button type="button">♡ 關注</button>
+	</a>
+	
 	<br>
 	<h3>活動評價</h3>
 		<div th:each="rv : ${reviewListData}">
@@ -50,7 +72,8 @@
 	<p th:if="${#lists.isEmpty(reviewListData)}">尚無評價。</p>
 	<br>
 	<br>
-    <a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>
+ 	<a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>｜<a th:href="@{/member/activity/follow/myFollows}">我的關注</a>｜	<a th:href="@{/member/activity/registration/myRegistrations}">我的報名</a>
+
 
 </body>
 </html>

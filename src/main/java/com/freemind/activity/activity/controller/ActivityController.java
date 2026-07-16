@@ -23,8 +23,8 @@ import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.category.model.ActivityCat;
 import com.freemind.activity.category.model.ActivityCatService;
+import com.freemind.activity.follow.model.ActivityFollowService;
 import com.freemind.activity.registration.model.RegistrationService;
-import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 import jakarta.servlet.ServletOutputStream;
@@ -44,6 +44,9 @@ public class ActivityController {
     
     @Autowired
     private RegistrationService regisSvc;
+    
+    @Autowired
+    private ActivityFollowService followSvc;
 
     @GetMapping("listAllActivity")
     public String listAllActivity(ModelMap model) {
@@ -355,8 +358,17 @@ public class ActivityController {
     }
     
     @GetMapping("listOneActivity")
-    public String listOneActivity(@RequestParam("activityId") Integer activityId, ModelMap model) {
+    public String listOneActivity(@RequestParam("activityId") Integer activityId,
+    								@AuthenticationPrincipal MemberUserDetails userDetails,
+    								ModelMap model) {
         Activity activity = activitySvc.getOneActivity(activityId);
+        
+        // 訪客不查關注狀態
+        if (userDetails != null) {
+            model.addAttribute("isFollowing",
+                followSvc.isFollowing(userDetails.getMember().getMemberId(), activityId));
+        }
+        
         model.addAttribute("activity", activity);
         model.addAttribute("reviewListData", regisSvc.getReviewsByActivity(activity));
         return "front-end/member/activity/listOneActivity";

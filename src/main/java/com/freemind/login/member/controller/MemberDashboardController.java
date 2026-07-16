@@ -27,6 +27,12 @@ public class MemberDashboardController {
         return "front-end/member/memberpage/dashboard";
     }
 	
+	@GetMapping("/myActivityRegistration")
+	public String myActivityRegistration() {
+	    return "redirect:/member/activity/registration/myRegistrations";
+	}
+
+	
 	@GetMapping("/myCollection")
     public String getMyCollection() {
         return "front-end/member/memberpage/myCollection";
@@ -62,6 +68,11 @@ public class MemberDashboardController {
 		model.addAttribute("articlePage", articlePage);
 	    model.addAttribute("currentPage", page);
 		return "front-end/member/article/myArticleCollection";
+	}
+	
+	@GetMapping("/myCollection/activity")
+	public String myCollectionActivity() {
+	    return "redirect:/member/activity/follow/myFollows";
 	}
 	
 }

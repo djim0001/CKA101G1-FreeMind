@@ -5,18 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.freemind.activity.activity.util.HibernateUtil_CompositeQuery_Activity;
+import com.freemind.activity.follow.model.ActivityFollowId;
+import com.freemind.activity.follow.model.ActivityFollowRepository;
 
 @Service
 public class ActivityService {
 	
 	@Autowired
-	ActivityRepository repository;
+	private ActivityRepository repository;
 	
 	@Autowired
 	private  SessionFactory sessionFactory;

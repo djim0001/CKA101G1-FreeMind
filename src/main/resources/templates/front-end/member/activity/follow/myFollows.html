@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的關注活動</title>
+</head>
+<body>
+
+    <h1>我的關注活動</h1>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+    <p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+
+    <table border="1">
+        <tr>
+            <th>活動名稱</th>
+            <th>活動時間</th>
+            <th>活動狀態</th>
+            <th></th>
+        </tr>
+        <tr th:each="a : ${followListData}">
+            <td>
+                <a th:href="@{/member/activity/listOneActivity(activityId=${a.activityId})}"
+                   th:text="${a.activityName}"></a>
+            </td>
+            <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+            <td th:text="${a.memberViewStatusText}"></td>
+            <td>
+                <form th:action="@{/member/activity/follow/unfollow}" method="post"
+                      onsubmit="return confirm('確定取消關注嗎？')">
+                    <input type="hidden" name="activityId" th:value="${a.activityId}">
+                    <button type="submit">取消關注</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(followListData)}">目前沒有關注任何活動。</p>
+	<br>
+    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/activity/select_page}">活動首頁</a>｜<a th:href="@{/member/dashboard/myCollection}">我的收藏</a>
+
+</body>
+</html>

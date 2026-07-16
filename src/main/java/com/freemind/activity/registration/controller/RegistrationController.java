@@ -1,6 +1,7 @@
 package com.freemind.activity.registration.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,10 +17,11 @@ import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
+import com.freemind.activity.report.model.ActivityReportService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
-@Controller
+//@Controller
 @RequestMapping("/member/activity/registration")
 public class RegistrationController {
 
@@ -28,6 +30,9 @@ public class RegistrationController {
     
     @Autowired 
     private ActivityService activitySvc;
+    
+    @Autowired
+    private ActivityReportService reportSvc;
 
     // 一、我的報名清單
     @GetMapping("myRegistrations")
@@ -37,6 +42,10 @@ public class RegistrationController {
     		Member member = userDetails.getMember();
     		List<Registration> list = regisSvc.getMyRegistrations(member);
     		model.addAttribute("regisListData", list);
+    		
+    		Set<Integer> reportedActivityIds = reportSvc.getReportedActivityIds(member);
+    		model.addAttribute("reportedActivityIds", reportedActivityIds);
+    		
     		return "front-end/member/activity/registration/myRegistrations";
     }
     
@@ -46,11 +55,17 @@ public class RegistrationController {
                            @AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
     		Member member = userDetails.getMember();
-    		Activity activity = activitySvc.getOneActivity(Integer.valueOf(activityId));
+    		Activity activity = activitySvc.getOneActivity(activityId);
+    		
+    		if (activity == null) {
+    			redirectAttributes.addFlashAttribute("errorMessage", "活動不存在");
+    			return "redirect:/member/activity/registration/myRegistrations";
+    		}
+    		
     		try {
     			regisSvc.register(member, activity);
     			redirectAttributes.addFlashAttribute("successMessage", "報名成功,等待審核");
-    		} catch (IllegalStateException e) {
+    		} catch (IllegalArgumentException | IllegalStateException e) {
     			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
     		}
     		 return "redirect:/member/activity/registration/myRegistrations";
@@ -66,7 +81,7 @@ public class RegistrationController {
     		try {
     			regisSvc.cancel(regisId, cancelReason, cancelNote, userDetails.getMember());
     			redirectAttributes.addFlashAttribute("successMessage", "已取消報名");
-    		} catch (IllegalStateException e) {
+    		} catch (IllegalArgumentException | IllegalStateException e) {
     			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
     		}
     		 return "redirect:/member/activity/registration/myRegistrations";
@@ -95,7 +110,7 @@ public class RegistrationController {
 		try {
 			regisSvc.approve(regisId, userDetails.getMember());
 			redirectAttributes.addFlashAttribute("successMessage", "審核完成");
-		} catch (IllegalStateException e) {
+		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
 		return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
@@ -111,7 +126,7 @@ public class RegistrationController {
     		try {
     			regisSvc.review(regisId, rating, reviewContent, userDetails.getMember());
     			redirectAttributes.addFlashAttribute("successMessage", "已送出評論");
-    		} catch (IllegalStateException e) {
+    		} catch (IllegalArgumentException | IllegalStateException e) {
     			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
     		}
     		 return "redirect:/member/activity/registration/myRegistrations";
