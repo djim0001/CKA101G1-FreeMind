@@ -2,6 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 <title>編輯文章</title>
 <style>
 * {
@@ -108,16 +110,27 @@ textarea:focus {
 	margin-top: 4px;
 }
 
-button {
-	display: inline-block;
-	padding: 10px 24px;
+.form-actions {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.form-actions button,
+.form-actions a.btn-preview {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 42px;
+	padding: 0 24px;
 	font-size: 15px;
 	font-weight: 500;
 	border: none;
 	border-radius: 6px;
 	cursor: pointer;
 	transition: background-color 0.2s, color 0.2s;
-	margin-right: 12px;
+	text-decoration: none;
+	box-sizing: border-box;
 }
 
 button[value="draft"] {
@@ -141,14 +154,29 @@ button[value="submit"]:hover {
 	background-color: #d39393;
 }
 
+.btn-preview {
+	margin-left: auto;
+	background-color: #fff;
+	color: #7a6b6b;
+	border: 1px solid #ccc !important;
+}
+
+.btn-preview:hover {
+	background-color: #f0f0f0;
+}
+
 @media ( max-width : 640px) {
 	form {
 		padding: 24px 20px;
 	}
-	button {
+	.form-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.form-actions button,
+	.form-actions a.btn-preview {
 		width: 100%;
-		margin-bottom: 12px;
-		margin-right: 0;
+		margin-left: 0;
 	}
 }
 </style>
@@ -212,9 +240,10 @@ button[value="submit"]:hover {
 			<textarea name="content" id="content" th:text="${form.content}"></textarea>
 			<p th:if="${contentError}" th:text="${contentError}" class="field-error"></p>
 		</div>
-		<div>
+		<div class="form-actions">
 			<button type="submit" name="action" value="draft">儲存草稿</button>
 			<button type="submit" name="action" value="submit">儲存並送審</button>
+			<a th:href="@{/psych/article/{id}/preview(id=${articleId})}" target="_blank" class="btn-preview">預覽文章</a>
 		</div>
 	</form>
 	
@@ -260,7 +289,42 @@ button[value="submit"]:hover {
 			height : 400,
 			plugins : 'link image',
 			toolbar : 'undo redo | blocks | bold italic | alignleft aligncenter alignright | image link',
-			images_upload_url : '/article/uploadImage',
+			images_upload_handler : function(blobInfo, progress) {
+				return new Promise(function(resolve, reject) {
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', '/psych/article/uploadImage');
+					xhr.setRequestHeader(
+						document.querySelector('meta[name="_csrf_header"]').content,
+						document.querySelector('meta[name="_csrf"]').content
+					);
+					xhr.upload.onprogress = function(e) {
+						progress(e.loaded / e.total * 100);
+					};
+					xhr.onload = function() {
+						var json;
+						try {
+							json = JSON.parse(xhr.responseText);
+						} catch (e) {
+							json = null;
+						}
+						if (xhr.status !== 200) {
+							reject((json && json.error) ? json.error : 'HTTP Error: ' + xhr.status);
+							return;
+						}
+						if (!json || typeof json.location !== 'string') {
+							reject('Invalid response: ' + xhr.responseText);
+							return;
+						}
+						resolve(json.location);
+					};
+					xhr.onerror = function() {
+						reject('Image upload failed due to a network error');
+					};
+					var formData = new FormData();
+					formData.append('file', blobInfo.blob(), blobInfo.filename());
+					xhr.send(formData);
+				});
+			},
 			relative_urls : false,
 			remove_script_host : true,
 			convert_urls : false,
@@ -270,7 +334,7 @@ button[value="submit"]:hover {
 			    editor.on('input change', function() {
 			        formChanged = true;
 			    });
-			}   
+			}
 		});
 	</script>	
 	<script>
@@ -286,7 +350,7 @@ button[value="submit"]:hover {
 		    if (file) {
 		        preview.src = URL.createObjectURL(file);
 		        preview.style.display = 'block';
-		        fileName.textContent = file.name;  // 顯示檔名
+		        fileName.textContent = file.name;  
 		    }
 		});
 	</script>

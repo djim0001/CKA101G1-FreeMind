@@ -3,6 +3,7 @@ package com.freemind.article.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,9 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.article.dto.ArticleInteractionStatsDTO;
+import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
+import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
@@ -35,18 +39,29 @@ public class AdminArticleController {
 	@Autowired
 	private ArticleCatService articleCatService;
 	
+	@Autowired
+	private ArticleInteractionService articleInteractionService;
+	
 	@GetMapping
     public String articleAdmin(Model model,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
-		
+    		@RequestParam(name = "page", defaultValue = "1") Integer page) {
+		Page<Article> articlePage = articleService.getSubmittedArticles(page);
+	    model.addAttribute("articlePage", articlePage);
+	    model.addAttribute("currentPage", page);
+	    model.addAttribute("articleCats", articleCatService.getAllCats());
+	    
+	    Map<Integer, String> articleStatuses = new LinkedHashMap<>();
+	    articleStatuses.put(1, "待審核");
+	    articleStatuses.put(2, "已上架");
+	    articleStatuses.put(3, "已退回");
+	    articleStatuses.put(4, "已下架");
+	    model.addAttribute("articleStatuses", articleStatuses);
 		return "back-end/article/articleAdmin";
     }
 	
     @GetMapping("/pending")
     public String getPendingArticles(Model model, 
-    		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
-		
+    		@RequestParam(name = "page", defaultValue = "1") Integer page) {
 		Page<Article> articlePage = articleService.getPendingArticles(page);
         model.addAttribute("articlePage", articlePage);
         model.addAttribute("currentPage", page);
@@ -57,20 +72,31 @@ public class AdminArticleController {
     @GetMapping("/reviewed")
     public String getReviewedArticles(Model model,
     		@RequestParam(name = "status", required = false) Integer status,
-    		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
-		
+    		@RequestParam(name = "page", defaultValue = "1") Integer page) {
 		Page<Article> articlePage = articleService.getReviewedArticles(status, page);
+		
+		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
+		for(Article article : articlePage.getContent()) {
+			ArticleInteractionStatsDTO stats = null;
+			
+			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
+				stats = articleInteractionService.getArticleStatistics(article);
+			}
+			
+			ArticleWithStatsDTO dto = new ArticleWithStatsDTO(article, stats);
+			articleList.add(dto);
+		}
+		
 		model.addAttribute("articlePage", articlePage);
 	    model.addAttribute("currentPage", page);
 	    model.addAttribute("currentStatus", status);
+		model.addAttribute("articleList", articleList);
     	return "back-end/article/reviewedList";
     }
     
     @GetMapping("/{articleId}/review")
     public String getReviewDetail(Model model, 
 			@PathVariable Integer articleId,
-			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
 			RedirectAttributes redirectAttributes) {
     	
 		try {
@@ -87,13 +113,7 @@ public class AdminArticleController {
     @GetMapping("/categories")
     public String getCatSearch(Model model,
     		@RequestParam(name = "catId", required = false) Integer catId,
-    		@RequestParam(name = "page", defaultValue = "1") Integer page,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
-		
-//    	Page<ArticleCat> articleCatPage = articleCatService.getAllCats(catId, page);
-//    	model.addAttribute("articleCatPage", articleCatPage);
-//    	model.addAttribute("currentPage", page);
-		
+    		@RequestParam(name = "page", defaultValue = "1") Integer page) {
 		List<ArticleCat> cats = articleCatService.getAllCats();
 		List<Map<String, Object>> catList = new ArrayList<>();
 		
@@ -109,16 +129,13 @@ public class AdminArticleController {
 	}
     
     @GetMapping("/categories/create")
-    public String getCreateForm(Model model,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails) {
-		
+    public String getCreateForm(Model model) {
     	return "back-end/article/createCatForm";
     }
     
     @GetMapping("/categories/{catId}")
     public String getCatDetail(Model model,
     		@PathVariable Integer catId,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
 		
 		try {
@@ -135,7 +152,6 @@ public class AdminArticleController {
     @PostMapping("/categories/create")
     public String createCat(Model model,
     		@RequestParam(name = "catName") String catName,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
     	
 		try {
@@ -155,7 +171,6 @@ public class AdminArticleController {
     public String editArticleCat(Model model,
     		@PathVariable(name = "catId") Integer catId,
     		@RequestParam(name = "catName") String catName,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
     		RedirectAttributes redirectAttributes) {
     	
 		try {
@@ -171,10 +186,9 @@ public class AdminArticleController {
     }
     
     @PostMapping("/categories/{catId}/deactivate")
-    public String deactivateArticleCat(Model model,
-    		@PathVariable Integer catId,
-    		@AuthenticationPrincipal AdminUserDetails prinUserDetails,
-    		RedirectAttributes redirectAttributes) {
+    public String deactivateArticleCat(Model model, 
+    		 @PathVariable Integer catId,
+			 RedirectAttributes redirectAttributes) {
     	
 		try {
 			articleCatService.deactivateCat(catId);
@@ -194,10 +208,9 @@ public class AdminArticleController {
 			@RequestParam(name = "action") String action,
 			@RequestParam(value = "rejectReason", required = false) Integer rejectReason,
 			@RequestParam(value = "rejectNote", required = false) String rejectNote,
-			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
+			@AuthenticationPrincipal AdminUserDetails prinAdminUser,
 			RedirectAttributes redirectAttributes) {
-		
-		Integer adminId = prinUserDetails.getAdmin().getAdminId();
+		Integer adminId = prinAdminUser.getAdmin().getAdminId();
 		
 		try {
 			if ("approve".equals(action)) {
@@ -217,9 +230,9 @@ public class AdminArticleController {
 	@PostMapping("/{articleId}/unpublish")
 	public String unpublishArticle(Model model,
 			@PathVariable(name = "articleId") Integer articleId,
-			@AuthenticationPrincipal AdminUserDetails prinUserDetails,
+			@AuthenticationPrincipal AdminUserDetails prinAdminUser,
 			RedirectAttributes redirectAttributes) {
-		Integer adminId = prinUserDetails.getAdmin().getAdminId();
+		Integer adminId = prinAdminUser.getAdmin().getAdminId();
 		
 		try {
 			articleService.unPublishArticle(articleId, adminId);

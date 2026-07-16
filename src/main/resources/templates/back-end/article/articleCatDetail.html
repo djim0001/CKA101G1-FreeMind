@@ -81,7 +81,7 @@
 </head>
 <body>
     <h1>文章分類詳情</h1>
-    <a th:href="@{/admin/article/categories}" class="btn-action">返回分類搜尋</a>
+    <a th:href="@{/admin/article/categories}" class="btn-action">返回分類管理</a>
     <br><br>
 
     <form th:action="@{/admin/article/categories/{id}/edit(id=${articleCat.articleCatId})}" method="post" id="editForm">

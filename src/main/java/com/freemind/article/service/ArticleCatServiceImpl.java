@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.freemind.article.entity.ArticleCat;
@@ -13,9 +14,6 @@ import com.freemind.article.repository.ArticleRepository;
 @Service
 public class ArticleCatServiceImpl implements ArticleCatService{
 	
-	@Value("${app.article-cat.page-size}")
-	private Integer artCatPageSize;
-	
 	@Autowired
 	private ArticleCatRepository articleCatRepository;
 	
@@ -24,7 +22,7 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 
 	@Override
 	public List<ArticleCat> getAllCats() {
-		return articleCatRepository.findAll();
+		return articleCatRepository.findAll(Sort.by("articleCatId").ascending());
 	}
 	
 	@Override
@@ -32,17 +30,6 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 		return articleCatRepository.findByArticleCatStatusTrue();
 	}
 
-//	@Override
-//	public Page<ArticleCat> getAllCats(Integer catId, Integer page) {
-//		Pageable pageable =  PageRequest.of(page - 1, artCatPageSize);
-//		
-//		if (catId != null) {
-//			return articleCatRepository.findByArticleCatId(catId, pageable);
-//		}
-//		
-//		return articleCatRepository.findAll(pageable);
-//	}
-	
 	@Override
 	public ArticleCat getCatById(Integer catId) {
 		ArticleCat articleCat = articleCatRepository.findById(catId)

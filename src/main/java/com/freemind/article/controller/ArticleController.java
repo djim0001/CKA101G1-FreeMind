@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.freemind.article.dto.ArticleInteractionStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
 import com.freemind.article.service.ArticleViewService;
+import com.freemind.login.psychologist.dto.PsychologistProfileRes;
+import com.freemind.login.psychologist.service.PsychologistService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +47,9 @@ public class ArticleController {
 	
 	@Autowired
 	private ArticleViewService articleViewService;
+	
+	@Autowired
+	private PsychologistService psychologistService;
 	
 	@ModelAttribute("articleCats")
 	public List<ArticleCat> articleCatList() {
@@ -83,6 +89,15 @@ public class ArticleController {
 			return "front-end/member/article/articleList";
 		}
 		
+		if (article.getPsychologist() != null && article.getPsychologist().getPsychId() != null) {
+		    try {
+		        PsychologistProfileRes authorPsych = psychologistService.getProfile(article.getPsychologist().getPsychId());
+		        model.addAttribute("authorPsych", authorPsych);
+		    } catch (IllegalArgumentException e) {
+		        model.addAttribute("authorPsych", null);
+		    }
+		}
+		
 		Integer memberId = (prinUserDetails != null) ? prinUserDetails.getMember().getMemberId() : null;
 		
 		String visitorKey = buildVisitorKey(memberId, request, visitorId);
@@ -90,18 +105,14 @@ public class ArticleController {
 		
 		if (memberId != null) articleInteractionService.recordView(articleId, memberId);
 		
-		long realLikeCount = articleInteractionService.getLikeCount(articleId);
-		long displayLikeCount = article.getLikeBaseCount() + realLikeCount;
-		long realBookmarkCount = articleInteractionService.getBookmarkCount(articleId);
-		long displayBookmarkCount = article.getBookmarkBaseCount() + realBookmarkCount;
+		ArticleInteractionStatsDTO articleStatistics = articleInteractionService.getArticleStatistics(article);
 		
 		model.addAttribute("article", article);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("selectedCatId", catId);
 //		model.addAttribute("likeCount", articleInteractionService.getLikeCount(articleId));
 //		model.addAttribute("bookmarkCount", articleInteractionService.getBookmarkCount(articleId));
-		model.addAttribute("likeCount", displayLikeCount);
-		model.addAttribute("bookmarkCount", displayBookmarkCount);
+		model.addAttribute("stats", articleStatistics);
 		model.addAttribute("shareCount", article.getShareCount());
 		model.addAttribute("viewCount", article.getViewCount());
 		model.addAttribute("likedByMe", articleInteractionService.isLikedByMember(articleId, memberId));

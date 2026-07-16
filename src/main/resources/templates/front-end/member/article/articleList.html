@@ -79,6 +79,22 @@ body {
 	border-color: #e8b4b4;
 }
 
+.search-bar select {
+	padding: 10px 16px;
+	border: 1px solid #e8d5d5;
+	border-radius: 20px;
+	font-size: 14px;
+	outline: none;
+	color: #7a6b6b;
+	background-color: #fff;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.search-bar select:focus {
+	border-color: #e8b4b4;
+}
+
 .search-bar button {
 	padding: 10px 24px;
 	background-color: #e8b4b4;
@@ -114,6 +130,9 @@ body {
 		flex-wrap: wrap;
 	}
 	.search-bar input {
+		flex-basis: 100%;
+	}
+	.search-bar select {
 		flex-basis: 100%;
 	}
 }
@@ -153,13 +172,6 @@ body {
 	border-radius: 10px;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
-
-/* .hot-title { */
-/* 	font-size: 17px; */
-/* 	font-weight: 700; */
-/* 	color: #4a3e3e; */
-/* 	margin-bottom: 16px; */
-/* } */
 
 .hot-list {
 	display: grid;
@@ -426,6 +438,10 @@ body {
 		
 		<form class="search-bar" th:action="@{/article}" method="get">
 			<input type="text" name="keyword" placeholder="搜尋文章標題或作者..." th:value="${keyword}" />
+			<select name="sort">
+				<option value="">發布日期新至舊</option>
+				<option value="asc">發布日期舊至新</option>
+			</select>
 			<button type="submit">搜尋</button>
 			<a th:if="${keyword != null && !keyword.isEmpty()}" th:href="@{/article}" class="clear-search">清除搜尋</a>
 		</form>

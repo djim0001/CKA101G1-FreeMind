@@ -24,8 +24,12 @@ import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminRepository;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.repository.PsychologistRepository;
+import com.freemind.util.ImageUploadValidator;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.freemind.article.exception.ArticleValidationException;
 
 
@@ -34,6 +38,9 @@ public class ArticleServiceImpl implements ArticleService{
 	
 	@Value("${app.article.page-size}")
 	private int artPageSize;
+	
+	@Value("${app.article.image.max-size}")
+	private DataSize maxImageSize;
 	
 	@Value("${app.hot-score.weight.share:5.0}")
     private double weightShare;
@@ -61,7 +68,6 @@ public class ArticleServiceImpl implements ArticleService{
 		}
 		
 		validateTitleLength(form.getTitle());
-		
 		Article article = createArticleWithForm(form, psychId);
 		article.setArticleStatus(0); // 建立草稿, 不檢查欄位
 		return articleRepository.save(article);
@@ -264,6 +270,7 @@ public class ArticleServiceImpl implements ArticleService{
 		article.setContent(form.getContent());
 		
 		if (form.getCoverImageFile() != null && !form.getCoverImageFile().isEmpty()) {
+			validateCoverImageSize(form.getCoverImageFile());
 			try {
 				article.setCoverImage(form.getCoverImageFile().getBytes());
 			} catch (IOException e) {
@@ -286,12 +293,43 @@ public class ArticleServiceImpl implements ArticleService{
 		return article;
 	}
 	
+	private void updateArticleWithForm(Article article, ArticleCreateForm form) {
+		article.setTitle(form.getTitle());
+		article.setContent(form.getContent());
+		
+		if (form.getArticleCatId() != null) {
+			article.setArticleCat(articleCatRepository.findById(form.getArticleCatId())
+					.orElseThrow(() -> new IllegalArgumentException("查無此分類")));
+		}
+		
+		if (form.getCoverImageFile() != null && !form.getCoverImageFile().isEmpty()) {
+			validateCoverImageSize(form.getCoverImageFile());
+			try {
+				article.setCoverImage(form.getCoverImageFile().getBytes());
+			} catch (IOException e) {
+				throw new RuntimeException("首圖讀取失敗", e);
+			}
+		}
+		
+		article.setUpdatedAt(LocalDateTime.now());
+	}
+	
 	private void validateTitleLength(String title) {
 	    if (title != null && title.length() > 50) {
 	    	Map<String, String> errors = new LinkedHashMap<>();
 	        errors.put("titleError", "標題不可超過 50 字");
 	        throw new ArticleValidationException(errors);
 	    }
+	}
+	
+	private void validateCoverImageSize(MultipartFile file) {
+		try {
+			ImageUploadValidator.validateImageSize(file, maxImageSize);
+		} catch (IllegalArgumentException e) {
+			Map<String, String> errors = new LinkedHashMap<>();
+			errors.put("coverError", e.getMessage());
+			throw new ArticleValidationException(errors);
+		}
 	}
 	
 	private void validateSubmission(Integer articleCatId, String title, String content, boolean hasCoverImage) {
@@ -320,26 +358,6 @@ public class ArticleServiceImpl implements ArticleService{
 	    }
 	}
 
-	private void updateArticleWithForm(Article article, ArticleCreateForm form) {
-		article.setTitle(form.getTitle());
-		article.setContent(form.getContent());
-		
-		if (form.getArticleCatId() != null) {
-			article.setArticleCat(articleCatRepository.findById(form.getArticleCatId())
-					.orElseThrow(() -> new IllegalArgumentException("查無此分類")));
-		}
-		
-		if (form.getCoverImageFile() != null && !form.getCoverImageFile().isEmpty()) {
-			try {
-				article.setCoverImage(form.getCoverImageFile().getBytes());
-			} catch (IOException e) {
-				throw new RuntimeException("首圖讀取失敗", e);
-			}
-		}
-		
-		article.setUpdatedAt(LocalDateTime.now());
-	}
-	
 	@Override
 	public void deleteDraft(Integer articleId, Integer psychId) {
 		Article article = getEditableArticle(articleId, psychId);
@@ -362,6 +380,19 @@ public class ArticleServiceImpl implements ArticleService{
 		
 		article.setArticleStatus(4);
 		articleRepository.save(article);
+	}
+	
+	@Override
+	public Page<Article> getSubmittedArticles(Integer page) {
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("submittedAt").ascending());
+		
+		List<Integer> articleStatuses = new ArrayList<Integer>();
+		articleStatuses.add(1);
+		articleStatuses.add(2);
+		articleStatuses.add(3);
+		articleStatuses.add(4);
+		
+		return articleRepository.findByStatuses(articleStatuses, pageable);
 	}
 	
 	@Override

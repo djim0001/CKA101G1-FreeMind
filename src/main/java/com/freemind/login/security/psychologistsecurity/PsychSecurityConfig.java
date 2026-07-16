@@ -35,7 +35,7 @@ public class PsychSecurityConfig {
 
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/psych/psychologistLogin").permitAll()
-				.anyRequest().authenticated()
+				.anyRequest().hasRole("PSYCH")
 			)
 
 			.userDetailsService(psychUserDetailsService)
@@ -84,6 +84,10 @@ public class PsychSecurityConfig {
 				.authenticationEntryPoint((request, response, authException) -> {
 					requestCache.saveRequest(request, response);
 					response.sendRedirect("/psych/psychologistLogin");
+				})
+				
+					.accessDeniedHandler((request, response, accessDeniedException) -> {
+			        response.sendRedirect("/psych/psychologistLogin?unauthorized");
 				})
 			);
 

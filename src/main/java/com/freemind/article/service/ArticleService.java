@@ -21,6 +21,8 @@ public interface ArticleService {
 	
 //	Page<Article> searchPublishedArticles(String keyword, Integer page);
 	
+	Page<Article> getSubmittedArticles(Integer page);
+	
 	Page<Article> getPendingArticles(Integer page);
 	
 	Article getArticle(Integer articleId, Integer psychId);

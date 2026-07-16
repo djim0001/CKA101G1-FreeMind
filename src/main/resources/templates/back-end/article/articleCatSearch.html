@@ -1,144 +1,159 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>文章分類搜尋</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>文章分類｜管理後台</title>
+<link rel="stylesheet" th:href="@{/css/course/style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
 <style>
-.btn-action {
-    display: inline-block;
-    padding: 6px 12px;
-    background-color: #f0f0f0;
-    color: #000000;
-    text-decoration: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.btn-action:hover {
-    background-color: #e0e0e0;
-}
-
 .search-container {
-    position: relative;
-    width: 300px;
-    margin-bottom: 20px;
+	position: relative;
+	width: 100%;
+	max-width: 320px;
 }
-
-.search-input {
-    width: 100%;
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+.search-container .dropdown {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 100%;
+	max-height: 220px;
+	overflow-y: auto;
+	background: #fff;
+	border: 1px solid #d8dce3;
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	display: none;
+	z-index: 10;
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
 }
-
-.dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
-    display: none;
-    z-index: 10;
+.search-container .dropdown-item {
+	padding: 8px 12px;
+	cursor: pointer;
+	color: #333;
+	font-size: 14px;
 }
-
-.dropdown-item {
-    padding: 8px;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
-    color: #333;
-}
-
-.dropdown-item:hover {
-    background-color: #f0f0f0;
-}
-
-.result-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.result-table th, .result-table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-}
-
-.result-table th {
-    background-color: #f2f2f2;
+.search-container .dropdown-item:hover {
+	background-color: #f2f4f7;
 }
 </style>
 </head>
-<body>
-    <h1>文章分類管理</h1>
-    <a th:href="@{/admin/article/categories/create}" class="btn-action">新增文章分類</a>
-    <a th:href="@{/admin/article}" class="btn-action">返回文章管理</a>
-    <br><br>
+<body class="thy2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+					CONSOLE</small></a>
+			<p class="nav-label">專欄文章管理</p>
+			<nav class="nav">
+				<a th:href="@{/admin/article}">文章總覽</a>
+				<a th:href="@{/admin/article/pending}">待審核文章</a>
+				<a th:href="@{/admin/article/reviewed}">已審核文章</a>
+				<a class="active" th:href="@{/admin/article/categories}">文章分類管理</a>
+				<a th:href="@{/}">返回後台管理</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<span>後台管理／專欄文章／文章分類</span>
+				<div class="admin-id">
+					<span class="avatar">管</span><b
+						th:text="${admin != null ? admin.name : '系統管理員'}">系統管理員</b>
+				</div>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>文章分類管理</h1>
+					</div>
+				</div>
+				<div class="grid-2">
+					<section class="panel">
+						<h2>搜尋 / 新增分類</h2>
+						<div class="form-group">
+							<label for="searchInput">輸入分類編號或名稱搜尋</label>
+							<div class="search-container">
+								<input id="searchInput" class="field" type="text"
+									placeholder="輸入分類編號或名稱搜尋……" autocomplete="off">
+								<div id="dropdown" class="dropdown"></div>
+							</div>
+						</div>
+						<a class="btn" style="margin-top: 16px; display: inline-block"
+							th:href="@{/admin/article/categories/create}">新增文章分類</a>
+					</section>
+					<section class="panel">
+						<h2>文章分類一覽</h2>
+						<div class="table-wrap">
+							<table style="min-width: 0">
+								<thead>
+									<tr>
+										<th>分類編號</th>
+										<th>分類名稱</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${articleCats == null || articleCats.isEmpty()}">
+										<td class="empty-state" colspan="3">目前沒有分類資料</td>
+									</tr>
+									<tr th:each="cat : ${articleCats}">
+										<td th:text="${cat.articleCatId}">編號</td>
+										<td><strong th:text="${cat.articleCatName}">分類名稱</strong></td>
+										<td><a class="btn secondary"
+											th:href="@{/admin/article/categories/{id}(id=${cat.articleCatId})}">查看</a></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+				</div>
+			</main>
+		</div>
+	</div>
 
-    <!-- 搜尋 -->
-    <div class="search-container">
-        <input type="text" id="searchInput" class="search-input"
-               placeholder="輸入分類編號或名稱搜尋..." autocomplete="off" />
-        <div id="dropdown" class="dropdown"></div>
-    </div>
+	<script th:inline="javascript">
+		const allCats = /*[[${articleCats}]]*/ [];
+	</script>
+	<script>
+		const searchInput = document.getElementById('searchInput');
+		const dropdown = document.getElementById('dropdown');
 
-    <!-- 全部分類資料（隱藏，給 JS 用） -->
-    <script th:inline="javascript">
-        const allCats = /*[[${articleCats}]]*/ [];
-    </script>
+		searchInput.addEventListener('input', function() {
+			const keyword = this.value.trim();
+			dropdown.innerHTML = '';
 
-    <script>
-        const searchInput = document.getElementById('searchInput');
-        const dropdown = document.getElementById('dropdown');
+			if (keyword === '') {
+				dropdown.style.display = 'none';
+				return;
+			}
 
-        searchInput.addEventListener('input', function() {
-            const keyword = this.value.trim();
-            dropdown.innerHTML = '';
+			const matches = allCats.filter(cat =>
+				String(cat.articleCatId).includes(keyword) ||
+				cat.articleCatName.toLowerCase().includes(keyword.toLowerCase())
+			);
 
-            if (keyword === '') {
-                dropdown.style.display = 'none';
-                return;
-            }
+			if (matches.length === 0) {
+				dropdown.style.display = 'none';
+				return;
+			}
 
-            const matches = allCats.filter(cat =>
-                String(cat.articleCatId).includes(keyword) ||
-                cat.articleCatName.toLowerCase().includes(keyword.toLowerCase())
-            );
+			matches.forEach(cat => {
+				const item = document.createElement('div');
+				item.className = 'dropdown-item';
+				item.textContent = cat.articleCatId + ' - ' + cat.articleCatName;
+				item.addEventListener('click', function() {
+					window.location.href = '/admin/article/categories/' + cat.articleCatId;
+				});
+				dropdown.appendChild(item);
+			});
 
-            if (matches.length === 0) {
-                dropdown.style.display = 'none';
-                return;
-            }
+			dropdown.style.display = 'block';
+		});
 
-            matches.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item';
-                item.textContent = cat.articleCatId + ' - ' + cat.articleCatName;
-                item.addEventListener('click', function() {
-                    window.location.href = '/admin/article/categories/' + cat.articleCatId;
-                });
-                dropdown.appendChild(item);
-            });
-
-            dropdown.style.display = 'block';
-        });
-
-        // 點擊頁面其他地方關閉 dropdown
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-container')) {
-                dropdown.style.display = 'none';
-            }
-        });
-    </script>
+		document.addEventListener('click', function(e) {
+			if (!e.target.closest('.search-container')) {
+				dropdown.style.display = 'none';
+			}
+		});
+	</script>
 </body>
 </html>

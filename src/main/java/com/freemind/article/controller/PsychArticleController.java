@@ -1,92 +1,153 @@
 package com.freemind.article.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.dto.ArticleCreateForm;
+import com.freemind.article.dto.ArticleInteractionStatsDTO;
+import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.exception.ArticleValidationException;
 import com.freemind.article.service.ArticleCatService;
+import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
+import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
+import com.freemind.util.ImageUploadValidator;
 
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/psych/article")
 public class PsychArticleController {
+	
+	@Value("${article.upload.dir}")
+	private String uploadDir;
+
+	@Value("${article.upload.url-path}")
+	private String urlPath;
+	
+	@Value("${app.article.image.max-size}")
+	private DataSize maxImageSize;
 
 	@Autowired
 	private ArticleService articleService;
 
 	@Autowired
 	private ArticleCatService articleCatService;
+	
+	@Autowired
+	private ArticleInteractionService articleInteractionService;
 
 	@ModelAttribute("articleCats")
 	public List<ArticleCat> articleCatList() {
 		return articleCatService.getActiveCats();
 	}
 
-	// testing
-	@PostMapping("/set_psychId_session")
-	public String setPsychIdSession(@RequestParam(name = "psychIdSession", required = false) Integer psychIdSession, HttpSession session) {
-		session.setAttribute("psychId", psychIdSession);
-		return "redirect:/psych/article/myArticles";
-	}
-
 	@GetMapping("/myArticles")
 	public String myArticles(Model model, 
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
 			@RequestParam(name = "page", defaultValue = "1") Integer page) {
 
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
-
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
+		
+		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
+		for (Article article : articlePage.getContent()) {
+			ArticleInteractionStatsDTO stats = null;
+			
+			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
+				stats = articleInteractionService.getArticleStatistics(article);
+			}
+			
+			ArticleWithStatsDTO dto = new ArticleWithStatsDTO(article, stats);
+			articleList.add(dto);
+		}
+		
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
+		model.addAttribute("articleList", articleList);
 		return "front-end/psych/article/myArticles";
 	}
 	
 	@GetMapping("/create")
-	public String getCreateForm(Model model, @SessionAttribute(name = "psychId", required = false) Integer psychId) {
-
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+	public String getCreateForm(Model model) {
 
 		model.addAttribute("form", new ArticleCreateForm());
 		return "front-end/psych/article/createForm";
+	}
+	
+	@GetMapping("/{articleId}/preview")
+	public String previewArticle(Model model,
+			@PathVariable Integer articleId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser) {
+		
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
+		Article article = articleService.getArticle(articleId, psychId);
+		
+		model.addAttribute("article", article);
+		return "front-end/psych/article/previewArticle";
+	}
+	
+	@PostMapping("/preview")
+	public String previewFromForm(Model model,
+			@ModelAttribute ArticleCreateForm form) {
+		
+		Article tempArticle = new Article();
+		tempArticle.setTitle(form.getTitle());
+		tempArticle.setContent(form.getContent());
+		
+		if (form.getArticleCatId() != null) {
+			try {
+				ArticleCat tempCat = articleCatService.getCatById(form.getArticleCatId());
+				tempArticle.setArticleCat(tempCat);
+			} catch (IllegalArgumentException e) {
+				System.out.println("預覽時忽略即可：" + e.getMessage());
+			}
+		}
+		
+		if (form.getCoverImageFile() != null && !form.getCoverImageFile().isEmpty()) {
+			try {
+				tempArticle.setCoverImage(form.getCoverImageFile().getBytes());
+			} catch (IOException e) {
+				System.out.println("檔案讀取失敗, 預覽時忽略即可：" + e.getMessage());
+			}
+		}
+		
+		model.addAttribute("article", tempArticle);
+		return "front-end/psych/article/previewArticle";
 	}
 
 	@PostMapping("/create")
 	public String createArticle(Model model, 
 			@ModelAttribute ArticleCreateForm form,
 			@RequestParam("action") String action,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser) {
 
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		
 		try {
 			if ("submit".equals(action)) {
@@ -106,17 +167,13 @@ public class PsychArticleController {
 
 		return "redirect:/psych/article/myArticles";
 	}
-
+	
 	@PostMapping("/{articleId}/submit")
 	public String submitDraft(Model model, @PathVariable Integer articleId,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
 			RedirectAttributes redirectAttributes) {
 
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 
 		try {
 			articleService.submitExistingDraft(articleId, psychId);
@@ -135,14 +192,10 @@ public class PsychArticleController {
 	public String getEditForm(Model model, 
 			@PathVariable Integer articleId,
 			@RequestParam(name = "page", defaultValue = "1") Integer page,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
 			RedirectAttributes redirectAttributes) {
 
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 
 		// 可編輯: 0 草稿, 2 已發布, 3 審核未通過
 		try {
@@ -180,13 +233,9 @@ public class PsychArticleController {
 			@RequestParam("action") String action, 
 			@RequestParam(name = "page", defaultValue = "1") Integer page,
 			@PathVariable Integer articleId,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId) {
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser) {
 
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 
 		try {
 			if ("submit".equals(action)) {
@@ -216,14 +265,10 @@ public class PsychArticleController {
 	@PostMapping("/{articleId}/unpublish")
 	public String unpublishArticle(Model model,
 			@PathVariable Integer articleId, 
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
 			RedirectAttributes redirectAttributes) {
 		
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		
 		try {
 			articleService.unPublishMyArticle(articleId, psychId);
@@ -238,14 +283,10 @@ public class PsychArticleController {
 	@PostMapping("/{articleId}/delete")
 	public String deleteDraft(Model model,
 			@PathVariable Integer articleId,
-			@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
 			RedirectAttributes redirectAttributes) {
 		
-		// testing
-		if (psychId == null) {
-			model.addAttribute("errorMessage", "*請先登入");
-			return "front-end/psych/article/test-login";
-		}
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		
 		try {
 			articleService.deleteDraft(articleId, psychId);
@@ -255,6 +296,51 @@ public class PsychArticleController {
 		}
 		
         return "redirect:/psych/article/myArticles";
+	}
+	
+	// saving <img src=""> to backend from TinyMCE
+	@ResponseBody
+	@PostMapping("/uploadImage") 
+	public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
+		Map<String, String> jsonResult = new HashMap<>();
+
+		if (file == null || file.isEmpty()) {
+			jsonResult.put("error", "未選擇檔案");
+			return ResponseEntity.badRequest().body(jsonResult); // 400
+		}
+		
+		try {
+			ImageUploadValidator.validateImageSize(file, maxImageSize);
+		}  catch (IllegalArgumentException e) {
+			 jsonResult.put("error", e.getMessage());
+			 return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE).body(jsonResult);
+		}
+
+		try {
+			File dir = new File(uploadDir);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+
+			String originFileName = file.getOriginalFilename();
+			String ext = "";
+
+			if (originFileName != null && originFileName.contains(".")) {
+				ext = originFileName.substring(originFileName.lastIndexOf("."));
+			}
+
+			String newFileName = UUID.randomUUID().toString() + ext;
+			File dest = new File(dir, newFileName);
+			file.transferTo(dest.toPath());
+
+			String basePath = urlPath.replace("**", "");
+			jsonResult.put("location", basePath + newFileName);
+			return ResponseEntity.ok(jsonResult); // 200
+
+		} catch (Exception e) {
+			jsonResult.put("error", "上傳失敗: " + e.getMessage());
+			return ResponseEntity.internalServerError().body(jsonResult); // 500
+		}
 	}
 
 }

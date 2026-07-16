@@ -28,8 +28,8 @@ public class MemberArticleController {
 	
 	@PostMapping("/{articleId}/like")
 	public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable Integer articleId,
-														  @AuthenticationPrincipal MemberUserDetails prinUserDetails) {
-		Integer memberId = prinUserDetails.getMember().getMemberId();
+														  @AuthenticationPrincipal MemberUserDetails prinMemberUser) {
+		Integer memberId = prinMemberUser.getMember().getMemberId();
 		articleInteractionService.toggleLike(articleId, memberId);
 		
 		Article article = articleService.getPublishedArticle(articleId);
@@ -44,8 +44,8 @@ public class MemberArticleController {
 	
 	@PostMapping("/{articleId}/bookmark")
 	public ResponseEntity<Map<String, Object>> toggleBookmark(@PathVariable Integer articleId,
-            												  @AuthenticationPrincipal MemberUserDetails prinUserDetails) {
-		Integer memberId = prinUserDetails.getMember().getMemberId();
+            												  @AuthenticationPrincipal MemberUserDetails prinMemberUser) {
+		Integer memberId = prinMemberUser.getMember().getMemberId();
 		articleInteractionService.toggleBookmark(articleId, memberId);
 		
 		Article article = articleService.getPublishedArticle(articleId);
