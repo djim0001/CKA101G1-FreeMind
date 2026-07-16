@@ -217,6 +217,7 @@ public class PsychologistService {
 		res.setRegisAt(p.getRegisAt());
 		res.setProfilePic(p.getProfilePic() !=null ? p.getProfilePic() : "");
 		res.setBankAccount(p.getBankAccount());
+		res.setAccountStatus(p.getAccountStatus());
 		return res ;
 	}
 	

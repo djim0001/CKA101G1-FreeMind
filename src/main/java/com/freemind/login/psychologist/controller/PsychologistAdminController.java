@@ -3,6 +3,7 @@ package com.freemind.login.psychologist.controller;
 import java.util.List;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
 import com.freemind.login.psychologist.dto.PsychologistAdminRes;
+import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.repository.PsychologistRepository;
 import com.freemind.login.psychologist.service.PsychologistService;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
 @Controller
 @RequestMapping("/admin/psych")
@@ -25,10 +29,12 @@ public class PsychologistAdminController {
 
 	private final PsychologistService psychologistService;
 	private final AdminService adminSvc;
+	private final PsychologistRepository r;
 	
-	public PsychologistAdminController(PsychologistService psychologistService , AdminService adminSvc) {
+	public PsychologistAdminController(PsychologistService psychologistService , AdminService adminSvc, PsychologistRepository r) {
 		this.psychologistService = psychologistService;
 		this.adminSvc = adminSvc;
+		this.r =r;
 	}
 
 	
@@ -76,14 +82,20 @@ public class PsychologistAdminController {
 	@GetMapping("/{psychId}")
 	public String adminDetail(Model model,
 			@PathVariable Integer psychId,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
+//			@AuthenticationPrincipal AdminUserDetails userDetails,
+//			@SessionAttribute(name = "adminId", required = false) Integer adminId,
 			RedirectAttributes redirectAttributes) {
-
+		
+		Integer adminId = admin.getAdminId(); 	
+//		if (userDetails == null || userDetails.getAdmin() == null) {
+//	        model.addAttribute("errorMessage", "*請先登入");
+//	        return "back-end/login";
+//	    }
 		if (adminId == null) {
 			model.addAttribute("errorMessage", "*請先登入");
 			return "back-end/login";
 		}
-
 		try {
 			PsychologistAdminRes psych = psychologistService.getAdmin(psychId);
 			model.addAttribute("psych", psych);
@@ -98,10 +110,13 @@ public class PsychologistAdminController {
 	public String updateLicense(
 			@PathVariable Integer psychId,
 			@RequestParam("approved") boolean approved,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+//			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
 			Model model,
 			RedirectAttributes redirectAttributes) {
 
+		Integer adminId = admin.getAdminId();
+		
 		if (adminId == null) {
 			model.addAttribute("errorMessage", "*請先登入");
 			return "back-end/login";
@@ -121,10 +136,13 @@ public class PsychologistAdminController {
 	public String updateStatus(
 			@PathVariable Integer psychId,
 			@RequestParam("status") Integer status,
-			@SessionAttribute(name = "adminId", required = false) Integer adminId,
+			@ModelAttribute("admin") Admin admin,
+//			@SessionAttribute(name = "adminId", required = false) Integer adminId,
 			Model model,
 			RedirectAttributes redirectAttributes) {
-
+		Integer adminId = admin.getAdminId(); 
+		Psychologist psych = r.findById(psychId).orElseThrow();
+		System.out.println("accountStatus = " + psych.getAccountStatus());
 		if (adminId == null) {
 			model.addAttribute("errorMessage", "*請先登入");
 			return "back-end/login";
