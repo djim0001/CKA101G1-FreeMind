@@ -34,3 +34,5 @@ build/
 
 ### Upload settings ###
 uploads/
+
+src/main/resources/static/images/
