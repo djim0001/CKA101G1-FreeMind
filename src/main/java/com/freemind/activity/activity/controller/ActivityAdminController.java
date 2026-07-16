@@ -1,6 +1,8 @@
 package com.freemind.activity.activity.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -170,11 +171,21 @@ public class ActivityAdminController {
     public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
             throws IOException {
         res.setContentType("image/jpeg");
-        ServletOutputStream out = res.getOutputStream();
         Activity activity = activitySvc.getOneActivity(activityId);
-        if (activity != null && activity.getPicture() != null) {
-            out.write(activity.getPicture());
+     
+
+        if (activity == null || activity.getPicture() == null) {
+            return;
         }
+
+        String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+        File imageFile = new File(uploadDir, activity.getPicture());
+
+        if (!imageFile.exists()) {
+            return;
+        }
+        res.setContentType("image/jpeg");
+        Files.copy(imageFile.toPath(), res.getOutputStream());
     }
     
     // 詳情

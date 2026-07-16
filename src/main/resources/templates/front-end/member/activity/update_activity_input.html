@@ -114,8 +114,8 @@
         </p>
 
 		<p>
-		    活動圖片（選填，不選則維持原圖）：
-		    <img th:if="*{picture != null}"
+		    活動圖片：
+		    <img id="originalPicture" th:if="*{picture != null}"
      		th:src="@{/member/activity/activityImage(activityId=*{activityId})}"
      		style="max-width:200px;">
 		    <input type="file" name="pictureFile" onchange="previewImage(event)">
@@ -134,16 +134,23 @@
 // 圖片預覽
 function previewImage(event) {
     const preview = document.getElementById('preview');
+    const original = document.getElementById('originalPicture'); 
     const file = event.target.files[0];
     if (file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             preview.src = e.target.result;
             preview.style.display = 'block';
+            if (original) {
+                original.style.display = 'none';   // 選了新檔案，把舊圖藏起來
+            }
         }
         reader.readAsDataURL(file);
     } else {
         preview.style.display = 'none';
+        if (original) {
+            original.style.display = '';   // 使用者取消選檔，舊圖恢復顯示
+        }
     }
 }
 
