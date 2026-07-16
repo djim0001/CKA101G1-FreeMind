@@ -114,7 +114,11 @@ public class ActivityController {
                           @RequestParam("pictureFile") MultipartFile pictureFile,
                           @AuthenticationPrincipal MemberUserDetails userDetails,
                           ModelMap model) throws IOException {
-        if (result.hasErrors()) {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
+    		if (result.hasErrors()) {
             return "front-end/member/activity/addActivity";
         }
 
@@ -156,7 +160,10 @@ public class ActivityController {
                           @RequestParam("pictureFile") MultipartFile pictureFile,
                           @AuthenticationPrincipal MemberUserDetails userDetails,
                           ModelMap model) throws IOException {
-        if (result.hasErrors()) {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    		if (result.hasErrors()) {
             return "front-end/member/activity/update_activity_input";
         }
 
@@ -209,6 +216,10 @@ public class ActivityController {
     // 查看我發起的活動
     @GetMapping("ownedActivities")
     public String ownedActivities(@AuthenticationPrincipal MemberUserDetails userDetails, ModelMap model) {
+    	 	if (userDetails == null) {
+    	        return "redirect:/front-end/login";
+    	    }
+    	
     		Integer memberId = userDetails.getMember().getMemberId();
         
         Map<String, String[]> emptyMap = new HashMap<>();
@@ -234,6 +245,10 @@ public class ActivityController {
     				@RequestParam(value = "currentPage", required = false) Integer currentPage, 
     				@AuthenticationPrincipal MemberUserDetails userDetails,
     				ModelMap model) {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
     		Integer memberId = userDetails.getMember().getMemberId();
         
         if (currentPage == null) {
@@ -264,7 +279,11 @@ public class ActivityController {
                          @RequestParam("cancelNote") String cancelNote,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          ModelMap model) {
-        try {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
+    		try {
             // 先驗身分:這個活動是不是我的?
             Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
@@ -298,7 +317,11 @@ public class ActivityController {
                             @RequestParam("postponeNote") String postponeNote,
                             @AuthenticationPrincipal MemberUserDetails userDetails,
                             ModelMap model) {
-        try {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
+    		try {
             Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
@@ -334,7 +357,11 @@ public class ActivityController {
                                       @RequestParam(value = "regisEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisEnd,
                                       @AuthenticationPrincipal MemberUserDetails userDetails,
                                       ModelMap model) {
-        try {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
+    		try {
             Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
