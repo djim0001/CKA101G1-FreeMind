@@ -4,6 +4,7 @@ import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.reports.model.ReportsService;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 import jakarta.validation.Valid;
 
@@ -52,7 +54,7 @@ public class ReportsMemberController {
 	public String reportsHome(ModelMap model) {
 		return "front-end/member/consultation/reports/consultationFeedbackHome";
 	}
-	
+
 	@PostMapping("frontInsert")
 	public String frontInsert(@Valid Reports reports, BindingResult result, ModelMap model) {
 		if (result.hasErrors()) {
@@ -64,55 +66,46 @@ public class ReportsMemberController {
 	}
 
 	@GetMapping("myReportsForm")
-	public String myReportsForm(ModelMap model) {
-		return "front-end/member/consultation/reports/myReportsForm";
-	}
-
-	@PostMapping("myReports")
-	public String myReports(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/reports/myReportsForm";
+	public String myReportsForm(@AuthenticationPrincipal MemberUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
 		}
-		List<Reports> list = reportsSvc.getByMemberId(Integer.valueOf(memberId));
+		Integer memberId = prinUserDetails.getMember().getMemberId();
+		List<Reports> list = reportsSvc.getByMemberId(memberId);
 		model.addAttribute("reportsListData", list);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/reports/myReportsForm";
 	}
 
-	@GetMapping("reportLookupForm")
-	public String reportLookupForm(ModelMap model) {
-		return "front-end/member/consultation/reports/reportLookupForm";
-	}
 
-	@PostMapping("reportLookup")
-	public String reportLookup(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/reports/reportLookupForm";
+
+	@GetMapping("reportLookupForm")
+	public String reportLookupForm(@AuthenticationPrincipal MemberUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
 		}
-		Integer mid = Integer.valueOf(memberId);
+		Integer mid = prinUserDetails.getMember().getMemberId();
 		List<Orders> allReportableOrders = ordersSvc.getConfirmedOrCompletedByMemberId(mid);
 		List<Reports> myReports = reportsSvc.getByMemberId(mid);
 		java.util.Set<Integer> reportedOrderIds = myReports.stream().filter(r -> r.getOrders() != null)
 				.map(r -> r.getOrders().getOrderId()).collect(java.util.stream.Collectors.toSet());
 		List<Orders> list = allReportableOrders.stream().filter(o -> !reportedOrderIds.contains(o.getOrderId()))
 				.collect(java.util.stream.Collectors.toList());
-		if (list.isEmpty()) {
-			model.addAttribute("errorMessage", "查無可回報的諮商紀錄（可能都已經回報過了）。");
-			return "front-end/member/consultation/reports/reportLookupForm";
-		}
 		model.addAttribute("ordersListData", list);
-		model.addAttribute("memberId", memberId);
+		model.addAttribute("memberId", mid);
 		return "front-end/member/consultation/reports/reportLookupForm";
 	}
 
 	@PostMapping("reportSelect")
-	public String reportSelect(@RequestParam("orderId") String orderId, @RequestParam("memberId") String memberId,
-			ModelMap model) {
+	public String reportSelect(@RequestParam("orderId") String orderId,
+			@AuthenticationPrincipal MemberUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
+		}
+		Integer memberId = prinUserDetails.getMember().getMemberId();
 		Reports reports = new Reports();
 		Member member = new Member();
-		member.setMemberId(Integer.valueOf(memberId));
+		member.setMemberId(memberId);
 		reports.setMember(member);
 		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
 		reports.setOrders(orders);

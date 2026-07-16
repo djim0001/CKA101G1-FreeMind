@@ -168,43 +168,30 @@ public class OrdersMemberController {
 		return "front-end/member/consultation/orders/bookSuccess";
 	}
 
-	@GetMapping("myOrdersForm")
-	public String myOrdersForm(ModelMap model) {
-		return "front-end/member/consultation/orders/myOrdersForm";
-	}
-
-	@PostMapping("myOrders")
-	public String myOrders(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/orders/myOrdersForm";
+	@GetMapping("myOrders")
+	public String myOrders(@AuthenticationPrincipal MemberUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
 		}
-		List<Orders> list = ordersSvc.getByMemberId(Integer.valueOf(memberId));
+		Integer memberId = prinUserDetails.getMember().getMemberId();
+		List<Orders> list = ordersSvc.getByMemberId(memberId);
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/myOrdersList";
 	}
 
 	@GetMapping("reviewForm")
-	public String reviewForm(ModelMap model) {
-		return "front-end/member/consultation/orders/reviewForm";
-	}
-
-	@PostMapping("reviewLookup")
-	public String reviewLookup(@RequestParam("memberId") String memberId, ModelMap model) {
-		if (memberId == null || memberId.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入會員編號");
-			return "front-end/member/consultation/orders/reviewForm";
+	public String reviewForm(@AuthenticationPrincipal MemberUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
 		}
-		List<Orders> list = ordersSvc.getCompletedUnratedByMemberId(Integer.valueOf(memberId));
-		if (list.isEmpty()) {
-			model.addAttribute("errorMessage", "目前沒有可評論的諮商紀錄。");
-			return "front-end/member/consultation/orders/reviewForm";
-		}
+		Integer memberId = prinUserDetails.getMember().getMemberId();
+		List<Orders> list = ordersSvc.getCompletedUnratedByMemberId(memberId);
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/reviewList";
 	}
+
 
 	@PostMapping("reviewSelect")
 	public String reviewSelect(@RequestParam("orderId") String orderId, ModelMap model) {
