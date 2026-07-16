@@ -1,57 +1,111 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>會員註冊</title>
+<meta charset="UTF-8">
+<title>會員註冊</title>
 </head>
 <body>
 
-    <h1>會員註冊</h1>
+	<h1>會員註冊</h1>
 
-    <form th:action="@{/front-end/register}" th:object="${registerForm}" method="post">
+	<style>
+.required::after {
+	content: " *";
+	color: red;
+}
+</style>
+	<p style="color: #666; font-size: 0.9em;">
+		<span style="color: red;">*</span> 為必填欄位
+	</p>
 
-        <p>
-            <label>帳號：<input type="text" th:field="*{memberAccount}"></label>
-            <span style="color:red;" th:if="${#fields.hasErrors('memberAccount')}" th:errors="*{memberAccount}"></span>
-        </p>
+	<form th:action="@{/front-end/register}" th:object="${registerForm}"
+		method="post">
 
-        <p>
-            <label>密碼：<input type="password" th:field="*{memberPassword}"></label>
-            <span style="color:red;" th:if="${#fields.hasErrors('memberPassword')}" th:errors="*{memberPassword}"></span>
-        </p>
+		<p>
+			<label class="required">帳號：<input type="text"
+				th:field="*{memberAccount}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('memberAccount')}"
+				th:errors="*{memberAccount}"></span>
+		</p>
 
-        <p>
-            <label>姓名：<input type="text" th:field="*{name}"></label>
-            <span style="color:red;" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-        </p>
+		<p>
+			<label class="required">密碼：<input type="password"
+				th:field="*{memberPassword}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('memberPassword')}"
+				th:errors="*{memberPassword}"></span>
+		</p>
 
-        <p>
-            <label>性別：
-                <select th:field="*{gender}">
-                    <option value="">請選擇</option>
-                    <option value="男">男</option>
-                    <option value="女">女</option>
-                </select>
-            </label>
-            <span style="color:red;" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
-        </p>
+		<p>
+			<label class="required">確認密碼：<input type="password"
+				th:field="*{confirmPassword}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('confirmPassword')}"
+				th:errors="*{confirmPassword}"></span>
+		</p>
 
-        <p>
-            <label>手機號碼：<input type="text" th:field="*{phoneNumber}"></label>
-            <span style="color:red;" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
-        </p>
+		<p>
+			<label class="required">姓名：<input type="text"
+				th:field="*{name}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+		</p>
 
-        <p>
-            <label>信箱：<input type="text" th:field="*{email}"></label>
-            <span style="color:red;" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-        </p>
+		<p>
+			<label class="required">性別： <select th:field="*{gender}">
+					<option value="">請選擇</option>
+					<option value="男">男</option>
+					<option value="女">女</option>
+			</select>
+			</label> <span style="color: red;" th:if="${#fields.hasErrors('gender')}"
+				th:errors="*{gender}"></span>
+		</p>
 
-        <button type="submit">送出註冊</button>
-    </form>
+		<p>
+			<label class="required">手機號碼：<input type="text"
+				th:field="*{phoneNumber}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('phoneNumber')}"
+				th:errors="*{phoneNumber}"></span>
+		</p>
 
-    <p>
-        <a th:href="@{/front-end/login}">已有帳號？回登入頁</a>
-    </p>
+		<p>
+			<label class="required">信箱：<input type="text"
+				th:field="*{email}"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+		</p>
+
+		<p>
+			<label>生日：<input type="date" th:field="*{birthday}"></label>
+			<span style="color: red;" th:if="${#fields.hasErrors('birthday')}"
+				th:errors="*{birthday}"></span>
+		</p>
+
+		<p>
+			<label>縣市：<input type="text" th:field="*{city}" maxlength="5"></label>
+			<span style="color: red;" th:if="${#fields.hasErrors('city')}"
+				th:errors="*{city}"></span>
+		</p>
+
+		<p>
+			<label>區：<input type="text" th:field="*{dist}" maxlength="5"></label>
+			<span style="color: red;" th:if="${#fields.hasErrors('dist')}"
+				th:errors="*{dist}"></span>
+		</p>
+
+		<p>
+			<label>地址：<input type="text" th:field="*{address}"
+				maxlength="40"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+		</p>
+
+		<p>
+			<label>暱稱：<input type="text" th:field="*{nickname}"
+				maxlength="200"></label> <span style="color: red;"
+				th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+		</p>
+		<button type="submit">送出註冊</button>
+	</form>
+
+	<p>
+		<a th:href="@{/front-end/login}">已有帳號？回登入頁</a>
+	</p>
 
 </body>
 </html>

@@ -75,7 +75,7 @@ public class MemberSecurityConfig {
                 	    "/member/activity/activityImage"
                 	).permitAll()
                 
-                .anyRequest().hasRole("MEMBER")
+                .anyRequest().hasAnyRole("MEMBER","ADMIN")
             )
 
             .userDetailsService(memberUserDetailsService)

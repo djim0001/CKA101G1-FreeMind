@@ -1,5 +1,7 @@
 package com.freemind.login.member.dto;
 
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -30,6 +32,9 @@ public class RegisterForm {
 	@NotEmpty(message = "會員密碼: 請勿空白")
 	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,20}$", message = "密碼: 長度需8到20字元，且必須包含英文大寫、小寫與數字")
 	private String memberPassword;
+	
+	@NotEmpty(message = "確認密碼: 請勿空白")
+	private String confirmPassword;
 
 	@NotEmpty(message = "姓名: 請勿空白")
 	@Pattern(regexp = "^[(一-龥)(a-zA-Z0-9_)]{2,20}$", message = "姓名: 只能是中、英文字母、數字和_ , 且長度必需在2到20之間")
@@ -46,9 +51,75 @@ public class RegisterForm {
 	@Email(message = "信箱格式不正確")
 	private String email;
 
+	/* ===== 以下為選填欄位：可為空，有填才會存 ===== */
+
+	/** 生日（選填）。ISO 格式對應 <input type="date"> 的 yyyy-MM-dd */
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	private LocalDate birthday;
+
+	@Size(max = 5, message = "縣市: 長度不可超過5字元")
+	private String city;
+
+	@Size(max = 5, message = "區: 長度不可超過5字元")
+	private String dist;
+
+	@Size(max = 40, message = "地址: 長度不可超過40字元")
+	private String address;
+	
+	@Size(max = 200, message = "暱稱: 長度不可超過200字元")
+	private String nickname;
+	
+	public String getConfirmPassword() {
+	    return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+	    this.confirmPassword = confirmPassword;
+	}
+	
 	public String getMemberAccount() {
 		return memberAccount;
 	}
+	public LocalDate getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(LocalDate birthday) {
+		this.birthday = birthday;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getDist() {
+		return dist;
+	}
+
+	public void setDist(String dist) {
+		this.dist = dist;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
 
 	public void setMemberAccount(String memberAccount) {
 		this.memberAccount = memberAccount;

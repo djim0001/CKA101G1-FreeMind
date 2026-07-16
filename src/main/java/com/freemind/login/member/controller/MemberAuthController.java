@@ -69,6 +69,12 @@ public class MemberAuthController {
 		if (memberService.findByEmail(form.getEmail()) != null) {
 			result.rejectValue("email", "duplicate", "此信箱已被註冊");
 		}
+		// 兩次密碼須一致
+		if (form.getMemberPassword() != null
+		        && !form.getMemberPassword().equals(form.getConfirmPassword())) {
+		    result.rejectValue("confirmPassword", "mismatch", "兩次輸入的密碼不一致");
+		}
+		
 		if (result.hasErrors()) {
 			return "front-end/member/auth/register";
 		}
@@ -81,10 +87,19 @@ public class MemberAuthController {
 		member.setGender(form.getGender());
 		member.setPhoneNumber(form.getPhoneNumber());
 		member.setEmail(form.getEmail());
+		// 選填欄位：空白轉 null，避免資料庫存一堆空字串
+		member.setBirthday(form.getBirthday());
+		member.setCity(blankToNull(form.getCity()));
+		member.setDist(blankToNull(form.getDist()));
+		member.setAddress(blankToNull(form.getAddress()));
+		member.setNickname(blankToNull(form.getNickname()));
+		
 		member.setAccountStatus(0);
 		member.setRegisAt(LocalDateTime.now());
 		memberService.addMember(member);
 
+		// sendOtpMail : 給資料庫（Redis）跟系統後台程式看的 OtpService 48行 （用來產生資料庫的 Key）
+		// 會被存成如 : otp:register:user@gmail.com、otp:reset:user@gmail.com
 		sendOtpMail("register", form.getEmail(), "會員註冊");
 		return "redirect:/front-end/register/verify?email=" + form.getEmail();
 	}
@@ -191,13 +206,13 @@ public class MemberAuthController {
 		}
 		member.setMemberPassword(passwordEncoder.encode(newPassword)); // BCrypt
 	    if (member.getAccountStatus() == 0) {
-	        member.setAccountStatus(1); // 未啟用帳號：OTP 已證明信箱所有權，順便啟用
+	        member.setAccountStatus(1); // 未啟用帳號：OTP 驗證完順便啟用
 	    }
 	    memberService.updateMember(member);
 	    return "redirect:/front-end/login?resetSuccess";
 	}
 	
-	/** 產生 OTP 並寄出；回傳 false 代表仍在冷卻時間內 */
+	/** 產生 OTP 並寄出；回傳 false 代表在冷卻 */
 	private boolean sendOtpMail(String purpose, String email, String purposeText) {
 		String otp = otpService.generateOtp(purpose, email);
 		if (otp == null) {
@@ -206,4 +221,10 @@ public class MemberAuthController {
 		otpMailService.sendOtp(email, purposeText, otp);
 		return true;
 	}
+	
+	/** 選填欄位沒填時表單會送空字串轉成 null  */
+	private static String blankToNull(String s) {
+	    return (s == null || s.isBlank()) ? null : s;
+	}
+	
 }
