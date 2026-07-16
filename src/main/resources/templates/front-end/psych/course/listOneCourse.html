@@ -1,237 +1,277 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>課程詳情查看</title>
-<style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-	/* 背景遮罩 */
-	.modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		z-index: 9999;
-	}
-
-	/* 彈出視窗 */
-	.modal-box {
-		background-color: white;
-		width: 420px;
-		padding: 25px;
-		border-radius: 8px;
-		position: relative;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-	}
-
-	.modal-box h3 {
-		margin-top: 0;
-		margin-bottom: 20px;
-		text-align: center;
-	}
-
-	.modal-box div {
-		margin-bottom: 15px;
-	}
-
-	.modal-box label {
-		display: inline-block;
-		width: 120px;
-	}
-
-	.modal-box input[type="text"],
-	.modal-box input[type="number"],
-	.modal-box input[type="date"] {
-		width: 200px;
-		padding: 5px;
-	}
-
-	/* 右上角關閉按鈕 */
-	.modal-close {
-		position: absolute;
-		top: 8px;
-		right: 10px;
-		border: none;
-		background: none;
-		font-size: 24px;
-		cursor: pointer;
-	}
-
-	.modal-actions {
-		text-align: center;
-		margin-top: 20px;
-	}
-
-	.modal-actions button {
-		margin: 0 8px;
-		padding: 6px 14px;
-		cursor: pointer;
-	}
-
-	.error {
-		color: red;
-		font-size: 14px;
-	}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程詳情｜心理師中心</title>
+<link rel="stylesheet" th:href="@{/css/course/psych-style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-all-styles.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-editor.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-preview.css}" />
 </head>
-<body>
-	<h1>課程詳情查看</h1>
-	<h3>
-		<a th:href="@{/psych/course/select_course}">心理師課程一覽</a>
-	</h3>
-
-	<br>
-	<br>
-	<span>課程狀態： </span><span th:text="${course.courseStatusText}"></span> <br> 
-	<div th:if="${course.canAddPsychDiscount()}">
-		<form method="post" th:action="@{discount_model_box}">
-			<input type="hidden" name="courseId" th:value="${course.courseId}">
-			<button type="submit">添加心理師折扣</button>
-		</form>
-	</div>
-	<button th:if="${!course.canAddPsychDiscount()}">尚無法更改心理師折扣</button>
-	<br>
-	<span>課程名稱： <span><span th:text="${course.courseName}"></span><br> 
-	<span>課程分類名稱： </span><span th:text="${course.courseCategories.courseCatName}"></span><br>
-	<span>影片： </span><br>
-	<video width="640" controls>
-    		<source th:src="@{${course.videoSrc}}" type="video/mp4">
-	</video><br>
-	<span>預覽影片： </span><br>
-	<video width="640" controls>
-    		 <source th:src="@{${course.videoSrcPre}}" type="video/mp4">
-	</video><br>
-	<span>課程大綱： </span><span th:text="${course.outline}" sytle="overflow: scroll"></span> <br> 
-	<div th:if="${course.courseStatus}==4">
-		<span>上架時間： </span>
-		<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}"></span>
-	</div>
-	<div th:if="${course.courseStatus}==5">
-		<span>下架時間： </span>
-		<span th:text="${#temporals.format(course.delistedAt, 'yyyy年MM月dd日 HH:mm')}"></span><br>
-		<span>下架原因： </span><span th:text="${course.delistReason.label}"></span> 
-	</div>
-	
-	<span>收藏次數： </span><span th:text="${course.saveCount}"></span> <br> 
-	<span>評價次數： </span><span th:text="${course.starCount}"></span> <br> 
-	<span>總星數： </span><span th:text="${course.reviewCount}"></span> <br> 
-	<span>提問次數： </span><span th:text="${course.commentCount}"></span> <br> 
-	<span>心理師折扣： </span><span th:text="${course.psychDiscount==null?'無':course.psychDiscount}"></span> <br> 
-	<div th:if="${course.psychDiscount!=null}">
-		<span>折扣開始時間： </span>
-		<span th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></span><br>
-		<span>折扣結束時間： </span>
-		<span th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></span>
-	</div>
-	<span>課程定價： </span><span th:text="${course.price}"></span> <br>
-	<div th:if="${course.courseStatus==0 or course.courseStatus==3}">
-		<form method="post" th:action="@{update_course}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<button type="submit">修改</button>
-		</form>
-		<form method="post" th:action="@{submit_course}">
-			<input type="hidden" name="courseId"
-				th:value="${course.courseId}">
-			<button type="submit">送出審核</button>
-		</form>
-	</div>
-	
-	<div>
-		<section class="side-panel mentor">
-		心理師回復:
-			<div th:each="comment : ${courseQuestions}">
-				<p th:text="${comment.member.name} + ':'"></p>
-				<p th:text="${comment.courseQuestion}"></p>
-				<div th:if="${comment.courseAnswer!=null}">
-					<p style="text-align: right;" th:text="${comment.course.psychologist.name} + '心理師回覆:'"></p>
-					<p style="text-align: right;" th:text="${comment.courseAnswer}"></p>
+<body class="th2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/psych/course/select_course}">諮由自在
+				Free Mind<small>THERAPIST STUDIO</small>
+			</a>
+			<nav class="nav">
+				<a class="active" th:href="@{/psych/course/select_course}">課程管理</a><a
+					th:href="@{/psych/course/add_course}">新增／編輯課程</a><a
+					th:href="@{/psych/payout/selectPayout}">營運與成長</a><a
+					th:href="@{/course/qa/psych}">學員提問</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<p>課程管理／課程詳情</p>
+				<span class="status" th:text="${course.courseStatusText}">狀態</span>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1 th:text="${course.courseName}">課程名稱</h1>
+						<p>
+							<span th:text="${course.courseCategories.courseCatName}">分類</span>・心理師預覽模式
+						</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn ghost" th:href="@{/psych/course/select_course}">返回課程管理</a>
+						<form class="inline-form"
+							th:if="${course.courseStatus == 0 or course.courseStatus == 3}"
+							method="post" th:action="@{update_course}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button class="btn secondary" type="submit">修改課程</button>
+						</form>
+						<form class="inline-form"
+							th:if="${course.courseStatus == 0 or course.courseStatus == 3}"
+							method="post" th:action="@{submit_course}"
+							data-confirm-form="送審後課程資料與原價會暫時鎖定，確定送出？">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button class="btn" type="submit">送出審核</button>
+						</form>
+					</div>
 				</div>
-				<div th:if="${comment.courseAnswer==null}">
-					<form method="post"
-						  th:action="@{/psych/course/answer_course}">
-						<label>心理師回復:</label><span class="error" th:text="${answerMsg}"></span>
-						<input name="courseAnswer"></input>
-						<input type="hidden" name="questionId" th:value="${comment.questionId}">
-						<input type="hidden" name="courseId" th:value="${comment.course.courseId}">
-						<input type="hidden" name="returnUrl">
-						<button type="submit">送出新增</button>
-					</form>
-				</div>
-			</div>
-		</section>
+				<section class="preview-hero">
+					<div class="cover-mock">
+						<span>課程封面預覽</span><strong th:text="${course.courseName}">課程名稱</strong>
+					</div>
+					<div class="preview-summary">
+						<span class="status" th:text="${course.courseStatusText}">狀態</span>
+						<p class="eyebrow"
+							th:text="${course.courseCategories.courseCatName}">分類</p>
+						<h1 th:text="${course.courseName}">課程名稱</h1>
+						<p class="lead">
+							<span class="pending-data">課程介紹待 Course 欄位</span>
+						</p>
+						<div class="price-preview">
+							<span>課程原價</span><strong>NT$ <span
+								th:text="${course.price}">0</span></strong><small
+								th:text="${course.psychDiscount == null ? '目前無折扣' : '目前折扣：' + course.psychDiscount}">目前無折扣</small>
+						</div>
+					</div>
+				</section>
+				<section class="preview-content">
+					<article class="preview-main">
+						<div class="preview-tabs">
+							<button class="active" type="button" data-preview-tab="intro">課程資訊</button>
+							<button type="button" data-preview-tab="outline">內容大綱</button>
+							<button type="button" data-preview-tab="video">課程影片</button>
+						</div>
+						<div data-preview-panel="intro">
+							<h2>課程資訊</h2>
+							<div class="detail-grid">
+								<dl class="summary-list">
+									<div>
+										<dt>收藏次數</dt>
+										<dd th:text="${course.saveCount}">0</dd>
+									</div>
+									<div>
+										<dt>評價次數</dt>
+										<dd th:text="${course.reviewCount}">0</dd>
+									</div>
+									<div>
+										<dt>總星數</dt>
+										<dd th:text="${course.starCount}">0</dd>
+									</div>
+									<div>
+										<dt>提問次數</dt>
+										<dd th:text="${course.commentCount}">0</dd>
+									</div>
+								</dl>
+								<dl class="summary-list">
+									<div th:if="${course.courseStatus == 4}">
+										<dt>上架時間</dt>
+										<dd
+											th:text="${#temporals.format(course.listedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+									</div>
+									<div th:if="${course.courseStatus == 5}">
+										<dt>下架時間</dt>
+										<dd
+											th:text="${#temporals.format(course.delistedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+									</div>
+									<div th:if="${course.courseStatus == 5}">
+										<dt>下架原因</dt>
+										<dd th:text="${course.delistReason.label}">—</dd>
+									</div>
+									<div th:if="${course.psychDiscount != null}">
+										<dt>折扣期間</dt>
+										<dd>
+											<span
+												th:text="${#temporals.format(course.discountStart,'yyyy年MM月dd日')}">—</span>
+											至 <span
+												th:text="${#temporals.format(course.discountEnd,'yyyy年MM月dd日')}">—</span>
+										</dd>
+									</div>
+								</dl>
+							</div>
+						</div>
+						<div data-preview-panel="outline" hidden>
+							<h2>純文字內容大綱</h2>
+							<div class="text-outline" th:text="${course.outline}">課程大綱</div>
+						</div>
+						<div data-preview-panel="video" hidden>
+							<h2>課程影片</h2>
+							<div class="video-grid">
+								<div class="video-card">
+									<h3>完整課程影片</h3>
+									<video controls>
+										<source th:src="@{${course.videoSrc}}" type="video/mp4">
+									</video>
+								</div>
+								<div class="video-card">
+									<h3>課程預覽影片</h3>
+									<video controls>
+										<source th:src="@{${course.videoSrcPre}}" type="video/mp4">
+									</video>
+								</div>
+							</div>
+						</div>
+					</article>
+					<aside class="preview-check">
+						<h3>課程操作</h3>
+						<p>課程下架僅能由管理員執行。</p>
+						<form th:if="${course.canAddPsychDiscount()}" method="post"
+							th:action="@{discount_model_box}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button class="btn" type="submit">設定心理師折扣</button>
+						</form>
+						<button class="btn ghost" type="button"
+							th:if="${!course.canAddPsychDiscount()}" disabled>目前無法設定折扣</button>
+					</aside>
+				</section>
+				<section class="panel">
+					<div class="panel-title-row">
+						<div>
+							<h2>學員提問</h2>
+							<p class="meta">一則提問只能由此課程的心理師回覆一次。</p>
+						</div>
+						<a class="btn ghost" th:href="@{/course/qa/psych}">查看全部提問</a>
+					</div>
+					<div class="question-list">
+						<div class="question-card" th:each="comment : ${courseQuestions}">
+							<div class="question-head">
+								<strong th:text="${comment.member.name}">會員</strong><span
+									class="status"
+									th:text="${comment.courseAnswer == null ? '待回覆' : '已回覆'}">狀態</span>
+							</div>
+							<p th:text="${comment.courseQuestion}">問題</p>
+							<div class="answer-box" th:if="${comment.courseAnswer != null}">
+								<strong><span
+									th:text="${comment.course.psychologist.name}">心理師</span> 心理師回覆</strong>
+								<p th:text="${comment.courseAnswer}">回覆</p>
+							</div>
+							<form th:if="${comment.courseAnswer == null}" method="post"
+								th:action="@{/psych/course/answer_course}">
+								<div class="form-group">
+									<label>心理師回覆</label>
+									<textarea class="field" name="courseAnswer" required></textarea>
+									<span class="error" th:text="${answerMsg}"></span>
+								</div>
+								<input type="hidden" name="questionId"
+									th:value="${comment.questionId}"><input type="hidden"
+									name="courseId" th:value="${comment.course.courseId}"><input
+									type="hidden" name="returnUrl">
+								<button class="btn" type="submit">送出回覆</button>
+							</form>
+						</div>
+					</div>
+				</section>
+			</main>
+		</div>
 	</div>
-	
-	<div th:if="${psychDiscountMsg == 'show'}" class="modal-overlay" id="psychDiscountModal">
-
+	<div class="modal-overlay" id="psychDiscountModal"
+		th:if="${psychDiscountMsg == 'show'}">
 		<div class="modal-box">
-	
-			<button type="button" class="modal-close" onclick="closePsychDiscountModal()">×</button>
-	
-			<h3>添加心理師折扣</h3>
-	
-			<form method="post"
-				  th:action="@{update_psych_discount}"
-				  th:object="${psychDiscountForm}"
-				  onsubmit="closePsychDiscountModal()">
-	
-				<div>
-					<label>心理師折扣:<font color="red">*</font></label>
-					<input type="text" th:field="*{psychDiscount}" />
-					<br />
-					<span
+			<button class="modal-close" type="button" data-close-discount>×</button>
+			<h2>設定心理師折扣</h2>
+			<form method="post" th:action="@{update_psych_discount}"
+				th:object="${psychDiscountForm}">
+				<div class="form-group">
+					<label for="psychDiscount">折扣額度 <span class="required">＊</span></label>
+					<div class="discount-quick">
+						<button class="discount-chip" type="button"
+							data-discount-rate="0.95">九五折</button>
+						<button class="discount-chip" type="button"
+							data-discount-rate="0.9">九折</button>
+						<button class="discount-chip" type="button"
+							data-discount-rate="0.85">八五折</button>
+						<button class="discount-chip" type="button"
+							data-discount-rate="0.8">八折</button>
+						<button class="discount-chip" type="button"
+							data-discount-rate="0.75">七五折</button>
+					</div>
+					<select id="psychDiscount" class="field"
+						th:field="*{psychDiscount}" data-psych-discount-input required><option
+							value="">請選擇折扣</option>
+						<option value="0.95">九五折</option>
+						<option value="0.9">九折</option>
+						<option value="0.85">八五折</option>
+						<option value="0.8">八折</option>
+						<option value="0.75">七五折</option>
+						<option value="0.7">七折</option>
+						<option value="0.65">六五折</option>
+						<option value="0.6">六折</option>
+						<option value="0.55">五五折</option>
+						<option value="0.5">五折</option>
+						<option value="0.45">四五折</option>
+						<option value="0.4">四折</option>
+						<option value="0.35">三五折</option>
+						<option value="0.3">三折</option>
+						<option value="0.25">二五折</option>
+						<option value="0.2">二折</option>
+						<option value="0.15">一五折</option>
+						<option value="0.1">一折</option></select><span class="error"
 						th:if="${#fields.hasErrors('psychDiscount')}"
-						th:errors="*{psychDiscount}"
-						class="error"
-						id="psychDiscount.errors">
-					</span>
+						th:errors="*{psychDiscount}"></span>
 				</div>
-	
-				<div>
-					<label>折扣時間:<font color="red">*</font></label>
-					<input type="number" name="discountMonth" min="1" value="3" />
-					<span> 月</span><br>
-					<span
+				<div class="form-group">
+					<label for="discountMonth">折扣時間（月）</label><input id="discountMonth"
+						class="field" type="number" name="discountMonth" min="1" value="3"
+						required><span class="error"
 						th:if="${#fields.hasErrors('discountMonth')}"
-						th:errors="*{discountMonth}"
-						class="error"
-						id="discountMonth.errors">
-					</span>
+						th:errors="*{discountMonth}"></span>
 				</div>
-	
-				<div>
-					<label>折扣開始日期:<font color="red">*</font></label>
-					<input type="date" th:field="*{discountStart}" id="discountStart" />
-					<br />
-					<span
-						th:if="${#fields.hasErrors('discountStart')}"
-						th:errors="*{discountStart}"
-						class="error"
-						id="discountStart.errors">
-					</span>
+				<div class="form-group">
+					<label for="discountStart">折扣開始日期</label><input id="discountStart"
+						class="field" type="date" th:field="*{discountStart}"
+						data-discount-start required><span class="form-note">最早從隔日起算。</span><span
+						class="error" th:if="${#fields.hasErrors('discountStart')}"
+						th:errors="*{discountStart}"></span>
 				</div>
-	
 				<input type="hidden" name="courseId" th:value="${course.courseId}">
-	
 				<div class="modal-actions">
-					<button type="button" onclick="closePsychDiscountModal()">取消</button>
-					<button type="submit">添加心理師折扣</button>
+					<button class="btn ghost" type="button" data-close-discount>取消</button>
+					<button class="btn" type="submit">儲存折扣</button>
 				</div>
-	
 			</form>
 		</div>
 	</div>
-	
-</body>
+<script th:src="@{/js/course/psych-app.js}"></script>
+<script th:src="@{/js/course/psych-editor.js}"></script>
+<script th:src="@{/js/course/psych-preview.js}"></script></body>
 </html>

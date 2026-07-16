@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>課程發布管理｜管理後台</title>
+
 <link rel="stylesheet" th:href="@{/css/course/style.css}" />
 <link rel="stylesheet" th:href="@{/css/course/admin.css}" />
 
@@ -41,16 +42,16 @@
 				</div>
 				<section class="stats">
 					<div class="stat">
-						<span>待審核</span><strong data-thymeleaf-pending>—</strong><em>待後端統計欄位</em>
+						<span>待審核</span><strong th:text="${courseCountAwait}">—</strong><em>待後端統計欄位</em>
 					</div>
 					<div class="stat">
-						<span>已排程上架</span><strong data-thymeleaf-pending>—</strong>
+						<span>已排程上架</span><strong th:text="${courseCountSuccess}">—</strong>
 					</div>
 					<div class="stat">
-						<span>已上架</span><strong data-thymeleaf-pending>—</strong>
+						<span>已上架</span><strong th:text="${courseCountListed}">—</strong>
 					</div>
 					<div class="stat">
-						<span>本月已下架</span><strong data-thymeleaf-pending>—</strong>
+						<span>已下架</span><strong th:text="${courseCountDelisted}">—</strong>
 					</div>
 				</section>
 				<div class="tabs" data-tabs>
@@ -60,11 +61,16 @@
 				</div>
 				<section class="tab-panel" data-panel="review">
 					<div class="toolbar">
-						<input class="field" type="search" placeholder="搜尋課程或心理師……"><select
-							class="field"><option>全部主題</option>
-							<option>情緒照護</option>
-							<option>自我成長</option></select><select class="field"><option>申請時間新至舊</option></select>
+					<form>
+						<input class="field" type="search" placeholder="搜尋課程或心理師……">
+						<select class="field" th:each="courseCategories : ${courseCategoriesListAll}">
+							<option >全部主題</option>
+							<option 
+								th:value="${courseCategories.courseCatId}"
+				    				th:text="${courseCategories.courseCatName}"></option>
+							<select class="field"><option>申請時間新至舊</option></select>
 						<button class="btn secondary" type="button" data-toast="已套用篩選條件">篩選</button>
+					</form>
 					</div>
 					<div class="table-wrap">
 						<table class="compact-table">
@@ -162,7 +168,7 @@
 							<div>
 								<h2>選擇要下架的課程</h2>
 								<p class="meta">
-									保留管理員下架功能；此區需由 Controller 同時提供
+									由管理員選擇要下架的課程並記錄原因；此區需由 Controller 同時提供
 									<code>courseList</code>
 									與
 									<code>delistReasons</code>
@@ -170,29 +176,40 @@
 								</p>
 							</div>
 						</div>
-						<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益。</div>
+						<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益與學習紀錄。</div>
 						<div class="table-wrap" style="margin-top: 16px">
 							<table class="compact-table">
 								<thead>
 									<tr>
-										<th>課程</th>
-										<th>心理師</th>
-										<th>主題</th>
+										<th>課程／心理師</th>
+										<th>分類</th>
 										<th>狀態</th>
+										<th>收藏／評價／提問</th>
+										<th>定價</th>
+										<th>審核員工</th>
 										<th>操作</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr th:if="${courseList == null}">
-										<td class="empty-state" colspan="5"><span
-											class="pending-data">待 Controller 提供 courseList</span></td>
+									<tr th:if="${courseList == null || courseList.isEmpty()}">
+										<td class="empty-state" colspan="7"><span
+											class="pending-data">目前沒有可下架的課程，或待 Controller 提供
+												courseList</span></td>
 									</tr>
 									<tr th:each="course : ${courseList}">
-										<td><strong th:text="${course.courseName}">課程名稱</strong></td>
-										<td th:text="${course.psychologist.name}">心理師</td>
+										<td><div class="course-summary">
+												<strong th:text="${course.courseName}">課程名稱</strong><span
+													class="meta" th:text="${course.psychologist.name}">心理師</span>
+											</div></td>
 										<td th:text="${course.courseCategories.courseCatName}">分類</td>
 										<td><span class="status"
 											th:text="${course.courseStatusText}">狀態</span></td>
+										<td><span th:text="${course.saveCount}">0</span>／<span
+											th:text="${course.reviewCount}">0</span>／<span
+											th:text="${course.commentCount}">0</span></td>
+										<td>NT$ <span th:text="${course.price}">0</span></td>
+										<td
+											th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}">—</td>
 										<td><button class="btn danger" type="button"
 												data-open-take-down th:data-course-id="${course.courseId}"
 												th:data-course-name="${course.courseName}">下架課程</button></td>
@@ -200,6 +217,7 @@
 								</tbody>
 							</table>
 						</div>
+						<p class="pending-data" style="margin-top: 12px">下架清單的獨立分頁參數尚待後端命名確認，暫不與上架審核分頁共用。</p>
 					</div>
 				</section>
 			</main>

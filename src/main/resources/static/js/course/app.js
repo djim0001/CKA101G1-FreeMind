@@ -55,13 +55,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const courseName = document.querySelector('[data-take-down-course]');
   const courseId = document.querySelector('[data-take-down-course-id]');
   const reason = document.querySelector('[data-take-down-reason]');
+  let takeDownTrigger = null;
+
+  const closeTakeDownDialog = () => {
+    if (dialog?.open) dialog.close();
+  };
+
   document.querySelectorAll('[data-open-take-down]').forEach(button => button.addEventListener('click', () => {
+    takeDownTrigger = button;
     if (courseName) courseName.textContent = button.dataset.courseName || '';
     if (courseId) courseId.value = button.dataset.courseId || '';
     if (reason) reason.value = '';
-    dialog?.showModal();
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+      document.body.classList.add('dialog-open');
+      requestAnimationFrame(() => reason?.focus());
+    }
   }));
-  document.querySelectorAll('[data-close-take-down]').forEach(button => button.addEventListener('click', () => dialog?.close()));
+  document.querySelectorAll('[data-close-take-down]').forEach(button => button.addEventListener('click', closeTakeDownDialog));
+
+  dialog?.addEventListener('click', event => {
+    if (event.target === dialog) closeTakeDownDialog();
+  });
+
+  dialog?.addEventListener('close', () => {
+    document.body.classList.remove('dialog-open');
+    takeDownTrigger?.focus();
+  });
+
+  dialog?.addEventListener('cancel', () => {
+    document.body.classList.remove('dialog-open');
+  });
+
+  dialog?.querySelector('form')?.addEventListener('submit', event => {
+    if (!reason?.value) {
+      event.preventDefault();
+      reason?.focus();
+      notify('請先選擇下架原因');
+    }
+  });
 
   document.querySelectorAll('[data-close-modal]').forEach(button => button.addEventListener('click', () => {
     const modal = button.closest('.modal, .coupon-modal');

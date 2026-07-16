@@ -113,4 +113,18 @@ public interface OrderDetailRepository
     		Byte coursePermission,
     		Pageable pageable
     		);
+    @Query("""
+    	    SELECT od
+    	    FROM OrderDetail od
+    	    WHERE od.courseOrder.member.memberId = :memberId
+    	      AND od.courseOrder.courseOrderId = :courseOrderId
+    	      AND od.course.courseId = :courseId
+    	      AND od.courseOrder.paymentStatus = 1
+    	      AND od.coursePermission = 1
+    	""")
+    	Optional<OrderDetail> findAccessibleOrderDetail(
+    	        @Param("memberId") Integer memberId,
+    	        @Param("courseOrderId") Integer courseOrderId,
+    	        @Param("courseId") Integer courseId
+    	);
 }

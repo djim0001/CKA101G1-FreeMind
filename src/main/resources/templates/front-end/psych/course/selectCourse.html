@@ -1,84 +1,155 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>心理師查詢課程頁面</title>
-<style>
-span.error{
-color:  red;
-font-size: 12px;
-}
-</style>
-</head>
-<body>
-	<h3>
-		<a th:href="@{/}">首頁</a>
-	</h3>
-	<h3>
-		<a th:href="@{/psych/course/add_course}">心理師新增修改課程</a>
-	</h3>
-
-		<table>
-			<thead>
-				<tr>
-					<th><a th:href="@{/psych/course/select_course}">課程名稱</a></th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
-						    			)}">課程分類名稱</a>
-					</th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'courseStatusAsc' ? 'courseStatusDesc' : 'courseStatusAsc'}
-						    			)}">課程狀態</a></th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
-						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
-						    			)}">平均星數</a></th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
-						    			)}">評價次數</a></th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
-						    			)}">提問次數</a></th>
-					<th>心理師折扣</th>
-					<th>折扣開始時間</th>
-					<th>折扣結束時間</th>
-					<th><a th:href="@{/psych/course/select_course(page=1,
-							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
-						    			)}">課程定價</a></th>
-					<th>功能</th>
-				</tr>
-			</thead>
-			<tbody>
-				<th:block th:each="course : ${courseListAllPages.content}">
-					<tr>
-						<td th:text="${course.courseName}"></td>
-						<td th:text="${course.courseCategories.courseCatName}"></td>
-						<td th:text="${course.courseStatusText}"></td>
-						<td th:text="${course.saveCount}"></td>
-						<td th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}"></td>
-						<td th:text="${course.reviewCount}"></td>
-						<td th:text="${course.commentCount}"></td>
-						<td th:text="${course.psychDiscount}"></td>
-						<td th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日')}"></td>
-						<td th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日')}"></td>
-						<td th:text="${course.price}"></td>
-						<td>
-							<form method="get" th:action="@{get_one_course/{courseId}(courseId=${course.courseId})}">
-								<input type="hidden" name="courseId"
-									th:value="${course.courseId}">
-								<button type="submit">查看詳情</button>
-							</form>
-						</td>
-					</tr>
-				</th:block>
-			</tbody>
-		</table>
-		
-		<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/psych/course/select_course', ${orderBy})}"></div>	
-		
-	
-</body>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程管理｜心理師中心</title>
+<link rel="stylesheet" th:href="@{/css/course/psych-style.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-all-styles.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-editor.css}" />
+<link rel="stylesheet" th:href="@{/css/course/psych-preview.css}" /></head>
+<body class="th2-page">
+	<div class="layout">
+		<aside class="sidebar">
+			<a class="brand" th:href="@{/psych/course/select_course}">諮由自在
+				Free Mind<small>THERAPIST STUDIO</small>
+			</a>
+			<nav class="nav">
+				<a class="active" th:href="@{/psych/course/select_course}">課程管理</a><a
+					th:href="@{/psych/course/add_course}">新增／編輯課程</a><a
+					th:href="@{/psych/payout/selectPayout}">營運與成長</a><a
+					th:href="@{/course/qa/psych}">學員提問</a>
+			</nav>
+		</aside>
+		<div class="main">
+			<header class="topbar">
+				<p>心理師中心／課程商城</p>
+				<button class="btn ghost" type="button" data-toast="目前沒有新通知">通知</button>
+			</header>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>課程管理</h1>
+						<p>查看課程狀態、設定上架後折扣與管理學員互動；課程下架由管理員執行。</p>
+					</div>
+					<a class="btn" th:href="@{/psych/course/add_course}">＋ 建立新課程</a>
+				</div>
+				<section class="stats">
+					<div class="stat">
+						<span>全部課程</span><strong
+							th:text="${courseListAllPages != null ? courseListAllPages.totalElements : '—'}">—</strong>
+					</div>
+					<div class="stat">
+						<span>已上架</span><strong class="pending-data"
+							data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>審核中</span><strong class="pending-data"
+							data-thymeleaf-pending>—</strong>
+					</div>
+					<div class="stat">
+						<span>待回覆提問</span><strong class="pending-data"
+							data-thymeleaf-pending>—</strong>
+					</div>
+				</section>
+				<div class="tabs" data-tabs>
+					<button class="active" data-tab="courses">課程狀態</button>
+					<button data-tab="students">學員互動</button>
+				</div>
+				<section class="tab-panel" data-panel="courses">
+					<div class="toolbar">
+						<input class="field" placeholder="搜尋課程名稱……"><select
+							class="field"><option>全部狀態</option>
+							<option>草稿</option>
+							<option>審核中</option>
+							<option>審核成功</option>
+							<option>審核失敗</option>
+							<option>已上架</option>
+							<option>已下架</option></select><select class="field"><option>最近更新</option>
+							<option>建立時間</option></select>
+					</div>
+					<div class="table-wrap">
+						<table>
+							<thead>
+								<tr>
+									<th>課程名稱</th>
+									<th>原價／折扣</th>
+									<th>課程狀態</th>
+									<th>學員互動</th>
+									<th>可執行操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									th:if="${courseListAllPages == null || courseListAllPages.content.isEmpty()}">
+									<td class="empty-state" colspan="5">目前沒有課程</td>
+								</tr>
+								<tr th:each="course : ${courseListAllPages.content}">
+									<td><div class="course-summary">
+											<strong th:text="${course.courseName}">課程名稱</strong><span
+												class="meta"
+												th:text="${course.courseCategories.courseCatName}">分類</span>
+										</div></td>
+									<td>NT$ <span th:text="${course.price}">0</span><br>
+									<span class="meta"
+										th:text="${course.psychDiscount == null ? '目前無折扣' : course.psychDiscount}">目前無折扣</span></td>
+									<td><span class="status"
+										th:text="${course.courseStatusText}">狀態</span></td>
+									<td>收藏 <span th:text="${course.saveCount}">0</span>・評價 <span
+										th:text="${course.reviewCount}">0</span>・提問 <span
+										th:text="${course.commentCount}">0</span></td>
+									<td><form class="inline-form" method="get"
+											th:action="@{get_one_course/{courseId}(courseId=${course.courseId})}">
+											<input type="hidden" name="courseId"
+												th:value="${course.courseId}">
+											<button class="btn secondary" type="submit">查看詳情</button>
+										</form></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div
+						th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/psych/course/select_course', ${orderBy})}"></div>
+				</section>
+				<section class="tab-panel" data-panel="students" hidden>
+					<div class="notice">
+						<span class="pending-data">此分頁需 Controller 同時提供
+							questions；獨立提問頁功能仍保留。</span>
+					</div>
+					<div class="table-wrap" style="margin-top: 16px">
+						<table>
+							<thead>
+								<tr>
+									<th>學員</th>
+									<th>課程／內容</th>
+									<th>提問時間</th>
+									<th>狀態</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${questions == null}">
+									<td class="empty-state" colspan="5">待 Controller 提供
+										questions</td>
+								</tr>
+								<tr th:each="courseQa : ${questions}">
+									<td th:text="${courseQa.member.name}">會員</td>
+									<td><strong th:text="${courseQa.course.courseName}">課程</strong><br>
+									<span th:text="${courseQa.courseQuestion}">問題</span></td>
+									<td th:text="${courseQa.askedAt}">—</td>
+									<td><span class="status"
+										th:text="${courseQa.courseAnswer == null ? '待回覆' : '已回覆'}">狀態</span></td>
+									<td><a class="btn secondary" th:href="@{/course/qa/psych}">前往處理</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</main>
+		</div>
+	</div>
+<script th:src="@{/js/course/psych-app.js}"></script>
+<script th:src="@{/js/course/psych-editor.js}"></script>
+<script th:src="@{/js/course/psych-preview.js}"></script></body>
 </html>

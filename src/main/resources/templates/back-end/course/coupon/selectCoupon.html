@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>優惠券管理｜管理後台</title>
+
 <link rel="stylesheet" th:href="@{/css/course/style.css}" />
 <link rel="stylesheet" th:href="@{/css/course/admin.css}" />
 </head>
@@ -34,45 +35,65 @@
 						<h1>全站課程優惠券管理</h1>
 						<p>設定折扣、折抵上限、消費門檻與發放後有效天數。</p>
 					</div>
-					<a class="btn" th:href="@{/admin/coupon/add_coupon}">＋ 新增優惠券</a>
+					<a class="btn" href="#coupon-spec">＋ 新增優惠券</a>
 				</div>
 				<div class="notice">所有優惠券皆適用全站已上架課程，不使用優惠碼，也不綁定指定課程。</div>
 				<div class="grid-2" style="margin-top: 20px">
-					<section class="panel">
+					<section class="panel" id="coupon-spec">
 						<h2>優惠券規格</h2>
-						<p class="meta">新增與完整後端驗證放在「新增優惠券」頁；此區保留管理端快速規格檢視與試算。</p>
-						<div class="form-grid">
+						<p class="meta">
+							建立新的全站課程優惠券規格；標示 <span class="required">＊</span> 的欄位為必填。
+						</p>
+						<p class="error" th:if="${errorMessage != null}"
+							th:text="${errorMessage}"></p>
+						<form class="form-grid" th:if="${coupon != null}"
+							th:action="@{/admin/coupon/insert_coupon}" method="post"
+							th:object="${coupon}" style="margin-top: 18px">
 							<div class="form-group">
-								<label for="coupon-name">優惠券名稱</label><input id="coupon-name"
-									class="field" value="新會員療癒啟程禮" data-thymeleaf-pending>
+								<label for="couponName">優惠券名稱 <span class="required">＊</span></label><input
+									id="couponName" class="field" type="text"
+									th:field="*{couponName}" required autocomplete="off"><span
+									class="error" th:if="${#fields.hasErrors('couponName')}"
+									th:errors="*{couponName}"></span>
 							</div>
 							<div class="form-group">
-								<label for="discount">折扣倍率</label><select id="discount"
-									class="field" data-admin-discount><option value="0.9">九折</option>
-									<option value="0.8" selected>八折</option>
-									<option value="0.7">七折</option>
-									<option value="0.6">六折</option>
-									<option value="0.5">五折</option></select>
+								<label for="discount">折扣倍率 <span class="required">＊</span></label><input
+									id="discount" class="field" type="number" min="0.1" max="0.95"
+									step="0.05" th:field="*{discount}" required data-admin-discount><span
+									class="form-note">例如九五折填 0.95，八折填 0.8。</span><span
+									class="error" th:if="${#fields.hasErrors('discount')}"
+									th:errors="*{discount}"></span>
 							</div>
 							<div class="form-group">
-								<label for="discount-limit">最高折抵金額（NT$）</label><input
-									id="discount-limit" class="field" type="number" value="300"
-									min="1" data-admin-limit>
+								<label for="discountLimit">最高折抵金額（NT$）</label><input
+									id="discountLimit" class="field" type="number" min="0" step="1"
+									th:field="*{discountLimit}" data-admin-limit><span
+									class="error" th:if="${#fields.hasErrors('discountLimit')}"
+									th:errors="*{discountLimit}"></span>
 							</div>
 							<div class="form-group">
-								<label for="trigger-threshold">消費觸發門檻（NT$）</label><input
-									id="trigger-threshold" class="field" type="number" value="1500"
-									min="0" data-admin-threshold>
+								<label for="triggerThreshold">消費觸發門檻（NT$）</label><input
+									id="triggerThreshold" class="field" type="number" min="0"
+									step="1" th:field="*{triggerThreshold}" data-admin-threshold><span
+									class="error" th:if="${#fields.hasErrors('triggerThreshold')}"
+									th:errors="*{triggerThreshold}"></span>
 							</div>
 							<div class="form-group">
-								<label for="discount-duration">發放後有效天數</label><input
-									id="discount-duration" class="field" type="number" value="30"
-									min="1">
+								<label for="discountDuration">發放後有效天數 <span
+									class="required">＊</span></label><input id="discountDuration"
+									class="field" type="number" min="1" step="1"
+									th:field="*{discountDuration}" required><span
+									class="error" th:if="${#fields.hasErrors('discountDuration')}"
+									th:errors="*{discountDuration}"></span>
 							</div>
-						</div>
+							<div class="form-group" style="align-self: end">
+								<button class="btn" type="submit">儲存優惠券規格</button>
+							</div>
+						</form>
+						<p class="pending-data" th:if="${coupon == null}"
+							style="margin-top: 18px">待 Controller 提供 coupon
+							表單物件後即可在此新增規格。</p>
 						<div class="notice" style="margin-top: 16px" data-discount-example></div>
-						<a class="btn" style="margin-top: 16px"
-							th:href="@{/admin/coupon/add_coupon}">前往建立規格</a>
 					</section>
 					<section class="panel">
 						<h2>發放會員優惠券</h2>
@@ -167,3 +188,5 @@
 <script th:src="@{/js/course/app.js}"></script>
 </body>
 </html>
+
+

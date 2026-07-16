@@ -1,5 +1,6 @@
 package com.freemind.course.order.model;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.freemind.course.order.model.OrderDetail.CompositeOrderDetail;
 import com.freemind.login.member.model.Member;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderDetailService {
@@ -161,5 +164,61 @@ public class OrderDetailService {
 						unlocked,
 						pageable
 						);
+	}
+	
+	@Transactional
+	public void updatePlaybackPosition(
+	        Integer memberId,
+	        Integer courseOrderId,
+	        Integer courseId,
+	        Long playbackSeconds) {
+
+	    if (courseOrderId == null) {
+	        throw new IllegalArgumentException(
+	                "訂單編號不能為空"
+	        );
+	    }
+
+	    if (courseId == null) {
+	        throw new IllegalArgumentException(
+	                "課程編號不能為空"
+	        );
+	    }
+
+	    if (
+	        playbackSeconds == null ||
+	        playbackSeconds < 0
+	    ) {
+	        throw new IllegalArgumentException(
+	                "播放時間格式錯誤"
+	        );
+	    }
+
+	    /*
+	     * Java LocalTime 只能表示一天內的時間，
+	     * 最大值不能達到 86400 秒。
+	     */
+	    if (playbackSeconds >= 86400) {
+	        throw new IllegalArgumentException(
+	                "使用 LocalTime 時，影片時間不能超過 24 小時"
+	        );
+	    }
+
+	    OrderDetail orderDetail =
+	            repository.findAccessibleOrderDetail(
+	                    memberId,
+	                    courseOrderId,
+	                    courseId
+	            )
+	            .orElseThrow(() ->
+	                    new IllegalArgumentException(
+	                            "找不到訂單明細或沒有觀看權限"
+	                    )
+	            );
+
+	    LocalTime playbackPosition =
+	            LocalTime.ofSecondOfDay(playbackSeconds);
+
+	    orderDetail.setPlaybackPosition(playbackPosition);
 	}
 }

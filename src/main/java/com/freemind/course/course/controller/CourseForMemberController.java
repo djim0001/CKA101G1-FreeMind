@@ -3,6 +3,8 @@ package com.freemind.course.course.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -10,8 +12,11 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.course.model.Course;
@@ -20,6 +25,7 @@ import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseQaComment;
 import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.dto.PlaybackPositionReq;
 import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
@@ -137,10 +143,89 @@ public class CourseForMemberController {
 		course.setSaved(courseSvc
 				.isCourseInBookmark(member.getMemberId(), course.getCourseId()));
 		boolean coursePermission = orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId);
+		if(coursePermission) {
+			OrderDetail item = orderDetailSvc.getAccessibleOrderDetail(courseId, member);
+			model.addAttribute("orderDetail", item);
+		}
+		model.addAttribute("memberId", member.getMemberId());
 		model.addAttribute("coursePermission", coursePermission);
 		model.addAttribute("course", course);
 		return "front-end/member/course/listOneCourse";
 	}
+	
+//	@ResponseBody
+//	@PostMapping("/playback-position")
+//	 public ResponseEntity<Void> updatePlaybackPosition(
+//	            @RequestBody PlaybackPositionReq request,
+//	            @RequestParam(value = "memberId", required = false) Integer memberId,
+////	            @ModelAttribute("member") Member member,
+//	            HttpSession session) {
+//
+//		System.out.println("開始");
+////	        Integer memberId = member.getMemberId();
+//
+//	        if (memberId == null) {
+//	        	System.out.println("沒有memberId");
+//	            return ResponseEntity
+//	                    .status(HttpStatus.UNAUTHORIZED)
+//	                    .build();
+//	        }
+//System.out.println("開始儲存進度");
+//	        orderDetailSvc.updatePlaybackPosition(
+//	                memberId,
+//	                request.courseOrderId(),
+//	                request.courseId(),
+//	                request.playbackSeconds()
+//	        );
+//	        System.out.println("會員編號：" + memberId);
+//	        System.out.println("訂單編號：" + request.courseOrderId());
+//	        System.out.println("課程編號：" + request.courseId());
+//	        System.out.println("播放秒數：" + request.playbackSeconds());
+//	        
+//	        return ResponseEntity.noContent().build();
+//	    }
+	
+	@ResponseBody
+	@PostMapping("/playback-position")
+	public ResponseEntity<Void> updatePlaybackPosition(
+	        @RequestBody PlaybackPositionReq request,
+	        @ModelAttribute("member") Member member) {
+
+	    System.out.println("已進入播放位置 Controller");
+	    System.out.println("收到的 request：" + request);
+
+	    if (member == null || member.getMemberId() == null) {
+
+	        System.out.println("找不到登入會員");
+
+	        return ResponseEntity
+	                .status(HttpStatus.UNAUTHORIZED)
+	                .build();
+	    }
+
+	    Integer memberId = member.getMemberId();
+
+	    System.out.println("會員編號：" + memberId);
+	    System.out.println(
+	            "訂單編號：" + request.courseOrderId()
+	    );
+	    System.out.println(
+	            "課程編號：" + request.courseId()
+	    );
+	    System.out.println(
+	            "播放秒數：" + request.playbackSeconds()
+	    );
+
+	    orderDetailSvc.updatePlaybackPosition(
+	            memberId,
+	            request.courseOrderId(),
+	            request.courseId(),
+	            request.playbackSeconds()
+	    );
+
+	    return ResponseEntity.noContent().build();
+	}
+	
 	
 	@GetMapping("/get_all_qa/{courseId}")
 	public String CourseAllQa(
