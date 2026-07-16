@@ -1,206 +1,132 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>所有課程一覽頁面</title>
-<style>
-	span.error {
-		color: red;
-		font-size: 12px;
-	}
-	.cart-modal {
-       position: fixed;
-       inset: 0;
-       background-color: rgba(0, 0, 0, 0.4);
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       z-index: 9999;
-   }
-
-   .cart-modal-content {
-       background-color: white;
-       padding: 24px 36px;
-       border-radius: 8px;
-       text-align: center;
-       min-width: 280px;
-       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-   }
-
-   .cart-modal-content button {
-       margin-top: 16px;
-       padding: 8px 24px;
-       cursor: pointer;
-   }
-	.favorite-btn {
-	    border: none;
-	    background: none;
-	    font-size: 28px;
-	    cursor: pointer;
-	    color: #ccc;
-	    transition: 0.2s;
-	}
-	
-	.favorite-btn.active {
-	    color: red;
-	}
-	
-	.favorite-btn:hover {
-	    transform: scale(1.15);
-	}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>探索課程｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h3>
-		<a th:href="@{/course_index}">課程index</a>
-		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
-	</h3>
-	<h5>
-		<a th:href="@{/member/course/shopping_cart}">購物車</a>
-		<a th:href="@{/member/dashboard/myCollection/course}">我的收藏</a>
-	</h5>
-	<span>會員名稱:</span>
-	<span th:text=${memberName}></span>
-	<br>
-	<form method="get" th:action="@{/member/course/select_course}">
-		<button type="submit" name="orderBy" th:value="popular">熱門課程</button>
-		<button type="submit" name="orderBy" th:value="listedAt">最新課程</button>
-	</form>
-	<form th:action="@{/member/course/search-by-category}" method="get">
-		<th:block th:each="courseCategories : ${courseCategoriesListAll}">
+<body class="thy2-member">
+	<header class="site-header">
+		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
+			Free Mind<small>COURSE MARKET</small>
+		</a>
+		<nav class="main-nav">
+			<a class="active" th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container">
+		<section class="hero">
+			<div>
+				<p class="eyebrow">Course market</p>
+				<h1>找到適合此刻的心理課程</h1>
+				<p>用自己的速度學習，從理解情緒、關係與自我開始。</p>
+			</div>
+			<div class="hero-art" aria-hidden="true"></div>
+		</section>
+		<div class="notice member-message" th:if="${cartMsg != null}"
+			th:text="${cartMsg}" style="margin-top: 22px"></div>
+		<form class="toolbar" method="get"
+			th:action="@{/member/course/select_course}">
+			<input class="field" type="search" name="keyword"
+				placeholder="搜尋課程名稱或心理師……" data-course-search><select
+				class="field" name="orderBy"><option value="listedAt"
+					th:selected="${orderBy == 'listedAt'}">最新上架</option>
+				<option value="popular" th:selected="${orderBy == 'popular'}">熱門課程</option>
+				<option value="priceAsc" th:selected="${orderBy == 'priceAsc'}">價格由低至高</option>
+				<option value="priceDesc" th:selected="${orderBy == 'priceDesc'}">價格由高至低</option></select>
+			<button class="btn" type="submit">搜尋課程</button>
+		</form>
+		<form class="tabs course-sort-tabs" method="get"
+			th:action="@{/member/course/select_course}" aria-label="課程排序">
+			<button type="submit" name="orderBy" value="popular"
+				th:classappend="${orderBy == 'popular'} ? 'active' : ''">熱門課程</button>
+			<button type="submit" name="orderBy" value="listedAt"
+				th:classappend="${orderBy == null or orderBy == '' or orderBy == 'listedAt'} ? 'active' : ''">最新課程</button>
+		</form>
+		<form class="tabs course-category-tabs" method="get"
+			th:action="@{/member/course/search-by-category}" aria-label="課程分類">
+			<a th:href="@{/member/course/select_course}"
+				th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
 			<button type="submit" name="courseCatId"
-					th:value="${courseCategories.courseCatId}"
-				    th:text="${courseCategories.courseCatName}"></button>
-		</th:block>
-	</form>
-	<table>
-		<thead>
-			<tr>
-				<th><a th:href="@{/member/course/select_course}">課程名稱</a></th>
-				<th>心理師名稱</th>
-				<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'courseCategoriesAsc' ? 'courseCategoriesDesc' : 'courseCategoriesAsc'}
-						    			)}">課程分類名稱</a>
-				<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'saveCountAsc' ? 'saveCountDesc' : 'saveCountAsc'}
-						    			)}">收藏次數</a></th>
-					<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'starCountAsc' ? 'starCountDesc' : 'starCountAsc'}
-						    			)}">平均星數</a></th>
-					<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'reviewCountAsc' ? 'reviewCountDesc' : 'reviewCountAsc'}
-						    			)}">評價次數</a></th>
-					<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'commentCountAsc' ? 'commentCountDesc' : 'commentCountAsc'}
-						    			)}">提問次數</a></th>
-					<th><a th:href="@{/member/course/select_course(page=1,
-							        orderBy=${orderBy == 'priceAsc' ? 'priceDesc' : 'priceAsc'}
-						    			)}">課程定價</a></th>
-				<th>功能</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="course : ${courseList}">
-				<tr>
-					<td th:text="${course.courseName}">
-<!-- 					<span><button type="button" -->
-<!-- 						        class="favorite-btn" -->
-<!-- 						        th:classappend="${course.saved} ? ' active' : ''" -->
-<!-- 						        th:attr="data-course-id=${course.courseId}"> -->
-<!-- 						    ♥ -->
-<!-- 						</button></span><br> -->
-					</td>
-					<td th:text="${course.psychologist.name}"></td>
-					<td th:text="${course.courseCategories.courseCatName}"></td>
-					<td th:text="${course.saveCount}"></td>
-					<td th:text="${course.reviewCount == null || course.reviewCount == 0
-							? '0.0'
-							: #numbers.formatDecimal(
-								course.reviewCount * 1.0 / course.starCount,
-								1,
-								1
-							)}">
-					</td>
-					<td th:text="${course.reviewCount}"></td>
-					<td th:text="${course.commentCount}"></td>
-					<td th:text="${course.price}"></td>
-					<td>
-						<form method="get" th:action="@{get_one_course/{courseId}(courseId=${course.courseId})}">
-							<button type="submit">查看詳情</button>
+				th:each="courseCategories : ${courseCategoriesListAll}"
+				th:value="${courseCategories.courseCatId}"
+				th:text="${courseCategories.courseCatName}"
+				th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
+		</form>
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Available courses</p>
+				<h2>所有課程</h2>
+			</div>
+			<p>依你的步調，選一堂想開始的課。</p>
+		</div>
+		<div class="empty-state"
+			th:if="${courseList == null || courseList.isEmpty()}">
+			<h3>目前沒有符合條件的課程</h3>
+			<p>請調整搜尋條件後再試一次。</p>
+		</div>
+		<section class="course-grid">
+			<article class="course-card" data-course-card
+				th:each="course : ${courseList}"
+				th:attr="data-category=${course.courseCategories.courseCatId}">
+				<div class="course-cover"
+					th:text="${course.courseCategories.courseCatName}">課程分類</div>
+				<div class="course-body">
+					<span class="tag"
+						th:text="${course.courseCategories.courseCatName}">分類</span>
+					<h3 th:text="${course.courseName}">課程名稱</h3>
+					<p class="meta">
+						<span th:text="${course.psychologist.name}">心理師</span> 心理師
+					</p>
+					<div class="course-stats">
+						<span>收藏 <b th:text="${course.saveCount}">0</b></span><span>評價
+							<b th:text="${course.reviewCount}">0</b>
+						</span><span>提問 <b th:text="${course.commentCount}">0</b></span>
+					</div>
+					<div class="price-row">
+						<span class="price">NT$ <span th:text="${course.price}">0</span></span>
+						<form class="inline-form" method="get"
+							th:action="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}">
+							<button class="btn secondary" type="submit">查看課程</button>
 						</form>
-						<form method="post" th:action="@{add_cart}" >
+					</div>
+					<div class="inline-actions">
+						<form class="inline-form" method="post"
+							th:action="@{/member/course/add_cart}">
 							<input type="hidden" name="courseId"
-								th:value="${course.courseId}">
-							<input type="hidden" name="returnUrl">
-							<button type="submit" id="addCart">加入購物車</button>
+								th:value="${course.courseId}"><input type="hidden"
+								name="returnUrl">
+							<button class="btn" type="submit">加入購物車</button>
 						</form>
-						
-						<form th:action="@{/member/dashboard/favorite/toggle}" method="post">
-						    <input type="hidden" name="courseId" th:value="${course.courseId}">
-						    <input type="hidden" name="currentPage" th:value="${currentPage}">
-   							<input type="hidden" name="orderBy" th:value="${orderBy}">
-						    <input type="hidden" name="returnUrl">
-						    <button type="submit"
-						            class="favorite-btn"
-						            th:classappend="${course.saved} ? ' active' : ''">
-						        ♥
-						    </button>
-						</form>	
-					</td>	
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
-	<div th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>	
-		
-	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
-	    <div class="cart-modal-content">
-	        <p th:text="${cartMsg}"></p>
-	        <button type="button" onclick="closeCartModal()">確定</button>
-	    </div>
-	</div>
-	<script>
-	    function closeCartModal() {
-	        document.getElementById("cartModal").style.display = "none";
-	    }
-	    document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-	        input.value = window.location.pathname + window.location.search;
-	    });
-	    document.addEventListener("DOMContentLoaded", function () {
-
-	        document.querySelectorAll(".favorite-btn").forEach(function (btn) {
-
-	            btn.addEventListener("click", function () {
-
-	                const courseId = this.dataset.courseId;
-	                const button = this;
-
-	                fetch("/course/favorite/toggle", {
-	                    method: "POST",
-	                    headers: {
-	                        "Content-Type": "application/x-www-form-urlencoded"
-	                    },
-	                    body: "courseId=" + encodeURIComponent(courseId)
-	                })
-	                .then(response => response.json())
-	                .then(data => {
-	                    if (data.saved) {
-	                        button.classList.add("active");
-	                    } else {
-	                        button.classList.remove("active");
-	                    }
-	                })
-	                .catch(error => {
-	                    console.error("收藏失敗", error);
-	                    alert("收藏失敗，請稍後再試");
-	                });
-
-	            });
-
-	        });
-
-	    });
-	</script>
+						<form class="inline-form" method="post"
+							th:action="@{/member/dashboard/favorite/toggle}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}"><input type="hidden"
+								name="currentPage" th:value="${currentPage}"><input
+								type="hidden" name="orderBy" th:value="${orderBy}"><input
+								type="hidden" name="returnUrl">
+							<button class="btn ghost" type="submit"
+								th:classappend="${course.saved} ? ' is-active' : ''">
+								<span class="favorite-heart" aria-hidden="true"
+									th:text="${course.saved} ? '♥' : '♡'">♡</span><span
+									th:text="${course.saved} ? '已收藏' : '收藏'">收藏</span>
+							</button>
+						</form>
+					</div>
+				</div>
+			</article>
+		</section>
+		<div
+			th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>
+	</main>
+	<footer class="site-footer">讓學習成為照顧自己的方式。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

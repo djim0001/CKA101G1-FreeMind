@@ -5,10 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>課程發布管理｜管理後台</title>
-
 <link rel="stylesheet" th:href="@{/css/course/style.css}" />
 <link rel="stylesheet" th:href="@{/css/course/admin.css}" />
-
 </head>
 <body class="thy2-page">
 	<div class="layout">
@@ -42,16 +40,16 @@
 				</div>
 				<section class="stats">
 					<div class="stat">
-						<span>待審核</span><strong th:text="${courseCountAwait}">—</strong><em>待後端統計欄位</em>
+						<span>待審核</span><strong data-thymeleaf-pending>—</strong><em>待後端統計欄位</em>
 					</div>
 					<div class="stat">
-						<span>已排程上架</span><strong th:text="${courseCountSuccess}">—</strong>
+						<span>已排程上架</span><strong data-thymeleaf-pending>—</strong>
 					</div>
 					<div class="stat">
-						<span>已上架</span><strong th:text="${courseCountListed}">—</strong>
+						<span>已上架</span><strong data-thymeleaf-pending>—</strong>
 					</div>
 					<div class="stat">
-						<span>已下架</span><strong th:text="${courseCountDelisted}">—</strong>
+						<span>本月已下架</span><strong data-thymeleaf-pending>—</strong>
 					</div>
 				</section>
 				<div class="tabs" data-tabs>
@@ -61,16 +59,11 @@
 				</div>
 				<section class="tab-panel" data-panel="review">
 					<div class="toolbar">
-					<form>
-						<input class="field" type="search" placeholder="搜尋課程或心理師……">
-						<select class="field" th:each="courseCategories : ${courseCategoriesListAll}">
-							<option >全部主題</option>
-							<option 
-								th:value="${courseCategories.courseCatId}"
-				    				th:text="${courseCategories.courseCatName}"></option>
-							<select class="field"><option>申請時間新至舊</option></select>
+						<input class="field" type="search" placeholder="搜尋課程或心理師……"><select
+							class="field"><option>全部主題</option>
+							<option>情緒照護</option>
+							<option>自我成長</option></select><select class="field"><option>申請時間新至舊</option></select>
 						<button class="btn secondary" type="button" data-toast="已套用篩選條件">篩選</button>
-					</form>
 					</div>
 					<div class="table-wrap">
 						<table class="compact-table">
@@ -223,14 +216,16 @@
 			</main>
 		</div>
 	</div>
-	<dialog class="admin-dialog" data-take-down-dialog>
+	<dialog class="admin-dialog" aria-labelledby="takeDownDialogTitle"
+		data-take-down-dialog>
 	<form method="post" th:action="@{delisted_course}">
 		<div class="dialog-head">
 			<div>
 				<span class="dialog-kicker">管理員操作</span>
-				<h2>確認下架課程</h2>
+				<h2 id="takeDownDialogTitle">確認下架課程</h2>
 			</div>
-			<button class="dialog-close" type="button" data-close-take-down>×</button>
+			<button class="dialog-close" type="button" aria-label="關閉下架視窗"
+				data-close-take-down>×</button>
 		</div>
 		<p>
 			即將下架：<strong data-take-down-course></strong>
@@ -239,7 +234,7 @@
 		<div class="form-group">
 			<label for="delistReason">下架原因</label><select id="delistReason"
 				class="field" name="delistReason" required data-take-down-reason><option
-					value="">請選擇</option>
+					value="">請選擇下架原因</option>
 				<option th:each="reason : ${delistReasons}" th:value="${reason}"
 					th:text="${reason.label}"></option></select>
 		</div>
@@ -252,3 +247,6 @@
 <script th:src="@{/js/course/app.js}"></script>
 </body>
 </html>
+
+
+

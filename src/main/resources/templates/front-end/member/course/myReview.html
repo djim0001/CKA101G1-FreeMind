@@ -1,201 +1,107 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>我的評價</title>
-<style>
-span.error{
-	font-size: 12px;
-	color: red;
-}
-.modal-overlay {
-	display: none;
-	position: fixed;
-	inset: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 1000;
-	justify-content: center;
-	align-items: center;
-}
-
-.modal-overlay.show {
-	display: flex;
-}
-
-.modal-box {
-	position: relative;
-	width: 90%;
-	max-width: 500px;
-	padding: 24px;
-	background-color: white;
-	border-radius: 12px;
-}
-
-.modal-close {
-	position: absolute;
-	top: 10px;
-	right: 14px;
-	border: none;
-	background: none;
-	font-size: 28px;
-	cursor: pointer;
-}
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-overlay.show {
-    display: flex;
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的評價｜我的療癒足跡</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h1>我的評價</h1>
-	<h3>
-		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
-	</h3>
-<!-- 	<div> -->
-<!-- 		<form method="post" th:action="@{review_model_box}"> -->
-<!-- 			<input type="hidden" name="returnUrl" id="returnUrl" /> -->
-<!-- 			<button type="submit">新增評價</button> -->
-<!-- 		</form> -->
-<!-- 	</div> -->
-	<button type="button" onclick="openReviewModal()">新增評價</button>
-	<div>
-	    <article style="border:solid 5px black" th:each="item : ${myCourses}">
-	    		<div>
-	    		<div><span th:text="${item.course.courseName}">不被焦慮綁架：日常穩定練習</span>
-		    		<h3 th:text="${item.rating}+'★'">★★★★★</h3>
-		    		<p th:text="${item.reviewContent}">練習很具體，焦慮出現時終於知道可以先做什麼。</p>
-		    		<p th:text="${'評價時間：' + #temporals.format(item.reviewedAt, 'yyyy年MM月dd日 HH:mm')}">2026/07/10 20:16</p>
-	    		</div><span style="color:blue;">已評價</span></div>
-	    		<button class="btn secondary" type="button" disabled>此課程已完成評價</button>
-	    	</article>
-	  </div>
-	
-	
-	<div class="modal-overlay" id="reviewModal">
-
-		<div class="modal-box">
-		<button type="button" class="modal-close" onclick="closeReviewModal()">×</button>
-	
-		<p>
-			<font color="red">*</font>表示必填
-		</p>
-		<form th:action="@{review}" method="post"
-			th:object="${review}" onsubmit="closeReviewModal()">
-	
+<body class="thy2-member healing-page coupon-tone-page">
+	<header class="site-header">
+		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
+			Free Mind<small>MY HEALING JOURNEY</small>
+		</a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a class="active"
+				th:href="@{/member/dashboard/my_review}">我的評價</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container healing-shell">
+		<div class="healing-header">
 			<div>
-				選擇課程: <select th:field="*{courseId}">
-					<option th:if="${unreviewedCourses == null or #lists.isEmpty(unreviewedCourses)}"
-				            value="">
-				        無課程
-				    </option>
-					<option th:each="item : ${unreviewedCourses}"
-						th:value="${item.course.courseId}" th:text="${item.course.courseName}" />
-				</select>
+				<p class="eyebrow">My reviews</p>
+				<h1>我的療癒足跡／我的評價</h1>
+				<p class="meta">每位會員對每堂課只能評價一次。</p>
 			</div>
-			<div>
-				<label>我的評價:<font color="red">*</font></label>
-				<textarea  th:field="*{reviewContent}" required></textarea>
-				<br /> <span th:if="${#fields.hasErrors('reviewContent')}"
-					th:errors="*{reviewContent}" class="error"
-					id="reviewContent.errors"></span>
+			<button class="btn" type="button" data-toggle-target="#reviewModal">＋
+				新增評價</button>
+		</div>
+		<div class="empty-state"
+			th:if="${myCourses == null || myCourses.isEmpty()}">
+			<h3>尚未留下課程評價</h3>
+			<p>完成學習後，歡迎分享你的感受。</p>
+		</div>
+		<section class="stack">
+			<article class="review-item" th:each="item : ${myCourses}">
+				<div class="order-head">
+					<div>
+						<span class="tag" th:text="${item.course.courseName}">課程名稱</span>
+						<h3 class="rating" th:text="${item.rating} + '★'">★★★★★</h3>
+						<p th:text="${item.reviewContent}">評價內容</p>
+						<p class="meta"
+							th:text="${'評價時間：' + #temporals.format(item.reviewedAt, 'yyyy年MM月dd日 HH:mm')}">—</p>
+					</div>
+					<span class="status-chip">已評價</span>
+				</div>
+				<button class="btn secondary" type="button" disabled>此課程已完成評價</button>
+			</article>
+		</section>
+		<div
+			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/my_review')}"></div>
+	</main>
+	<div class="modal-shell" id="reviewModal" hidden>
+		<div class="modal-card">
+			<div class="modal-head">
+				<div>
+					<p class="eyebrow">Course review</p>
+					<h2>新增課程評價</h2>
+				</div>
+				<button class="icon-button" type="button" data-close-modal>×</button>
 			</div>
-			<div>
-				<label>課程評分:</label>
-				<select th:field="*{rating}" required>
-					<option value="5">★★★★★ 非常有幫助</option>
-					<option value="4">★★★★ 有幫助</option>
-					<option value="3">★★★ 普通</option>
-					<option value="2">★★ 需要改善</option>
-					<option value="1">★ 不符合期待</option>
-				</select>
-			</div>
-			<div>
-				<button type="button" onclick="closeReviewModal()">取消</button>
-				<input type="hidden" name="returnUrl" id="returnUrl" />
-				<button type="submit" id="submit"
-						th:if="${!(unreviewedCourses == null or #lists.isEmpty(unreviewedCourses))}">
-						送出評價
-				</button>
-			</div>
-		</form>
-	</div></div>
-	
-	<div
-		th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/my_review')}"></div>
-	
-
-
-<script>
-//顯示評價視窗
-function openReviewModal() {
-	const reviewModal = document.getElementById("reviewModal");
-
-	if (reviewModal) {
-		reviewModal.classList.add("show");
-	}
-}
-
-// 關閉評價視窗
-function closeReviewModal() {
-	const reviewModal = document.getElementById("reviewModal");
-
-	if (reviewModal) {
-		reviewModal.classList.remove("show");
-	}
-}
-
-// 點擊 Modal 外面的半透明區域時關閉
-document.getElementById("reviewModal")?.addEventListener("click", function (event) {
-	if (event.target === this) {
-		closeReviewModal();
-	}
-});
-
-// 按下 Esc 鍵時關閉
-document.addEventListener("keydown", function (event) {
-	if (event.key === "Escape") {
-		closeReviewModal();
-	}
-});
-document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-    input.value = window.location.pathname + window.location.search;
-});
-</script>
-<script th:inline="javascript">
-    document.addEventListener("DOMContentLoaded", function () {
-
-        const reviewModalMsg = /*[[${reviewModalMsg}]]*/ null;
-
-        if (reviewModalMsg === "show") {
-            openReviewModal();
-        }
-    });
-
-    function openReviewModal() {
-        const modal = document.getElementById("reviewModal");
-
-        if (modal) {
-            modal.classList.add("show");
-        }
-    }
-
-    function closeReviewModal() {
-        const modal = document.getElementById("reviewModal");
-
-        if (modal) {
-            modal.classList.remove("show");
-        }
-    }
-</script>
+			<form th:action="@{/member/dashboard/review}" method="post"
+				th:object="${review}">
+				<div class="form-group">
+					<label for="reviewCourse">選擇課程 <span class="required">＊</span></label><select
+						class="field" id="reviewCourse" th:field="*{courseId}" required><option
+							value=""
+							th:if="${unreviewedCourses == null || #lists.isEmpty(unreviewedCourses)}">無可評價課程</option>
+						<option th:each="item : ${unreviewedCourses}"
+							th:value="${item.course.courseId}"
+							th:text="${item.course.courseName}">課程</option></select>
+				</div>
+				<div class="form-group" style="margin-top: 14px">
+					<label for="reviewContent">我的評價 <span class="required">＊</span></label>
+					<textarea class="field" id="reviewContent"
+						th:field="*{reviewContent}" maxlength="1000" required></textarea>
+					<span class="error" th:if="${#fields.hasErrors('reviewContent')}"
+						th:errors="*{reviewContent}"></span>
+				</div>
+				<div class="form-group" style="margin-top: 14px">
+					<label for="rating">課程評分 <span class="required">＊</span></label><select
+						class="field" id="rating" th:field="*{rating}" data-review-rating
+						required><option value="5">★★★★★ 非常有幫助</option>
+						<option value="4">★★★★ 有幫助</option>
+						<option value="3">★★★ 普通</option>
+						<option value="2">★★ 需要改善</option>
+						<option value="1">★ 不符合期待</option></select><strong class="rating"
+						data-rating-preview>★★★★★</strong>
+				</div>
+				<input type="hidden" name="returnUrl">
+				<div class="inline-actions" style="margin-top: 18px">
+					<button class="btn ghost" type="button" data-close-modal>取消</button>
+					<button class="btn" type="submit"
+						th:if="${!(unreviewedCourses == null || #lists.isEmpty(unreviewedCourses))}">送出評價</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<footer class="site-footer">你的回饋能幫助課程持續變得更好。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

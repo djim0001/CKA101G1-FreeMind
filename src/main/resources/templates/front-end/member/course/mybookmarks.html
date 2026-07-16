@@ -1,101 +1,100 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>我的收藏課程</title>
-  <link rel="stylesheet" th:href="@{/css/course/mybookmarks.css}"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>收藏課程｜我的療癒足跡</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-  <main class="container">
-    <header class="page-header">
-      <div>
-        <p class="page-kicker">我的收藏</p>
-        <h1>我的收藏／課程</h1>
-      </div>
-      <div class="header-actions">
-        <a th:href="@{/member/course/select_course}" class="btn-back">課程商城</a>
-        <a th:href="@{/member/course/shopping_cart}" class="btn-back btn-soft">購物車</a>
-        <a th:href="@{/member/dashboard}" class="btn-back">我的療癒足跡</a>
-      </div>
-    </header>
-
-    <nav class="tabs" aria-label="收藏分類">
-      <button type="button" class="active" data-filter="all">已收藏課程</button>
-      <button type="button" data-filter="high-rating">高評價課程</button>
-      <button type="button" data-filter="popular">熱門收藏</button>
-    </nav>
-
-    <section class="toolbar" aria-label="課程搜尋">
-      <div class="search-box">
-        <label for="courseSearch">搜尋課程</label>
-        <input id="courseSearch" type="search" placeholder="輸入課程名稱、心理師或分類" />
-      </div>
-      <div class="summary-pill">
-        <span>目前顯示</span>
-        <strong id="visibleCount">0</strong>
-      </div>
-    </section>
-
-    <section class="course-list" id="courseList" th:if="${myBookmarks != null && !myBookmarks.isEmpty()}">
-      <article
-        class="course-card"
-        th:each="course : ${myBookmarks}"
-        th:attr="data-rating=${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount},data-save-count=${course.saveCount},data-category=${course.courseCategories.courseCatName}">
-        <div class="course-cover">
-          <span class="cover-text" th:text="${course.courseCategories.courseCatName}">心理健康</span>
-        </div>
-
-        <div class="course-info">
-          <h2 th:text="${course.courseName}">情緒覺察與壓力調節入門</h2>
-
-          <div class="course-meta">
-            <span class="cat-tag" th:text="${course.courseCategories.courseCatName}">心理健康</span>
-            <span>心理師 <strong th:text="${course.psychologist.name}">林庭安</strong></span>
-            <span>收藏 <strong th:text="${course.saveCount}">0</strong></span>
-            <span>平均星數 <strong th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}">0</strong></span>
-            <span>評價 <strong th:text="${course.reviewCount}">0</strong></span>
-            <span>提問 <strong th:text="${course.commentCount}">0</strong></span>
-            <span>定價 <strong th:text="${course.price}">0</strong></span>
-          </div>
-
-          <div class="course-action">
-            <form method="get" th:action="@{/member/course/get_one_course}">
-              <input type="hidden" name="courseId" th:value="${course.courseId}" />
-              <button type="submit">查看詳情</button>
-            </form>
-
-            <form method="post" th:action="@{/member/course/add_cart}">
-              <input type="hidden" name="courseId" th:value="${course.courseId}" />
-              <input type="hidden" name="returnUrl" />
-              <button type="submit" class="btn-cart">加入購物車</button>
-            </form>
-
-            <form method="post" th:action="@{/member/dashboard/favorite/toggle}">
-              <input type="hidden" name="courseId" th:value="${course.courseId}" />
-              <input type="hidden" name="returnUrl" />
-              <button type="submit" class="favorite-btn active" aria-label="取消收藏">♥</button>
-            </form>
-          </div>
-        </div>
-      </article>
-    </section>
-
-    <section id="emptyState" class="empty-state is-hidden">
-      尚無收藏課程
-    </section>
-
-    <div class="pagination-wrap" id="paginationWrap" data-page-size="5">
-      <div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/myCollection/course')}"></div>
-    </div>
-  </main>
-
-  <div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
-    <div class="cart-modal-content">
-      <p th:text="${cartMsg}">已加入購物車。</p>
-      <button type="button" onclick="closeCartModal()">確定</button>
-    </div>
-  </div>
-
-<script th:src="@{/js/course/mybookmarks.js}"></script></body>
+<body class="thy2-member healing-page">
+	<header class="site-header">
+		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
+			Free Mind<small>MY HEALING JOURNEY</small>
+		</a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				class="active" th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
+				th:href="@{/member/dashboard/my_review}">我的評價</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container healing-shell">
+		<div class="healing-header">
+			<div>
+				<p class="eyebrow">My collection</p>
+				<h1>我的療癒足跡／收藏課程</h1>
+			</div>
+			<a class="btn" th:href="@{/member/dashboard/myLearning}">返回我的療癒足跡</a>
+		</div>
+		<div class="notice member-message" th:if="${cartMsg != null}"
+			th:text="${cartMsg}"></div>
+		<div class="toolbar">
+			<input class="field" type="search" placeholder="搜尋收藏課程……"
+				data-course-search><select class="field" data-topic-filter><option
+					value="">全部分類</option></select><span class="meta">收藏的課程會保留在這裡</span>
+		</div>
+		<div class="empty-state"
+			th:if="${myBookmarks == null || myBookmarks.isEmpty()}">
+			<h3>尚無收藏課程</h3>
+			<a class="btn" th:href="@{/member/course/select_course}">探索課程</a>
+		</div>
+		<section class="course-grid"
+			th:if="${myBookmarks != null && !myBookmarks.isEmpty()}">
+			<article class="course-card" data-course-card
+				th:each="course : ${myBookmarks}"
+				th:attr="data-category=${course.courseCategories.courseCatName}">
+				<div class="course-cover"
+					th:text="${course.courseCategories.courseCatName}">分類</div>
+				<div class="course-body">
+					<span class="tag">已收藏</span>
+					<h3 th:text="${course.courseName}">課程名稱</h3>
+					<p class="meta">
+						<span th:text="${course.psychologist.name}">心理師</span> 心理師
+					</p>
+					<div class="course-stats">
+						<span>收藏 <b th:text="${course.saveCount}">0</b></span><span>平均星數
+							<b
+							th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}">0</b>
+						</span><span>評價 <b th:text="${course.reviewCount}">0</b></span><span>提問
+							<b th:text="${course.commentCount}">0</b>
+						</span>
+					</div>
+					<div class="price-row">
+						<span class="price">NT$ <span th:text="${course.price}">0</span></span>
+						<form method="get" th:action="@{/member/course/get_one_course}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}">
+							<button class="btn secondary" type="submit">查看詳情</button>
+						</form>
+					</div>
+					<div class="inline-actions">
+						<form method="post" th:action="@{/member/course/add_cart}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}"><input type="hidden"
+								name="returnUrl">
+							<button class="btn" type="submit">加入購物車</button>
+						</form>
+						<form method="post"
+							th:action="@{/member/dashboard/favorite/toggle}">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}"><input type="hidden"
+								name="returnUrl">
+							<button class="btn ghost" type="submit">
+								<span class="favorite-heart" aria-hidden="true">♥</span><span>取消收藏</span>
+							</button>
+						</form>
+					</div>
+				</div>
+			</article>
+		</section>
+		<div
+			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/dashboard/myCollection/course')}"></div>
+	</main>
+	<footer class="site-footer">收藏喜歡的內容，留給需要時的自己。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
+</body>
 </html>
