@@ -7,7 +7,7 @@
 <body>
 	<h3>新增諮商訂單</h3>
 
-	<form method="post" th:action="@{/orders/insert}" th:object="${orders}">
+	<form method="post" th:action="@{/admin/orders/insert}" th:object="${orders}">
 
 
 		<div th:if="${#fields.hasAnyErrors()}" style="color: red;">
@@ -82,7 +82,7 @@
 			value="新增">
 	</form>
 
-	<a th:href="@{/orders/listAllOrders}">回列表</a>
+	<a th:href="@{/admin/orders/listAllOrders}">回列表</a>
 
 </body>
 </html>

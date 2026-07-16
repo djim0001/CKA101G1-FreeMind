@@ -78,7 +78,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
 
-	<form class="search-form" method="post" th:action="@{/orders/psychOrders}">
+	<form class="search-form" method="post" th:action="@{/psych/orders/psychOrders}">
 		心理師編號：<input type="text" name="psychId" th:value="${psychId}">
 		<input type="submit" value="查詢">
 	</form>
@@ -127,7 +127,7 @@
 				<!-- 晤談筆記欄：只有已確認的訂單能填寫筆記並標記完成 -->
 				<td>
 					<form th:if="${order.orderStatus == 1}" class="action-form"
-					      method="post" th:action="@{/orders/complete}">
+					      method="post" th:action="@{/psych/orders/complete}">
 						<input type="hidden" name="orderId" th:value="${order.orderId}">
 						<input type="hidden" name="psychId" th:value="${psychId}">
 						<textarea name="psychNote" rows="3" placeholder="這次諮商的重點記錄，會員將能看到"></textarea>
@@ -139,12 +139,12 @@
 				<!-- 操作欄：依狀態顯示同意/拒絕，或標記未出席 -->
 				<td>
 					<div th:if="${order.orderStatus == 0}">
-						<form method="post" th:action="@{/orders/approve}" class="action-form">
+						<form method="post" th:action="@{/psych/orders/approve}" class="action-form">
 							<input type="hidden" name="orderId" th:value="${order.orderId}">
 							<input type="hidden" name="psychId" th:value="${psychId}">
 							<button type="submit" class="btn btn-approve">同意</button>
 						</form>
-						<form method="post" th:action="@{/orders/reject}" class="action-form">
+						<form method="post" th:action="@{/psych/orders/reject}" class="action-form">
 							<input type="hidden" name="orderId" th:value="${order.orderId}">
 							<input type="hidden" name="psychId" th:value="${psychId}">
 							<button type="submit" class="btn btn-reject"
@@ -153,7 +153,7 @@
 					</div>
 
 					<div th:if="${order.orderStatus == 1}">
-						<form method="post" th:action="@{/orders/noShow}" class="action-form">
+						<form method="post" th:action="@{/psych/orders/noShow}" class="action-form">
 							<input type="hidden" name="orderId" th:value="${order.orderId}">
 							<input type="hidden" name="psychId" th:value="${psychId}">
 							<button type="submit" class="btn btn-noshow"

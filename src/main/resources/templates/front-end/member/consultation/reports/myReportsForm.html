@@ -33,7 +33,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/reports/myReports}">
+	<form method="post" th:action="@{/member/reports/myReports}">
 		會員編號：<input type="text" name="memberId" th:value="${memberId}">
 		<input type="submit" value="查詢">
 	</form>

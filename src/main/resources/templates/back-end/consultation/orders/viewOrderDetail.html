@@ -55,7 +55,7 @@
         <tr><th>評論時間</th><td th:text="${orders.reviewedAt != null ? #temporals.format(orders.reviewedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td></tr>
     </table>
 
-    <a th:href="@{/orders/listAllOrders}">回列表</a>
+    <a th:href="@{/admin/orders/listAllOrders}">回列表</a>
 
 </body>
 </html>

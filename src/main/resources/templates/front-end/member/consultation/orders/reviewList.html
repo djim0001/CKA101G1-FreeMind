@@ -45,7 +45,7 @@
 			<td th:text="${order.psychologist.name}"></td>
 			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 			<td>
-				<form method="post" th:action="@{/orders/reviewSelect}">
+				<form method="post" th:action="@{/member/orders/reviewSelect}">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="submit" value="撰寫評論">
 				</form>
@@ -53,7 +53,7 @@
 		</tr>
 	</table>
 
-	<a th:href="@{/orders/reviewForm}">重新查詢</a>
+	<a th:href="@{/member/orders/reviewForm}">重新查詢</a>
 
 </body>
 </html>
