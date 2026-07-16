@@ -209,6 +209,10 @@ public class ActivityController {
     // 查看我發起的活動
     @GetMapping("ownedActivities")
     public String ownedActivities(@AuthenticationPrincipal MemberUserDetails userDetails, ModelMap model) {
+    	 	if (userDetails == null) {
+    	        return "redirect:/front-end/login";
+    	    }
+    	
     		Integer memberId = userDetails.getMember().getMemberId();
         
         Map<String, String[]> emptyMap = new HashMap<>();
