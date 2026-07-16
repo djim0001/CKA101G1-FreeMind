@@ -48,15 +48,15 @@
                 <span th:case="'other'">其他</span>
             </td>
             <td>
-                <form method="post" th:action="@{/orders/viewDetail}">
+                <form method="post" th:action="@{/admin/orders/viewDetail}">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="submit" value="查看詳情">
 				</form>
-                <form method="post" th:action="@{/orders/getOne_For_Update}">
+                <form method="post" th:action="@{/admin/orders/getOne_For_Update}">
                     <input type="hidden" name="orderId" th:value="${order.orderId}">
                     <input type="submit" value="修改">
                 </form>
-                <form method="post" th:action="@{/orders/delete}">
+                <form method="post" th:action="@{/admin/orders/delete}">
                     <input type="hidden" name="orderId" th:value="${order.orderId}">
                     <input type="submit" value="刪除"
                            onclick="return confirm('確定要刪除此筆訂單嗎？')">
@@ -65,8 +65,8 @@
         </tr>
     </table>
 
-    <a th:href="@{/orders/addOrders}">新增訂單</a>
-    <a th:href="@{/orders/select_Page}">查詢</a>
+    <a th:href="@{/admin/orders/addOrders}">新增訂單</a>
+    <a th:href="@{/admin/orders/select_Page}">查詢</a>
 
 </body>
 </html>

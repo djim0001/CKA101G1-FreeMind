@@ -9,8 +9,8 @@
 
 	<span style="color:green;" th:if="${success != null}" th:text="${success}"></span>
 
-	<a th:href="@{/reports/addReports}">新增回報</a>
-    <a th:href="@{/reports/select_Page}">查詢</a>
+	<a th:href="@{/admin/reports/addReports}">新增回報</a>
+    <a th:href="@{/admin/reports/select_Page}">查詢</a>
 
     <table border="1">
         <tr>
@@ -32,11 +32,11 @@
                 <span th:case="2">已解決</span>
             </td>
             <td>
-                <form method="post" th:action="@{/reports/getOne_For_Reply}">
+                <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
 					<input type="hidden" name="reportId" th:value="${report.reportId}">
 					<input type="submit" value="回覆">
 				</form>
-                <form method="post" th:action="@{/reports/delete}">
+                <form method="post" th:action="@{/admin/reports/delete}">
 				    <input type="hidden" name="reportId" th:value="${report.reportId}">
 				    <input type="submit" value="刪除"
 				           onclick="return confirm('確定要刪除此筆資料嗎？')">

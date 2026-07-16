@@ -4,44 +4,93 @@
 <meta charset="UTF-8">
 <title>新增諮商問題回報</title>
 <style>
+    * { box-sizing: border-box; }
+
     body {
-        font-family: "Microsoft JhengHei", Arial, sans-serif;
-        margin: 30px;
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
         color: #333;
     }
-    h3 {
-        margin-bottom: 20px;
+
+    .card {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
     }
+
+    h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0 0 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+
     table {
         border-collapse: collapse;
         width: 100%;
         margin-top: 10px;
     }
+
     th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
+        border: 1px solid #f2dddd;
+        padding: 12px 10px;
         text-align: center;
         vertical-align: middle;
+        font-size: 14px;
     }
+
     th {
-        background-color: #f2f2f2;
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #fdfafa;
+    }
+
+    .nowrap { white-space: nowrap; }
+
+    .status-confirmed { color: #1a7a1a; font-weight: bold; }
+    .status-completed { color: #1565c0; font-weight: bold; }
+
+    .report-btn {
+        display: inline-block;
+        padding: 7px 16px;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background-color 0.2s;
+    }
+    .report-btn:hover {
+        background-color: #d39393;
+    }
+
+    .empty-hint {
+        font-size: 14px;
+        color: #999;
+        margin-top: 12px;
     }
 </style>
 </head>
 <body>
-	<h3>新增諮商問題回報</h3>
+	<div class="card">
+		<h3>新增諮商問題回報</h3>
 
-	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+		<p class="empty-hint" th:if="${#lists.isEmpty(ordersListData)}">查無可回報的諮商紀錄（可能都已經回報過了）。</p>
 
-	<form method="post" th:action="@{/reports/reportLookup}">
-		會員編號：<input type="text" name="memberId" th:value="${memberId}"><br>
-		<input type="submit" value="查看我的諮商紀錄">
-	</form>
-
-	<div th:if="${ordersListData != null}">
-		<h3>會員編號 <span th:text="${memberId}"></span> 的諮商紀錄</h3>
-
-		<table>
+		<table th:unless="${#lists.isEmpty(ordersListData)}">
 			<tr>
 				<th>訂單編號</th>
 				<th>心理師編號</th>
@@ -53,22 +102,20 @@
 			<tr th:each="order : ${ordersListData}">
 				<td th:text="${order.orderId}"></td>
 				<td th:text="${order.psychologist.psychId}"></td>
-				<td th:text="${order.psychologist.name}"></td>
-				<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+				<td class="nowrap" th:text="${order.psychologist.name}"></td>
+				<td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 				<td th:switch="${order.orderStatus}">
-					<span th:case="1">已確認</span>
-					<span th:case="4">已完成</span>
+					<span th:case="1" class="status-confirmed">已確認</span>
+					<span th:case="4" class="status-completed">已完成</span>
 				</td>
 				<td>
-					<form method="post" th:action="@{/reports/reportSelect}">
+					<form method="post" th:action="@{/member/reports/reportSelect}">
 						<input type="hidden" name="orderId" th:value="${order.orderId}">
-						<input type="hidden" name="memberId" th:value="${memberId}">
-						<input type="submit" value="回報這筆諮商">
+						<input type="submit" class="report-btn" value="回報這筆諮商">
 					</form>
 				</td>
 			</tr>
 		</table>
 	</div>
-
 </body>
 </html>

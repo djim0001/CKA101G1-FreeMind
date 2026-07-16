@@ -19,12 +19,12 @@ public class PsychUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// TODO: PsychologistRepository 要加一行衍生查詢:
-		// Psychologist findByPsychAccount(String psychAccount);
 		Psychologist psychologist = psychologistRepository.findByPsychAccount(username);
 		if (psychologist == null) {
 			throw new UsernameNotFoundException("心理師帳號不存在: " + username);
 		}
 		return new PsychUserDetails(psychologist);
 	}
+	
+	
 }

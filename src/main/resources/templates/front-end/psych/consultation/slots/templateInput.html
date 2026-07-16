@@ -14,7 +14,7 @@
 	<button type="button" onclick="checkAll(false)">一鍵全部取消</button>
 	<br><br>
 
-	<form method="post" th:action="@{/slots/templateSubmit}">
+	<form method="post" th:action="@{/psych/slots/templateSubmit}">
 		<input type="hidden" name="psychId" th:value="${slots.psychologist.psychId}">
 
 		<div th:each="hour : ${#numbers.sequence(0, 23)}" style="margin-bottom:4px;">

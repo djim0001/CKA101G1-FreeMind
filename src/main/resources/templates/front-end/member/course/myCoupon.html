@@ -1,110 +1,112 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>優惠券搜尋頁面</title>
-<style>
-.coupon-modal {
-       position: fixed;
-       inset: 0;
-       background-color: rgba(0, 0, 0, 0.4);
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       z-index: 9999;
-   }
-
- .coupon-modal-content {
-     background-color: white;
-     padding: 24px 36px;
-     border-radius: 8px;
-     text-align: center;
-     min-width: 280px;
-     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
- }
-
- .coupon-modal-content button {
-     margin-top: 16px;
-     padding: 8px 24px;
-     cursor: pointer;
- }
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的優惠券｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h1>我的優惠券</h1>
-
-	<h3>
-		<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
-	</h3>
-	<h3>
-		<a th:href="@{/member/course/shopping_cart}">購物車</a>
-	</h3>
-	<br>
-	<div th:each="coupon : ${coupons}">
-	    	<span th:text="${coupon.couponName}"></span>
-	   	<form th:action="@{/member/coupon/claim}"
-	          method="post">
-	        <input type="hidden"
-	               name="couponId"
-	               th:value="${coupon.couponId}">
-	        <button type="submit">
-	            領取優惠券
-	        </button>
-	    </form>
-	</div>
-	<table>
-		<thead>
-			<tr>
-				<th>優惠券名稱</th>
-				<th>消費觸發門檻</th>
-				<th>優惠券折扣</th>
-				<th>折扣上限</th>
-				<th>使用狀態</th>
-				<th>起始日期</th>
-				<th>結束日期</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="memberCoupon : ${myCoupons}">
-				<tr>
-					<td th:text="${memberCoupon.coupon.couponName}"></td>
-					<td
-						th:text="${memberCoupon.coupon.triggerThreshold != null ? memberCoupon.coupon.triggerThreshold : '無'}"></td>
-					<td th:text="${memberCoupon.coupon.discount}"></td>
-					<td
-						th:text="${memberCoupon.coupon.discountLimit != null ? memberCoupon.coupon.discountLimit : '無'}">
-					</td>
-					<td
-						th:text="${memberCoupon.couponStatusText}">
-					</td>
-					<td
-						th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy年MM月dd日')}">
-					</td>
-					<td
-						th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy年MM月dd日')}">
-					</td>
-				</tr>
-			</th:block>
-		</tbody>
-
-	</table>
-	<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon')}"></div>	
-
-	<div id="couponModal" class="coupon-modal" th:if="${couponMsg != null}">
-	    <div class="coupon-modal-content">
-	        <p th:text="${couponMsg}"></p>
-	        <button type="button" onclick="closeCouponModal()">確定</button>
-	    </div>
-	</div>
-
-	<script>
-	    function closeCouponModal() {
-	        document.getElementById("couponModal").style.display = "none";
-	    }
-	    
-	</script>
-
-
+<body class="thy2-member coupon-tone-page">
+	<header class="site-header">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>MEMBER
+				CENTER</small></a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				class="active" th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">My coupons</p>
+				<h1>我的優惠券</h1>
+			</div>
+			<p>查看可領取優惠與會員持有的優惠券</p>
+		</div>
+		<div class="notice member-message" th:if="${couponMsg != null}"
+			th:text="${couponMsg}"></div>
+		<div class="tabs" data-tabs>
+			<button class="active" data-tab="owned" type="button">我的優惠券</button>
+			<button data-tab="claim" type="button">可領取優惠券</button>
+		</div>
+		<section data-panel="owned">
+			<div class="empty-state"
+				th:if="${myCoupons == null || myCoupons.isEmpty()}">
+				<h3>目前沒有會員優惠券</h3>
+				<p>前往「可領取優惠券」查看最新優惠。</p>
+			</div>
+			<div class="coupon-card-grid">
+				<article class="coupon-record" th:each="memberCoupon : ${myCoupons}">
+					<div class="coupon-value-panel">
+						<small>全站課程折扣</small><strong
+							th:text="${memberCoupon.coupon.discount}">—</strong><span>最高折抵
+							NT$ <b
+							th:text="${memberCoupon.coupon.discountLimit != null ? memberCoupon.coupon.discountLimit : '無上限'}">—</b>
+						</span>
+					</div>
+					<div class="coupon-record-body">
+						<div class="order-head">
+							<div>
+								<span class="tag" th:text="${memberCoupon.couponStatusText}">狀態</span>
+								<h2 th:text="${memberCoupon.coupon.couponName}">優惠券名稱</h2>
+							</div>
+						</div>
+						<dl>
+							<div>
+								<dt>消費門檻</dt>
+								<dd>
+									NT$ <span
+										th:text="${memberCoupon.coupon.triggerThreshold != null ? memberCoupon.coupon.triggerThreshold : '無'}">—</span>
+								</dd>
+							</div>
+							<div>
+								<dt>使用期限</dt>
+								<dd>
+									<span
+										th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy年MM月dd日')}">—</span>－<span
+										th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy年MM月dd日')}">—</span>
+								</dd>
+							</div>
+						</dl>
+						<a class="btn" th:href="@{/member/course/shopping_cart}">前往購物車</a>
+					</div>
+				</article>
+			</div>
+		</section>
+		<section data-panel="claim" hidden>
+			<div class="course-grid">
+				<article class="course-card claim-coupon-card"
+					th:each="coupon : ${coupons}"
+					th:with="alreadyOwned=${myCoupons != null and #lists.contains(myCoupons.![coupon.couponId], coupon.couponId)}, canClaim=${!alreadyOwned and (unclaimableCouponIds == null or !#lists.contains(unclaimableCouponIds, coupon.couponId))}"
+					th:classappend="${!canClaim} ? ' is-unavailable' : ''">
+					<div class="course-cover" th:text="${canClaim} ? '限時優惠' : '目前不可領取'">限時優惠</div>
+					<div class="course-body">
+						<span class="tag"
+							th:classappend="${!canClaim} ? ' unavailable' : ''"
+							th:text="${canClaim} ? '可領取' : '不可領取'">可領取</span>
+						<h3 th:text="${coupon.couponName}">優惠券名稱</h3>
+						<p class="meta" th:if="${!canClaim}"
+							th:text="${alreadyOwned} ? '你已領取過這張優惠券' : '目前不符合領取資格'">目前不可領取</p>
+						<form th:if="${canClaim}" method="post"
+							th:action="@{/member/coupon/claim}" style="margin-top: auto">
+							<input type="hidden" name="couponId"
+								th:value="${coupon.couponId}">
+							<button class="btn" type="submit">領取優惠券</button>
+						</form>
+						<button th:unless="${canClaim}" class="btn ghost" type="button"
+							disabled style="margin-top: auto">無法領取</button>
+					</div>
+				</article>
+			</div>
+		</section>
+		<div
+			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon')}"></div>
+	</main>
+	<footer class="site-footer">優惠券資格與折抵金額以結帳驗證結果為準。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

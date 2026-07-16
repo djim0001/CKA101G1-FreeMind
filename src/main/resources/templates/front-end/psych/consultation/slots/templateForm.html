@@ -9,9 +9,9 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/slots/templateLookup}">
+	<form method="post" th:action="@{/psych/slots/templateLookup}">
 		心理師編號：<input type="text" name="psychId">
-		<input type="submit" value="查詢/設定">
+		<input type="submit" value="確定">
 	</form>
 
 </body>

@@ -9,7 +9,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/slots/manageLookup}">
+	<form method="post" th:action="@{/psych/slots/manageLookup}">
 		心理師編號：<input type="text" name="psychId"><br>
 		日期：<input type="date" name="slotDate"><br>
 		<input type="submit" value="查詢">

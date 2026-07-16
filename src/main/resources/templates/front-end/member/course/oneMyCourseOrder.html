@@ -1,75 +1,64 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>課程訂單詳情</title>
-<style>
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background-color: #f2f2f2; }
-    .status-paid { color: green; font-weight: bold; }
-    .status-unpaid { color: red; font-weight: bold; }
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程訂單詳情｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-
-	<h1>課程訂單詳情</h1>
-	
-	<table>
-		<thead>
-			<tr>
-				<th>訂單編號</th>
-				<th>會員姓名</th>
-				<th>優惠券序號</th>
-				<th>訂單總額</th>
-				<th>折扣金額</th>
-				<th>實付金額</th>
-				<th>付款方式</th>
-				<th>付款狀態</th>
-				<th>訂單時間</th>
-			</tr>
-		</thead>
-		<tbody>
-			<!-- 情況一：如果是用「會員編號」查出來的多筆訂單列表 (orders) -->
-			<th:block th:if="${orders != null}">
-				<tr th:each="order : ${orders}">
-					<td th:text="${order.courseOrderId}"></td>
-					<td th:text="${order.member.name}"></td>
-					<!-- 優惠券可能為空，用 ? 防止出錯 -->
-					<td th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '無使用優惠券'}"></td>
-					<td th:text="${order.orderTotal}"></td>
-					<td th:text="${order.discountAmount != null ? order.discountAmount : 0}"></td>
-					<td th:text="${order.netAmount}"></td>
-					<!-- 付款方式判斷 -->
-					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
-					<!-- 付款狀態判斷 -->
-					<td>
-						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
-						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
-					</td>
-					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-				</tr>
-			</th:block>
-
-			<!-- 情況二：如果是用「訂單編號」查出來的單筆訂單 (order) -->
-			<th:block th:if="${order != null}">
-				<tr>
-					<td th:text="${order.courseOrderId}"></td>
-					<td th:text="${order.member.name}"></td>
-					<td th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '無使用優惠券'}"></td>
-					<td th:text="${order.orderTotal}"></td>
-					<td th:text="${order.discountAmount != null ? order.discountAmount : 0}"></td>
-					<td th:text="${order.netAmount}"></td>
-					<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}"></td>
-					<td>
-						<span th:if="${order.paymentStatus == 1}" class="status-paid">已付款</span>
-						<span th:if="${order.paymentStatus == 0}" class="status-unpaid">未付款</span>
-					</td>
-					<td th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-				</tr>
-			</th:block>
-		</tbody>
-	</table>
-	
+<body class="thy2-member">
+	<header class="site-header">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>MEMBER
+				CENTER</small></a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				class="active" th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Order detail</p>
+				<h1 style="font-size: 38px">課程訂單詳情</h1>
+			</div>
+			<a class="btn secondary" th:href="@{/member/course/my_course_order}">返回訂單紀錄</a>
+		</div>
+		<div class="empty-state" th:if="${orders == null || orders.isEmpty()}">找不到此訂單</div>
+		<section class="stack" th:if="${orders != null}">
+			<article class="panel order-card" th:each="order : ${orders}"
+				th:if="${order != null}">
+				<div class="order-head">
+					<div>
+						<strong>訂單 #<span th:text="${order.courseOrderId}">—</span></strong>
+						<p class="meta"
+							th:text="${#temporals.format(order.orderedAt, 'yyyy-MM-dd HH:mm:ss')}">—</p>
+					</div>
+					<span class="status-chip" th:if="${order.paymentStatus == 1}">已付款</span><span
+						class="status-chip pending" th:if="${order.paymentStatus == 0}">未付款</span>
+				</div>
+				<div class="order-meta">
+					<span>會員：<b th:text="${order.member.name}">會員</b></span><span>付款方式：<b
+						th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}">—</b></span><span>優惠券：<b
+						th:text="${order.memberCoupon != null ? order.memberCoupon.couponSerialNo : '無使用優惠券'}">—</b></span>
+				</div>
+				<div class="summary-row">
+					<span>訂單總額</span><strong>NT$ <span
+						th:text="${order.orderTotal}">0</span></strong>
+				</div>
+				<div class="summary-row">
+					<span>折扣金額</span><strong>− NT$ <span
+						th:text="${order.discountAmount != null ? order.discountAmount : 0}">0</span></strong>
+				</div>
+				<div class="summary-row total">
+					<span>實付金額</span><span class="price">NT$ <span
+						th:text="${order.netAmount}">0</span></span>
+				</div>
+			</article>
+		</section>
+	</main>
+	<footer class="site-footer">訂單資料會妥善保留於會員中心。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

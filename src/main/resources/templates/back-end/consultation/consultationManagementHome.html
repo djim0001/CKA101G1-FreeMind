@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>諮商預約管理</title>
+<style>
+    body {
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        margin: 30px;
+        color: #333;
+    }
+    h3 {
+        margin-bottom: 20px;
+    }
+    .menu {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 320px;
+    }
+    .menu a {
+        display: block;
+        padding: 14px 18px;
+        background-color: #f2f2f2;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+        font-size: 1rem;
+        transition: background-color 0.15s;
+    }
+    .menu a:hover {
+        background-color: #e0e0e0;
+    }
+</style>
+</head>
+<body>
+	<h3>諮商預約管理</h3>
+
+	<div class="menu">
+		<a th:href="@{/admin/orders/listAllOrders}">查看諮商預約紀錄與詳情</a>
+		<a th:href="@{/admin/reports/listAllReports}">會員回報與問題處理</a>
+		<a th:href="@{/admin/slots/listAllSlots}">預約時段表調整</a>
+	</div>
+
+</body>
+</html>

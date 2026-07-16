@@ -9,7 +9,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/orders/reviewLookup}">
+	<form method="post" th:action="@{/member/orders/reviewLookup}">
 		會員編號：<input type="text" name="memberId"><br>
 		<input type="submit" value="查看可評論的諮商紀錄">
 	</form>

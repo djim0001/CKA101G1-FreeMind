@@ -1,177 +1,127 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>結帳頁面</title>
-<style>
-span.error {
-	font-size: 12px;
-	color: red;
-}
-span.error {
-    font-size: 12px;
-    color: red;
-}
-
-.modal {
-    position: fixed;
-    z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    width: 700px;
-    max-height: 80vh;
-    overflow-y: auto;
-    border-radius: 8px;
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>課程結帳｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h1>結帳頁面</h1>
-	<h3>
-		<a th:href="@{/member/course/select_course}">會員課程一覽頁面</a>
-	</h3>
-	<table>
-		<tr>
-			<th>課程名稱</th>
-			<th>心理師</th>
-			<th>原價</th>
-			<th>折扣</th>
-			<th>小計</th>
-			<th>操作</th>
-		</tr>
-
-		<tr th:each="item : ${cartList}">
-			<td th:text="${item.courseName}"></td>
-			<td th:text="${item.psychologistName}"></td>
-			<td th:text="${item.price}"></td>
-			<td th:text="${item.psychDiscount==null?'無折扣':item.psychDiscount}"></td>
-			<td th:text="${item.subtotal}"></td>
-			<td>
-				<form th:action="@{/member/course/cart_remove}" method="post" onsubmit="return confirm('確定要從購物車移除此課程嗎？');">
-					<input type="hidden" name="courseId" th:value="${item.courseId}">
-					<input type="hidden" name="returnUrl">
-					<button type="submit">從購物車移除</button>
-				</form>
-			</td>
-		</tr>
-	</table>
-	<br>
-
-	<form method="post" th:action="@{/member/coupon/coupon_model_box}">
-	    <button type="submit">選擇優惠券</button>
-		<input type="hidden" name="returnUrl">
-	    <span th:if="${orderCoupon != null}">
-	        已選擇：
-	        <b th:text="${couponName}"></b>
-	        <b th:text="${couponError}"></b>
-	    </span>
-	</form>
-	<form th:if="${orderCoupon != null}"
-	      method="post"
-	      th:action="@{/member/coupon/remove_coupon}">
-	    <input type="hidden" name="returnUrl">
-	    <button type="submit">取消優惠券</button>
-	</form>
-	
-	<div>
-	<form th:action="@{cart_clear}" method="post" onsubmit="return confirm('確定要清空購物車嗎？');">
-		<button type="submit">清空購物車</button>
-	</form>
-		<span>總計：</span> <span
-			style="font-weight: bold; color: #d97706; font-size: 20px;"
-			th:text="'NT$ ' + ${cartTotal}"> </span>
-	</div>
-	
-	<form th:action="@{checkout}" method="post" onsubmit="return confirm('訂單資訊確認無誤');">
-	<div>
-	    <label>
-	        <input type="radio" name="paymentMethod" value="0">
-	        信用卡支付
-	    </label>
-	    <label>
-	        <input type="radio" name="paymentMethod" value="1">
-	        第三方支付
-	    </label><br>
-	    <span class="error" th:text="${paymentMethodMsg}"></span>
-	</div>
+<body class="thy2-member">
+	<header class="site-header">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>SECURE
+				CHECKOUT</small></a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/shopping_cart}">← 返回購物車</a>
+		</nav>
+		<span class="meta">安全加密結帳</span>
+	</header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Secure checkout</p>
+				<h1 style="font-size: 38px">完成你的課程訂單</h1>
+			</div>
+			<p>購物車 ✓ 付款資訊 ② 完成 ③</p>
 		</div>
-	    <button type="submit">確認結帳</button>
-	</form>
-	
-	
-	
-<div id="couponModal" class="modal" th:if="${chooseCouponMsg == 'show'}">
-    <div class="modal-content">
-        <h2>選擇優惠券</h2>
-
-        <table border="1" width="100%">
-            <thead>
-                <tr>
-                    <th>優惠券編號</th>
-                    <th>優惠券名稱</th>
-                    <th>優惠券折扣</th>
-                    <th>開始時間</th>
-                    <th>結束時間</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                <tr th:if="${memCoupons == null or memCoupons.isEmpty()}">
-                    <td colspan="6">目前沒有可使用的優惠券</td>
-                </tr>
-
-                <tr th:each="memberCoupon : ${memCoupons}">
-                    <td th:text="${memberCoupon.couponSerialNo}"></td>
-
-                    <td th:text="${memberCoupon.coupon.couponName}"></td>
-                    
-                    <td th:text="${memberCoupon.coupon.discount}"></td>
-
-                    <td th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy-MM-dd')}"></td>
-
-                    <td th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy-MM-dd')}"></td>
-
-                    <td>
-                        <form method="post" th:action="@{/member/coupon/choose_coupon}">
-                            <input type="hidden"
-                                   name="couponSerialNo"
-                                   th:value="${memberCoupon.couponSerialNo}">
-							<input type="hidden" name="returnUrl">
-                            <button type="submit">使用此優惠券</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <br>
-
-        <button type="button" onclick="closeCouponModal()">關閉</button>
-    </div>
-</div>	
-<script>
-function closeCouponModal() {
-    const modal = document.getElementById("couponModal");
-    if (modal) {
-        modal.style.display = "none";
-    }
-}
-document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
-    input.value = window.location.pathname + window.location.search;
-});
-</script>	
+		<div class="two-col">
+			<section class="stack">
+				<div class="panel">
+					<h2>訂單課程</h2>
+					<article class="cart-item" th:each="item : ${cartList}">
+						<div class="thumb">課程</div>
+						<div>
+							<h3 th:text="${item.courseName}">課程名稱</h3>
+							<p class="meta">
+								<span th:text="${item.psychologistName}">心理師</span>・<span
+									th:text="${item.psychDiscount == null ? '無折扣' : item.psychDiscount}">折扣</span>
+							</p>
+						</div>
+						<div>
+							<strong class="price">NT$ <span
+								th:text="${item.subtotal}">0</span></strong>
+							<form method="post" th:action="@{/member/course/cart_remove}"
+								data-confirm-form="確定移除此課程？">
+								<input type="hidden" name="courseId" th:value="${item.courseId}"><input
+									type="hidden" name="returnUrl">
+								<button class="btn ghost" type="submit">移除</button>
+							</form>
+						</div>
+					</article>
+				</div>
+				<div class="panel">
+					<h2>付款方式</h2>
+					<form method="post" th:action="@{/member/course/checkout}"
+						data-confirm-form="訂單資訊確認無誤？">
+						<label style="display: flex; gap: 9px; margin: 12px 0"><input
+							type="radio" name="paymentMethod" value="0" required>信用卡支付</label><label
+							style="display: flex; gap: 9px; margin: 12px 0"><input
+							type="radio" name="paymentMethod" value="1" required>第三方支付</label><span
+							class="error" th:text="${paymentMethodMsg}"></span><label
+							style="display: flex; gap: 9px; margin: 18px 0; font-size: 13px"><input
+							type="checkbox" required>我已閱讀並同意課程購買與退款規範。</label>
+						<button class="btn" type="submit">確認結帳</button>
+					</form>
+				</div>
+			</section>
+			<aside class="panel">
+				<h2>訂單摘要</h2>
+				<form method="post" th:action="@{/member/coupon/coupon_model_box}">
+					<input type="hidden" name="returnUrl">
+					<button class="btn secondary" type="submit">選擇優惠券</button>
+				</form>
+				<div class="selected-coupon-box" th:if="${orderCoupon != null}"
+					style="margin-top: 14px">
+					<div>
+						<span class="meta">已選擇優惠券</span><strong th:text="${couponName}">優惠券</strong><small
+							class="error" th:text="${couponError}"></small>
+					</div>
+					<form method="post" th:action="@{/member/coupon/remove_coupon}">
+						<input type="hidden" name="returnUrl">
+						<button class="btn ghost" type="submit">取消</button>
+					</form>
+				</div>
+				<div class="summary-row total">
+					<span>應付金額</span><span class="price"
+						th:text="'NT$ ' + ${cartTotal}">NT$ 0</span>
+				</div>
+				<p class="meta">結帳時會重新驗證優惠券狀態、效期與消費門檻。</p>
+			</aside>
+		</div>
+	</main>
+	<div class="modal-shell" id="couponModal"
+		th:if="${chooseCouponMsg == 'show'}">
+		<div class="modal-card">
+			<div class="modal-head">
+				<div>
+					<p class="eyebrow">Member coupons</p>
+					<h2>選擇優惠券</h2>
+				</div>
+				<button class="icon-button" type="button" aria-label="關閉"
+					data-close-modal>×</button>
+			</div>
+			<div class="empty-state"
+				th:if="${memCoupons == null || memCoupons.isEmpty()}">目前沒有可使用的優惠券</div>
+			<div class="stack">
+				<article class="question-item"
+					th:each="memberCoupon : ${memCoupons}">
+					<span class="tag" th:text="${memberCoupon.couponSerialNo}">編號</span>
+					<h3 th:text="${memberCoupon.coupon.couponName}">優惠券名稱</h3>
+					<p class="meta">
+						<span
+							th:text="${#temporals.format(memberCoupon.couponStartAt, 'yyyy-MM-dd')}">開始</span>－<span
+							th:text="${#temporals.format(memberCoupon.couponEndAt, 'yyyy-MM-dd')}">結束</span>・折扣
+						<span th:text="${memberCoupon.coupon.discount}">—</span>
+					</p>
+					<form method="post" th:action="@{/member/coupon/choose_coupon}">
+						<input type="hidden" name="couponSerialNo"
+							th:value="${memberCoupon.couponSerialNo}"><input
+							type="hidden" name="returnUrl">
+						<button class="btn" type="submit">使用此優惠券</button>
+					</form>
+				</article>
+			</div>
+		</div>
+	</div>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

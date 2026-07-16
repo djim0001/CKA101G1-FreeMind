@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>我的問題回報清單</title>
+
+<style>
+	th:nth-child(1) { width: 12%; }  /* 活動名稱 */
+	th:nth-child(2) { width: 33%; }  /* 回報內容 */
+	th:nth-child(3) { width: 8%;  }  /* 處理狀態 */
+	th:nth-child(4) { width: 12%; }  /* 回報時間 */
+	th:nth-child(5) { width: 35%; }  /* 管理員回覆 */
+</style>
+</head>
+<body>
+
+    <h1>我的問題回報清單</h1>
+	
+	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
+	
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+	
+	<table border="1" style="table-layout: fixed; width: 100%;">
+        <tr>
+            <th>活動名稱</th>
+            <th>回報內容</th>
+            <th>處理狀態</th>
+            <th>回報時間</th>
+            <th>管理員回覆</th>
+        </tr>
+        <tr th:each="r : ${reportListData}">
+            <td th:text="${r.activity.activityName}"></td>
+            <td th:text="${r.reportContent}"></td>
+            <td th:text="${r.reportStatusText}"></td>
+            <td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+            <td>
+                <div th:if="${r.repliedAt != null}">
+                    <span th:text="${r.replyContent}"></span><br>
+                    <small th:text="'(回覆於 ' + ${#temporals.format(r.repliedAt, 'yyyy/MM/dd HH:mm')} + ')'"></small>
+                </div>
+                <span th:if="${r.repliedAt == null}">—</span>
+            </td>
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
+
+	<br>
+    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/registration/myRegistrations}">我的活動報名清單</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
+
+</script>
+</body>
+</html>

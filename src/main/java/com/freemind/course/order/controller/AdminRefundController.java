@@ -66,7 +66,7 @@ public class AdminRefundController {
 
         redirectAttributes.addFlashAttribute("success", "退款審核成功，已退款");
 
-        return "redirect:/admin/refund/list";
+        return "redirect:/admin/course/select_course_order";
     }
 
     // ==========================

@@ -80,17 +80,24 @@ public class PsychSecurityConfig {
 				.rememberMeParameter("remember-me")
 			)
 
-			.exceptionHandling(ex -> ex
-				.authenticationEntryPoint((request, response, authException) -> {
-					requestCache.saveRequest(request, response);
-					response.sendRedirect("/psych/psychologistLogin");
-				})
+//			.exceptionHandling(ex -> ex
+//				.authenticationEntryPoint((request, response, authException) -> {
+//					requestCache.saveRequest(request, response);
+//					response.sendRedirect("/psych/psychologistLogin");
+//				})
+//			);
 				
-					.accessDeniedHandler((request, response, accessDeniedException) -> {
-			        response.sendRedirect("/psych/psychologistLogin?unauthorized");
-				})
+			.exceptionHandling(ex -> ex
+			    .authenticationEntryPoint((request, response, authException) -> {
+			        requestCache.saveRequest(request, response);
+			        response.sendRedirect("/psych/psychologistLogin");
+			    })
+			    .accessDeniedHandler((request, response, accessDeniedException) ->
+			        response.sendRedirect("/psych/psychologistLogin?unauthorized"))
 			);
-
+		
+		
+		
 		return http.build();
 	}
 

@@ -23,7 +23,7 @@
 
     <span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-    <form method="post" th:action="@{/orders/search}">
+    <form method="post" th:action="@{/admin/orders/search}">
         <div class="search-form-wrap">
             <span class="search-field">訂單編號：<input type="text" name="orderId"></span>
             <span class="search-field">會員編號：<input type="text" name="memberId"></span>
@@ -150,7 +150,7 @@
         </table>
     </div>
 
-    <a th:href="@{/orders/listAllOrders}">回列表</a>
+    <a th:href="@{/admin/orders/listAllOrders}">回列表</a>
 
 </body>
 </html>

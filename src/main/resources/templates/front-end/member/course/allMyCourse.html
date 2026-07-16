@@ -1,53 +1,75 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>會員課程一覽頁面</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>個人學習空間｜我的療癒足跡</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
 </head>
-<body>
-	<h3>
-		<a th:href="@{/member/course/select_course}">課程商城</a>
-	</h3>
-	<h5>
-		<a th:href="@{/member/course/shopping_cart}">購物車</a> <a
-			th:href="@{/member/coupon/my_coupon}">我的優惠券</a> <a
-			th:href="@{/member/course/my_course_order}">我的訂單</a>
-		<a th:href="@{/member/dashboard/my_review}">我的評價</a>
-	</h5>
-	<h1>我的課程</h1>
-	<span>會員名稱:</span>
-	<span th:text=${member.name}></span>
-	<br>
-	<table>
-		<tr>
-			<th>課程名稱</th>
-			<th>進度</th>
-			<th>上次播放時間點</th>
-			<th>功能</th>
-		</tr>
-
-		<tr th:each="item : ${myCoursePage}">
-			<td th:text="${item.course.courseName}"></td>
-			<td th:text="${item.courseProgress}+'/100'"></td>
-			<td th:text="${item.playbackPosition}"></td>
-			<td>
-				<form method="get" th:action="@{/member/course/get_one_course/{courseId}(courseId=${item.course.courseId})}">
-					<button type="submit">查看詳情</button>
-				</form>
-			</td>
-		</tr>
-	</table>
-	<div
-		th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/course/my_bookmarks')}"></div>
-
-	<div id="cartModal" class="cart-modal" th:if="${cartMsg != null}">
-		<div class="cart-modal-content">
-			<p th:text="${cartMsg}"></p>
-			<button type="button" onclick="closeCartModal()">確定</button>
+<body class="thy2-member healing-page coupon-tone-page">
+	<header class="site-header">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>MY
+				HEALING JOURNEY</small></a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}">探索課程</a><a
+				class="active" th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
+				th:href="@{/member/dashboard/my_review}">我的評價</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+	</header>
+	<main class="container healing-shell">
+		<div class="healing-header">
+			<div>
+				<p class="eyebrow">My healing journey</p>
+				<h1>我的療癒足跡／個人學習空間</h1>
+				<p class="meta">
+					歡迎回來，<span th:text="${member.name}">會員</span>。
+				</p>
+			</div>
+			<a class="btn" th:href="@{/member/course/select_course}">探索更多課程</a>
 		</div>
-	</div>
-
+		<div class="notice member-message" th:if="${cartMsg != null}"
+			th:text="${cartMsg}"></div>
+		<div class="empty-state"
+			th:if="${myCoursePage == null || myCoursePage.isEmpty()}">
+			<h3>尚未開始任何課程</h3>
+			<p>購買課程後，就能在這裡繼續學習。</p>
+		</div>
+		<section class="stack">
+			<article class="panel learning-card" th:each="item : ${myCoursePage}">
+				<div class="learning-cover">
+					<video muted playsinline preload="metadata" data-course-thumbnail
+						th:src="${item.course.videoSrcPre != null and !#strings.isEmpty(item.course.videoSrcPre) ? item.course.videoSrcPre : item.course.videoSrc}"
+						th:attr="aria-label=${item.course.courseName + '影片預覽圖'}"></video>
+					<span>繼續學習</span>
+				</div>
+				<div>
+					<span class="tag">我的課程</span>
+					<h2 th:text="${item.course.courseName}">課程名稱</h2>
+					<p class="meta">
+						上次播放位置：<span
+							th:text="${item.playbackPosition != null ? item.playbackPosition : '尚未觀看'}">—</span>
+					</p>
+					<div class="progress">
+						<span th:style="|width:${item.courseProgress}%|" style="width: 0"></span>
+					</div>
+					<div class="course-actions">
+						<span>課程進度 <b th:text="${item.courseProgress} + '/100'">0/100</b></span>
+						<form method="get"
+							th:action="@{/member/course/get_one_course/{courseId}(courseId=${item.course.courseId})}">
+							<button class="btn" type="submit">繼續學習</button>
+						</form>
+					</div>
+				</div>
+			</article>
+		</section>
+		<div
+			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/course/my_bookmarks')}"></div>
+	</main>
+	<footer class="site-footer">每一次回來，都是照顧自己的足跡。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

@@ -22,10 +22,21 @@ public class MemberDashboardController {
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
 	
+	@GetMapping("/myAppointment")
+	public String myAppointment() {
+	    return "front-end/member/memberpage/myAppointment";
+	}
+	
 	@GetMapping
     public String getDashboard() {
         return "front-end/member/memberpage/dashboard";
     }
+	
+	@GetMapping("/myActivityRegistration")
+	public String myActivityRegistration() {
+	    return "redirect:/member/activity/registration/myRegistrations";
+	}
+
 	
 	@GetMapping("/myCollection")
     public String getMyCollection() {
@@ -62,6 +73,11 @@ public class MemberDashboardController {
 		model.addAttribute("articlePage", articlePage);
 	    model.addAttribute("currentPage", page);
 		return "front-end/member/article/myArticleCollection";
+	}
+	
+	@GetMapping("/myCollection/activity")
+	public String myCollectionActivity() {
+	    return "redirect:/member/activity/follow/myFollows";
 	}
 	
 }

@@ -114,6 +114,18 @@
             align-items: center;
         }
         
+           /* 驗證成功訊息提示 */
+        .verified-message {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            color: #166534;
+            background-color: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
    
 
         /* 表單區域 */
@@ -232,11 +244,16 @@
             <span>帳號或密碼錯誤，請稍後再試。</span>
         </div>
 
+
         <!-- 登出訊息 -->
         <div th:if="${param.logout}" class="logout-message">
             ✓ 已成功登出
         </div>
         
+          <!-- 登出訊息 -->
+        <div th:if="${param.verified}" class="verified-message">
+            ✓ 驗證完成，帳號已啟用
+        </div>
        
 
         <!-- 測試提示區 -->

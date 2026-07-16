@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>課程審核預覽｜管理後台</title>
-<link rel="stylesheet" th:href="@{/css/course/style.css}" />
-<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin-style.css}" />
 </head>
 <body class="thy2-page">
 	<div class="layout">
@@ -18,7 +16,8 @@
 				<a class="active" th:href="@{/admin/course/select_course}">課程發布管理</a><a
 					th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
 					th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a
-					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a><a
+					th:href="@{/admin/course/select_course_categories}">課程分類</a>
 			</nav>
 		</aside>
 		<div class="main">
@@ -36,7 +35,8 @@
 					</div>
 					<a class="btn ghost" th:href="@{/admin/course/select_course}">返回課程發布管理</a>
 				</div>
-				<div class="review-shell">
+				<div class="review-shell"
+					th:classappend="${course.courseStatus == 4 or course.courseStatus == 5} ? ' review-shell-full' : ''">
 					<div>
 						<section class="panel">
 							<div class="panel-heading">
@@ -83,16 +83,25 @@
 									</div>
 									<div th:if="${course.courseStatus == 5}">
 										<dt>下架原因</dt>
-										<dd th:text="${course.delistReason.label}">—</dd>
+										<dd
+											th:text="${course.delistReason != null and course.delistReason.label != null ? course.delistReason.label : '--'}">--</dd>
 									</div>
-									<div th:if="${course.psychDiscount != null}">
-										<dt>心理師折扣</dt>
-										<dd>
-											<span th:text="${course.psychDiscount}">—</span>（<span
-												th:text="${course.discountStart}">—</span> 至 <span
-												th:text="${course.discountEnd}">—</span>）
-										</dd>
-									</div>
+									<th:block th:if="${course.psychDiscount != null}">
+										<div>
+											<dt>心理師折扣</dt>
+											<dd th:text="${course.psychDiscount}">—</dd>
+										</div>
+										<div>
+											<dt>折扣開始</dt>
+											<dd
+												th:text="${course.discountStart != null ? #temporals.format(course.discountStart,'yyyy/MM/dd HH:mm') : '--'}">--</dd>
+										</div>
+										<div>
+											<dt>折扣結束</dt>
+											<dd
+												th:text="${course.discountEnd != null ? #temporals.format(course.discountEnd,'yyyy/MM/dd HH:mm') : '--'}">--</dd>
+										</div>
+									</th:block>
 								</dl>
 							</div>
 							<div class="video-grid">
@@ -115,7 +124,8 @@
 							<div class="outline-box" th:text="${course.outline}">課程大綱</div>
 						</section>
 					</div>
-					<aside class="panel review-side">
+					<aside class="panel review-side"
+						th:if="${course.courseStatus != 4 and course.courseStatus != 5}">
 						<p class="meta">上架申請審核</p>
 						<h2>審核檢核表</h2>
 						<p>
@@ -156,6 +166,6 @@
 			</main>
 		</div>
 	</div>
-<script th:src="@{/js/course/app.js}"></script>
+	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>
 </html>

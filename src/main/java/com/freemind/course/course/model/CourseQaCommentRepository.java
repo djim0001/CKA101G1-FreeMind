@@ -1,8 +1,11 @@
 package com.freemind.course.course.model;
 
 import java.util.List;
-  //做CRUD的地方
+
+//做CRUD的地方
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.freemind.login.psychologist.entity.Psychologist;
 
 public interface CourseQaCommentRepository
         extends JpaRepository<CourseQaComment, Integer> {
@@ -24,4 +27,9 @@ public interface CourseQaCommentRepository
     
     // 查詢某一堂課的所有 QA，照提問時間排序
     List<CourseQaComment> findByCourse_CourseIdOrderByAskedAtDesc(Integer courseId);
+    
+    int countByCoursePsychologistPsychIdAndCourseAnswerIsNull(
+            Integer psychId
+    );
+    
 }

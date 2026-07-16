@@ -8,7 +8,7 @@
     <h3>修改諮商訂單</h3>
 
     <form method="post"
-          th:action="@{/orders/update}"
+          th:action="@{/admin/orders/update}"
           th:object="${orders}">
 
         <input type="hidden" th:field="*{orderId}">
@@ -89,7 +89,7 @@
         <input type="submit" value="修改">
     </form>
 
-    <a th:href="@{/orders/listAllOrders}">回列表</a>
+    <a th:href="@{/admin/orders/listAllOrders}">回列表</a>
 
 </body>
 </html>

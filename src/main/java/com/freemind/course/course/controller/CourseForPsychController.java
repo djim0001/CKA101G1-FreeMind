@@ -49,124 +49,136 @@ import jakarta.validation.Valid;
 public class CourseForPsychController {
 
 	private final CourseService courseSvc;
-    private final CourseCategoriesService courseCategoriesSvc;
-    private final PsychologistService psychologistService;
-    private final CourseQaCommentService courseQaCommentSvc;
-    
+	private final CourseCategoriesService courseCategoriesSvc;
+	private final PsychologistService psychologistService;
+	private final CourseQaCommentService courseQaCommentSvc;
+
 //    @Value("${course.video.upload-path}")
 //    private String videoUploadPath;
-    @Value("${course.video.upload.dir}")
-    private String videoUploadDir;
-    @Value("${course.video.url-path}")
+	@Value("${course.video.upload.dir}")
+	private String videoUploadDir;
+	@Value("${course.video.url-path}")
 	private String videoUrlPath;
 
-    public CourseForPsychController(
-            CourseService courseSvc,
-            CourseCategoriesService courseCategoriesSvc,
-            PsychologistService psychologistService,
-            CourseQaCommentService courseQaCommentSvc) {
+	public CourseForPsychController(CourseService courseSvc, CourseCategoriesService courseCategoriesSvc,
+			PsychologistService psychologistService, CourseQaCommentService courseQaCommentSvc) {
 
-        this.courseSvc = courseSvc;
-        this.courseCategoriesSvc = courseCategoriesSvc;
-        this.psychologistService = psychologistService;
-        this.courseQaCommentSvc = courseQaCommentSvc;
-    }
-	
+		this.courseSvc = courseSvc;
+		this.courseCategoriesSvc = courseCategoriesSvc;
+		this.psychologistService = psychologistService;
+		this.courseQaCommentSvc = courseQaCommentSvc;
+	}
 
 	@ModelAttribute("courseCategoriesListAll")
 	public List<CourseCategories> courseCategoriesListAll() {
 		return courseCategoriesSvc.getAllCourseCategories();
 	}
 
-	
 	@GetMapping("/select_course")
-	public String psychSelectCourse(
-			@ModelAttribute("psych") PsychologistSelfRes psych,
+	public String psychSelectCourse(@ModelAttribute("psych") PsychologistSelfRes psych,
 			@RequestParam(defaultValue = "1") Integer page,
-			@RequestParam(name = "orderBy", required = false) String orderBy,
-			ModelMap model) {
+			@RequestParam(name = "orderBy", required = false) String orderBy, ModelMap model) {
 
-		if (page < 1)  page = 1;
+		if (page < 1)
+			page = 1;
 		Integer currentPage = page;
-		
+
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		
+
 		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
-		
-		Page<Course> courseListAllPages = 
-				courseSvc.getCoursesByPsychId(psych.getPsychId(), currentPage - 1, sortField);
-		
+
+		Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psych.getPsychId(), currentPage - 1, sortField);
+
+		int wait = courseSvc.countCoursesByStatus((byte) 1);
+		int listed = courseSvc.countCoursesByStatus((byte) 4);
+		int unansweredCount = courseQaCommentSvc.countUnansweredQuestions(psych.getPsychId());
+
+		List<CourseQaComment> questions = courseQaCommentSvc.getQuestionsByPsychId(psych.getPsychId());
+
+		model.addAttribute("courseCountAwait", wait);
+		model.addAttribute("courseCountListed", listed);
+		model.addAttribute("unansweredCount", unansweredCount);
+
+		model.addAttribute("questions", questions);
 		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("courseListAllPages", courseListAllPages);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", courseListAllPages.getTotalPages());
-		if(orderBy != null)
+		if (orderBy != null)
 			model.addAttribute("orderBy", orderBy);
 
 		return "front-end/psych/course/selectCourse";
 	}
 
 	@GetMapping("/add_course")
-	public String psychAddCourse(ModelMap model,
-			@ModelAttribute("psych") PsychologistSelfRes psych){
+	public String psychAddCourse(ModelMap model, @ModelAttribute("psych") PsychologistSelfRes psych) {
 		Course course = new Course();
 		course.setPsychologist(psychologistService.getOnePsychologist(psych.getPsychId()));
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
-	
-	@PostMapping("/answer_course")
-	public String psychAnswerdCourse(
-			ModelMap model,
-			@RequestParam("questionId") Integer questionId,
-			@RequestParam("courseId") Integer courseId,
-			@RequestParam("courseAnswer") String courseAnswer,
-			@ModelAttribute("psych") PsychologistSelfRes psych,
-			RedirectAttributes redirectAttributes) {
-		try {
-			courseQaCommentSvc.answerQuestion(questionId, psych.getPsychId(), courseAnswer);
-			model.addAttribute(
-	                "answerMsg",
-	                "回復成功"
-	        );
-	    } catch (IllegalArgumentException e) {
-	    		model.addAttribute(
-	                "answerMsg",
-	                e.getMessage()
-	        );
-	    }
-		
-		Course course = courseSvc.getOneCourse(courseId);
-		
-		List<CourseQaComment> courseQuestions = 
-				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
-		model.addAttribute("courseQuestions", courseQuestions);
-		model.addAttribute("course", course);
-		
-		return "front-end/psych/course/listOneCourse";
+
+	@GetMapping("/psych_qa")
+	public String showPsychQuestions(@SessionAttribute(name = "psychId", required = false) Integer psychId,
+			ModelMap model) {
+
+		List<CourseQaComment> questions = courseQaCommentSvc.getQuestionsByPsychId(psychId);
+
+		model.addAttribute("questions", questions);// 前面的是對外面的(HTML)
+
+		return "front-end/psych/course/psychCourseQa";
 	}
 	
+	@PostMapping("answer_qa")
+    public String answerQuestion(
+            @RequestParam("questionId") Integer questionId,
+            @RequestParam("courseAnswer") String courseAnswer) {
+
+		courseQaCommentSvc.answerUpdateQuestion(
+        		questionId, courseAnswer
+        );
+
+        return "redirect:/psych/course/psych_qa";
+    }
+
+	@PostMapping("/answer_course")
+	public String psychAnswerdCourse(ModelMap model, @RequestParam("questionId") Integer questionId,
+			@RequestParam("courseId") Integer courseId, @RequestParam("courseAnswer") String courseAnswer,
+			@ModelAttribute("psych") PsychologistSelfRes psych, RedirectAttributes redirectAttributes) {
+		try {
+			courseQaCommentSvc.answerQuestion(questionId, psych.getPsychId(), courseAnswer);
+			model.addAttribute("answerMsg", "回復成功");
+		} catch (IllegalArgumentException e) {
+			model.addAttribute("answerMsg", e.getMessage());
+		}
+
+		Course course = courseSvc.getOneCourse(courseId);
+
+		List<CourseQaComment> courseQuestions = courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+		model.addAttribute("courseQuestions", courseQuestions);
+		model.addAttribute("course", course);
+
+		return "front-end/psych/course/listOneCourse";
+	}
+
 	@PostMapping("/insert_or_update_course")
-	public String insertOrUpdateCourse (
-			@RequestParam(name="video") MultipartFile video,
-			@RequestParam(name="videoPre") MultipartFile videoPre,
-			@Valid Course course, BindingResult result, 
-			@ModelAttribute("psych") PsychologistSelfRes psych,
-			ModelMap model) throws IOException{
+	public String insertOrUpdateCourse(@RequestParam(name = "video") MultipartFile video,
+			@RequestParam(name = "videoPre") MultipartFile videoPre, @Valid Course course, BindingResult result,
+			@ModelAttribute("psych") PsychologistSelfRes psych, ModelMap model) throws IOException {
 		result = removeFieldError(course, result, "video");
 		result = removeFieldError(course, result, "videoPre");
 		boolean videoExist = false;
 		// 確認影片是否上傳
 		if (course.getCourseId() == null && (video == null || video.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
-		}else if (course.getCourseId() == null && (videoPre == null || videoPre.isEmpty())) {
+		} else if (course.getCourseId() == null && (videoPre == null || videoPre.isEmpty())) {
 			model.addAttribute("videoErrorMsg", "兩個影片都需上傳");
-		}else 
+		} else
 			videoExist = true;
 		if (result.hasErrors() || !videoExist) {
 			return "front-end/psych/course/addCourse";
 		}
-		
+
 		// 將課程路徑存入
 		if (video != null && !video.isEmpty())
 			course.setVideoSrc(uploadVideo(video));
@@ -174,7 +186,7 @@ public class CourseForPsychController {
 			String videoSrc = course.getVideoSrc();
 			course.setVideoSrc(videoSrc);
 		}
-		if(videoPre != null&& !videoPre.isEmpty())
+		if (videoPre != null && !videoPre.isEmpty())
 			course.setVideoSrcPre(uploadVideo(videoPre));
 		else {
 			String videoSrcPre = course.getVideoSrcPre();
@@ -187,85 +199,74 @@ public class CourseForPsychController {
 
 		return "front-end/psych/course/listOneCourse";
 	}
-	
+
 	@PostMapping("/update_psych_discount")
-	public String updatePsychDiscount(
-	        @Valid @ModelAttribute("psychDiscountForm") PsychDiscountFormDTO form,
-	        BindingResult result, ModelMap model,
-	        @RequestParam(name = "courseId") Integer courseId) {
-		
+	public String updatePsychDiscount(@Valid @ModelAttribute("psychDiscountForm") PsychDiscountFormDTO form,
+			BindingResult result, ModelMap model, @RequestParam(name = "courseId") Integer courseId) {
+
 		if (result.hasErrors()) {
 			Course course = courseSvc.getOneCourse(form.getCourseId());
 
-	        model.addAttribute("course", course);
-	        model.addAttribute("psychDiscountMsg", "show");
+			model.addAttribute("course", course);
+			model.addAttribute("psychDiscountMsg", "show");
 			return "front-end/psych/course/listOneCourse";
 		}
 		Course course = courseSvc.getOneCourse(courseId);
 		course.setPsychDiscount(form.getPsychDiscount());
 		course.setDiscountStart(form.getDiscountStart().atStartOfDay());
-		course.setDiscountEnd(
-				form.getDiscountStart()
-				.plusMonths(form.getDiscountMonth())
-				.atStartOfDay());
+		course.setDiscountEnd(form.getDiscountStart().plusMonths(form.getDiscountMonth()).atStartOfDay());
 		courseSvc.updateCourse(course);
-		
+
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
 
 	@GetMapping("/get_one_course/{courseId}")
-	public String psychGetOneCourse(
-			@PathVariable("courseId") Integer courseId, 
-			ModelMap model) {
+	public String psychGetOneCourse(@PathVariable("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
-		
-		List<CourseQaComment> courseQuestions = 
-				courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
+
+		List<CourseQaComment> courseQuestions = courseQaCommentSvc.getAllCourseQaByCourseId(courseId);
 		model.addAttribute("courseQuestions", courseQuestions);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
+
 	@PostMapping("/update_course")
-	public String psychUpdateCourse(
-			@RequestParam("courseId") Integer courseId, 
-			ModelMap model) {
+	public String psychUpdateCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/addCourse";
 	}
+
 	@PostMapping("/submit_course")
-	public String psychSubmitCourse(
-			@RequestParam("courseId") Integer courseId, 
-			ModelMap model) {
+	public String psychSubmitCourse(@RequestParam("courseId") Integer courseId, ModelMap model) {
 		Course course = courseSvc.getOneCourse(courseId);
-		course.setCourseStatus((byte)1);
+		course.setCourseStatus((byte) 1);
 		courseSvc.updateCourse(course);
 		model.addAttribute("course", course);
 		return "front-end/psych/course/listOneCourse";
 	}
+
 	@PostMapping("/discount_model_box")
-	public String discountModelBox(ModelMap model, 
-			@RequestParam("courseId") Integer courseId,
+	public String discountModelBox(ModelMap model, @RequestParam("courseId") Integer courseId,
 			@ModelAttribute("psych") PsychologistSelfRes psych) {
 		Course course = courseSvc.getOneCourse(courseId);
 		PsychDiscountFormDTO form = new PsychDiscountFormDTO();
-	    form.setCourseId(courseId);
-	    
+		form.setCourseId(courseId);
+
 		model.addAttribute("course", course);
 		model.addAttribute("psychDiscountForm", form);
 		model.addAttribute("psychDiscountMsg", "show");
 		return "front-end/psych/course/listOneCourse";
 	}
-	
-	
+
 	// util
-	public String uploadVideo(MultipartFile video) throws IOException{
+	public String uploadVideo(MultipartFile video) throws IOException {
 		String originalFilename = video.getOriginalFilename();
 
 		String extension = "";
 		if (originalFilename != null && originalFilename.contains(".")) {
-		    extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+			extension = originalFilename.substring(originalFilename.lastIndexOf("."));
 		}
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
@@ -274,7 +275,7 @@ public class CourseForPsychController {
 //		String uploadDir = videoUploadPath;
 		String uploadDir = videoUploadDir;
 		String urlPath = videoUrlPath;
-		
+
 		try {
 			File dir = new File(uploadDir);
 			if (!dir.exists()) {
@@ -284,18 +285,16 @@ public class CourseForPsychController {
 			video.transferTo(dest.toPath());
 			String basePath = urlPath.replace("**", "");
 			return basePath + newFileName;
-			}catch (Exception e) {
-				return newFileName; // 500
-			}
+		} catch (Exception e) {
+			return newFileName; // 500
 		}
+	}
+
 	// 去除BindingResult中某個欄位的FieldError紀錄
-	public BindingResult removeFieldError(
-			Course course, BindingResult result, 
-			String removedFieldname) {
+	public BindingResult removeFieldError(Course course, BindingResult result, String removedFieldname) {
 		// 從原BindingResult中去除removedFieldname這個欄位的紀錄之後，再將其它所保留下來的欄位的FieldError紀錄轉換成errorsListToKeep這個List物件
 		List<FieldError> errorsListToKeep = result.getFieldErrors().stream()
-				.filter(fieldError -> !fieldError.getField().equals(removedFieldname))
-				.collect(Collectors.toList());
+				.filter(fieldError -> !fieldError.getField().equals(removedFieldname)).collect(Collectors.toList());
 		// 對驗證的目標對象建立一個新(空)的BindingResult的物件
 		// 參數一：目標對象
 		// 參數二：對象的名稱(通常是類別名首字母小寫)
@@ -307,6 +306,5 @@ public class CourseForPsychController {
 		// 更新後的BindingResult
 		return result;
 	}
-	
 
 }

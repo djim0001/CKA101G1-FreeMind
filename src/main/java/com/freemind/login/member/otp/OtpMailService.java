@@ -53,10 +53,10 @@ public class OtpMailService {
 		}
 
 		Properties props = new Properties();
-		props.put("mail.smtp.host", "smtp.gmail.com");
-		props.put("mail.smtp.port", "587");
-		props.put("mail.smtp.auth", "true");
-		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.gmail.com");  //指定郵件發送伺服器（SMTP）的主機名稱為 Google 的 SMTP 伺服器
+		props.put("mail.smtp.port", "587");			    //587 Port。用於傳輸層安全協議（TLS）的標準 SMTP 連線埠
+		props.put("mail.smtp.auth", "true");			//啟用 SMTP 身份驗證。發信前必須提供帳號與密碼進行登入
+		props.put("mail.smtp.starttls.enable", "true"); //啟用 STARTTLS 安全加密。將原本明文的 TCP 連線升級為加密的 TLS 連線，確保傳輸過程中的帳號、密碼及郵件內容不被竊聽
 
 		Session session = Session.getInstance(props, new Authenticator() {
 			@Override
@@ -66,10 +66,21 @@ public class OtpMailService {
 		});
 
 		try {
-			MimeMessage message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(username));
+			// MimeMessage 代表「一封電子郵件」的類別
+			// 1.初始化信件物件，必須綁定一個連線會話 (Session)
+			MimeMessage message = new MimeMessage(session); 
+			
+			// 2.設定寄件者 (From)
+			message.setFrom(new InternetAddress(username));		//Java Mail API 中，InternetAddress 用來代表符合標準的電子郵件地址，
+																//會檢查字串是否符合標準電子郵件格式（含有 @、是否有合法的網域名稱等）
+																//自動將 Email 拆解為「個人名稱（Personal Name）」與「實際信箱（Address）
+			// 3. 設定收件者 (To)
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+			
+			// 4. 設定主旨 (Subject)，並指定 UTF-8 編碼避免中文亂碼
 			message.setSubject("FreeMind " + purposeText + "驗證碼", "UTF-8");
+			
+			// 5. 設定內文 (Text)
 			message.setText("您的驗證碼為：" + otp + "\n\n驗證碼 5 分鐘內有效，請勿將驗證碼提供給他人。", "UTF-8");
 			Transport.send(message);
 			log.info("OTP 驗證信已寄出：{}", to);

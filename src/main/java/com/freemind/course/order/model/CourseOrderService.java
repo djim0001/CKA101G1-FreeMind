@@ -8,9 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.freemind.course.coupon.model.MemberCoupon;
+import com.freemind.course.dto.CourseOrderSearchCondition;
+import com.freemind.course.util.CourseOrderSpecification;
 import com.freemind.login.member.model.Member;
 
 import jakarta.transaction.Transactional;
@@ -18,7 +21,7 @@ import jakarta.transaction.Transactional;
 @Service
 public class CourseOrderService {
 
-	private static final int PAGE_SIZE = 10;
+	private static final int PAGE_SIZE = 5;
 	@Autowired
 	private CourseOrderRepository repository;
 	@Autowired
@@ -172,5 +175,41 @@ public class CourseOrderService {
      // 修改付款狀態
         order.setPaymentStatus(2);
 	}
+	@Transactional
+    public Page<CourseOrder> searchOrders(
+            CourseOrderSearchCondition condition,
+            Integer page) {
+
+        if (condition == null) {
+            condition = new CourseOrderSearchCondition();
+        }
+
+        // 前端頁碼從 1 開始
+        if (page == null || page < 1) {
+            page = 1;
+        }
+
+        Specification<CourseOrder> specification =
+                CourseOrderSpecification
+                        .keywordContains(condition.getKeyword())
+                        .and(
+                            CourseOrderSpecification.paymentStatusEquals(
+                                condition.getPaymentStatus()
+                            )
+                        )
+                        .and(
+                            CourseOrderSpecification.orderedDateEquals(
+                                condition.getOrderedDate()
+                            )
+                        );
+
+        Pageable pageable = PageRequest.of(
+                page - 1,
+                PAGE_SIZE,
+                Sort.by("orderedAt").descending()
+        );
+
+        return repository.findAll(specification, pageable);
+    }
 
 }

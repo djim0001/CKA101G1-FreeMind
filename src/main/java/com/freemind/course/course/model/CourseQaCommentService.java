@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 @Service
 public class CourseQaCommentService {
@@ -138,4 +139,14 @@ public class CourseQaCommentService {
                         memberId
                 );
     }
+    
+    public int countUnansweredQuestions(Integer psychId) {
+        if (psychId == null) {
+            throw new IllegalArgumentException("心理師編號不能為空");
+        }
+
+        return repository
+                .countByCoursePsychologistPsychIdAndCourseAnswerIsNull(psychId);
+    }
+    
 }

@@ -5,18 +5,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.freemind.activity.activity.util.HibernateUtil_CompositeQuery_Activity;
+import com.freemind.activity.follow.model.ActivityFollowId;
+import com.freemind.activity.follow.model.ActivityFollowRepository;
 
 @Service
 public class ActivityService {
 	
 	@Autowired
-	ActivityRepository repository;
+	private ActivityRepository repository;
 	
 	@Autowired
 	private  SessionFactory sessionFactory;
@@ -55,7 +56,6 @@ public class ActivityService {
 	    activity.setMember(existing.getMember());   // 找出原本的發起人，設定到即將要存檔的activity身上
 	    activity.setRegisCount(existing.getRegisCount()); // 補回目前報名人數，不讓使用者的表單洗掉這個值
 	    
-	    System.out.println("=== 除錯：Service收到的picture是否為null = " + (activity.getPicture() == null));
 	    
 	    // 保留原始圖片
 	    if (activity.getPicture() == null) { 
