@@ -38,7 +38,7 @@
 	心理師編號：<span th:text="${orders.psychologist.psychId}"></span><br>
 	諮商時間：<span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm')}"></span><br>
 
-	<form method="post" th:action="@{/orders/submitReview}">
+	<form method="post" th:action="@{/member/orders/submitReview}">
 		<input type="hidden" name="orderId" th:value="${orders.orderId}">
 
 		評分：

@@ -9,7 +9,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/orders/psychPending}">
+	<form method="post" th:action="@{/psych/orders/psychPending}">
 		心理師編號：<input type="text" name="psychId">
 		<input type="submit" value="查詢">
 	</form>

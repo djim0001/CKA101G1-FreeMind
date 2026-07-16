@@ -9,7 +9,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/orders/bookLookup}">
+	<form method="post" th:action="@{/member/orders/bookLookup}">
 		心理師編號：<input type="text" name="psychId"><br>
 		預約日期：<input type="date" name="slotDate"><br>
 		<input type="submit" value="查詢可預約時段">

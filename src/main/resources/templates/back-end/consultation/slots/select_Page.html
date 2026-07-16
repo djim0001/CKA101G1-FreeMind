@@ -10,25 +10,25 @@
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
     <!-- 依時段編號查詢 -->
-    <form method="post" th:action="@{/slots/getOne_For_Display}">
+    <form method="post" th:action="@{/admin/slots/getOne_For_Display}">
         時段編號：<input type="text" name="timeslotId">
         <input type="submit" value="查詢">
     </form><br>
 
     <!-- 依心理師編號查詢 -->
-    <form method="post" th:action="@{/slots/getByPsychId}">
+    <form method="post" th:action="@{/admin/slots/getByPsychId}">
         心理師編號：<input type="text" name="psychId">
         <input type="submit" value="查詢">
     </form><br>
 
     <!-- 依預約日期查詢 -->
-    <form method="post" th:action="@{/slots/getBySlotDate}">
+    <form method="post" th:action="@{/admin/slots/getBySlotDate}">
         預約日期：<input type="date" name="slotDate">
         <input type="submit" value="查詢">
     </form><br>
 
     <!-- 依預約狀態查詢 -->
-    <form method="post" th:action="@{/slots/getByConsStatus}">
+    <form method="post" th:action="@{/admin/slots/getByConsStatus}">
         預約狀態（24碼）：<input type="text" name="consStatus" maxlength="24">
         <input type="submit" value="查詢">
     </form><br>
@@ -63,7 +63,7 @@
         </table>
     </div>
 
-    <a th:href="@{/slots/listAllSlots}">回列表</a>
+    <a th:href="@{/admin/slots/listAllSlots}">回列表</a>
 
 </body>
 </html>

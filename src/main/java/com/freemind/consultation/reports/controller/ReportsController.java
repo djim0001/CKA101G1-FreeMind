@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.reports.model.ReportsService;
@@ -24,7 +23,7 @@ import com.freemind.login.member.model.Member;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/reports")
+@RequestMapping("/admin/reports")
 public class ReportsController {
 
 	@Autowired
@@ -47,7 +46,6 @@ public class ReportsController {
 				}
 			}
 		});
-
 		binder.registerCustomEditor(Member.class, "member", new PropertyEditorSupport() {
 			@Override
 			public void setAsText(String text) {
@@ -69,121 +67,64 @@ public class ReportsController {
 		return "back-end/consultation/reports/listAllReports";
 	}
 
-	/*
-	 * 轉交至addReports.html
-	 */
 	@GetMapping("addReports")
 	public String addReports(ModelMap model) {
-		Reports reports = new Reports(); // 建立空的Reports物件
-		model.addAttribute("reports", reports); // 傳給畫面
-
-		// 傳訂單清單給下拉選單
+		Reports reports = new Reports();
+		model.addAttribute("reports", reports);
 		model.addAttribute("ordersList", ordersSvc.getAll());
-
-		return "back-end/consultation/reports/addReports"; // 顯示新增表單
+		return "back-end/consultation/reports/addReports";
 	}
 
-	/*
-	 * 轉交至select_Page.html，顯示查詢頁面
-	 */
 	@GetMapping("select_Page")
 	public String select_Page(ModelMap model) {
 		return "back-end/consultation/reports/select_Page";
 	}
 
-	/*
-	 * 新增表單提交
-	 */
 	@PostMapping("insert")
 	public String insert(@Valid Reports reports, BindingResult result, ModelMap model) {
-
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
 			model.addAttribute("ordersList", ordersSvc.getAll());
-			return "back-end/consultation/reports/addReports"; // 如果驗證有錯誤，回到新增表單頁面重新填寫
+			return "back-end/consultation/reports/addReports";
 		}
-		/*************************** 2.開始新增資料 *****************************************/
-		reportsSvc.addReports(reports); // 呼叫 Service 新增資料到資料庫
-		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
+		reportsSvc.addReports(reports);
 		List<Reports> list = reportsSvc.getAll();
 		model.addAttribute("reportsListData", list);
 		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/reports/listAllReports";
+		return "redirect:/admin/reports/listAllReports";
 	}
 
-	// ===== 會員：新增問題回報（表單提交）=====
-
-	@PostMapping("frontInsert")
-	public String frontInsert(@Valid Reports reports, BindingResult result, ModelMap model) {
-
-		if (result.hasErrors()) {
-			return "front-end/member/consultation/reports/addReports";
-		}
-
-		reportsSvc.addReports(reports);
-
-		model.addAttribute("success", "問題回報已送出，我們會盡快處理！");
-		return "front-end/member/consultation/reports/reportSuccess";
-	}
-
-	/*
-	 * 點擊修改按鈕時，查出單筆資料並轉交至修改頁面
-	 */
 	@PostMapping("getOne_For_Update")
-	public String getOne_For_Update(@RequestParam("reportId") String reportId, ModelMap model) { // 接收從畫面傳來的reportId，ModelMap傳資料給畫面用
-
-		// 步驟二：查詢這筆回報資料，步驟一不用寫，因為只有單筆
-		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));// 轉型成Integer
-
-		// 步驟三：傳給修改表單畫面
-
+	public String getOne_For_Update(@RequestParam("reportId") String reportId, ModelMap model) {
+		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
 		if (reports.getAdmin() == null) {
 			reports.setAdmin(new Admin());
 		}
-
 		model.addAttribute("reports", reports);
 		return "back-end/consultation/reports/update_reports_input";
 	}
 
-	/*
-	 * 修改表單提交
-	 */
 	@PostMapping("update")
 	public String update(@Valid Reports reports, BindingResult result, ModelMap model) {
-
-		// 步驟一：驗證格式有錯誤
 		if (result.hasErrors()) {
 			model.addAttribute("ordersList", ordersSvc.getAll());
-			return "back-end/consultation/reports/update_reports_input"; // 如果驗證有錯誤，回到修改表單頁面
+			return "back-end/consultation/reports/update_reports_input";
 		}
-
-		// 步驟二：修改資料
-		reportsSvc.updateReports(reports);// 呼叫Service修改資料
-
-		// 步驟三：修改完成，回到這筆資料的詳細頁
+		reportsSvc.updateReports(reports);
 		model.addAttribute("success", "-(修改成功)");
 		Reports updatedReports = reportsSvc.getOneReports(reports.getReportId());
 		model.addAttribute("reports", updatedReports);
 		return "back-end/consultation/reports/listOneReports";
 	}
 
-	/*
-	 * 點擊修改按鈕時，處理刪除的方法
-	 */
 	@PostMapping("delete")
 	public String delete(@RequestParam("reportId") String reportId, ModelMap model) {
-
-		// 步驟二：刪除資料
 		reportsSvc.deleteReports(Integer.valueOf(reportId));
-
-		// 步驟三：刪除完成，顯示最新列表
 		List<Reports> list = reportsSvc.getAll();
 		model.addAttribute("reportsListData", list);
 		model.addAttribute("success", "-(刪除成功)");
 		return "back-end/consultation/reports/listAllReports";
 	}
 
-	// 依 reportId 單筆查詢
 	@PostMapping("getOne_For_Display")
 	public String getOne_For_Display(@RequestParam("reportId") String reportId, ModelMap model) {
 		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
@@ -191,7 +132,6 @@ public class ReportsController {
 		return "back-end/consultation/reports/select_Page";
 	}
 
-	// 依 reportStatus 查詢
 	@PostMapping("getByStatus")
 	public String getByStatus(@RequestParam("reportStatus") String reportStatus, ModelMap model) {
 		List<Reports> list = reportsSvc.getByReportsStatus(Integer.valueOf(reportStatus));
@@ -199,7 +139,6 @@ public class ReportsController {
 		return "back-end/consultation/reports/select_Page";
 	}
 
-	// 依 memberId 查詢
 	@PostMapping("getByMember")
 	public String getByMember(@RequestParam("memberId") String memberId, ModelMap model) {
 		List<Reports> list = reportsSvc.getByMemberId(Integer.valueOf(memberId));
@@ -207,35 +146,12 @@ public class ReportsController {
 		return "back-end/consultation/reports/select_Page";
 	}
 
-	// 會員：查看自己的問題回報處理進度
-
-	@GetMapping("myReportsForm")
-	public String myReportsForm(ModelMap model) {
-		return "front-end/member/consultation/reports/myReportsForm";
-	}
-
-	@PostMapping("myReports")
-	public String myReports(@RequestParam("memberId") String memberId, ModelMap model) {
-	    if (memberId == null || memberId.isBlank()) {
-	        model.addAttribute("errorMessage", "請輸入會員編號");
-	        return "front-end/member/consultation/reports/myReportsForm";
-	    }
-	    List<Reports> list = reportsSvc.getByMemberId(Integer.valueOf(memberId));
-	    model.addAttribute("reportsListData", list);
-	    model.addAttribute("memberId", memberId);
-	    return "front-end/member/consultation/reports/myReportsForm";   // ← 改這行
-	}
-
-	// 後台：查看問題回報
-
 	@PostMapping("getOne_For_Reply")
 	public String getOne_For_Reply(@RequestParam("reportId") String reportId, ModelMap model) {
 		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
-
 		if (reports.getAdmin() == null) {
 			reports.setAdmin(new Admin());
 		}
-
 		model.addAttribute("reports", reports);
 		return "back-end/consultation/reports/reply_reports_input";
 	}
@@ -245,9 +161,7 @@ public class ReportsController {
 			@RequestParam(value = "adminId", required = false) String adminId,
 			@RequestParam("reportStatus") String reportStatus,
 			@RequestParam(value = "reportNote", required = false) String reportNote, ModelMap model) {
-
 		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
-
 		if (adminId != null && !adminId.isBlank()) {
 			Admin admin = new Admin();
 			admin.setAdminId(Integer.valueOf(adminId));
@@ -255,85 +169,31 @@ public class ReportsController {
 		}
 		reports.setReportStatus(Integer.valueOf(reportStatus));
 		reports.setReportNote(reportNote);
-
 		reportsSvc.updateReports(reports);
-
 		model.addAttribute("success", "-(回覆成功)");
 		Reports updatedReports = reportsSvc.getOneReports(reports.getReportId());
 		model.addAttribute("reports", updatedReports);
 		return "back-end/consultation/reports/listOneReports";
-
 	}
 
-	// ===== 會員：新增問題回報（先選訂單）=====
-
-	@GetMapping("reportLookupForm")
-	public String reportLookupForm(ModelMap model) {
-		return "front-end/member/consultation/reports/reportLookupForm";
-	}
-
-	@PostMapping("reportLookup")
-	public String reportLookup(@RequestParam("memberId") String memberId, ModelMap model) {
-	    if (memberId == null || memberId.isBlank()) {
-	        model.addAttribute("errorMessage", "請輸入會員編號");
-	        return "front-end/member/consultation/reports/reportLookupForm";
-	    }
-	    Integer mid = Integer.valueOf(memberId);
-	    List<Orders> allReportableOrders = ordersSvc.getConfirmedOrCompletedByMemberId(mid);
-	    List<Reports> myReports = reportsSvc.getByMemberId(mid);
-	    java.util.Set<Integer> reportedOrderIds = myReports.stream().filter(r -> r.getOrders() != null)
-	            .map(r -> r.getOrders().getOrderId()).collect(java.util.stream.Collectors.toSet());
-	    List<Orders> list = allReportableOrders.stream().filter(o -> !reportedOrderIds.contains(o.getOrderId()))
-	            .collect(java.util.stream.Collectors.toList());
-	    if (list.isEmpty()) {
-	        model.addAttribute("errorMessage", "查無可回報的諮商紀錄（可能都已經回報過了）。");
-	        return "front-end/member/consultation/reports/reportLookupForm";
-	    }
-	    model.addAttribute("ordersListData", list);
-	    model.addAttribute("memberId", memberId);
-	    return "front-end/member/consultation/reports/reportLookupForm";   // ← 改這行
-	}
-
-	@PostMapping("reportSelect")
-	public String reportSelect(@RequestParam("orderId") String orderId, @RequestParam("memberId") String memberId,
-			ModelMap model) {
-		Reports reports = new Reports();
-		Member member = new Member();
-		member.setMemberId(Integer.valueOf(memberId));
-		reports.setMember(member);
-
-		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
-		reports.setOrders(orders);
-
-		model.addAttribute("reports", reports);
-		return "front-end/member/consultation/reports/addReports";
-	}
-
-	// 諮商問題回報同時查詢一筆以上
 	@PostMapping("search")
 	public String search(@RequestParam(value = "reportId", required = false) String reportId,
 			@RequestParam(value = "memberId", required = false) String memberId,
 			@RequestParam(value = "reportStatus", required = false) String reportStatus, ModelMap model) {
-
-		// 諮商問題編號是唯一識別，若有填，直接查單筆並忽略其他條件
 		if (reportId != null && !reportId.isBlank()) {
 			Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
 			model.addAttribute("reports", reports);
 			return "back-end/consultation/reports/select_Page";
 		}
-
 		Integer memberIdVal = (memberId != null && !memberId.isBlank()) ? Integer.valueOf(memberId) : null;
 		Integer reportStatusVal = (reportStatus != null && !reportStatus.isBlank()) ? Integer.valueOf(reportStatus)
 				: null;
-
 		if (memberIdVal == null && reportStatusVal == null) {
 			model.addAttribute("errorMessage", "請至少填寫一個查詢條件");
 			return "back-end/consultation/reports/select_Page";
 		}
-
 		List<Reports> list = reportsSvc.search(memberIdVal, reportStatusVal);
 		model.addAttribute("reportsListData", list);
 		return "back-end/consultation/reports/select_Page";
 	}
-
 }

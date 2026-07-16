@@ -7,7 +7,7 @@
 <body>
 	<h3>回覆諮商問題回報</h3>
 
-	<form method="post" th:action="@{/reports/reply}">
+	<form method="post" th:action="@{/admin/reports/reply}">
 		<input type="hidden" name="reportId" th:value="${reports.reportId}">
 
 		諮商問題編號：<span th:text="${reports.reportId}"></span><br>
@@ -31,7 +31,7 @@
 		<input type="submit" value="送出回覆">
 	</form>
 
-	<a th:href="@{/reports/listAllReports}">回列表</a>
+	<a th:href="@{/admin/reports/listAllReports}">回列表</a>
 
 </body>
 </html>

@@ -13,7 +13,7 @@
 	</span>
 
 	<form method="post"
-		th:action="@{/reports/insert}"
+		th:action="@{/admin/reports/insert}"
 		th:object="${reports}">
 
 		會員編號:
@@ -46,7 +46,7 @@
         <input type="submit" value="新增">
     </form>
 
-    <a th:href="@{/reports/listAllReports}">回列表</a>
+    <a th:href="@{/admin/reports/listAllReports}">回列表</a>
 
 
 </body>

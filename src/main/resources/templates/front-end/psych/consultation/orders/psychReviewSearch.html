@@ -46,7 +46,7 @@
 <body>
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
 
-	<form class="search-form" method="post" th:action="@{/orders/psychReviews}">
+	<form class="search-form" method="post" th:action="@{/psych/orders/psychReviews}">
 		心理師編號：<input type="text" name="psychId" th:value="${psychId}">
 		<input type="submit" value="查詢">
 	</form>

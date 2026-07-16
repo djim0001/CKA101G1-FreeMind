@@ -13,7 +13,7 @@
 	</span>
 
 	<form method="post"
-		th:action="@{/reports/frontInsert}"
+		th:action="@{/member/reports/frontInsert}"
 		th:object="${reports}">
 
 		會員編號:
@@ -34,7 +34,7 @@
         <input type="submit" value="新增">
     </form>
 
-    <a th:href="@{/reports/reportLookupForm}">回列表</a>
+    <a th:href="@{/member/reports/reportLookupForm}">回列表</a>
 
 </body>
 </html>

@@ -25,12 +25,12 @@
 			<td th:text="${order.visitPurpose}"></td>
 			<td th:text="${order.visitPurposeNote}"></td>
 			<td>
-				<form method="post" th:action="@{/orders/approve}" style="display:inline;">
+				<form method="post" th:action="@{/psych/orders/approve}" style="display:inline;">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="hidden" name="psychId" th:value="${psychId}">
 					<input type="submit" value="同意">
 				</form>
-				<form method="post" th:action="@{/orders/reject}" style="display:inline;">
+				<form method="post" th:action="@{/psych/orders/reject}" style="display:inline;">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="hidden" name="psychId" th:value="${psychId}">
 					<input type="submit" value="拒絕"
@@ -40,7 +40,7 @@
 		</tr>
 	</table>
 
-	<a th:href="@{/orders/psychPendingForm}">重新查詢</a>
+	<a th:href="@{/psych/orders/psychPendingForm}">重新查詢</a>
 
 </body>
 </html>

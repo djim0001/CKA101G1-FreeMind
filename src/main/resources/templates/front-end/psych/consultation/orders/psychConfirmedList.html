@@ -25,7 +25,7 @@
 			<td th:text="${order.visitPurpose}"></td>
 			<td th:text="${order.visitPurposeNote}"></td>
 			<td>
-				<form method="post" th:action="@{/orders/complete}">
+				<form method="post" th:action="@{/psych/orders/complete}">
 					<input type="hidden" name="orderId" th:value="${order.orderId}">
 					<input type="hidden" name="psychId" th:value="${psychId}">
 					晤談筆記：<br>
@@ -37,7 +37,7 @@
 		</tr>
 	</table>
 
-	<a th:href="@{/orders/psychConfirmedForm}">重新查詢</a>
+	<a th:href="@{/psych/orders/psychConfirmedForm}">重新查詢</a>
 
 </body>
 </html>

@@ -10,7 +10,7 @@
 	心理師編號：<span th:text="${slots.psychologist.psychId}"></span><br>
 	日期：<span th:text="${slots.slotDate}"></span><br>
 
-	<form method="post" th:action="@{/orders/bookSubmit}">
+	<form method="post" th:action="@{/member/orders/bookSubmit}">
 		<input type="hidden" name="timeslotId" th:value="${slots.timeslotId}">
 		<input type="hidden" name="psychId" th:value="${slots.psychologist.psychId}">
 

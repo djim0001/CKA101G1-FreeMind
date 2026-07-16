@@ -33,7 +33,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/reports/reportLookup}">
+	<form method="post" th:action="@{/member/reports/reportLookup}">
 		會員編號：<input type="text" name="memberId" th:value="${memberId}"><br>
 		<input type="submit" value="查看我的諮商紀錄">
 	</form>
@@ -60,7 +60,7 @@
 					<span th:case="4">已完成</span>
 				</td>
 				<td>
-					<form method="post" th:action="@{/reports/reportSelect}">
+					<form method="post" th:action="@{/member/reports/reportSelect}">
 						<input type="hidden" name="orderId" th:value="${order.orderId}">
 						<input type="hidden" name="memberId" th:value="${memberId}">
 						<input type="submit" value="回報這筆諮商">

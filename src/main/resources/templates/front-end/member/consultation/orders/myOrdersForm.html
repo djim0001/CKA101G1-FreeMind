@@ -9,7 +9,7 @@
 
 	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
 
-	<form method="post" th:action="@{/orders/myOrders}">
+	<form method="post" th:action="@{/member/orders/myOrders}">
 		會員編號：<input type="text" name="memberId">
 		<input type="submit" value="查詢">
 	</form>
