@@ -99,9 +99,7 @@
 
 <div class="detail-container" th:if="${psych != null}">
 
-<!--     <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? ${psych.profilePic} : '/images/cp4.png'" alt="大頭照"> -->
-    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/images/cp4.png}" alt="大頭照">
-<!-- 			"${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}}: @{/images/cp4.png}" -->
+    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/images/noPsychPic.png}" alt="大頭照">
     <h2 th:text="${psych.name} + ' 心理師'"></h2>
 
     <p>
@@ -125,7 +123,7 @@
         <!-- 有空的格子：整格包成可點擊連結 -->
         <a th:if="${!d.isEmpty && d.hasAvailability}"
 		   class="day-link"
-		   th:href="@{/orders/bookLookup(psychId=${psych.psychId}, slotDate=${d.date})}">
+		   th:href="@{/member/orders/bookLookup(psychId=${psych.psychId}, slotDate=${d.date})}">
 		    <span class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></span>
 		    <span class="day-date" th:text="${d.date}"></span>
 		</a>
