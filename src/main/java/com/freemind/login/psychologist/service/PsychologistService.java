@@ -589,7 +589,9 @@ public class PsychologistService {
 				Join<Psychologist , Slots> slotJoin = root.join("consultationSlots",JoinType.INNER);
 				return cb.and(
 						cb.equal(slotJoin.get("slotDate"), slotDate),
-						cb.like(slotJoin.get("consStatus"), "%1%")
+						cb.or(
+						cb.like(slotJoin.get("consStatus"), "%1%"),
+						cb.like(slotJoin.get("consStatus"), "%4%"))
 						);
 			});
 		}
@@ -694,8 +696,8 @@ public class PsychologistService {
 			
 			AvailableDateRes dateRes = new AvailableDateRes();
 			dateRes.setDate(date);
-			dateRes.setHasAvailability(consStatus != null && consStatus.contains("1"));
-			
+			//看預約狀態
+			dateRes.setHasAvailability(consStatus != null && (consStatus.contains("1") || consStatus.contains("4")));
 			calender.add(dateRes);
 		}
 		
