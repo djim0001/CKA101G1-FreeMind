@@ -1,10 +1,13 @@
 package com.freemind.activity.activity.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,7 +31,6 @@ import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -118,9 +120,10 @@ public class ActivityController {
 
         activity.setMember(userDetails.getMember());
 
-        // 再把圖片設定好
+        // 再把圖片設定好      
         if (!pictureFile.isEmpty()) {
-            activity.setPicture(pictureFile.getBytes());
+            String savedFileName = saveUploadedPicture(pictureFile);
+            activity.setPicture(savedFileName);
         }
 
         // 資料都準備齊全了，才呼叫一次Service
@@ -157,16 +160,28 @@ public class ActivityController {
             return "front-end/member/activity/update_activity_input";
         }
 
+        String oldPictureFileName = null;
         if (!pictureFile.isEmpty()) {
-            activity.setPicture(pictureFile.getBytes());
-        }
+            // 先記住(換照片前)資料庫裡原本的舊檔名，更新成功才刪除舊圖
+            Activity existing = activitySvc.getOneActivity(activity.getActivityId());
+            oldPictureFileName = existing.getPicture();
 
+            String savedFileName = saveUploadedPicture(pictureFile);
+            activity.setPicture(savedFileName);
+        }
+        
+        
         try {
         		Activity dbActivity = activitySvc.getOneActivity(activity.getActivityId());
             if (!dbActivity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
                 throw new IllegalStateException("無權操作此活動");
             }
             activitySvc.updateActivity(activity);
+            
+            // 更新成功後，才刪除舊圖片檔案
+            if (oldPictureFileName != null) {
+                deleteOldPicture(oldPictureFileName);
+            }
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             return "front-end/member/activity/update_activity_input";
@@ -350,14 +365,21 @@ public class ActivityController {
     @GetMapping("activityImage")
     public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
             throws IOException {
-        res.setContentType("image/jpeg");
-        ServletOutputStream out = res.getOutputStream();
+     Activity activity = activitySvc.getOneActivity(activityId);
 
-        Activity activity = activitySvc.getOneActivity(activityId);
+     if (activity == null || activity.getPicture() == null) {
+         return;   // 沒有活動或沒有圖片，什麼都不寫，回應空白
+     }  
 
-        if (activity != null && activity.getPicture() != null) {
-            out.write(activity.getPicture());
-        }
+     // 組出圖片在磁碟上的實際路徑
+     String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+     File imageFile = new File(uploadDir, activity.getPicture());
+
+     if (!imageFile.exists()) {
+         return;   // 檔名有記錄，但實體檔案不存在（例如被誤刪），一樣回應空白
+     }
+     res.setContentType("image/jpeg");
+     Files.copy(imageFile.toPath(), res.getOutputStream()); // 讀取這個檔案 → 把讀到的內容寫進 response
     }
     
     @GetMapping("listOneActivity")
@@ -405,5 +427,38 @@ public class ActivityController {
             }
         }
         return map;
+    }
+    
+    // 把上傳的圖片真正寫進磁碟，回傳存檔用的檔名
+    private String saveUploadedPicture(MultipartFile pictureFile) throws IOException {
+        // 1. 從原始檔名取出副檔名
+        String originalFilename = pictureFile.getOriginalFilename();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+        // 2. 產生一個不會撞名的新檔名：時間戳記 + 一小段隨機碼 + 副檔名
+        String savedFileName = System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8) + extension;
+
+        // 3. 組出資料夾的絕對路徑（專案根目錄 + uploads/activity-images/）
+        String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();   // 資料夾不存在就自動建立
+        }
+
+        // 4. 把上傳的檔案真正寫進這個路徑
+        File dest = new File(dir, savedFileName);  // 做一個代表某個檔案路徑的物件(資料夾名, 檔案名稱)
+        pictureFile.transferTo(dest); // 把上傳的檔案寫入指定的磁碟位置，取代getBytes()
+
+        // 5. 回傳這個檔名
+        return savedFileName;
+    }
+    
+    // 刪除舊圖
+    private void deleteOldPicture(String fileName) {
+        String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+        File oldFile = new File(uploadDir, fileName);
+        if (oldFile.exists()) {
+            oldFile.delete();
+        }
     }
 }

@@ -5,174 +5,427 @@
     <meta charset="UTF-8">
     <title>活動列表</title>
     <style>
-  /* =================================================================== */
-  /* 🎯 分配 10 個直行的寬度比例 (加起來剛好 100%) */
-  /* =================================================================== */
-  th:nth-child(1) { width: 10%; }  /* 圖片 */
-  th:nth-child(2) { width: 4%; }  /* 編號 */
-  th:nth-child(3) { width: 22%; } /* 活動名稱 */
-  th:nth-child(4) { width: 6%; } /* 縣市 */
-  th:nth-child(5) { width: 6%; } /* 區域 */
-  th:nth-child(6) { width: 14%; } /* 活動時間 */
-  th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
-  th:nth-child(8) { width: 14%; } /* 報名時間 */
-  th:nth-child(9) { width: 10%; }  /* 報名狀態 */
-  th:nth-child(10) { width: 7%; } /* 操作按鈕 */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-.status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    border: 1px solid;
-}
-.status-pending {
-    color: #b8860b;
-    border-color: #b8860b;
-    background-color: #fff8e6;
-}
-.status-confirmed {
-    color: #2e7d32;
-    border-color: #2e7d32;
-    background-color: #e8f5e9;
-}
-    
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #4a3e3e;
+    }
+
+    .page-header a {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: #e8b4b4;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+
+    .page-header a:hover {
+        background-color: #d39393;
+    }
+
+    .msg-error {
+        color: #c0392b;
+        background-color: #fdecea;
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    .msg-success {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    /* 篩選表單卡片 */
+    .filter-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 20px 22px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .filter-card .field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+        color: #7a6b6b;
+    }
+
+    .filter-card input,
+    .filter-card select {
+        padding: 8px 12px;
+        border: 1px solid #e8d5d5;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        color: #333;
+    }
+
+    .filter-card input:focus,
+    .filter-card select:focus {
+        border-color: #e8b4b4;
+    }
+
+    .filter-card button {
+        align-self: flex-end;
+        padding: 9px 26px;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .filter-card button:hover {
+        background-color: #d39393;
+    }
+
+    /* 活動列表表格卡片 */
+    .table-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* =================================================================== */
+    /* 🎯 分配 10 個直行的寬度比例 (100%) */
+    /* =================================================================== */
+    th:nth-child(1) { width: 10%; }  /* 圖片 */
+    th:nth-child(2) { width: 4%; }  /* 編號 */
+    th:nth-child(3) { width: 19%; } /* 活動名稱 */
+    th:nth-child(4) { width: 6%; } /* 縣市 */
+    th:nth-child(5) { width: 6%; } /* 區域 */
+    th:nth-child(6) { width: 14%; } /* 活動時間 */
+    th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
+    th:nth-child(8) { width: 14%; } /* 報名時間 */
+    th:nth-child(9) { width: 10%; }  /* 報名狀態 */
+    th:nth-child(10) { width: 10%; } /* 操作按鈕 */
+
+    thead th {
+        background-color: #fbf2f2;
+        color: #4a3e3e;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 20px 10px;
+        text-align: center;
+        white-space: nowrap;  
+        border-bottom: 2px solid #f2dddd;
+    }
+
+    tbody td {
+        padding: 12px 10px;
+        font-size: 14px;
+        border-bottom: 1px solid #f2eeee;
+        vertical-align: middle;
+        text-align: center; 
+    }
+
+    tbody tr:hover {
+        background-color: #fdf7f7;
+    }
+
+    .table-card img {
+        max-width: 150px;
+        border-radius: 6px;
+    }
+
+	td:nth-child(6),
+	td:nth-child(8) {
+	    text-align: left;
+	}
+
+    /* 詳情/報名按鈕 */
+    .btn-outline {
+        display: inline-block;
+        width: 80px;
+        text-align: center;
+        padding: 6px 0;
+        margin: 3px 2px; 
+        background-color: #fff;
+        color: #7a6b6b;
+        border: 1px solid #e8b4b4;
+        border-radius: 20px;
+        font-size: 13px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+        background-color: #e8b4b4;
+        color: #fff;
+    }
+
+	.btn-primary {
+	    display: inline-block;
+	    width: 80px;
+        text-align: center;
+        padding: 6px 0;
+	    margin: 3px 2px; 
+	    background-color: #fff;
+	    color: #7a6b6b;
+	    border: 1px solid #f0c29a;
+	    border-radius: 20px;
+	    font-size: 13px;
+	    white-space: nowrap;
+	    cursor: pointer;
+	    transition: all 0.2s;
+	}
+	
+	.btn-primary:hover {
+	    background-color: #f0c29a;
+	    color: #fff;
+	}
+
+    /* 狀態標籤 */
+	.status-badge {
+	    display: inline-block;
+	    width: 80px;
+	    text-align: center;
+	    padding: 4px 0;
+	    margin: 3px 2px;
+	    border-radius: 20px;
+	    font-size: 13px;
+	    font-weight: 500;
+	    white-space: nowrap;
+	    border: 1px solid;
+	}
+    .status-pending {
+        color: #b8860b;
+        border-color: #b8860b;
+        background-color: #fff8e6;
+    }
+    .status-confirmed {
+        color: #2e7d32;
+        border-color: #2e7d32;
+        background-color: #e8f5e9;
+    }
+
+    /* 分頁 */
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .pagination form button {
+        display: inline-block;
+        padding: 8px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        border: 1px solid #f2dddd;
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .pagination form button:hover {
+        background-color: #e8b4b4;
+        color: #fff;
+        border-color: #e8b4b4;
+    }
     </style>
 </head>
 <body>
+<div class="container">
 
-    <h1>活動列表</h1>
-    
-    <p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
-	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
+    <div class="page-header">
+        <h1>活動列表</h1>
+        <a th:href="@{/member/activity/select_page}">回活動首頁</a>
+    </div>
 
-    <h3><a th:href="@{/member/activity/select_page}">回活動首頁</a></h3>
+    <p th:if="${errorMessage}" th:text="${errorMessage}" class="msg-error"></p>
+    <p th:if="${successMessage}" th:text="${successMessage}" class="msg-success"></p>
 
-    <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post">
-        <p>
-            縣市：<input type="text" name="activityCity">
-        </p>
-        <p>
-            區域：<input type="text" name="activityDist">
-        </p>
-        <p>
-            活動名稱關鍵字：<input type="text" name="activityName">
-        </p>
-      	<p>
-		    活動分類：
-		    <select name="activityCatId">
-		        <option value="">全部</option>
-		        <option th:each="cat : ${activityCatListData}"
-		                th:value="${cat.activityCatId}"
-		                th:text="${cat.activityCatName}">
-		        </option>
-		    </select>
-		</p>
-		<p>
-		    報名狀態：
-		    <select name="registrationStatus">
-		        <option value="">全部</option>
-		        <option value="0">尚未開放報名</option>
-		        <option value="1">可報名中</option>
-		        <option value="2">已截止報名</option>
-		        <option value="3">已結束</option>
-		    </select>
-		</p>
-		<p>
-		    名額狀態：
-		    <select name="isFull">
-		        <option value="">全部</option>
-		        <option value="false">尚有名額</option>
-		        <option value="true">已額滿</option>
-		    </select>
-		</p>
-		<p>
-		    活動開始時間範圍：
-		    <input type="date" name="activityStartFrom"> ~ 
-		    <input type="date" name="activityStartTo">
-		</p>
+    <form class="filter-card" th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post">
+        <div class="field">
+            縣市
+            <input type="text" name="activityCity">
+        </div>
+        <div class="field">
+            區域
+            <input type="text" name="activityDist">
+        </div>
+        <div class="field">
+            活動名稱關鍵字
+            <input type="text" name="activityName">
+        </div>
+        <div class="field">
+            活動分類
+            <select name="activityCatId">
+                <option value="">全部</option>
+                <option th:each="cat : ${activityCatListData}"
+                        th:value="${cat.activityCatId}"
+                        th:text="${cat.activityCatName}">
+                </option>
+            </select>
+        </div>
+        <div class="field">
+            報名狀態
+            <select name="registrationStatus">
+                <option value="">全部</option>
+                <option value="0">尚未開放報名</option>
+                <option value="1">可報名中</option>
+                <option value="2">已截止報名</option>
+                <option value="3">已結束</option>
+            </select>
+        </div>
+        <div class="field">
+            名額狀態
+            <select name="isFull">
+                <option value="">全部</option>
+                <option value="false">尚有名額</option>
+                <option value="true">已額滿</option>
+            </select>
+        </div>
+        <div class="field">
+            活動開始時間範圍
+            <span>
+                <input type="date" name="activityStartFrom"> ~
+                <input type="date" name="activityStartTo">
+            </span>
+        </div>
         <button type="submit">查詢</button>
     </form>
 
-	<table border="1">
-	    <tr>
-	        <th>活動圖片</th>
-	        <th>活動編號</th>
-	        <th>活動名稱</th>
-	        <th>縣市</th>
-	        <th>區域</th>
-	        <th>活動時間</th>
-	        <th>名額</th>
-	        <th>報名時間</th>
-	        <th>報名狀態</th>
-	        <th></th>
-	    </tr>
-	    <tr th:each="a : ${activityListData}" th:style="${a.ended} ? 'color:gray;' : ''">
-	        <td>
-	            <img th:if="${a.picture != null}" 
-	                 th:src="@{/member/activity/activityImage(activityId=${a.activityId})}" 
-	                 style="max-width: 100px;">
-	            <img th:unless="${a.picture != null}" 
-	                 th:src="@{/images/no-image.jpg}" 
-	                 style="max-width: 100px;">
-	        </td>
-	        <td th:text="${a.activityId}"></td>
-	        <td th:text="${a.activityName}"></td>
-	        <td th:text="${a.activityCity}"></td>
-	        <td th:text="${a.activityDist}"></td>
-	        <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-	        <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
-	        <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
-	        <td th:text="${a.registrationStatusText}"></td>
-			<td>
-			    <form th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
-			        <input type="hidden" name="activityId" th:value="${a.activityId}">
-			        <button type="submit">查看詳情</button>
-			    </form>
-
-			    <!-- 已報名:審核中(status=0) -->
-			    <span th:if="${myRegisMap.get(a.activityId) == 0}" class="status-badge status-pending">審核中</span>
-			
-			    <!-- 已報名:已報名成功(status=1) -->
-			    <span th:if="${myRegisMap.get(a.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
-
-   				 <th:block th:if="${myRegisMap.get(a.activityId) == null}">
-					<!-- 情況 1：未登入 -->
-					<form th:if="${a.registrable}" sec:authorize="isAnonymous()"
-					      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-					    <input type="hidden" name="activityId" th:value="${a.activityId}">
-					    <button type="submit">報名</button>
-					</form>
+    <div class="table-card">
+        <table>
+        		<thead>
+	            <tr>
+	                <th>活動圖片</th>
+	                <th>編號</th>
+	                <th>活動名稱</th>
+	                <th>縣市</th>
+	                <th>區域</th>
+	                <th>活動時間</th>
+	                <th>名額</th>
+	                <th>報名時間</th>
+	                <th>報名狀態</th>
+	                <th></th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <tr th:each="a : ${activityListData}" th:style="${a.ended} ? 'color:gray;' : ''">
+	                <td>
+	                    <img th:if="${a.picture != null}"
+	                         th:src="@{/member/activity/activityImage(activityId=${a.activityId})}">
+	                    <img th:unless="${a.picture != null}"
+	                         th:src="@{/images/no-image.jpg}">
+	                </td>
+	                <td th:text="${a.activityId}"></td>
+	                <td th:text="${a.activityName}"></td>
+	                <td th:text="${a.activityCity}"></td>
+	                <td th:text="${a.activityDist}"></td>
+	                <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+	                <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+	                <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+	                <td th:text="${a.registrationStatusText}"></td>
+	                <td>
+	                    <form th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
+	                        <input type="hidden" name="activityId" th:value="${a.activityId}">
+	                        <button type="submit" class="btn-outline">查看詳情</button>
+	                    </form>
 	
-					<!-- 情況 2：已登入會員-->
-					<form th:if="${a.registrable}" sec:authorize="hasRole('MEMBER')"
-					      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-					    <!-- 只有當活動發起人不是自己時，才顯示報名按鈕 -->
-					    <th:block th:if="${a.member.memberId != #authentication.principal.member.memberId}">
-					        <input type="hidden" name="activityId" th:value="${a.activityId}">
-					        <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listAllActivity}">
-					        <button type="submit">報名</button>
-					    </th:block>
-					</form>
-				
-			</td>
-	    </tr>
-	</table>
-	<div>
-	    <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
-	        <input type="hidden" name="currentPage" th:value="${i}">
-	        <input type="hidden" name="activityCity" th:value="${param.activityCity}">
-	        <input type="hidden" name="activityDist" th:value="${param.activityDist}">
-	        <input type="hidden" name="activityName" th:value="${param.activityName}">
-	        <input type="hidden" name="activityCatId" th:value="${param.activityCatId}">
-	        <input type="hidden" name="registrationStatus" th:value="${param.registrationStatus}">
-	        <input type="hidden" name="isFull" th:value="${param.isFull}">
-	        <input type="hidden" name="activityStartFrom" th:value="${param.activityStartFrom}">
-	        <input type="hidden" name="activityStartTo" th:value="${param.activityStartTo}">
-	        <button type="submit" th:text="${i}" 
-	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
-	    </form>
-	</div>
+	                    <!-- 已報名:審核中(status=0) -->
+	                    <span th:if="${myRegisMap.get(a.activityId) == 0}" class="status-badge status-pending">審核中</span>
+	
+	                    <!-- 已報名:已報名成功(status=1) -->
+	                    <span th:if="${myRegisMap.get(a.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
+	
+	                    <th:block th:if="${myRegisMap.get(a.activityId) == null}">
+	                        <!-- 情況 1：未登入 -->
+	                        <form th:if="${a.registrable}" sec:authorize="isAnonymous()"
+	                              th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+	                            <input type="hidden" name="activityId" th:value="${a.activityId}">
+	                            <button type="submit" class="btn-primary">報名</button>
+	                        </form>
+	
+	                        <!-- 情況 2：已登入會員-->
+	                        <form th:if="${a.registrable}" sec:authorize="hasRole('MEMBER')"
+	                              th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+	                            <!-- 只有當活動發起人不是自己時，才顯示報名按鈕 -->
+	                            <th:block th:if="${a.member.memberId != #authentication.principal.member.memberId}">
+	                                <input type="hidden" name="activityId" th:value="${a.activityId}">
+	                                <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listAllActivity}">
+	                                <button type="submit" class="btn-primary">報名</button>
+	                            </th:block>
+	                        </form>
+	                    </th:block>
+	                </td>
+	            </tr>
+	        </tbody>
+        </table>
+    </div>
 
+    <div class="pagination">
+        <form th:action="@{/member/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
+            <input type="hidden" name="currentPage" th:value="${i}">
+            <input type="hidden" name="activityCity" th:value="${param.activityCity}">
+            <input type="hidden" name="activityDist" th:value="${param.activityDist}">
+            <input type="hidden" name="activityName" th:value="${param.activityName}">
+            <input type="hidden" name="activityCatId" th:value="${param.activityCatId}">
+            <input type="hidden" name="registrationStatus" th:value="${param.registrationStatus}">
+            <input type="hidden" name="isFull" th:value="${param.isFull}">
+            <input type="hidden" name="activityStartFrom" th:value="${param.activityStartFrom}">
+            <input type="hidden" name="activityStartTo" th:value="${param.activityStartTo}">
+            <button type="submit" th:text="${i}"
+                    th:style="${i == currentPage} ? 'font-weight:bold; background-color:#e8b4b4; color:#fff;' : ''"></button>
+        </form>
+    </div>
+
+</div>
 </body>
 </html>

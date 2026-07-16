@@ -56,7 +56,6 @@ public class ActivityService {
 	    activity.setMember(existing.getMember());   // 找出原本的發起人，設定到即將要存檔的activity身上
 	    activity.setRegisCount(existing.getRegisCount()); // 補回目前報名人數，不讓使用者的表單洗掉這個值
 	    
-	    System.out.println("=== 除錯：Service收到的picture是否為null = " + (activity.getPicture() == null));
 	    
 	    // 保留原始圖片
 	    if (activity.getPicture() == null) { 

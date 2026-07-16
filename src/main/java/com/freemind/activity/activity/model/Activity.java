@@ -69,8 +69,8 @@ public class Activity implements Serializable{
 	@Size(max = 50, message = "詳細地點: 長度不能超過{max}")
 	private String activityLoc;
 
-	@Column(name="picture", columnDefinition="longblob")
-	private byte[] picture;
+	@Column(name="picture", length=255)
+	private String picture;
 
 	@Column(name = "regis_start", nullable = false)
 	@NotNull(message = "報名開始時間: 請勿空白")
@@ -204,12 +204,12 @@ public class Activity implements Serializable{
 	    this.activityLoc = activityLoc;
 	}
 
-	public byte[] getPicture() {
-		return picture;
+	public String getPicture() {
+	    return picture;
 	}
 
-	public void setPicture(byte[] picture) {
-		this.picture = picture;
+	public void setPicture(String picture) {
+	    this.picture = picture;
 	}
 
 	public LocalDateTime getRegisStart() {

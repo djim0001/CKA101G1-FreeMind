@@ -33,6 +33,8 @@ build/
 .vscode/
 
 ### Upload settings ###
-uploads/
+uploads/*
+!uploads/activity-images/
+!uploads/activity-images/**
 
 src/main/resources/static/images/
