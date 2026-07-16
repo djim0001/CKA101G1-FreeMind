@@ -44,54 +44,12 @@
             </td>
         </tr>
     </table>
-    
-    
-        <!-- ⬇️ 臨時測試表單,測完流程就整段刪掉 -->
-    <hr>
-    <h3>【測試用】送出問題回報</h3>
-    <form th:action="@{/member/activity/report/submit}" method="post">
-        <input type="number" name="activityId" value="3" /> <!-- 換成你資料庫真實存在、已結束、你有成功報名的活動id -->
-        <textarea name="reportContent" required></textarea>
-        <button type="submit">送出</button>
-    </form>
-    <hr>
 
     <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
 
 	<br>
-<!--     <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a> -->
+    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/registration/myRegistrations}">我的活動報名清單</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
 
-
-<script>
-// function toggleCancelForm(regisId) {
-//     const form = document.getElementById('cancelForm' + regisId);
-//     const button = document.getElementById('cancelBtn' + regisId);
-    
-//     if (form.style.display === 'none' || form.style.display === '') {
-//         form.style.display = 'block';
-//         button.style.backgroundColor = 'black';
-//         button.style.color = 'white';
-//     } else {
-//         form.style.display = 'none';
-//         button.style.backgroundColor = '';
-//         button.style.color = '';
-//     }
-// }
-
-// function toggleReviewForm(regisId) {
-//     const form = document.getElementById('reviewForm' + regisId);
-//     const button = document.getElementById('reviewBtn' + regisId);
-    
-//     if (form.style.display === 'none' || form.style.display === '') {
-//         form.style.display = 'block';
-//         button.style.backgroundColor = 'black';
-//         button.style.color = 'white';
-//     } else {
-//         form.style.display = 'none';
-//         button.style.backgroundColor = '';
-//         button.style.color = '';
-//     }
-// }
 </script>
 </body>
 </html>

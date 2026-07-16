@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>問題回報管理</title>
+
+<style>
+	th:nth-child(1) { width: 8%;  }  /* 回報人 */
+	th:nth-child(2) { width: 10%; }  /* 活動名稱 */
+	th:nth-child(3) { width: 24%; }  /* 回報內容 */
+	th:nth-child(4) { width: 6%;  }  /* 狀態 */
+	th:nth-child(5) { width: 10%; }  /* 回報時間 */
+	th:nth-child(6) { width: 8%;  }  /* 處理人 */
+	th:nth-child(7) { width: 22%; }  /* 回覆內容 */
+	th:nth-child(8) { width: 12%; }  /* 操作 */
+
+</style>
+</head>
+<body>
+
+    <h1>問題回報管理</h1>
+
+    <p>Hello, <span sec:authentication="principal.admin.name"></span>!</p>
+
+    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+    <p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+
+    <table border="1" style="table-layout: fixed; width: 100%;">
+        <tr>
+            <th>回報人</th>
+            <th>活動名稱</th>
+            <th>回報內容</th>
+            <th>狀態</th>
+            <th>回報時間</th>
+            <th>處理人</th>
+            <th>回覆內容</th>
+            <th></th>
+        </tr>
+        <tr th:each="r : ${reportListData}">
+            <td th:text="${r.member.name}"></td>
+            <td th:text="${r.activity.activityName}"></td>
+            <td th:text="${r.reportContent}"></td>
+            <td th:text="${r.reportStatusText}"></td>
+            <td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+            <td>
+                <span th:if="${r.admin != null}" th:text="${r.admin.name}"></span>
+                <span th:if="${r.admin == null}">—</span>
+            </td>
+            <td>
+                <span th:if="${r.replyContent != null}" th:text="${r.replyContent}"></span>
+                <span th:if="${r.replyContent == null}">—</span>
+            </td>
+            <td>
+                <!-- 狀態0:待處理 → 受理按鈕 -->
+                <form th:if="${r.reportStatus == 0}"
+                      th:action="@{/admin/activity/report/takeOver}" method="post" style="display:inline;">
+                    <input type="hidden" name="reportId" th:value="${r.reportId}">
+                    <button type="submit" onclick="return confirm('確定要受理此問題回報嗎？')">受理問題</button>
+                </form>
+
+                <!-- 狀態1:處理中 且是自己受理的 → 回覆按鈕+展開表單 -->
+                <div th:if="${r.reportStatus == 1 && r.admin.adminId == currentAdminId}" style="display:inline;">
+                    <button type="button" th:id="'replyBtn' + ${r.reportId}"
+                            th:onclick="'toggleReplyForm(' + ${r.reportId} + ')'">回覆問題</button>
+
+                    <div th:id="'replyForm' + ${r.reportId}" style="display:none;">
+                        <form th:action="@{/admin/activity/report/reply}" method="post"
+                              onsubmit="return confirm('確定要送出回覆嗎？')">
+                            <input type="hidden" name="reportId" th:value="${r.reportId}">
+                            <textarea name="replyContent" rows="8" style="width: 100%; box-sizing: border-box;" 
+         						 placeholder="請輸入回覆內容" required></textarea>
+                            <button type="submit">送出回覆</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 狀態1:處理中 但不是自己受理的 → 純顯示 -->
+                <span th:if="${r.reportStatus == 1 && r.admin.adminId != currentAdminId}">處理中(其他管理員)</span>
+
+                <!-- 狀態2:已處理 → 純顯示 -->
+                <span th:if="${r.reportStatus == 2}">—</span>
+            </td>
+        </tr>
+    </table>
+
+    <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
+
+    <br>
+    <a th:href="@{/admin/activity/activityAdminIndex}">回後台導覽頁</a>
+
+<script>
+function toggleReplyForm(reportId) {
+    const form = document.getElementById('replyForm' + reportId);
+    const button = document.getElementById('replyBtn' + reportId);
+
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+</script>
+</body>
+</html>

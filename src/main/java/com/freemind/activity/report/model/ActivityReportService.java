@@ -1,10 +1,10 @@
 package com.freemind.activity.report.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,7 @@ public class ActivityReportService {
 		return reportRepo.findByMemberWithActivity(member);
 	}
 
-	// 管理員接手處理問題(狀態0 → 1) 
+	// 管理員受理問題(狀態0 → 1) 
 	@Transactional
 	public ActivityReport takeOverReport(Integer reportId, Admin admin) {
 		ActivityReport report = reportRepo.findByIdWithDetails(reportId).orElseThrow(() -> new IllegalArgumentException("問題回報紀錄不存在"));
@@ -113,13 +113,14 @@ public class ActivityReportService {
 		return reportRepo.findByStatusWithDetails(status);
 	}
 	
-	// 已回報過的活動(不再出現回報按鈕):此會員已回報過的活動 id 集合
-	public Set<Integer> getReportedActivityIds(Member member) {
+	
+	// 已回報過的活動(不再出現回報按鈕):此會員已回報過的活動 id 集合(key/value=活動id/回報內容)
+	public Map<Integer, String> getReportedActivityMap(Member member) {
 		List<ActivityReport> reports = reportRepo.findByMemberWithActivity(member);
-		Set<Integer> ids = new HashSet<>();
+		Map<Integer, String> map = new HashMap<>();
 		for (ActivityReport r : reports) {
-			ids.add(r.getActivity().getActivityId());
+			map.put(r.getActivity().getActivityId(), r.getReportContent());
 		}
-		return ids;
+		return map;
 	}
 }

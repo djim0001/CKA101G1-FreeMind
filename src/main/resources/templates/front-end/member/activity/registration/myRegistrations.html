@@ -21,7 +21,8 @@
             <th>報名時間</th>
             <th>報名狀態</th>
             <th>活動狀態</th>
-            <th>我的評價</th> 
+            <th>我的評價</th>
+            <th>問題回報</th> 
             <th></th>
         </tr>
         <tr th:each="r : ${regisListData}" th:style="${r.regisStatus == 3} ? 'color:gray;' : ''">
@@ -35,6 +36,11 @@
 		              th:text="'★' + ${r.rating}"
 		              th:title="${r.reviewContent}"></span>
 		        <span th:if="${r.reviewedAt == null}">—</span>
+		    </td>
+		    <td>
+			    <span th:if="${r.regisStatus == 1 && r.activity.ended && #maps.containsKey(reportedActivityMap, r.activity.activityId)}"
+			          th:title="${reportedActivityMap.get(r.activity.activityId)}">已回報問題</span>
+			    <span th:unless="${r.regisStatus == 1 && r.activity.ended}">—</span>
 		    </td>
             <td> 
 			    <div th:if="${r.cancellable}" style="display:inline;">
@@ -74,11 +80,27 @@
 								    <option value="5">5</option>
 			                </select>
 			                <br>
-			                <textarea name="reviewContent" rows="5" cols="40" placeholder="分享活動心得"></textarea>
+			                <textarea name="reviewContent" rows="8" style="width: 100%; 
+			                		box-sizing: border-box;" placeholder="分享活動心得" required></textarea>
 			                <button type="submit">送出評論</button>
 			            </form>
 			        </div>
 			    </div>
+			    
+			    <div th:if="${r.regisStatus == 1 && r.activity.ended && !#maps.containsKey(reportedActivityMap, r.activity.activityId)}" 
+				     style="display:inline;">
+				    <button type="button" th:id="'reportBtn' + ${r.regisId}"
+				            th:onclick="'toggleReportForm(' + ${r.regisId} + ')'">回報問題</button>
+				
+				    <div th:id="'reportForm' + ${r.regisId}" style="display:none;">
+				        <form th:action="@{/member/activity/report/submit}" method="post"
+				              onsubmit="return confirm('確定要送出問題回報嗎？')">
+				            <input type="hidden" name="activityId" th:value="${r.activity.activityId}">
+				            <textarea name="reportContent" rows="4" cols="40" placeholder="請描述遇到的問題" required></textarea>
+				            <button type="submit">送出回報</button>
+				        </form>
+				    </div>
+				</div>
 			    
 			</td>
         </tr>
@@ -87,7 +109,7 @@
     <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
 
 	<br>
-    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
+    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/report/myReports}">我的問題回報</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
 
 
 <script>
@@ -110,6 +132,21 @@ function toggleReviewForm(regisId) {
     const form = document.getElementById('reviewForm' + regisId);
     const button = document.getElementById('reviewBtn' + regisId);
     
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        button.style.backgroundColor = 'black';
+        button.style.color = 'white';
+    } else {
+        form.style.display = 'none';
+        button.style.backgroundColor = '';
+        button.style.color = '';
+    }
+}
+
+function toggleReportForm(regisId) {
+    const form = document.getElementById('reportForm' + regisId);
+    const button = document.getElementById('reportBtn' + regisId);
+
     if (form.style.display === 'none' || form.style.display === '') {
         form.style.display = 'block';
         button.style.backgroundColor = 'black';
