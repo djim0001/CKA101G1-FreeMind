@@ -1,7 +1,7 @@
 package com.freemind.activity.registration.controller;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +21,7 @@ import com.freemind.activity.report.model.ActivityReportService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
-//@Controller
+@Controller
 @RequestMapping("/member/activity/registration")
 public class RegistrationController {
 
@@ -43,8 +43,8 @@ public class RegistrationController {
     		List<Registration> list = regisSvc.getMyRegistrations(member);
     		model.addAttribute("regisListData", list);
     		
-    		Set<Integer> reportedActivityIds = reportSvc.getReportedActivityIds(member);
-    		model.addAttribute("reportedActivityIds", reportedActivityIds);
+    		Map<Integer, String> reportedActivityMap = reportSvc.getReportedActivityMap(member);
+    	    model.addAttribute("reportedActivityMap", reportedActivityMap);
     		
     		return "front-end/member/activity/registration/myRegistrations";
     }

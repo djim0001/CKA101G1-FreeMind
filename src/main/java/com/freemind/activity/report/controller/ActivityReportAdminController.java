@@ -22,26 +22,28 @@ public class ActivityReportAdminController {
 
 	// 回報列表(先做「全部」,狀態篩選之後再加)
 	@GetMapping("list")
-	public String list(ModelMap model) {
+	public String list(@AuthenticationPrincipal AdminUserDetails userDetails,
+						ModelMap model) {
 		model.addAttribute("reportListData", reportSvc.getAllReports());
-		return "back-end/activity/report/reportList";  
+		model.addAttribute("currentAdminId", userDetails.getAdmin().getAdminId());
+		return "back-end/activity/report/reportList";
 	}
 
-	// 後台人員接手
+	// 後台人員受理問題
 	@PostMapping("takeOver")
 	public String takeOver(@RequestParam("reportId") Integer reportId,
 	                       @AuthenticationPrincipal AdminUserDetails userDetails,  
 	                       RedirectAttributes redirectAttributes) {
 		try {
 			reportSvc.takeOverReport(reportId, userDetails.getAdmin());  
-			redirectAttributes.addFlashAttribute("successMessage", "已接手此問題回報");
+			redirectAttributes.addFlashAttribute("successMessage", "已受理此問題回報");
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
 		return "redirect:/admin/activity/report/list";
 	}
 
-	// 後台人員回覆
+	// 後台人員回覆問題
 	@PostMapping("reply")
 	public String reply(@RequestParam("reportId") Integer reportId,
 	                    @RequestParam("replyContent") String replyContent,

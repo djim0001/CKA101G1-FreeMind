@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>活動列表</title>
@@ -110,11 +111,29 @@
 			        <input type="hidden" name="activityId" th:value="${a.activityId}">
 			        <button type="submit">查看詳情</button>
 			    </form>
-				<form th:if="${a.registrable && (#authentication.principal == 'anonymousUser' || a.member.memberId != #authentication.principal.member.memberId)}"
+<!-- 				<form th:if="${a.registrable && (#authentication.principal == 'anonymousUser' || a.member.memberId != #authentication.principal.member.memberId)}" -->
+<!-- 				      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;"> -->
+<!-- 				    <input type="hidden" name="activityId" th:value="${a.activityId}"> -->
+<!-- 				    <button type="submit">報名</button> -->
+<!-- 				</form> -->
+
+				<!-- 情況 1：未登入，只要活動可報名，直接顯示報名按鈕 -->
+				<form th:if="${a.registrable}" sec:authorize="isAnonymous()"
 				      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
 				    <input type="hidden" name="activityId" th:value="${a.activityId}">
 				    <button type="submit">報名</button>
 				</form>
+
+				<!-- 情況 2：已登入【一般會員】-->
+				<form th:if="${a.registrable}" sec:authorize="hasRole('MEMBER')"
+				      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+				    <!-- 只有當活動發起人不是自己時，才顯示報名按鈕 -->
+				    <th:block th:if="${a.member.memberId != #authentication.principal.member.memberId}">
+				        <input type="hidden" name="activityId" th:value="${a.activityId}">
+				        <button type="submit">報名</button>
+				    </th:block>
+				</form>
+
 			</td>
 	    </tr>
 	</table>
