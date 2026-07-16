@@ -9,6 +9,33 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.querySelectorAll('[data-toast]').forEach(element => element.addEventListener('click', () => notify(element.dataset.toast)));
+  const enhancePagination = () => {
+    const roots = new Set();
+    document.querySelectorAll('main a[href*="page="], main a[href*="currentPage="]').forEach(link => {
+      roots.add(link.closest('nav, ul, ol, .pagination') || link.parentElement);
+    });
+    document.querySelectorAll('main div').forEach(element => {
+      const ownText = [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(' ');
+      if (/第\s*\d+\s*\/\s*\d+\s*頁/.test(ownText)) roots.add(element);
+    });
+    roots.forEach(root => {
+      if (!root) return;
+      root.classList.add('pagination-ui');
+      root.setAttribute('role', 'navigation');
+      root.setAttribute('aria-label', '分頁導覽');
+      root.querySelectorAll('a').forEach(link => {
+        const label = link.textContent.trim();
+        const page = new URL(link.href, window.location.href).searchParams.get('page');
+        if (/最前|第一/.test(label)) link.setAttribute('aria-label', '前往第一頁');
+        else if (/上一/.test(label)) link.setAttribute('aria-label', '前往上一頁');
+        else if (/下一/.test(label)) link.setAttribute('aria-label', '前往下一頁');
+        else if (/最後|最末/.test(label)) link.setAttribute('aria-label', '前往最後一頁');
+        else if (page) link.setAttribute('aria-label', `前往第 ${page} 頁`);
+        if (link.matches('.active, [aria-current="page"]') || link.parentElement?.classList.contains('active')) link.setAttribute('aria-current', 'page');
+      });
+    });
+  };
+  enhancePagination();
   document.querySelectorAll('[data-tabs]').forEach(tabSet => tabSet.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => {
     tabSet.querySelectorAll('[data-tab]').forEach(item => item.classList.remove('active'));
     button.classList.add('active');

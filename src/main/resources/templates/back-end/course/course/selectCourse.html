@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>課程發布管理｜管理後台</title>
-<link rel="stylesheet" th:href="@{/css/course/style.css}" />
-<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin-style.css}" />
 </head>
 <body class="thy2-page">
 	<div class="layout">
@@ -34,44 +32,61 @@
 				<div class="page-head">
 					<div>
 						<h1>課程發布管理</h1>
-						<p>審核上架申請、查看發布狀態，並由管理員決定課程下架。</p>
+						<p>審核上架申請，並由管理員決定課程下架。</p>
 					</div>
 					<button class="btn ghost" type="button" data-toast="審核紀錄已匯出">匯出紀錄</button>
 				</div>
-				<section class="stats">
+				<section class="stats course-status-stats">
 					<div class="stat">
-						<span>待審核</span><strong data-thymeleaf-pending>—</strong><em>待後端統計欄位</em>
+						<span>待審核</span><strong
+							th:text="${courseCountAwait != null ? courseCountAwait : 0}">0</strong>
 					</div>
 					<div class="stat">
-						<span>已排程上架</span><strong data-thymeleaf-pending>—</strong>
+						<span>審核成功</span><strong
+							th:text="${courseCountSuccess != null ? courseCountSuccess : 0}">0</strong>
 					</div>
 					<div class="stat">
-						<span>已上架</span><strong data-thymeleaf-pending>—</strong>
+						<span>審核失敗</span><strong
+							th:text="${courseCountFail != null ? courseCountFail : 0}">0</strong>
 					</div>
 					<div class="stat">
-						<span>本月已下架</span><strong data-thymeleaf-pending>—</strong>
+						<span>已上架</span><strong
+							th:text="${courseCountListed != null ? courseCountListed : 0}">0</strong>
+					</div>
+					<div class="stat">
+						<span>已下架</span><strong
+							th:text="${courseCountDelisted != null ? courseCountDelisted : 0}">0</strong>
 					</div>
 				</section>
 				<div class="tabs" data-tabs>
 					<button class="active" data-tab="review">上架排程與審核</button>
-					<button data-tab="status">發布狀態</button>
 					<button data-tab="take-down">課程下架管理</button>
 				</div>
 				<section class="tab-panel" data-panel="review">
-					<div class="toolbar">
-						<input class="field" type="search" placeholder="搜尋課程或心理師……"><select
-							class="field"><option>全部主題</option>
-							<option>情緒照護</option>
-							<option>自我成長</option></select><select class="field"><option>申請時間新至舊</option></select>
-						<button class="btn secondary" type="button" data-toast="已套用篩選條件">篩選</button>
-					</div>
+					<form th:action="@{/admin/course/search}" method="get"
+						th:object="${condition}" class="toolbar course-search-form">
+						<input class="field" type="text" th:field="*{keyword}"
+							placeholder="搜尋課程或心理師……"><select class="field"
+							th:field="*{categoryId}"><option value="">課程分類－</option>
+							<option th:each="category : ${categoryList}"
+								th:value="${category.courseCatId}"
+								th:text="${category.courseCatName}"></option></select><select
+							class="field" th:field="*{courseStatus}"><option
+								value="">課程申請狀態－</option>
+							<option value="0">草稿</option>
+							<option value="1">待審核</option>
+							<option value="2">審核通過</option>
+							<option value="3">審核未通過</option>
+							<option value="4">已上架</option>
+							<option value="5">已下架</option></select>
+						<button class="btn secondary" type="submit">篩選</button>
+					</form>
 					<div class="table-wrap">
 						<table class="compact-table">
 							<thead>
 								<tr>
 									<th>課程／心理師</th>
-									<th>申請時間</th>
-									<th>建議上架</th>
+									<th>審核員工</th>
 									<th>狀態</th>
 									<th>審核操作</th>
 								</tr>
@@ -79,7 +94,7 @@
 							<tbody>
 								<tr
 									th:if="${courseListSubmit == null || courseListSubmit.isEmpty()}">
-									<td class="empty-state" colspan="5">目前沒有課程資料</td>
+									<td class="empty-state" colspan="4">目前沒有課程資料</td>
 								</tr>
 								<tr th:each="course : ${courseListSubmit}">
 									<td><div class="course-summary">
@@ -88,8 +103,8 @@
 												th:text="${course.psychologist.name}">心理師</span> 心理師・<span
 												th:text="${course.courseCategories.courseCatName}">分類</span></span>
 										</div></td>
-									<td><span class="pending-data" data-thymeleaf-pending>待送審時間欄位</span></td>
-									<td><span class="pending-data" data-thymeleaf-pending>待排程欄位</span></td>
+									<td
+										th:text="${course.admin != null ? course.admin.name : '--'}">--</td>
 									<td><span class="status"
 										th:text="${course.courseStatusText}">狀態</span></td>
 									<td><div class="inline-actions">
@@ -120,53 +135,28 @@
 							</tbody>
 						</table>
 					</div>
-					<div
-						th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/select_course', ${orderBy})}"></div>
-				</section>
-				<section class="tab-panel" data-panel="status" hidden>
-					<div class="table-wrap">
-						<table class="compact-table">
-							<thead>
-								<tr>
-									<th>課程</th>
-									<th>心理師</th>
-									<th>目前狀態</th>
-									<th>上架日期</th>
-									<th>操作</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="course : ${courseListSubmit}">
-									<td><strong th:text="${course.courseName}">課程名稱</strong></td>
-									<td th:text="${course.psychologist.name}">心理師</td>
-									<td><span class="status"
-										th:text="${course.courseStatusText}">狀態</span></td>
-									<td><span th:if="${course.courseStatus == 4}"
-										th:text="${#temporals.format(course.listedAt,'yyyy/MM/dd')}">日期</span><span
-										th:unless="${course.courseStatus == 4}">—</span></td>
-									<td><form class="inline-form" method="post"
-											th:action="@{get_one_course}">
-											<input type="hidden" name="courseId"
-												th:value="${course.courseId}">
-											<button class="btn ghost" type="submit">發布歷程</button>
-										</form></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+					<nav class="pagination-ui" aria-label="上架審核分頁"
+						th:if="${reviewTotalPages != null and reviewTotalPages > 1}">
+						<a
+							th:href="@{/admin/course/search(reviewPage=1,delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:attr="aria-disabled=${reviewCurrentPage <= 1}">第一頁</a><a
+							th:href="@{/admin/course/search(reviewPage=${reviewCurrentPage > 1 ? reviewCurrentPage - 1 : 1},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:attr="aria-disabled=${reviewCurrentPage <= 1}">上一頁</a><a
+							th:each="pageNumber : ${#numbers.sequence(1,reviewTotalPages)}"
+							th:href="@{/admin/course/search(reviewPage=${pageNumber},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:text="${pageNumber}"
+							th:attr="aria-current=${pageNumber == reviewCurrentPage ? 'page' : null}">1</a><a
+							th:href="@{/admin/course/search(reviewPage=${reviewCurrentPage < reviewTotalPages ? reviewCurrentPage + 1 : reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:attr="aria-disabled=${reviewCurrentPage >= reviewTotalPages}">下一頁</a><a
+							th:href="@{/admin/course/search(reviewPage=${reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:attr="aria-disabled=${reviewCurrentPage >= reviewTotalPages}">最後一頁</a>
+					</nav>
 				</section>
 				<section class="tab-panel" data-panel="take-down" hidden>
 					<div class="panel">
 						<div class="panel-heading">
 							<div>
 								<h2>選擇要下架的課程</h2>
-								<p class="meta">
-									由管理員選擇要下架的課程並記錄原因；此區需由 Controller 同時提供
-									<code>courseList</code>
-									與
-									<code>delistReasons</code>
-									。
-								</p>
 							</div>
 						</div>
 						<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益與學習紀錄。</div>
@@ -185,9 +175,7 @@
 								</thead>
 								<tbody>
 									<tr th:if="${courseList == null || courseList.isEmpty()}">
-										<td class="empty-state" colspan="7"><span
-											class="pending-data">目前沒有可下架的課程，或待 Controller 提供
-												courseList</span></td>
+										<td class="empty-state" colspan="7">目前沒有可下架的課程</td>
 									</tr>
 									<tr th:each="course : ${courseList}">
 										<td><div class="course-summary">
@@ -210,7 +198,22 @@
 								</tbody>
 							</table>
 						</div>
-						<p class="pending-data" style="margin-top: 12px">下架清單的獨立分頁參數尚待後端命名確認，暫不與上架審核分頁共用。</p>
+						<nav class="pagination-ui" aria-label="下架清單分頁"
+							th:if="${delistTotalPages != null and delistTotalPages > 1}">
+							<a
+								th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage},delistPage=1,reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='take-down')}"
+								th:attr="aria-disabled=${delistCurrentPage <= 1}">第一頁</a><a
+								th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage},delistPage=${delistCurrentPage > 1 ? delistCurrentPage - 1 : 1},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='take-down')}"
+								th:attr="aria-disabled=${delistCurrentPage <= 1}">上一頁</a><a
+								th:each="pageNumber : ${#numbers.sequence(1,delistTotalPages)}"
+								th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage},delistPage=${pageNumber},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='take-down')}"
+								th:text="${pageNumber}"
+								th:attr="aria-current=${pageNumber == delistCurrentPage ? 'page' : null}">1</a><a
+								th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage},delistPage=${delistCurrentPage < delistTotalPages ? delistCurrentPage + 1 : delistTotalPages},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='take-down')}"
+								th:attr="aria-disabled=${delistCurrentPage >= delistTotalPages}">下一頁</a><a
+								th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage},delistPage=${delistTotalPages},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='take-down')}"
+								th:attr="aria-disabled=${delistCurrentPage >= delistTotalPages}">最後一頁</a>
+						</nav>
 					</div>
 				</section>
 			</main>
@@ -244,9 +247,6 @@
 		</div>
 	</form>
 	</dialog>
-<script th:src="@{/js/course/app.js}"></script>
+	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>
 </html>
-
-
-

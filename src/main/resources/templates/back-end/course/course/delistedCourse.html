@@ -1,12 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>課程下架管理｜管理後台</title>
-<link rel="stylesheet" th:href="@{/css/course/style.css}" />
-<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin-style.css}" />
 </head>
 <body class="thy2-page">
 	<div class="layout">
@@ -15,10 +13,11 @@
 					CONSOLE</small></a>
 			<p class="nav-label">課程商城管理</p>
 			<nav class="nav">
-				<a th:href="@{/admin/course/select_course}">課程發布管理</a><a
-					class="active" th:href="@{/admin/course/goto_delisted}">課程下架管理</a><a
+				<a class="active" th:href="@{/admin/course/select_course}">課程發布管理</a><a
 					th:href="@{/admin/course/select_course_order}">訂單與退款</a><a
-					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+					th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a
+					th:href="@{/admin/coupon/select_coupon}">優惠券管理</a><a
+					th:href="@{/admin/course/select_course_categories}">課程分類</a>
 			</nav>
 		</aside>
 		<div class="main">
@@ -103,6 +102,6 @@
 		</div>
 	</form>
 	</dialog>
-<script th:src="@{/js/course/app.js}"></script>
+	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>
 </html>

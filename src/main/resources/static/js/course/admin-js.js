@@ -10,6 +10,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-toast]').forEach(element => element.addEventListener('click', () => notify(element.dataset.toast)));
 
+  const enhancePagination = () => {
+    const roots = new Set();
+    document.querySelectorAll('main a[href*="page="], main a[href*="currentPage="]').forEach(link => {
+      roots.add(link.closest('nav, ul, ol, .pagination') || link.parentElement);
+    });
+    document.querySelectorAll('main div').forEach(element => {
+      const ownText = [...element.childNodes].filter(node => node.nodeType === Node.TEXT_NODE).map(node => node.textContent).join(' ');
+      if (/第\s*\d+\s*\/\s*\d+\s*頁/.test(ownText)) roots.add(element);
+    });
+    roots.forEach(root => {
+      if (!root) return;
+      root.classList.add('pagination-ui');
+      root.setAttribute('role', 'navigation');
+      root.setAttribute('aria-label', '分頁導覽');
+      root.querySelectorAll('a').forEach(link => {
+        const label = link.textContent.trim();
+        const page = new URL(link.href, window.location.href).searchParams.get('page');
+        if (/最前|第一/.test(label)) link.setAttribute('aria-label', '前往第一頁');
+        else if (/上一/.test(label)) link.setAttribute('aria-label', '前往上一頁');
+        else if (/下一/.test(label)) link.setAttribute('aria-label', '前往下一頁');
+        else if (/最後|最末/.test(label)) link.setAttribute('aria-label', '前往最後一頁');
+        else if (page) link.setAttribute('aria-label', `前往第 ${page} 頁`);
+        if (link.matches('.active, [aria-current="page"]') || link.parentElement?.classList.contains('active')) link.setAttribute('aria-current', 'page');
+      });
+    });
+  };
+  enhancePagination();
+
+  document.querySelectorAll('[data-order-search-pagination]').forEach(container => {
+    const filters = {
+      keyword: container.dataset.keyword,
+      paymentStatus: container.dataset.paymentStatus,
+      orderedDate: container.dataset.orderedDate
+    };
+    container.querySelectorAll('a[href]').forEach(link => {
+      const url = new URL(link.href, window.location.href);
+      Object.entries(filters).forEach(([name, value]) => {
+        if (value !== undefined && value !== '') url.searchParams.set(name, value);
+        else url.searchParams.delete(name);
+      });
+      link.href = url;
+    });
+  });
+
   document.querySelectorAll('[data-tabs]').forEach(tabSet => {
     tabSet.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => {
       tabSet.querySelectorAll('[data-tab]').forEach(item => item.classList.remove('active'));
@@ -19,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }));
   });
+
+  const requestedTab = new URLSearchParams(window.location.search).get('tab');
+  const initialTab = document.querySelector('[data-refund-detail]') ? 'refunds' : requestedTab;
+  if (initialTab) {
+    [...document.querySelectorAll('[data-tab]')]
+      .find(button => button.dataset.tab === initialTab)
+      ?.click();
+  }
 
   document.querySelectorAll('[data-confirm-form]').forEach(form => form.addEventListener('submit', event => {
     if (!window.confirm(form.dataset.confirmForm)) event.preventDefault();
@@ -50,6 +102,36 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   [discount, limit, threshold].forEach(input => input?.addEventListener('input', updateDiscountExample));
   updateDiscountExample();
+
+  const couponSpecForm = document.querySelector('[data-coupon-spec-form]');
+  const couponTemplate = document.querySelector('[data-coupon-template]');
+  const newCouponButton = document.querySelector('[data-new-coupon]');
+  const couponName = document.querySelector('#couponName');
+  const discountDuration = document.querySelector('#discountDuration');
+  const couponSpecInputs = [couponName, discount, limit, threshold, discountDuration].filter(Boolean);
+
+  couponTemplate?.addEventListener('change', () => {
+    const selectedCoupon = couponTemplate.selectedOptions[0];
+    if (!selectedCoupon?.value || !couponSpecForm) return;
+
+    couponName.value = selectedCoupon.dataset.couponName || '';
+    discount.value = selectedCoupon.dataset.discount || '';
+    limit.value = selectedCoupon.dataset.discountLimit || '';
+    threshold.value = selectedCoupon.dataset.triggerThreshold || '';
+    discountDuration.value = selectedCoupon.dataset.discountDuration || '';
+    updateDiscountExample();
+    notify(`已載入「${selectedCoupon.dataset.couponName || selectedCoupon.textContent.trim()}」的優惠券規格`);
+  });
+
+  newCouponButton?.addEventListener('click', () => {
+    if (!couponSpecForm) return;
+    couponSpecForm.reset();
+    couponSpecInputs.forEach(input => { input.value = ''; });
+    if (couponTemplate) couponTemplate.value = '';
+    updateDiscountExample();
+    requestAnimationFrame(() => couponName?.focus());
+    notify('已清空優惠券規格，請建立新的優惠券');
+  });
 
   const dialog = document.querySelector('[data-take-down-dialog]');
   const courseName = document.querySelector('[data-take-down-course]');

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -9,9 +8,8 @@
 </head>
 <body class="thy2-member healing-page coupon-tone-page">
 	<header class="site-header">
-		<a class="brand" th:href="@{/member/course/select_course}">諮由自在
-			Free Mind<small>MY HEALING JOURNEY</small>
-		</a>
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>MY
+				HEALING JOURNEY</small></a>
 		<nav class="main-nav">
 			<a th:href="@{/member/course/select_course}">探索課程</a><a
 				class="active" th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
@@ -42,7 +40,12 @@
 		</div>
 		<section class="stack">
 			<article class="panel learning-card" th:each="item : ${myCoursePage}">
-				<div class="learning-cover">繼續學習</div>
+				<div class="learning-cover">
+					<video muted playsinline preload="metadata" data-course-thumbnail
+						th:src="${item.course.videoSrcPre != null and !#strings.isEmpty(item.course.videoSrcPre) ? item.course.videoSrcPre : item.course.videoSrc}"
+						th:attr="aria-label=${item.course.courseName + '影片預覽圖'}"></video>
+					<span>繼續學習</span>
+				</div>
 				<div>
 					<span class="tag">我的課程</span>
 					<h2 th:text="${item.course.courseName}">課程名稱</h2>
