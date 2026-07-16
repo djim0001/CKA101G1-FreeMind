@@ -20,7 +20,7 @@ body {
 }
 
 h1 {
-	max-width: 1000px;
+	max-width: 1100px;
 	margin: 0 auto 10px;
 	font-size: 28px;
 	font-weight: 700;
@@ -28,7 +28,7 @@ h1 {
 }
 
 h3 {
-	max-width: 1000px;
+	max-width: 1100px;
 	margin: 0 auto 24px;
 }
 
@@ -65,7 +65,7 @@ h3 a.btn-home:hover {
 }
 
 table {
-	max-width: 1000px;
+	max-width: 1100px;
 	width: 100%;
 	margin: 0 auto;
 	background: #fff;
@@ -77,30 +77,35 @@ table {
 }
 
 th, td {
-	padding: 14px 20px;
+	padding: 14px 16px;
 	text-align: left;
 	font-size: 15px;
+	vertical-align: middle;
 }
 
 th:nth-child(1), td:nth-child(1) {
-	width: 35%;
+	width: 34%;
 }
 
 th:nth-child(2), td:nth-child(2) {
-	width: 22%;
+	width: 15%;
 	white-space: nowrap;
 }
 
 th:nth-child(3), td:nth-child(3) {
-	width: 13%;
+	width: 10%;
 }
 
 th:nth-child(4), td:nth-child(4) {
-	width: 15%;
+	width: 13%;
 }
 
 th:nth-child(5), td:nth-child(5) {
-	width: 15%;
+	width: 20%;
+}
+
+th:nth-child(6), td:nth-child(6) {
+	width: 8%;
 }
 
 th {
@@ -124,30 +129,31 @@ tr:hover td {
 	background-color: #fdfafaf5;
 }
 
+/* 所有操作按鈕共用的基礎樣式：統一高度，避免高低不一 */
+.action-cell,
+.stats-cell {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 6px;
+	white-space: nowrap;
+}
+
+.action-cell form {
+	display: flex;
+	align-items: center;
+}
+
+a.btn-edit,
+button.btn-status,
+button.btn-stats,
 button[type="submit"] {
-	display: inline-block;
-	padding: 6px 16px;
-	font-size: 14px;
-	font-weight: 500;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all 0.2s;
-	font-family: inherit;
-}
-
-button[type="submit"]:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-a.btn-edit {
-	display: inline-block;
-	padding: 6px 16px;
-	font-size: 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 34px;
+	padding: 0 14px;
+	font-size: 13px;
 	font-weight: 500;
 	background-color: #fbf2f2;
 	color: #7a6b6b;
@@ -156,41 +162,26 @@ a.btn-edit {
 	text-decoration: none;
 	cursor: pointer;
 	transition: all 0.2s;
-	margin-right: 6px;
-}
-
-a.btn-edit:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-a.btn-edit.disabled {
-	opacity: 0.4;
-	pointer-events: none;
-	cursor: default;
-}
-
-button.btn-status {
-	display: inline-block;
-	padding: 6px 16px;
-	font-size: 14px;
-	font-weight: 500;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all 0.2s;
 	font-family: inherit;
+	white-space: nowrap;
+	box-sizing: border-box;
 }
 
-button.btn-status:hover {
+/* 互動數據按鈕維持窄一點的寬度 */
+button.btn-stats {
+	padding: 0 10px;
+}
+
+a.btn-edit:hover,
+button.btn-status:hover,
+button.btn-stats:hover,
+button[type="submit"]:hover {
 	background-color: #e8b4b4;
 	color: #fff;
 	border-color: #e8b4b4;
 }
 
+a.btn-edit.disabled,
 button.btn-status.disabled {
 	opacity: 0.4;
 	pointer-events: none;
@@ -203,7 +194,7 @@ button.btn-status.disabled {
 }
 
 .pagination {
-	max-width: 1000px;
+	max-width: 1100px;
 	margin: 24px auto 0;
 	display: flex;
 	justify-content: center;
@@ -300,6 +291,33 @@ button.btn-status.disabled {
     background-color: #d39393;
 }
 
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.stats-item {
+    background-color: #fbf2f2;
+    border: 1px solid #f2dddd;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+}
+
+.stats-item .stats-label {
+    font-size: 13px;
+    color: #7a6b6b;
+    margin-bottom: 6px;
+}
+
+.stats-item .stats-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4a3e3e;
+}
+
 @media ( max-width : 768px) {
 	table {
 		display: block;
@@ -317,79 +335,102 @@ button.btn-status.disabled {
 		<a class="btn-home" th:href="@{/}">回首頁</a>
 	</h3>
 	<table>
-		<thead>
-			<tr>
-				<th>標題</th>
-				<th>文章分類</th>
-				<th>文章狀態</th>
-				<th>建立時間</th>
-				<th>操作</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr th:each="article : ${articlePage.content}">
-				<td th:text="${article.title}"></td>
-				<td
-					th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></td>
-				<td th:text="${article.articleStatus}"
-					th:classappend="${article.articleStatus == 3} ? 'status-rejected' : ''"></td>
-				<td th:text="${article.createdAt}"></td>
-					<td>
-					<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
-				    <a th:if="${article.articleStatus == 0 || article.articleStatus == 2}"
-				       th:href="@{/psych/article/{id}/edit(id=${article.articleId}, page=${currentPage})}"
-				       class="btn-edit">編輯</a>
-				
-				    <form th:if="${article.articleStatus == 0}"
-				          th:action="@{/psych/article/{id}/submit(id=${article.articleId})}"
-				          method="post" style="display: inline;">
-				        <button type="submit" class="btn-status">送審</button>
-				    </form>
-				
-				    <form th:if="${article.articleStatus == 0}"
-				          th:action="@{/psych/article/{id}/delete(id=${article.articleId})}"
-				          method="post" style="display: inline;"
-				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
-				        <button type="submit" class="btn-status">刪除</button>
-				    </form>
-				
-				    <!-- 審核中 -->
-				    <a th:if="${article.articleStatus == 1}"
-				       class="btn-edit disabled">審核中</a>
-				
-				    <!-- 已發布：查看, 下架 -->
-					<a th:if="${article.articleStatus == 2}"
-					   th:href="@{/article/{id}(id=${article.articleId})}"
-					   target="_blank"
-					   class="btn-edit">查看</a>
-				    <form th:if="${article.articleStatus == 2}"
-				          th:action="@{/psych/article/{id}/unpublish(id=${article.articleId})}"
-				          method="post" style="display: inline;"
-				          onsubmit="return confirm('確定要下架此文章嗎？');">
-				        <button type="submit" class="btn-status">下架</button>
-				    </form>
-				
-				    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
-				    <a th:if="${article.articleStatus == 3}"
-					   th:href="@{/psych/article/{id}/edit(id=${article.articleId}, page=${currentPage})}"
-					   class="btn-edit">編輯</a>
-   
-					<button th:if="${article.articleStatus == 3}"
-					        class="btn-status"
-					        th:data-reason="${article.rejectReason}"
-					        th:data-note="${article.rejectNote}"
-					        onclick="showRejectDetail(this)">查看</button>
-				
-					<form th:if="${article.articleStatus == 3}"
-					      th:action="@{/psych/article/{id}/delete(id=${article.articleId})}"
-					      method="post" style="display: inline;"
-					      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
-					    <button type="submit" class="btn-status">刪除</button>
-					</form>
+	<thead>
+		<tr>
+			<th>標題</th>
+			<th>文章分類</th>
+			<th>文章狀態</th>
+			<th>建立時間</th>
+			<th>操作</th>
+			<th>數據</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="item : ${articleList}">
+			<td th:text="${item.article.title}"></td>
+			<td
+				th:text="${item.article.articleCat != null ? item.article.articleCat.articleCatName : '未分類'}"></td>
+			<td th:classappend="${item.article.articleStatus == 3} ? 'status-rejected' : ''"
+				th:switch="${item.article.articleStatus}">
+				<span th:case="0">草稿</span>
+				<span th:case="1">送審中</span>
+				<span th:case="2">已上架</span>
+				<span th:case="3">審核未過</span>
+				<span th:case="4">已下架</span>
+				<span th:case="*">未知</span>
+			</td>
+			<td th:text="${item.article.createdAt}"></td>
+				<td>
+				<div class="action-cell">
+				<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
+			    <a th:if="${item.article.articleStatus == 0 || item.article.articleStatus == 2}"
+			       th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
+			       class="btn-edit">編輯</a>
+			
+			    <form th:if="${item.article.articleStatus == 0}"
+			          th:action="@{/psych/article/{id}/submit(id=${item.article.articleId})}"
+			          method="post">
+			        <button type="submit" class="btn-status">送審</button>
+			    </form>
+			
+			    <form th:if="${item.article.articleStatus == 0}"
+			          th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
+			          method="post"
+			          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
+			        <button type="submit" class="btn-status">刪除</button>
+			    </form>
+			
+			    <!-- 審核中 -->
+			    <a th:if="${item.article.articleStatus == 1}"
+			       class="btn-edit disabled">審核中</a>
+			
+			    <!-- 已發布：查看, 下架 -->
+				<a th:if="${item.article.articleStatus == 2}"
+				   th:href="@{/article/{id}(id=${item.article.articleId})}"
+				   target="_blank"
+				   class="btn-edit">查看</a>
+			    <form th:if="${item.article.articleStatus == 2}"
+			          th:action="@{/psych/article/{id}/unpublish(id=${item.article.articleId})}"
+			          method="post"
+			          onsubmit="return confirm('確定要下架此文章嗎？');">
+			        <button type="submit" class="btn-status">下架</button>
+			    </form>
+			
+			    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
+			    <a th:if="${item.article.articleStatus == 3}"
+				   th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
+				   class="btn-edit">編輯</a>
 
-				    <!-- 已下架：編輯, 查看 -->
-				    <a th:if="${article.articleStatus == 4}" class="btn-edit disabled">編輯</a>
-					<button th:if="${article.articleStatus == 4}" class="btn-status disabled" disabled>查看</button>
+				<button th:if="${item.article.articleStatus == 3}"
+				        class="btn-status"
+				        th:data-reason="${item.article.rejectReason}"
+				        th:data-note="${item.article.rejectNote}"
+				        onclick="showRejectDetail(this)">查看</button>
+			
+				<form th:if="${item.article.articleStatus == 3}"
+				      th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
+				      method="post"
+				      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
+				    <button type="submit" class="btn-status">刪除</button>
+				</form>
+
+			    <!-- 已下架：編輯, 查看 -->
+			    <a th:if="${item.article.articleStatus == 4}" class="btn-edit disabled">編輯</a>
+				<button th:if="${item.article.articleStatus == 4}" class="btn-status disabled" disabled>查看</button>
+				</div>
+				</td>
+
+				<!-- 互動數據獨立欄位（窄按鈕） -->
+				<td>
+					<div class="stats-cell">
+						<button th:if="${item.articleStatistics != null}"
+						        class="btn-stats"
+						        th:data-view="${item.articleStatistics.viewCount}"
+						        th:data-like="${item.articleStatistics.likeCount}"
+						        th:data-favorite="${item.articleStatistics.bookmarkCount}"
+						        th:data-share="${item.articleStatistics.shareCount}"
+						        onclick="showStatsDetail(this)">查看</button>
+					</div>
 				</td>
 			</tr>
 		</tbody>
@@ -422,6 +463,32 @@ button.btn-status.disabled {
 	    </div>
 	</div>
 
+	<!-- 互動數據 Modal -->
+	<div id="statsModal" class="modal-overlay" onclick="closeStatsModal(event)">
+	    <div class="modal-box">
+	        <h3>互動數據</h3>
+	        <div class="stats-grid">
+	            <div class="stats-item">
+	                <div class="stats-label">觀看次數</div>
+	                <div class="stats-value" id="statView">0</div>
+	            </div>
+	            <div class="stats-item">
+	                <div class="stats-label">按讚次數</div>
+	                <div class="stats-value" id="statLike">0</div>
+	            </div>
+	            <div class="stats-item">
+	                <div class="stats-label">收藏次數</div>
+	                <div class="stats-value" id="statFavorite">0</div>
+	            </div>
+	            <div class="stats-item">
+	                <div class="stats-label">分享次數</div>
+	                <div class="stats-value" id="statShare">0</div>
+	            </div>
+	        </div>
+	        <button class="modal-close" onclick="closeStatsModal()">關閉</button>
+	    </div>
+	</div>
+
 	<script th:if="${alertMessage}">
 		window.onload = function() {
 			alert('[[${alertMessage}]]');
@@ -449,6 +516,20 @@ button.btn-status.disabled {
 		    function closeModal(event) {
 		        if (!event || event.target === document.getElementById('rejectModal') || event.target.classList.contains('modal-close')) {
 		            document.getElementById('rejectModal').classList.remove('active');
+		        }
+		    }
+
+		    function showStatsDetail(btn) {
+		        document.getElementById('statView').textContent = btn.getAttribute('data-view') || 0;
+		        document.getElementById('statLike').textContent = btn.getAttribute('data-like') || 0;
+		        document.getElementById('statFavorite').textContent = btn.getAttribute('data-favorite') || 0;
+		        document.getElementById('statShare').textContent = btn.getAttribute('data-share') || 0;
+		        document.getElementById('statsModal').classList.add('active');
+		    }
+
+		    function closeStatsModal(event) {
+		        if (!event || event.target === document.getElementById('statsModal') || event.target.classList.contains('modal-close')) {
+		            document.getElementById('statsModal').classList.remove('active');
 		        }
 		    }
 	</script>

@@ -11,8 +11,6 @@ public interface ArticleCatService {
 	
 	List<ArticleCat> getActiveCats();
 	
-//	Page<ArticleCat> getAllCats(Integer catId, Integer page);
-
 	ArticleCat getCatById(Integer catId);
 
 	ArticleCat createCat(String catName);

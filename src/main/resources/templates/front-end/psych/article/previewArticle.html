@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="'預覽：' + ${article.title}">文章預覽</title>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
+		sans-serif;
+	background-color: #f5f5f5;
+	color: #333;
+	line-height: 1.8;
+}
+
+.container {
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 30px 20px;
+}
+
+.preview-banner {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 20px;
+	padding: 12px 18px;
+	background-color: #fff3cd;
+	color: #7a5a00;
+	border: 1px solid #ffe08a;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.article-detail {
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	overflow: hidden;
+	padding: 0;
+}
+
+.cover-image {
+	width: 100%;
+	height: 380px;
+	overflow: hidden;
+	background-color: #fbf2f2;
+}
+
+.cover-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.article-body {
+	padding: 36px 40px 48px;
+}
+
+.article-body h1 {
+	font-size: 28px;
+	font-weight: 700;
+	color: #4a3e3e;
+	margin-bottom: 16px;
+	line-height: 1.4;
+}
+
+.article-body h1.no-title {
+	color: #bbb;
+	font-style: italic;
+}
+
+.article-meta {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 28px;
+	padding-bottom: 20px;
+	border-bottom: 1px solid #eee;
+	font-size: 14px;
+	color: #888;
+}
+
+.article-meta .cat-tag {
+	display: inline-block;
+	padding: 3px 14px;
+	background-color: #fbf2f2;
+	color: #7a6b6b;
+	border-radius: 14px;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.article-content {
+	font-size: 16px;
+	color: #444;
+	line-height: 1.4;
+}
+
+.article-content p {
+	margin-bottom: 6px;
+}
+
+.article-content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	margin: 12px 0;
+}
+
+.article-content h2, .article-content h3 {
+	margin-top: 28px;
+	margin-bottom: 12px;
+	color: #4a3e3e;
+}
+
+.empty-content {
+	color: #bbb;
+	font-style: italic;
+}
+
+@media ( max-width : 640px) {
+	.article-body {
+		padding: 24px 20px 36px;
+	}
+	.cover-image {
+		height: 220px;
+	}
+	.article-body h1 {
+		font-size: 22px;
+	}
+	.article-meta {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+	}
+}
+</style>
+</head>
+<body>
+	<div class="container">
+
+		<div class="preview-banner">
+			<i class="fa-regular fa-eye"></i>
+			這是預覽畫面，實際發布後排版可能略有不同
+		</div>
+
+		<div class="article-detail">
+
+			<div class="cover-image" th:if="${article.coverImage != null}">
+				<img th:src="@{/article/{id}/cover(id=${article.articleId})}" />
+			</div>
+
+			<div class="article-body">
+				<h1 th:if="${article.title != null and !#strings.isEmpty(article.title)}"
+					th:text="${article.title}"></h1>
+				<h1 class="no-title"
+					th:unless="${article.title != null and !#strings.isEmpty(article.title)}">
+					（尚未填寫標題）
+				</h1>
+
+				<div class="article-meta">
+					<span class="cat-tag"
+						th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
+				</div>
+
+				<!-- 文章內文 (TinyMCE 存的是 HTML，用 utext 才能渲染) -->
+				<div class="article-content"
+					th:if="${article.content != null and !#strings.isEmpty(article.content)}"
+					th:utext="${article.content}"></div>
+				<p class="empty-content"
+					th:unless="${article.content != null and !#strings.isEmpty(article.content)}">
+					（尚未填寫內文）
+				</p>
+			</div>
+
+		</div>
+
+	</div>
+</body>
+</html>
