@@ -26,7 +26,6 @@ public class PsychUserDetails implements UserDetails {
 
 	@Override
 	public String getPassword() {
-		// TODO: 依你 Psychologist entity 實際的密碼欄位 getter 調整
 		return psychologist.getPsychPassword();
 	}
 

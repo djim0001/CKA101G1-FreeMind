@@ -136,7 +136,6 @@ button.soft:hover { background-color: #e8b4b4; color: #fff; }
 				<span class="badge ok" th:if="${psych.accountStatus == 1}">帳號已啟用</span>
 				<span class="badge warn" th:if="${psych.accountStatus == 0}">帳號未啟用</span>
 				<span class="badge bad" th:if="${psych.accountStatus == 2}">帳號停權中</span>
-
 				<span class="badge ok" th:if="${psych.hasPracticeLicense}">執業許可:已通過</span>
 				<span class="badge warn" th:unless="${psych.hasPracticeLicense}">執業許可:審核中/未通過</span>
 			</div>
