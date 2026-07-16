@@ -3,40 +3,128 @@
 <head>
 <meta charset="UTF-8">
 <title>我的預約紀錄</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0 0 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #f2dddd;
+        padding: 12px 10px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    th {
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #fdfafa;
+    }
+
+    .nowrap { white-space: nowrap; }
+
+    .note-cell {
+        text-align: left;
+        white-space: normal;
+        word-break: break-word;
+    }
+
+    .status-pending   { color: #b8860b; font-weight: bold; }
+    .status-confirmed { color: #1a7a1a; font-weight: bold; }
+    .status-cancelled { color: #c62828; font-weight: bold; }
+    .status-noshow    { color: #ef6c00; font-weight: bold; }
+    .status-completed { color: #1565c0; font-weight: bold; }
+
+    .rebook-btn {
+        display: inline-block;
+        padding: 6px 14px;
+        background-color: #e8b4b4;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 13px;
+        white-space: nowrap;
+        transition: background-color 0.2s;
+    }
+    .rebook-btn:hover {
+        background-color: #d39393;
+    }
+</style>
 </head>
 <body>
-	<h3>會員編號 <span th:text="${memberId}"></span> 的預約紀錄</h3>
+	<div class="card">
+		<h3>會員編號 <span th:text="${memberId}"></span> 的預約紀錄</h3>
 
-	<table border="1">
-		<tr>
-			<th>訂單編號</th>
-			<th>心理師編號</th>
-			<th>開始時間</th>
-			<th>結束時間</th>
-			<th>訂單狀態</th>
-			<th>心理師晤談筆記</th>
-			<th>評分</th>
-			<th>心得內容</th>
-		</tr>
-		<tr th:each="order : ${ordersListData}">
-			<td th:text="${order.orderId}"></td>
-			<td th:text="${order.psychologist.psychId}"></td>
-			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:switch="${order.orderStatus}">
-				<span th:case="0">待確認</span>
-				<span th:case="1">已確認</span>
-				<span th:case="2">已取消</span>
-				<span th:case="3">未出席</span>
-				<span th:case="4">已完成</span>
-			</td>
-			<td th:text="${order.psychNote != null ? order.psychNote : '尚無筆記'}"></td>
-			<td th:text="${order.rating != null ? order.rating : '尚未評論'}"></td>
-			<td th:text="${order.reviewContent != null ? order.reviewContent : '-'}"></td>
-		</tr>
-	</table>
-
-	<a th:href="@{/member/orders/myOrdersForm}">重新查詢</a>
-
+		<table>
+			<tr>
+				<th>訂單編號</th>
+				<th>心理師編號</th>
+				<th>姓名</th>
+				<th>開始時間</th>
+				<th>結束時間</th>
+				<th>訂單狀態</th>
+				<th>心理師晤談筆記</th>
+				<th>評分</th>
+				<th>心得內容</th>
+				<th>操作</th>
+			</tr>
+			<tr th:each="order : ${ordersListData}">
+				<td th:text="${order.orderId}"></td>
+				<td th:text="${order.psychologist.psychId}"></td>
+				<td class="nowrap" th:text="${order.psychologist.name}"></td>
+				<td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+				<td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+				<td th:switch="${order.orderStatus}">
+					<span th:case="0" class="status-pending">待確認</span>
+					<span th:case="1" class="status-confirmed">已確認</span>
+					<span th:case="2" class="status-cancelled">已取消</span>
+					<span th:case="3" class="status-noshow">未出席</span>
+					<span th:case="4" class="status-completed">已完成</span>
+				</td>
+				<td class="note-cell" th:text="${order.psychNote != null ? order.psychNote : '尚無筆記'}"></td>
+				<td class="nowrap" th:text="${order.rating != null ? order.rating : '尚未評論'}"></td>
+				<td th:text="${order.reviewContent != null ? order.reviewContent : '-'}"></td>
+				<td>
+					<a class="rebook-btn"
+					   th:href="@{'/search/detail/' + ${order.psychologist.psychId}}">再次預約</a>
+				</td>
+			</tr>
+		</table>
+	</div>
 </body>
 </html>
