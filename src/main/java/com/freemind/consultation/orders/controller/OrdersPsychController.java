@@ -30,6 +30,11 @@ public class OrdersPsychController {
 		return "front-end/psych/consultation/orders/psychPendingForm";
 	}
 
+	@GetMapping("home")
+	public String psychHome(ModelMap model) {
+		return "front-end/psych/consultation/orders/psychHome";
+	}
+	
 	@PostMapping("psychPending")
 	public String psychPending(@RequestParam("psychId") String psychId, ModelMap model) {
 		if (psychId == null || psychId.isBlank()) {
