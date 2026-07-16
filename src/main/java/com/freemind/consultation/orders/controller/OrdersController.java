@@ -62,6 +62,11 @@ public class OrdersController {
 		});
 	}
 
+	@GetMapping("home")
+	public String consultationManagementHome(ModelMap model) {
+		return "back-end/consultation/consultationManagementHome";
+	}
+	
 	@GetMapping("listAllOrders")
 	public String listAllOrders(ModelMap model) {
 		List<Orders> list = ordersSvc.getAll();

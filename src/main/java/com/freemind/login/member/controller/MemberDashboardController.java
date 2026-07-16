@@ -22,6 +22,11 @@ public class MemberDashboardController {
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
 	
+	@GetMapping("/myAppointment")
+	public String myAppointment() {
+	    return "front-end/member/memberpage/myAppointment";
+	}
+	
 	@GetMapping
     public String getDashboard() {
         return "front-end/member/memberpage/dashboard";

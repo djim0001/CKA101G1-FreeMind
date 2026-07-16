@@ -48,6 +48,11 @@ public class ReportsMemberController {
 		});
 	}
 
+	@GetMapping("home")
+	public String reportsHome(ModelMap model) {
+		return "front-end/member/consultation/reports/consultationFeedbackHome";
+	}
+	
 	@PostMapping("frontInsert")
 	public String frontInsert(@Valid Reports reports, BindingResult result, ModelMap model) {
 		if (result.hasErrors()) {
