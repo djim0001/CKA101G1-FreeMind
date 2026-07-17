@@ -50,7 +50,7 @@ public class ActivityService {
 		    
 		// 發起者只能修改活動狀態為0：待審核、3：已退回的活動，其他活動狀態不可修改
 	    if (existing == null || (existing.getActivityStatus() != 0 && existing.getActivityStatus() != 3)) {
-	        throw new RuntimeException("此活動目前狀態不可修改");
+	        throw new RuntimeException("此活動目前不可修改");
 	    }
 	    
 	    activity.setMember(existing.getMember());   // 找出原本的發起人，設定到即將要存檔的activity身上
@@ -112,7 +112,7 @@ public class ActivityService {
 
 	    Integer status = existing.getActivityStatus();
 	    if (status != 0 && status != 1 && status != 2 && status != 5) {
-	        throw new RuntimeException("此活動目前狀態不可取消");
+	        throw new RuntimeException("此活動目前不可取消");
 	    }
 	    
 	    if (existing.getActivityEnd() != null && LocalDateTime.now().isAfter(existing.getActivityEnd())) {
@@ -130,7 +130,7 @@ public class ActivityService {
 	    Activity existing = repository.findById(activityId).orElse(null);
 
 	    if (existing == null || existing.getActivityStatus() != 2) {
-	        throw new RuntimeException("此活動目前狀態不可延期");
+	        throw new RuntimeException("此活動目前不可延期");
 	    }
 	    
 	    if (existing.getActivityEnd() != null && LocalDateTime.now().isAfter(existing.getActivityEnd())) {
@@ -149,7 +149,7 @@ public class ActivityService {
 		Activity existing = repository.findById(activityId).orElse(null);
 		
 		if (existing == null || existing.getActivityStatus() != 5) {
-		throw new RuntimeException("此活動目前狀態不可變更時間");
+		throw new RuntimeException("此活動目前無法變更時間");
 		}
 		
 		existing.setActivityStart(activityStart);
@@ -172,7 +172,7 @@ public class ActivityService {
 	    Activity existing = repository.findById(activityId).orElse(null);
 
 	    if (existing == null || existing.getActivityStatus() != 1) {
-	        throw new RuntimeException("此活動目前狀態不可發布");
+	        throw new RuntimeException("此活動目前不可發布");
 	    }
 
 	    existing.setActivityStatus(2);  // 改成「已發布」
@@ -195,7 +195,7 @@ public class ActivityService {
 	    Activity existing = repository.findById(activityId).orElse(null);
 
 	    if (existing == null || existing.getActivityStatus() != 0) {
-	        throw new RuntimeException("此活動目前狀態不可審核");
+	        throw new RuntimeException("此活動目前不可審核");
 	    }
 
 	    existing.setActivityStatus(1);  // 改成「已審核」
@@ -209,7 +209,7 @@ public class ActivityService {
 	    Activity existing = repository.findById(activityId).orElse(null);
 
 	    if (existing == null || existing.getActivityStatus() != 0) {
-	        throw new RuntimeException("此活動目前狀態不可退回");
+	        throw new RuntimeException("此活動目前不可退回");
 	    }
 
 	    existing.setActivityStatus(3);  // 改成「已退回」

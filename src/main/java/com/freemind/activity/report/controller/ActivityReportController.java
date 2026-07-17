@@ -1,5 +1,6 @@
 package com.freemind.activity.report.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.report.model.ActivityReport;
 import com.freemind.activity.report.model.ActivityReportService;
+import com.freemind.activity.util.PageUtils;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
@@ -28,14 +30,33 @@ public class ActivityReportController {
 
 	@Autowired
 	private ActivityService activitySvc;
+	
+	private static final int PAGE_SIZE = 3;
 
 	// 我的回報紀錄
 	@GetMapping("myReports")
-	public String myReports(@AuthenticationPrincipal MemberUserDetails userDetails,
+	public String myReports(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+							@AuthenticationPrincipal MemberUserDetails userDetails,
 	                        ModelMap model) {
 		Member member = userDetails.getMember();
 		List<ActivityReport> list = reportSvc.getMyReports(member);
-		model.addAttribute("reportListData", list);
+		
+		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+	    if (currentPage < 1) {
+	        currentPage = 1;
+	    } else if (currentPage > totalPages) {
+	        currentPage = totalPages;
+	    }
+
+	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
+	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+	    List<ActivityReport> pageData = fromIndex < toIndex 
+	            ? list.subList(fromIndex, toIndex) 
+	            : new ArrayList<>();
+		
+	    model.addAttribute("reportListData", pageData);
+	    model.addAttribute("currentPage", currentPage);
+	    model.addAttribute("totalPages", totalPages);
 		return "front-end/member/activity/report/myReports";
 	}
 

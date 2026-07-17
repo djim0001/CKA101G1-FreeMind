@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
+import com.freemind.activity.util.PageUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +29,8 @@ public class ActivityAdminController {
 
     @Autowired
     ActivityService activitySvc;
+    
+    private static final int PAGE_SIZE = 3;
 
     // 後台查詢
     @GetMapping("listAllActivity")
@@ -39,12 +43,7 @@ public class ActivityAdminController {
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForAdmin(emptyMap);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
 
         return "back-end/activity/activity/listAllActivity";
     }
@@ -63,12 +62,7 @@ public class ActivityAdminController {
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForAdmin(map);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
 
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
@@ -80,28 +74,16 @@ public class ActivityAdminController {
     
     // 後台審核申請活動
     @PostMapping("approve")
-    public String approve(@RequestParam("activityId") Integer activityId, ModelMap model) {
+    public String approve(@RequestParam("activityId") Integer activityId,
+                           RedirectAttributes redirectAttributes) {
         try {
             activitySvc.approveActivity(activityId);
+            redirectAttributes.addFlashAttribute("successMessage", "審核通過");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
-        
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForAdmin(emptyMap, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForAdmin(emptyMap);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        return "back-end/activity/activity/listAllActivity";
+
+        return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
     
     // 後台退回申請活動
@@ -109,55 +91,29 @@ public class ActivityAdminController {
     public String reject(@RequestParam("activityId") Integer activityId,
                           @RequestParam("rejectReason") Integer rejectReason,
                           @RequestParam("rejectNote") String rejectNote,
-                          ModelMap model) {
+                          RedirectAttributes redirectAttributes) {
         try {
             activitySvc.rejectActivity(activityId, rejectReason, rejectNote);
+            redirectAttributes.addFlashAttribute("successMessage", "退回成功");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+        		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForAdmin(emptyMap, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForAdmin(emptyMap);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        return "back-end/activity/activity/listAllActivity";
+        return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
     
     // 後台手動發布活動
     @PostMapping("publish")
-    public String publish(@RequestParam("activityId") Integer activityId, ModelMap model) {
+    public String publish(@RequestParam("activityId") Integer activityId,
+    		 				 RedirectAttributes redirectAttributes) {
         try {
             activitySvc.publishActivity(activityId);
+            redirectAttributes.addFlashAttribute("successMessage", "發布成功");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForAdmin(emptyMap, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForAdmin(emptyMap);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        
-        return "back-end/activity/activity/listAllActivity";
+        return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
     
     // 後台導覽頁
