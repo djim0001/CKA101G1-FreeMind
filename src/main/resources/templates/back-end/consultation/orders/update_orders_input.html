@@ -3,93 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <title>修改諮商訂單</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 620px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0 0 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+
+    .field {
+        margin-bottom: 16px;
+    }
+    .field > label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #7a6b6b;
+        margin-bottom: 6px;
+    }
+    .field .readonly {
+        font-size: 14px;
+        color: #444;
+    }
+
+    input[type="text"], select, textarea {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #e0d5d5;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+        outline: none;
+        border-color: #e8b4b4;
+    }
+    textarea { resize: none; height: 80px; }
+
+    .error {
+        color: #c62828;
+        font-size: 13px;
+        margin-left: 4px;
+    }
+
+    input[type="submit"] {
+        display: block;
+        width: 100%;
+        margin-top: 8px;
+        padding: 12px 0;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    input[type="submit"]:hover {
+        background-color: #d39393;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 16px;
+        color: #7a6b6b;
+        font-size: 14px;
+        text-decoration: none;
+    }
+    .back-link:hover { color: #d39393; }
+</style>
 </head>
 <body>
-    <h3>修改諮商訂單</h3>
+    <div class="card">
+        <h3>修改諮商訂單</h3>
 
-    <form method="post"
-          th:action="@{/admin/orders/update}"
-          th:object="${orders}">
+        <form method="post" th:action="@{/admin/orders/update}" th:object="${orders}">
 
-        <input type="hidden" th:field="*{orderId}">
-        <input type="hidden" name="slot" th:value="${orders.slot.timeslotId}">
+            <input type="hidden" th:field="*{orderId}">
+            <input type="hidden" name="slot" th:value="${orders.slot.timeslotId}">
+            <input type="hidden" th:field="*{member.memberId}">
+            <input type="hidden" th:field="*{psychologist.psychId}">
+            <input type="hidden" th:field="*{consStart}">
+            <input type="hidden" th:field="*{consEnd}">
+            <input type="hidden" th:field="*{createdAt}">
 
-        會員編號：
-		<span th:text="${orders.member.memberId}"></span>
-		<input type="hidden" th:field="*{member.memberId}"><br>
+            <div class="field">
+                <label>開始時間</label>
+                <span class="readonly" th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></span>
+            </div>
 
-        心理師編號：
-        <span th:text="${orders.psychologist.psychId}"></span>
-        <input type="hidden" th:field="*{psychologist.psychId}"><br>
+            <div class="field">
+                <label>結束時間</label>
+                <span class="readonly" th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></span>
+            </div>
 
-        開始時間：
-        <span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></span>
-        <input type="hidden" th:field="*{consStart}"><br>
+            <div class="field">
+                <label>心理師工作地點</label>
+                <input type="text" th:field="*{psychLoc}">
+                <span class="error" th:if="${#fields.hasErrors('psychLoc')}" th:errors="*{psychLoc}"></span>
+            </div>
 
-        結束時間：
-        <span th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></span>
-        <input type="hidden" th:field="*{consEnd}"><br>
+            <div class="field">
+                <label>是否為政府補助</label>
+                <select th:field="*{govSubsidy}">
+                    <option value="false">否</option>
+                    <option value="true">是</option>
+                </select>
+            </div>
 
-        建立時間：
-        <span th:text="${#temporals.format(orders.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
-        <input type="hidden" th:field="*{createdAt}"><br>
+            <div class="field">
+                <label>心理師諮詢費</label>
+                <input type="text" th:field="*{psychFee}">
+                <span class="error" th:if="${#fields.hasErrors('psychFee')}" th:errors="*{psychFee}"></span>
+            </div>
 
-        心理師工作地點：
-        <input type="text" th:field="*{psychLoc}">
-        <span style="color:red; margin-left:10px;"
-              th:if="${#fields.hasErrors('psychLoc')}"
-              th:errors="*{psychLoc}"></span><br>
+            <div class="field">
+                <label>訂單狀態</label>
+                <select th:field="*{orderStatus}">
+                    <option value="0">待確認</option>
+                    <option value="1">已確認</option>
+                    <option value="2">已取消</option>
+                    <option value="3">未出席</option>
+                    <option value="4">已完成</option>
+                </select>
+            </div>
 
-        是否為政府補助：
-        <select th:field="*{govSubsidy}">
-            <option value="false">否</option>
-            <option value="true">是</option>
-        </select><br>
+            <div class="field">
+                <label>來訪目的</label>
+                <select th:field="*{visitPurpose}">
+                    <option value="emotion">情緒困擾</option>
+                    <option value="stress">壓力調適</option>
+                    <option value="relationship">人際關係</option>
+                    <option value="family">家庭問題</option>
+                    <option value="career">職涯困惑</option>
+                    <option value="academic">課業壓力</option>
+                    <option value="self_growth">自我探索</option>
+                    <option value="sleep">睡眠問題</option>
+                    <option value="anxiety">焦慮傾向</option>
+                    <option value="other">其他</option>
+                </select>
+            </div>
 
-        心理師諮詢費：
-        <input type="text" th:field="*{psychFee}">
-        <span style="color:red; margin-left:10px;"
-              th:if="${#fields.hasErrors('psychFee')}"
-              th:errors="*{psychFee}"></span><br>
+            <div class="field">
+                <label>來訪目的備註</label>
+                <textarea th:field="*{visitPurposeNote}"></textarea>
+            </div>
 
-        訂單狀態：
-        <select th:field="*{orderStatus}">
-            <option value="0">0：待確認</option>
-            <option value="1">1：已確認</option>
-            <option value="2">2：已取消</option>
-            <option value="3">3：未出席</option>
-            <option value="4">4：已完成</option>
-        </select><br>
+            <div class="field">
+                <label>諮商參與形式</label>
+                <select th:field="*{sessionType}">
+                    <option value="0">單人諮商</option>
+                    <option value="1">伴侶諮商</option>
+                    <option value="2">家庭諮商</option>
+                    <option value="3">團體諮商</option>
+                </select>
+            </div>
 
-        來訪目的：
-        <select th:field="*{visitPurpose}">
-            <option value="emotion">情緒困擾</option>
-            <option value="stress">壓力調適</option>
-            <option value="relationship">人際關係</option>
-            <option value="family">家庭問題</option>
-            <option value="career">職涯困惑</option>
-            <option value="academic">課業壓力</option>
-            <option value="self_growth">自我探索</option>
-            <option value="sleep">睡眠問題</option>
-            <option value="anxiety">焦慮傾向</option>
-            <option value="other">其他</option>
-        </select><br>
+            <input type="submit" value="修改">
+        </form>
 
-        來訪目的備註：
-        <textarea th:field="*{visitPurposeNote}" rows="3" cols="30" style="resize:none;"></textarea><br>
-
-        諮商參與形式：
-        <select th:field="*{sessionType}">
-            <option value="0">0：單人諮商</option>
-            <option value="1">1：伴侶諮商</option>
-            <option value="2">2：家庭諮商</option>
-            <option value="3">3：團體諮商</option>
-        </select><br>
-
-        <input type="submit" value="修改">
-    </form>
-
-    <a th:href="@{/admin/orders/listAllOrders}">回列表</a>
-
+        <a class="back-link" th:href="@{/admin/orders/listAllOrders}">← 回列表</a>
+    </div>
 </body>
 </html>

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 @Controller
 @RequestMapping("/psych/slots")
@@ -28,19 +30,29 @@ public class SlotsPsychController {
 
 	private static final LocalDate TEMPLATE_DATE = LocalDate.of(2000, 1, 1);
 
+	// ===== 心理師：查詢/調整某天的可預約時段 =====
+
 	@GetMapping("manageSlotsForm")
-	public String manageSlotsForm(ModelMap model) {
+	public String manageSlotsForm(@AuthenticationPrincipal PsychUserDetails prinUserDetails, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
+		}
+		model.addAttribute("todayDate", java.time.LocalDate.now().toString());
 		return "front-end/psych/consultation/slots/manageSlotsForm";
 	}
 
 	@PostMapping("manageLookup")
-	public String manageLookup(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
-			ModelMap model) {
-		if (psychId == null || psychId.isBlank() || slotDateStr == null || slotDateStr.isBlank()) {
-			model.addAttribute("errorMessage", "請輸入心理師編號與日期");
+	public String manageLookup(@AuthenticationPrincipal PsychUserDetails prinUserDetails,
+			@RequestParam("slotDate") String slotDateStr, ModelMap model) {
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
+		}
+		Integer pid = prinUserDetails.getPsychologist().getPsychId();
+		if (slotDateStr == null || slotDateStr.isBlank()) {
+			model.addAttribute("errorMessage", "請選擇日期");
+			model.addAttribute("todayDate", java.time.LocalDate.now().toString());
 			return "front-end/psych/consultation/slots/manageSlotsForm";
 		}
-		Integer pid = Integer.valueOf(psychId);
 		LocalDate date = LocalDate.parse(slotDateStr);
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 		if (slots == null) {
@@ -56,9 +68,13 @@ public class SlotsPsychController {
 	}
 
 	@PostMapping("manageSubmit")
-	public String manageSubmit(@RequestParam("psychId") String psychId, @RequestParam("slotDate") String slotDateStr,
+	public String manageSubmit(@AuthenticationPrincipal PsychUserDetails prinUserDetails,
+			@RequestParam("slotDate") String slotDateStr,
 			@RequestParam(value = "openHours", required = false) List<Integer> openHours, ModelMap model) {
-		Integer pid = Integer.valueOf(psychId);
+		if (prinUserDetails == null) {
+			return "redirect:/front-end/login";
+		}
+		Integer pid = prinUserDetails.getPsychologist().getPsychId();
 		LocalDate date = LocalDate.parse(slotDateStr);
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 		boolean isNew = (slots == null);
@@ -96,6 +112,8 @@ public class SlotsPsychController {
 		model.addAttribute("success", "時段設定已更新！");
 		return "front-end/psych/consultation/slots/manageSlotsSuccess";
 	}
+
+	// ===== 心理師：設定固定範本（範本日固定為 2000-01-01）=====
 
 	@GetMapping("templateForm")
 	public String templateForm(ModelMap model) {
@@ -161,6 +179,4 @@ public class SlotsPsychController {
 		model.addAttribute("success", "固定範本已更新，並已套用到未來14天！已預約的時段不受影響。");
 		return "front-end/psych/consultation/slots/templateSuccess";
 	}
-
-	
 }
