@@ -2,178 +2,197 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>諮商訂單列表</title>
 <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif; background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 44px 20px; }
+    .wrap { max-width: 1280px; margin: 0 auto; }
+    .top { margin-bottom: 22px; }
+    .top h1 { font-size: 26px; font-weight: 700; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .search-card { background: #fff; border-radius: 14px; box-shadow: 0 3px 16px rgba(160,120,120,0.08); padding: 24px 28px; margin-bottom: 24px; }
+    .search-grid { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+    .search-field { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #7a6b6b; }
+    .search-field input[type="text"], .search-field input[type="date"], .search-field select {
+        padding: 7px 10px; border: 1px solid #e0d5d5; border-radius: 7px; font-family: inherit; font-size: 13.5px; color: #4a3e3e;
     }
+    .search-field input:focus, .search-field select:focus { outline: none; border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232,180,180,0.18); }
+    .search-btns { margin-top: 16px; display: flex; gap: 10px; }
+    .btn-search { padding: 9px 26px; background: #e8b4b4; color: #fff; border: none; border-radius: 7px; font-size: 14px; cursor: pointer; }
+    .btn-search:hover { background: #d39393; }
+    .btn-reset { padding: 9px 22px; background: #fff; color: #c07d7d; border: 1.5px solid #e8b4b4; border-radius: 7px; font-size: 14px; text-decoration: none; }
+    .btn-reset:hover { background: #fbf2f2; }
 
-    .card {
-        max-width: 1300px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
-
-    .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
-    .header h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0;
-    }
-    .header .actions a {
-        display: inline-block;
-        margin-left: 8px;
-        padding: 8px 18px;
-        background-color: #e8b4b4;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 14px;
-        transition: background-color 0.2s;
-    }
-    .header .actions a:hover {
-        background-color: #d39393;
-    }
-
-    .success {
-        color: #2e7d43;
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 10px 8px;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 13px;
-    }
-
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    tr:nth-child(even) td {
-        background-color: #fdfafa;
-    }
-
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 16px rgba(160,120,120,0.08); }
+    thead th { background: #5a4a45; color: #fff; font-weight: 600; font-size: 13.5px; padding: 14px 12px; white-space: nowrap; text-align: center; }
+    tbody td { padding: 13px 12px; font-size: 13.5px; border-bottom: 1px solid #f2e9e5; text-align: center; vertical-align: middle; }
+    tbody tr:hover td { background: #fdf9f7; }
     .nowrap { white-space: nowrap; }
 
-    .op-form {
-        margin-bottom: 4px;
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+    .b-pending { background: #fdf3e2; color: #b8860b; }
+    .b-confirmed { background: #e7f4e9; color: #1a7a1a; }
+    .b-cancelled { background: #fbeaea; color: #c62828; }
+    .b-noshow { background: #fdece0; color: #ef6c00; }
+    .b-completed { background: #e8f0fb; color: #1565c0; }
+
+    .fee { color: #a56a6a; font-weight: 600; }
+
+    .view-btn { display: inline-block; padding: 7px 16px; background: #fff; color: #c07d7d; border: 1.5px solid #e8b4b4; border-radius: 6px; font-size: 13px; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+    .view-btn:hover { background: #e8b4b4; color: #fff; }
+
+    .empty { color: #b3a5a0; font-size: 14px; padding: 50px; text-align: center; background: #fff; border-radius: 14px; }
+
+    /* 分頁 */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 20px; flex-wrap: wrap; }
+    .pagination button {
+        min-width: 38px; padding: 7px 12px; border: 1px solid #e8b4b4; background: #fff; color: #c07d7d;
+        border-radius: 7px; font-size: 14px; font-family: inherit; cursor: pointer; transition: all 0.15s;
     }
-    .op-btn {
-        width: 100%;
-        padding: 5px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        color: #fff;
-        font-size: 12px;
-        transition: opacity 0.2s;
-    }
-    .op-btn:hover { opacity: 0.85; }
-    .op-view   { background-color: #1565c0; }
-    .op-edit   { background-color: #b8860b; }
-    .op-delete { background-color: #c62828; }
+    .pagination button:hover:not(:disabled) { background: #fbf2f2; }
+    .pagination button.active { background: #e8b4b4; color: #fff; }
+    .pagination button:disabled { opacity: 0.4; cursor: default; }
 </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header">
-            <h3>諮商訂單列表</h3>
-            <div class="actions">
-                <a th:href="@{/admin/orders/addOrders}">新增訂單</a>
-                <a th:href="@{/admin/orders/select_Page}">查詢</a>
-            </div>
+    <div class="wrap">
+        <div class="top"><h1>諮商訂單列表</h1></div>
+
+        <div class="search-card">
+            <form method="post" th:action="@{/admin/orders/search}">
+                <div class="search-grid">
+                    <span class="search-field">訂單編號：<input type="text" name="orderId"></span>
+                    <span class="search-field">會員編號：<input type="text" name="memberId"></span>
+                    <span class="search-field">心理師編號：<input type="text" name="psychId"></span>
+                    <span class="search-field">
+                        訂單狀態：
+                        <select name="orderStatus">
+                            <option value="">全部</option>
+                            <option value="0">待確認</option>
+                            <option value="1">已確認</option>
+                            <option value="2">已取消</option>
+                            <option value="3">未出席</option>
+                            <option value="4">已完成</option>
+                        </select>
+                    </span>
+                    <span class="search-field">時段日期：<input type="date" name="slotDate"></span>
+                </div>
+                <div class="search-btns">
+                    <button type="submit" class="btn-search">查詢</button>
+                    <a class="btn-reset" th:href="@{/admin/orders/listAllOrders}">重設</a>
+                </div>
+            </form>
         </div>
 
         <span class="success" th:if="${success != null}" th:text="${success}"></span>
 
-        <table>
-            <tr>
-                <th>訂單編號</th>
-                <th>會員編號</th>
-                <th>會員名稱</th>
-                <th>心理師編號</th>
-                <th>心理師名稱</th>
-                <th>開始時間</th>
-                <th>結束時間</th>
-                <th>訂單狀態</th>
-                <th>諮詢費</th>
-                <th>來訪目的</th>
-                <th>操作</th>
-            </tr>
-            <tr th:each="order : ${ordersListData}">
-                <td th:text="${order.orderId}"></td>
-                <td th:text="${order.member.memberId}"></td>
-                <td class="nowrap" th:text="${order.member.name}"></td>
-                <td th:text="${order.psychologist.psychId}"></td>
-                <td class="nowrap" th:text="${order.psychologist.name}"></td>
-                <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-                <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-                <td th:switch="${order.orderStatus}">
-                    <span th:case="0">待確認</span>
-                    <span th:case="1">已確認</span>
-                    <span th:case="2">已取消</span>
-                    <span th:case="3">未出席</span>
-                    <span th:case="4">已完成</span>
-                </td>
-                <td th:text="${order.psychFee}"></td>
-                <td th:switch="${order.visitPurpose}">
-                    <span th:case="'emotion'">情緒困擾</span>
-                    <span th:case="'stress'">壓力調適</span>
-                    <span th:case="'relationship'">人際關係</span>
-                    <span th:case="'family'">家庭問題</span>
-                    <span th:case="'career'">職涯困惑</span>
-                    <span th:case="'academic'">課業壓力</span>
-                    <span th:case="'self_growth'">自我探索</span>
-                    <span th:case="'sleep'">睡眠問題</span>
-                    <span th:case="'anxiety'">焦慮傾向</span>
-                    <span th:case="'other'">其他</span>
-                    <span th:case="*" th:text="${order.visitPurpose}"></span>
-                </td>
-                <td class="nowrap">
-                    <form method="post" th:action="@{/admin/orders/viewDetail}" class="op-form">
-                        <input type="hidden" name="orderId" th:value="${order.orderId}">
-                        <input type="submit" class="op-btn op-view" value="查看詳情">
-                    </form>
-                    <form method="post" th:action="@{/admin/orders/getOne_For_Update}" class="op-form">
-                        <input type="hidden" name="orderId" th:value="${order.orderId}">
-                        <input type="submit" class="op-btn op-edit" value="修改">
-                    </form>
-                    <form method="post" th:action="@{/admin/orders/delete}" class="op-form">
-                        <input type="hidden" name="orderId" th:value="${order.orderId}">
-                        <input type="submit" class="op-btn op-delete" value="刪除"
-                               onclick="return confirm('確定要刪除此筆訂單嗎？')">
-                    </form>
-                </td>
-            </tr>
+        <table th:if="${!#lists.isEmpty(ordersListData)}">
+            <thead>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>會員編號</th>
+                    <th>會員名稱</th>
+                    <th>心理師編號</th>
+                    <th>心理師名稱</th>
+                    <th>開始時間</th>
+                    <th>結束時間</th>
+                    <th>訂單狀態</th>
+                    <th>諮詢費</th>
+                    <th>來訪目的</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="ordersBody">
+                <tr th:each="order : ${ordersListData}">
+                    <td th:text="${order.orderId}"></td>
+                    <td th:text="${order.member.memberId}"></td>
+                    <td class="nowrap" th:text="${order.member.name}"></td>
+                    <td th:text="${order.psychologist.psychId}"></td>
+                    <td class="nowrap" th:text="${order.psychologist.name}"></td>
+                    <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:switch="${order.orderStatus}">
+                        <span th:case="0" class="badge b-pending">待確認</span>
+                        <span th:case="1" class="badge b-confirmed">已確認</span>
+                        <span th:case="2" class="badge b-cancelled">已取消</span>
+                        <span th:case="3" class="badge b-noshow">未出席</span>
+                        <span th:case="4" class="badge b-completed">已完成</span>
+                    </td>
+                    <td class="fee" th:text="'NT$ ' + ${order.psychFee}"></td>
+                    <td th:switch="${order.visitPurpose}">
+                        <span th:case="'emotion'">情緒困擾</span>
+                        <span th:case="'stress'">壓力調適</span>
+                        <span th:case="'relationship'">人際關係</span>
+                        <span th:case="'family'">家庭問題</span>
+                        <span th:case="'career'">職涯困惑</span>
+                        <span th:case="'academic'">課業壓力</span>
+                        <span th:case="'self_growth'">自我探索</span>
+                        <span th:case="'sleep'">睡眠問題</span>
+                        <span th:case="'anxiety'">焦慮傾向</span>
+                        <span th:case="'other'">其他</span>
+                        <span th:case="*" th:text="${order.visitPurpose}"></span>
+                    </td>
+                    <td class="nowrap">
+                        <form method="post" th:action="@{/admin/orders/viewDetail}">
+                            <input type="hidden" name="orderId" th:value="${order.orderId}">
+                            <button type="submit" class="view-btn">查看詳情</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
         </table>
+
+        <div class="pagination" id="pagination"></div>
+
+        <div class="empty" th:if="${#lists.isEmpty(ordersListData)}">查無符合條件的諮商訂單。</div>
     </div>
+
+    <script>
+        (function () {
+            var rowsPerPage = 10;
+            var body = document.getElementById('ordersBody');
+            if (!body) return;
+            var rows = Array.prototype.slice.call(body.querySelectorAll('tr'));
+            var pageCount = Math.ceil(rows.length / rowsPerPage);
+            var pag = document.getElementById('pagination');
+
+            function showPage(page) {
+                rows.forEach(function (r, i) {
+                    r.style.display = (i >= (page - 1) * rowsPerPage && i < page * rowsPerPage) ? '' : 'none';
+                });
+                render(page);
+            }
+
+            function render(page) {
+                pag.innerHTML = '';
+                if (pageCount <= 1) return;
+
+                var prev = document.createElement('button');
+                prev.textContent = '‹';
+                prev.disabled = (page === 1);
+                prev.onclick = function () { showPage(page - 1); };
+                pag.appendChild(prev);
+
+                for (var i = 1; i <= pageCount; i++) {
+                    (function (p) {
+                        var b = document.createElement('button');
+                        b.textContent = p;
+                        if (p === page) b.classList.add('active');
+                        b.onclick = function () { showPage(p); };
+                        pag.appendChild(b);
+                    })(i);
+                }
+
+                var next = document.createElement('button');
+                next.textContent = '›';
+                next.disabled = (page === pageCount);
+                next.onclick = function () { showPage(page + 1); };
+                pag.appendChild(next);
+            }
+
+            if (rows.length) showPage(1);
+        })();
+    </script>
 </body>
 </html>

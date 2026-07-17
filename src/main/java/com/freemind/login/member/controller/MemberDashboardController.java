@@ -24,7 +24,7 @@ public class MemberDashboardController {
 	
 	@GetMapping("/myAppointment")
 	public String myAppointment() {
-	    return "front-end/member/memberpage/myAppointment";
+		return "redirect:/member/orders/myOrders";
 	}
 	
 	@GetMapping

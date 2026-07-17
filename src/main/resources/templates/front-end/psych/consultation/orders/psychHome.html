@@ -2,48 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>心理師預約管理</title>
 <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-        font-family: "Microsoft JhengHei", Arial, sans-serif;
-        margin: 30px;
-        color: #333;
+        font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif;
+        background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 60px 20px;
     }
-    h3 {
-        margin-bottom: 20px;
+    .wrap { max-width: 900px; margin: 0 auto; }
+
+    .head { text-align: center; margin-bottom: 40px; }
+    .head h1 { font-size: 30px; font-weight: 700; }
+    .head p { color: #a99a95; font-size: 15px; margin-top: 6px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .tile {
+        display: block; text-decoration: none; color: inherit;
+        background: #fff; border-radius: 16px; padding: 30px 26px;
+        box-shadow: 0 3px 16px rgba(160,120,120,0.08);
+        border: 1px solid #f2e9e5;
+        transition: transform 0.15s, box-shadow 0.2s;
     }
-    .menu {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-width: 320px;
+    .tile:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(232,180,180,0.28); }
+    .tile .icon {
+        width: 56px; height: 56px; border-radius: 14px;
+        background: #fbf2f2; display: flex; align-items: center; justify-content: center;
+        font-size: 26px; margin-bottom: 18px;
     }
-    .menu a {
-        display: block;
-        padding: 14px 18px;
-        background-color: #f2f2f2;
-        border-radius: 6px;
-        text-decoration: none;
-        color: #333;
-        font-size: 1rem;
-        transition: background-color 0.15s;
-    }
-    .menu a:hover {
-        background-color: #e0e0e0;
-    }
+    .tile h3 { font-size: 18px; margin-bottom: 6px; }
+    .tile p { font-size: 13px; color: #a99a95; }
 </style>
 </head>
 <body>
-	<h3>心理師預約管理</h3>
+    <div class="wrap">
+        <div class="head">
+            <h1>心理師預約管理</h1>
+            <p>管理你的預約時段、確認訂單，並掌握諮商紀錄與評價</p>
+        </div>
 
-	<div class="menu">
-		<a th:href="@{/psych/slots/manageSlotsForm}">預約時段表（單日調整）</a>
-		<a th:href="@{/psych/slots/templateForm}">設定固定範本</a>
-		<a th:href="@{/psych/orders/psychOrders}">預約狀態</a>
-		<a th:href="@{/psych/orders/psychHistoryForm}">歷史諮商紀錄</a>
-		<a th:href="@{/psych/orders/psychCancelledForm}">取消紀錄</a>
-		<a th:href="@{/psych/orders/psychReviews}">查看評價</a>
-	</div>
-
+        <div class="grid">
+            <a class="tile" th:href="@{/psych/slots/manageSlotsForm}">
+                <div class="icon">🗓️</div>
+                <h3>預約時段調整</h3>
+                <p>設定或調整每一天開放的可預約時段</p>
+            </a>
+            <a class="tile" th:href="@{/psych/orders/psychOrders}">
+                <div class="icon">📋</div>
+                <h3>預約狀態</h3>
+                <p>查看待確認/已確認訂單，同意、拒絕與標記完成</p>
+            </a>
+            <a class="tile" th:href="@{/psych/orders/psychHistoryForm}">
+                <div class="icon">📖</div>
+                <h3>歷史諮商紀錄</h3>
+                <p>查詢已完成、未出席、已取消的諮商紀錄</p>
+            </a>
+            <a class="tile" th:href="@{/psych/orders/psychCancelledForm}">
+                <div class="icon">🚫</div>
+                <h3>取消紀錄</h3>
+                <p>檢視所有已取消的預約</p>
+            </a>
+            <a class="tile" th:href="@{/psych/orders/psychReviews}">
+                <div class="icon">⭐</div>
+                <h3>查看評價</h3>
+                <p>查看會員給你的評分與心得回饋</p>
+            </a>
+        </div>
+    </div>
 </body>
 </html>
