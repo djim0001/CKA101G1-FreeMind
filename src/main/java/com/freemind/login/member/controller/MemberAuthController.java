@@ -17,7 +17,9 @@ import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 import com.freemind.login.member.otp.OtpMailService;
 import com.freemind.login.member.otp.OtpService;
+import com.freemind.login.security.membersecurity.GoogleLoginSuccessHandler;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 /**
@@ -53,14 +55,26 @@ public class MemberAuthController {
 	/* ==================== 註冊 ==================== */
 
 	@GetMapping("/register")
-	public String registerForm(ModelMap model) {
-		model.addAttribute("registerForm", new RegisterForm());
+	public String registerForm(ModelMap model, HttpSession session) {
+		RegisterForm form = new RegisterForm();
+		// Google 登入導過來的：email 已通過 Google 驗證，預填並鎖定（模板設 readonly）
+		String googleEmail = (String) session.getAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+		if (googleEmail != null) {
+			form.setEmail(googleEmail);
+			model.addAttribute("googleRegister", true);
+		}
+		model.addAttribute("registerForm", form);
 		return "front-end/member/auth/register";
 	}
 
 	@PostMapping("/register")
 	public String register(@Valid @ModelAttribute("registerForm") RegisterForm form,
-			BindingResult result, ModelMap model) {
+			BindingResult result, ModelMap model, HttpSession session) {
+
+		// 是否為「Google 帳號註冊」：以 session 存的 email 為準（表單欄位雖 readonly 仍可能被改造），
+		// 送出的 email 與 Google 驗證過的一致才算，否則一律走一般 OTP 流程
+		String googleEmail = (String) session.getAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+		boolean googleRegister = googleEmail != null && googleEmail.equals(form.getEmail());
 
 		// 帳號、信箱不可重複
 		if (memberService.findByAccount(form.getMemberAccount()) != null) {
@@ -76,6 +90,9 @@ public class MemberAuthController {
 		}
 		
 		if (result.hasErrors()) {
+			if (googleRegister) {
+				model.addAttribute("googleRegister", true); // 錯誤重回頁面時維持 Google 模式
+			}
 			return "front-end/member/auth/register";
 		}
 
@@ -94,9 +111,16 @@ public class MemberAuthController {
 		member.setAddress(blankToNull(form.getAddress()));
 		member.setNickname(blankToNull(form.getNickname()));
 		
-		member.setAccountStatus(0);
+		// Google 註冊：信箱已由 Google 驗證，直接啟用；一般註冊：未啟用，待 OTP 驗證
+		member.setAccountStatus(googleRegister ? 1 : 0);
 		member.setRegisAt(LocalDateTime.now());
 		memberService.addMember(member);
+
+		if (googleRegister) {
+			// 免 OTP，直接完成註冊，之後即可用 Google 一鍵登入
+			session.removeAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+			return "redirect:/front-end/login?verified";
+		}
 
 		// sendOtpMail : 給資料庫（Redis）跟系統後台程式看的 OtpService 48行 （用來產生資料庫的 Key）
 		// 會被存成如 : otp:register:user@gmail.com、otp:reset:user@gmail.com

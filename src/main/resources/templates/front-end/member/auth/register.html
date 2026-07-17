@@ -18,6 +18,13 @@
 		<span style="color: red;">*</span> 為必填欄位
 	</p>
 
+	<!-- Google 帳號註冊模式：email 已由 Google 驗證，鎖定不可改，送出後免驗證碼 -->
+	<p th:if="${googleRegister}"
+		style="background: #e8f0fe; border-left: 4px solid #4285F4; padding: 10px; color: #333;">
+		正在使用 Google 帳號 <strong th:text="${registerForm.email}"></strong> 註冊，
+		信箱已完成驗證，填妥其餘資料送出後即可用 Google 一鍵登入。
+	</p>
+
 	<form th:action="@{/front-end/register}" th:object="${registerForm}"
 		method="post">
 
@@ -66,9 +73,12 @@
 		</p>
 
 		<p>
+			<!-- Google 註冊時 email 唯讀（後端仍以 session 的 Google email 為準比對） -->
 			<label class="required">信箱：<input type="text"
-				th:field="*{email}"></label> <span style="color: red;"
-				th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+				th:field="*{email}" th:readonly="${googleRegister}"
+				th:style="${googleRegister} ? 'background:#eee;'"></label>  <!-- 三元運算子 條件 ? '成立時' : '不成立時'-->
+				<span style="color: red;" 
+				th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span> 
 		</p>
 
 		<p>
