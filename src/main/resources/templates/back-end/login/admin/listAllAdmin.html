@@ -49,6 +49,7 @@
 					<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
 					<input type="submit" value="刪除">
 				</form>
+				<a th:href="@{/admin/permissions/assign(adminId=${adminVO.adminId})}">權限設定</a>
 			</td>
 		</tr>
 	</table>
