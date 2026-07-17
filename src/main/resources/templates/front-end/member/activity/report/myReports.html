@@ -47,9 +47,18 @@
 
     <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
 
+	<!-- 分頁按鈕 -->
+	<div th:if="${totalPages > 1}">
+	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+	       th:href="@{/member/activity/report/myReports(currentPage=${i})}"
+	       th:text="${i}"
+	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
+	    </a>
+	</div>
+
 	<br>
     <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/registration/myRegistrations}">我的活動報名清單</a>｜<a th:href="@{/member/activity/listAllActivity}">查看全部活動列表</a>
 
-</script>
+
 </body>
 </html>

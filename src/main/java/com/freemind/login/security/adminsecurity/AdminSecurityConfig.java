@@ -39,6 +39,8 @@ public class AdminSecurityConfig {
                 .requestMatchers("/","/back-end/login").permitAll()
 //                .requestMatchers("/course_index/**").hasAnyRole("super_admin","courses")
                 .requestMatchers("/admin/select_page").hasRole("super_admin")
+                
+                
                 // 其他所有 /back-end/** 和 /admin/** 都需要「管理員」身分
                 // （不能用 authenticated()：兩條 chain 共用 session，會員登入也算已認證）
                 .anyRequest().hasRole("ADMIN")
@@ -53,7 +55,7 @@ public class AdminSecurityConfig {
                 .loginProcessingUrl("/back-end/login")
                 .usernameParameter("adminAccount")
                 .passwordParameter("adminPassword")
-                .defaultSuccessUrl("/", false)
+                .defaultSuccessUrl("/index_temp", false)
                 .failureUrl("/back-end/login?error=true")
                 .permitAll()
             )

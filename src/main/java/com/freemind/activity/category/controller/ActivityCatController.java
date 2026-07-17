@@ -54,7 +54,7 @@ public class ActivityCatController {
 		activityCatSvc.addActivityCat(activityCat); // 呼叫Service的addActivityCat方法，把這個已經驗證過的物件，交給Service處理（Service再呼叫Repository的save()存進資料庫）
 		List<ActivityCat> list = activityCatSvc.getAll();  // 新增完成後，重新查一次「全部的分類清單」
 		model.addAttribute("activityCatListData", list);  //把這份最新清單，放進「資料袋子」並取名activityCatListData
-		model.addAttribute("success", "- (新增成功)");
+		model.addAttribute("success", "新增成功");
 		return "back-end/activity/activityCat/listAllActivityCat";
 	}
 	
@@ -77,7 +77,7 @@ public class ActivityCatController {
 		activityCatSvc.updateActivityCat(activityCat);
 		List<ActivityCat> list = activityCatSvc.getAll();
 		model.addAttribute("activityCatListData", list);
-		model.addAttribute("success", "- (修改成功)");
+		model.addAttribute("success", "修改成功");
 		return "back-end/activity/activityCat/listAllActivityCat";
 	}
 	// 刪除
@@ -87,7 +87,7 @@ public class ActivityCatController {
 
 	    List<ActivityCat> list = activityCatSvc.getAll();   // 刪除後，重新查一次最新清單
 	    model.addAttribute("activityCatListData", list);    // 放進資料袋子，準備給列表頁顯示
-	    model.addAttribute("success", "- (刪除成功)");
+	    model.addAttribute("success", "刪除成功");
 	    return "back-end/activity/activityCat/listAllActivityCat";
 	}
 	

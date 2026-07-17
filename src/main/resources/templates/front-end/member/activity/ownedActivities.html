@@ -6,7 +6,7 @@
     <title>我發起的活動</title>
     <style>
   /* =================================================================== */
-  /* 🎯 分配 10 個直行的寬度比例 (加起來剛好 100%) */
+  /* 分配寬度比例 (100%) */
   /* =================================================================== */
   th:nth-child(1) { width: 10%; }  /* 活動圖片 */
   th:nth-child(2) { width: 4%; }  /* 編號 */
@@ -19,7 +19,6 @@
   th:nth-child(9) { width: 9%; } /* 查看詳情按鈕欄位 */	
   th:nth-child(10) { width: 10%; } /* 其他操作按鈕欄位 */	
   
-  /* 針對第 10 個 td (操作欄) 下達不准換行的指令，按鈕就絕對會乖乖併排 */
   td:nth-child(9) {
     white-space: nowrap; 
   }
@@ -36,6 +35,7 @@
     <h1>我發起的活動</h1>
 
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
+	<p th:if="${success}" th:utext="${success}" style="color:blue;"></p>
 
 	<h3><a th:href="@{/member/activity/select_page}">回活動首頁</a></h3>
 	    
@@ -97,7 +97,7 @@
 		    
 			<td>
 			    <div class="action-block" th:if="${a.activityStatus == 0 || a.activityStatus == 3}">
-			        <form th:action="@{/member/activity/getOne_For_Update}" method="post" style="display:inline;">
+			        <form th:action="@{/member/activity/getOne_For_Update}" method="get" style="display:inline;">
 			            <input type="hidden" name="activityId" th:value="${a.activityId}">
 			            <button type="submit">修改</button>
 			        </form>
