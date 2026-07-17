@@ -9,7 +9,9 @@ public class IndexTempController {
 	@GetMapping("/index_temp")
 	public String frontHome() {
 
+
 		return "/index_temp"; // 本來的首頁
+
 
 	}
 

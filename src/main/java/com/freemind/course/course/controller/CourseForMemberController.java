@@ -1,5 +1,7 @@
 package com.freemind.course.course.controller;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -30,6 +32,7 @@ import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.course.util.CourseSpecification;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 
@@ -79,6 +82,8 @@ public class CourseForMemberController {
 	@GetMapping("/select_course")
 	public String memberSelectCourse(
 			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(required = false) String keyword,
+			@ModelAttribute("condition") CourseSpecification condition,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
 
@@ -86,7 +91,8 @@ public class CourseForMemberController {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
-		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+//		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
 		if(member!=null) {
 			for(Course course : courseList) {
 				course.setSaved(courseSvc
@@ -153,38 +159,6 @@ public class CourseForMemberController {
 		return "front-end/member/course/listOneCourse";
 	}
 	
-//	@ResponseBody
-//	@PostMapping("/playback-position")
-//	 public ResponseEntity<Void> updatePlaybackPosition(
-//	            @RequestBody PlaybackPositionReq request,
-//	            @RequestParam(value = "memberId", required = false) Integer memberId,
-////	            @ModelAttribute("member") Member member,
-//	            HttpSession session) {
-//
-//		System.out.println("開始");
-////	        Integer memberId = member.getMemberId();
-//
-//	        if (memberId == null) {
-//	        	System.out.println("沒有memberId");
-//	            return ResponseEntity
-//	                    .status(HttpStatus.UNAUTHORIZED)
-//	                    .build();
-//	        }
-//System.out.println("開始儲存進度");
-//	        orderDetailSvc.updatePlaybackPosition(
-//	                memberId,
-//	                request.courseOrderId(),
-//	                request.courseId(),
-//	                request.playbackSeconds()
-//	        );
-//	        System.out.println("會員編號：" + memberId);
-//	        System.out.println("訂單編號：" + request.courseOrderId());
-//	        System.out.println("課程編號：" + request.courseId());
-//	        System.out.println("播放秒數：" + request.playbackSeconds());
-//	        
-//	        return ResponseEntity.noContent().build();
-//	    }
-	
 	@ResponseBody
 	@PostMapping("/playback-position")
 	public ResponseEntity<Void> updatePlaybackPosition(
@@ -215,12 +189,31 @@ public class CourseForMemberController {
 	    System.out.println(
 	            "播放秒數：" + request.playbackSeconds()
 	    );
+	    BigDecimal progress = request.playbackPercentage();
+
+	    if (progress == null) {
+	        progress = BigDecimal.ZERO;
+	    }
+
+	    progress = progress
+	            .max(BigDecimal.ZERO)
+	            .min(new BigDecimal("100"))
+	            .setScale(2, RoundingMode.HALF_UP);
 
 	    orderDetailSvc.updatePlaybackPosition(
 	            memberId,
 	            request.courseOrderId(),
 	            request.courseId(),
-	            request.playbackSeconds()
+	            request.playbackSeconds(),
+	            progress
+	    );
+
+	    orderDetailSvc.updatePlaybackPosition(
+	            memberId,
+	            request.courseOrderId(),
+	            request.courseId(),
+	            request.playbackSeconds(),
+	            progress
 	    );
 
 	    return ResponseEntity.noContent().build();

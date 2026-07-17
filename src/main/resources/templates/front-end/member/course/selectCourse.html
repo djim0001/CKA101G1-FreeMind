@@ -17,7 +17,7 @@
 				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
 				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
 		</nav>
-		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+		<div class="header-actions"><a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a class="profile-entry" th:href="@{/member/profile}"><span th:text="${member.name}">會員</span></a></div>
 	</header>
 	<main class="container">
 		<section class="hero">
@@ -50,7 +50,7 @@
 					th:classappend="${orderBy == null or orderBy == '' or orderBy == 'listedAt'} ? 'active' : ''">最新課程</button>
 			</form>
 			<form class="tabs course-category-tabs" method="get"
-				th:action="@{/member/course/search-by-category}" aria-label="課程分類">
+				th:action="@{/member/course/select_course}" aria-label="課程分類">
 				<a th:href="@{/member/course/select_course}"
 					th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
 				<button type="submit" name="courseCatId"
@@ -76,12 +76,14 @@
 			<article class="course-card" data-course-card
 				th:each="course : ${courseList}"
 				th:attr="data-category=${course.courseCategories.courseCatId}">
-				<div class="course-cover course-video-cover">
+				<a class="course-cover course-video-cover course-cover-link"
+					th:href="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}"
+					th:attr="aria-label=${'查看「' + course.courseName + '」課程詳情'}">
 					<video muted playsinline preload="metadata" data-course-thumbnail
 						th:src="${course.videoSrcPre != null and !#strings.isEmpty(course.videoSrcPre) ? course.videoSrcPre : course.videoSrc}"
 						th:attr="aria-label=${course.courseName + '影片預覽圖'}"></video>
 					<span th:text="${course.courseCategories.courseCatName}">課程分類</span>
-				</div>
+				</a>
 				<div class="course-body">
 					<span class="tag"
 						th:text="${course.courseCategories.courseCatName}">分類</span>
@@ -96,10 +98,6 @@
 					</div>
 					<div class="price-row">
 						<span class="price">NT$ <span th:text="${course.price}">0</span></span>
-						<form class="inline-form" method="get"
-							th:action="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}">
-							<button class="btn secondary" type="submit">查看課程</button>
-						</form>
 					</div>
 					<div class="inline-actions">
 						<form class="inline-form" method="post"
