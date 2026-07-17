@@ -3,56 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <title>查詢諮商問題回報</title>
-    <style>
-        .search-field {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-right: 24px;
-            margin-bottom: 16px;
-        }
-        .search-form-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-    </style>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 900px;
+        margin: 0 auto 24px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+    .card-header h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0;
+    }
+    .back-link {
+        display: inline-block;
+        padding: 8px 18px;
+        background-color: #e8b4b4;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    .back-link:hover { background-color: #d39393; }
+
+    h4 { font-size: 16px; color: #4a3e3e; margin: 0 0 12px; }
+
+    .error { color: #c62828; font-size: 14px; margin-bottom: 12px; }
+
+    .search-form-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 24px;
+        margin-bottom: 18px;
+    }
+    .search-field {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #7a6b6b;
+    }
+    .search-field input[type="text"],
+    .search-field select {
+        padding: 7px 10px;
+        border: 1px solid #e0d5d5;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+    }
+    .search-field input:focus, .search-field select:focus {
+        outline: none;
+        border-color: #e8b4b4;
+    }
+
+    .search-btn {
+        padding: 9px 26px;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .search-btn:hover { background-color: #d39393; }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 6px;
+    }
+    th, td {
+        border: 1px solid #f2dddd;
+        padding: 10px 12px;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: center;
+    }
+    td { text-align: center; }
+
+    .detail-table th { text-align: left; width: 35%; }
+    .detail-table td { text-align: left; }
+
+    .nowrap { white-space: nowrap; }
+    .desc-cell { text-align: left; word-break: break-word; }
+
+    .status-pending { color: #b8860b; font-weight: bold; }
+    .status-processing { color: #1565c0; font-weight: bold; }
+    .status-resolved { color: #2e7d43; font-weight: bold; }
+</style>
 </head>
 <body>
-    <h3>查詢諮商問題回報</h3>
-
-    <span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
-
-    <form method="post" th:action="@{/admin/reports/search}">
-        <div class="search-form-wrap">
-            <span class="search-field">諮商問題編號：<input type="text" name="reportId"></span>
-            <span class="search-field">會員編號：<input type="text" name="memberId"></span>
-            <span class="search-field">
-                處理狀態：
-                <select name="reportStatus">
-                    <option value="">請選擇</option>
-                    <option value="0">待處理</option>
-                    <option value="1">處理中</option>
-                    <option value="2">已解決</option>
-                </select>
-            </span>
+    <div class="card">
+        <div class="card-header">
+            <h3>查詢諮商問題回報</h3>
+            <a class="back-link" th:href="@{/admin/reports/listAllReports}">回列表</a>
         </div>
-        <input type="submit" value="查詢">
-    </form>
+
+        <span class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
+
+        <form method="post" th:action="@{/admin/reports/search}">
+            <div class="search-form-wrap">
+                <span class="search-field">諮商問題編號：<input type="text" name="reportId"></span>
+                <span class="search-field">會員編號：<input type="text" name="memberId"></span>
+                <span class="search-field">
+                    處理狀態：
+                    <select name="reportStatus">
+                        <option value="">請選擇</option>
+                        <option value="0">待處理</option>
+                        <option value="1">處理中</option>
+                        <option value="2">已解決</option>
+                    </select>
+                </span>
+            </div>
+            <input type="submit" class="search-btn" value="查詢">
+        </form>
+    </div>
 
     <!-- 單筆查詢結果 -->
-    <div th:if="${reports != null}">
-       
-        <table border="1">
+    <div class="card" th:if="${reports != null}">
+        <h4>查詢結果（單筆）</h4>
+        <table class="detail-table">
             <tr><th>編號</th><td th:text="${reports.reportId}"></td></tr>
             <tr><th>會員編號</th><td th:text="${reports.member.memberId}"></td></tr>
+            <tr><th>會員姓名</th><td th:text="${reports.member.name}"></td></tr>
             <tr><th>問題描述</th><td th:text="${reports.issueDesc}"></td></tr>
-            <tr><th>回報日期</th><td th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>回報日期</th><td th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm')}"></td></tr>
             <tr><th>處理狀態</th>
                 <td th:switch="${reports.reportStatus}">
-                    <span th:case="0">待處理</span>
-                    <span th:case="1">處理中</span>
-                    <span th:case="2">已解決</span>
+                    <span th:case="0" class="status-pending">待處理</span>
+                    <span th:case="1" class="status-processing">處理中</span>
+                    <span th:case="2" class="status-resolved">已解決</span>
                 </td>
             </tr>
             <tr><th>處理備註</th><td th:text="${reports.reportNote}"></td></tr>
@@ -60,12 +169,13 @@
     </div>
 
     <!-- 多筆查詢結果 -->
-    <div th:if="${reportsListData != null}">
-       
-        <table border="1">
+    <div class="card" th:if="${reportsListData != null}">
+        <h4>查詢結果（多筆）</h4>
+        <table>
             <tr>
                 <th>編號</th>
                 <th>會員編號</th>
+                <th>會員姓名</th>
                 <th>問題描述</th>
                 <th>回報日期</th>
                 <th>處理狀態</th>
@@ -73,18 +183,16 @@
             <tr th:each="report : ${reportsListData}">
                 <td th:text="${report.reportId}"></td>
                 <td th:text="${report.member.memberId}"></td>
-                <td th:text="${report.issueDesc}"></td>
-                <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td class="nowrap" th:text="${report.member.name}"></td>
+                <td class="desc-cell" th:text="${report.issueDesc}"></td>
+                <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:switch="${report.reportStatus}">
-                    <span th:case="0">待處理</span>
-                    <span th:case="1">處理中</span>
-                    <span th:case="2">已解決</span>
+                    <span th:case="0" class="status-pending">待處理</span>
+                    <span th:case="1" class="status-processing">處理中</span>
+                    <span th:case="2" class="status-resolved">已解決</span>
                 </td>
             </tr>
         </table>
     </div>
-
-    <a th:href="@{/admin/reports/listAllReports}">回列表</a>
-
 </body>
 </html>

@@ -2,45 +2,151 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>首頁</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>諮由自在｜線上心理諮商平台</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+        --green: #4a9d7f;
+        --green-dark: #37836a;
+        --green-light: #eaf5f0;
+        --ink: #2f3e39;
+        --gray: #7c8a85;
+    }
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        color: var(--ink);
+        background: #fff;
+        line-height: 1.7;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 40px;
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        z-index: 10;
+    }
+    .nav .logo { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; }
+    .nav .auth { display: flex; gap: 10px; }
+    .btn {
+        padding: 9px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+    }
+    .btn-outline { border: 1.5px solid #fff; color: #fff; background: transparent; }
+    .btn-outline:hover { background: rgba(255,255,255,0.18); }
+    .btn-solid { background: #fff; color: var(--green-dark); font-weight: 600; }
+    .btn-solid:hover { background: var(--green-light); }
+
+    .hero {
+        background: linear-gradient(135deg, #4a9d7f 0%, #37836a 100%);
+        color: #fff;
+        text-align: center;
+        padding: 130px 40px 90px;
+    }
+    .hero .tag { font-size: 15px; font-weight: 600; opacity: 0.9; margin-bottom: 14px; letter-spacing: 2px; }
+    .hero h1 { font-size: 42px; line-height: 1.35; margin-bottom: 20px; }
+    .hero p { font-size: 17px; opacity: 0.92; margin-bottom: 32px; }
+    .hero .cta { background: #fff; color: var(--green-dark); padding: 14px 42px; font-size: 16px; font-weight: 600; border-radius: 999px; display: inline-block; transition: background 0.2s; }
+    .hero .cta:hover { background: var(--green-light); }
+
+    .section { max-width: 1080px; margin: 0 auto; padding: 70px 40px; }
+    .section-head { text-align: center; margin-bottom: 44px; }
+    .section-head .sub { color: var(--green); font-weight: 600; margin-bottom: 8px; }
+    .section-head h2 { font-size: 30px; }
+
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
+    .card {
+        border: 1px solid #eee;
+        border-radius: 16px;
+        padding: 34px 26px;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(74,157,127,0.15); }
+    .card .icon {
+        width: 66px; height: 66px; margin: 0 auto 18px;
+        background: var(--green-light); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 30px;
+    }
+    .card h3 { font-size: 20px; margin-bottom: 10px; }
+    .card p { font-size: 14px; color: var(--gray); margin-bottom: 18px; }
+    .card .go { color: var(--green); font-weight: 600; font-size: 14px; }
+
+    footer { background: var(--ink); color: #cdd8d3; text-align: center; padding: 30px; font-size: 13px; }
+</style>
 </head>
 <body>
-<h1>首頁</h1>
 
-<form th:action="@{/back-end/logout}" method="post">
-    <button type="submit">登出 (管理員)</button>
-</form>
+    <div class="nav">
+        <a class="logo" th:href="@{/}">諮由自在</a>
+        <div class="auth">
+            <a class="btn btn-outline" th:href="@{/front-end/login}">會員登入</a>
+            <a class="btn btn-solid" th:href="@{/psych/psychologistLogin}">心理師登入</a>
+        </div>
+    </div>
 
-<form th:action="@{/front-end/logout}" method="post">
-    <button type="submit">登出 (會員)</button>
-</form>
+    <div class="hero">
+        <div class="tag">讓心理健康成為日常</div>
+        <h1>線上預約心理師<br>讓心理照護不中斷</h1>
+        <p>專業、安全且重視隱私的心理諮商平台，陪你安放每一種情緒。</p>
+        <a class="cta" th:href="@{/search}">開始預約</a>
+    </div>
 
-<form th:action="@{/psych/logout}" method="post">
-    <button type="submit">登出 (心理師)</button>
-</form>
-<h3><a th:href="@{/front-end/login}">會員登入</a>｜<a th:href="@{/member/profile}">會員個人檔案</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a></h3>
-<h3><a th:href="@{/back-end/login}">管理員登入</a>｜<a th:href="@{/admin/select_page}">管理員檔案</a></h3>
-<h3><a th:href="@{/psych/psychologistLogin}">心理師登入</a></h3>
-<h3><a th:href="@{/search}">心理師查詢</a></h3>
-<h3><a th:href="@{/admin/psych }">心理師管理</a></h3>
-<h3><a th:href="@{/admin/notifications/listAllNotification}">系統公告</a>｜<a th:href="@{/admin/notice/listAllNoticeTemplate}">通知範本</a></h3>
-<h3><a th:href="@{/consultation}">諮商預約</a></h3>
-<h3><a th:href="@{/member/course/select_course}">課程商城</a>｜<a th:href="@{/psych/course/select_course}">課程商城(心理師)</a>｜<a th:href="@{/admin/course/select_course}">課程商城(員工)</a></h3>
-<h3><a th:href="@{/article}">專欄文章</a>｜<a th:href="@{/member/dashboard/myCollection/article}">我的收藏</a>｜<a th:href="@{/psych/article/myArticles}">我的文章</a>｜<a th:href="@{/admin/article}">文章管理</a></h3>
-<h3><a th:href="@{/member/activity/activityIndex}">揪團活動</a>｜<a th:href="@{/member/activity/ownedActivities}">我發起的活動</a>｜<a th:href="@{/admin/activity/activityAdminIndex}">活動管理</a></h3>
+    <div class="section">
+        <div class="section-head">
+            <div class="sub">諮由自在服務</div>
+            <h2>探索我們的服務</h2>
+        </div>
+        <div class="cards">
+            <a class="card" th:href="@{/search}">
+                <div class="icon">🗓️</div>
+                <h3>預約諮商</h3>
+                <p>搜尋合適的心理師，選擇方便的時段，線上快速完成預約。</p>
+                <span class="go">立即預約 →</span>
+            </a>
+            <a class="card" th:href="@{/member/course/select_course}">
+                <div class="icon">📚</div>
+                <h3>課程商城</h3>
+                <p>豐富的線上心理健康課程，隨時隨地照顧自己的內在。</p>
+                <span class="go">瀏覽課程 →</span>
+            </a>
+            <a class="card" th:href="@{/article}">
+                <div class="icon">📰</div>
+                <h3>專欄文章</h3>
+                <p>由專業心理師撰寫的身心健康文章，陪你認識自己。</p>
+                <span class="go">閱讀文章 →</span>
+            </a>
+            <a class="card" th:href="@{/member/activity/activityIndex}">
+                <div class="icon">🤝</div>
+                <h3>揪團活動</h3>
+                <p>參加或發起心理健康相關活動，在連結中獲得支持。</p>
+                <span class="go">探索活動 →</span>
+            </a>
+            <a class="card" th:href="@{/member/dashboard}">
+                <div class="icon">🌿</div>
+                <h3>我的療癒足跡</h3>
+                <p>查看你的預約、學習、活動與收藏，管理專屬的療癒歷程。</p>
+                <span class="go">前往查看 →</span>
+            </a>
+            <a class="card" th:href="@{/member/profile}">
+                <div class="icon">👤</div>
+                <h3>會員個人檔案</h3>
+                <p>檢視與編輯你的個人資料，維護帳號資訊。</p>
+                <span class="go">前往管理 →</span>
+            </a>
+        </div>
+    </div>
 
-<script>
-function getCookieValue(name) {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-const userSession = getCookieValue("visitorId");
-if (!userSession) {
-	document.cookie = "visitorId=" + crypto.randomUUID();
-}
-</script>
+    <footer>© 2026 諮由自在 FreeMind｜CKA101G1</footer>
 
 </body>
 </html>

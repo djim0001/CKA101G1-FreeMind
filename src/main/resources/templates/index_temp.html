@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>首頁</title>
+</head>
+<body>
+<h1>首頁</h1>
+
+<form th:action="@{/back-end/logout}" method="post">
+    <button type="submit">登出 (管理員)</button>
+</form>
+
+<form th:action="@{/front-end/logout}" method="post">
+    <button type="submit">登出 (會員)</button>
+</form>
+
+<form th:action="@{/psych/logout}" method="post">
+    <button type="submit">登出 (心理師)</button>
+</form>
+<h3><a th:href="@{/front-end/login}">會員登入</a>｜<a th:href="@{/member/profile}">會員個人檔案</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a></h3>
+<h3><a th:href="@{/back-end/login}">管理員登入</a>｜<a th:href="@{/admin/select_page}">管理員檔案</a></h3>
+<h3><a th:href="@{/psych/psychologistLogin}">心理師登入</a></h3>
+<h3><a th:href="@{/search}">心理師查詢</a></h3>
+<h3><a th:href="@{/admin/psych }">心理師管理</a></h3>
+<h3><a th:href="@{/admin/notifications/listAllNotification}">系統公告</a>｜<a th:href="@{/admin/notice/listAllNoticeTemplate}">通知範本</a></h3>
+<h3><a th:href="@{/consultation}">諮商預約</a></h3>
+<h3><a th:href="@{/member/course/select_course}">課程商城</a>｜<a th:href="@{/psych/course/select_course}">課程商城(心理師)</a>｜<a th:href="@{/admin/course/select_course}">課程商城(員工)</a></h3>
+<h3><a th:href="@{/article}">專欄文章</a>｜<a th:href="@{/member/dashboard/myCollection/article}">我的收藏</a>｜<a th:href="@{/psych/article/myArticles}">我的文章</a>｜<a th:href="@{/admin/article}">文章管理</a></h3>
+<h3><a th:href="@{/member/activity/activityIndex}">揪團活動</a>｜<a th:href="@{/member/activity/ownedActivities}">我發起的活動</a>｜<a th:href="@{/admin/activity/activityAdminIndex}">活動管理</a></h3>
+
+<script>
+function getCookieValue(name) {
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+const userSession = getCookieValue("visitorId");
+if (!userSession) {
+	document.cookie = "visitorId=" + crypto.randomUUID();
+}
+</script>
+
+</body>
+</html>

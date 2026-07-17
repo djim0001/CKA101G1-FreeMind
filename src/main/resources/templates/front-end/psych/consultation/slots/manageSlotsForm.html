@@ -2,18 +2,89 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>查詢/調整我的預約時段</title>
+<title>調整可預約時段</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 480px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0 0 24px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+
+    label {
+        font-size: 14px;
+        color: #7a6b6b;
+        margin-right: 8px;
+    }
+
+    input[type="date"] {
+        padding: 8px 10px;
+        border: 1px solid #e0d5d5;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+    }
+    input[type="date"]:focus {
+        outline: none;
+        border-color: #e8b4b4;
+    }
+
+    input[type="submit"] {
+        display: block;
+        width: 100%;
+        margin-top: 24px;
+        padding: 12px 0;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    input[type="submit"]:hover {
+        background-color: #d39393;
+    }
+
+    .error {
+        color: #c62828;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+</style>
 </head>
 <body>
-	<h3>查詢/調整我的預約時段</h3>
+	<div class="card">
+		<h3>調整可預約時段</h3>
 
-	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+		<p class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
 
-	<form method="post" th:action="@{/psych/slots/manageLookup}">
-		心理師編號：<input type="text" name="psychId"><br>
-		日期：<input type="date" name="slotDate"><br>
-		<input type="submit" value="查詢">
-	</form>
-
+		<form method="post" th:action="@{/psych/slots/manageLookup}">
+			<label>選擇日期：</label>
+			<input type="date" name="slotDate" th:min="${todayDate}">
+			<input type="submit" value="查詢／調整這天的時段">
+		</form>
+	</div>
 </body>
 </html>
