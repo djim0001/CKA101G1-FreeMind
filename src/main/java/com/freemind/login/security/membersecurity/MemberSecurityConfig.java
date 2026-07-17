@@ -1,4 +1,4 @@
-package com.freemind.login.security.membersecurity;
+	package com.freemind.login.security.membersecurity;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -32,10 +32,13 @@ public class MemberSecurityConfig {
 
     private final DataSource dataSource;
     private final MemberUserDetailsService memberUserDetailsService;
+    private final GoogleLoginSuccessHandler googleLoginSuccessHandler;
 
-    public MemberSecurityConfig(DataSource dataSource, MemberUserDetailsService memberUserDetailsService) {
+    public MemberSecurityConfig(DataSource dataSource, MemberUserDetailsService memberUserDetailsService,
+            GoogleLoginSuccessHandler googleLoginSuccessHandler) {
         this.dataSource = dataSource;
         this.memberUserDetailsService = memberUserDetailsService;
+        this.googleLoginSuccessHandler = googleLoginSuccessHandler;
     }
 
     @Bean
@@ -47,12 +50,16 @@ public class MemberSecurityConfig {
     	// POST(按讚/收藏)不保存，避免登入後被重放成JSON頁        
        
     	http
-            .securityMatcher("/","/front-end/**","/member/**", "/article/**")
+            .securityMatcher("/","/front-end/**","/member/**", "/article/**",
+            		"/oauth2/**", "/login/oauth2/**")
             .authorizeHttpRequests(auth -> auth
-            		
+
             		//登入頁面
                 .requestMatchers("/","/front-end/login").permitAll()//登入頁面
-                
+
+                	// Google 登入（/oauth2/authorization/google 授權入口、/login/oauth2/code/google 回呼）
+                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+
                 	// 註冊與忘記密碼（含 OTP 驗證）給未登入的訪客
                 .requestMatchers("/front-end/register/**",
                 		"/front-end/forgot/**").permitAll()
@@ -101,6 +108,15 @@ public class MemberSecurityConfig {
                     response.sendRedirect(url);
                 })
                 .permitAll()
+            )
+
+            // Google 登入：點 /oauth2/authorization/google 跳 Google 授權，
+            // 回呼後由 GoogleLoginSuccessHandler 依 email 對應會員（詳見該類別）
+            .oauth2Login(oauth -> oauth
+                .loginPage("/front-end/login")
+                .successHandler(googleLoginSuccessHandler)					//過濾器預設會去監聽並攔截符合固定格式的網址：/oauth2/authorization/{registrationId}
+                .failureHandler((request, response, exception) ->
+                    response.sendRedirect("/front-end/login?error=google"))
             )
 
             .logout(logout -> logout
