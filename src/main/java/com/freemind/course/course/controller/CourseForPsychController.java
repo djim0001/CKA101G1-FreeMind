@@ -2,7 +2,6 @@ package com.freemind.course.course.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -10,8 +9,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -33,14 +30,12 @@ import com.freemind.course.course.model.CourseCategoriesService;
 import com.freemind.course.course.model.CourseQaComment;
 import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
+import com.freemind.course.dto.CourseQaSearchCondition;
 import com.freemind.course.dto.PsychDiscountFormDTO;
-import com.freemind.login.admin.model.Admin;
-import com.freemind.login.member.model.Member;
 import com.freemind.login.psychologist.dto.PsychologistSelfRes;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 //@Validated
@@ -76,8 +71,10 @@ public class CourseForPsychController {
 
 	@GetMapping("/select_course")
 	public String psychSelectCourse(@ModelAttribute("psych") PsychologistSelfRes psych,
+			@ModelAttribute CourseQaSearchCondition condition, @RequestParam(required = false) String keyword,
 			@RequestParam(defaultValue = "1") Integer page,
-			@RequestParam(name = "orderBy", required = false) String orderBy, ModelMap model) {
+			@RequestParam(name = "orderBy", required = false) String orderBy,
+			@RequestParam(name = "courseStatus", required = false) Byte courseStatus, ModelMap model) {
 
 		if (page < 1)
 			page = 1;
@@ -87,7 +84,8 @@ public class CourseForPsychController {
 
 		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
 
-		Page<Course> courseListAllPages = courseSvc.getCoursesByPsychId(psych.getPsychId(), currentPage - 1, sortField);
+		Page<Course> courseListAllPages = courseSvc.searchCourseByPsychologist(keyword, psych.getPsychId(),
+				currentPage - 1, sortField, courseStatus);
 
 		int wait = courseSvc.countCoursesByStatus((byte) 1);
 		int listed = courseSvc.countCoursesByStatus((byte) 4);
@@ -120,26 +118,34 @@ public class CourseForPsychController {
 
 	@GetMapping("/psych_qa")
 	public String showPsychQuestions(@SessionAttribute(name = "psychId", required = false) Integer psychId,
-			ModelMap model) {
+			@RequestParam(required = false) String keyword, @RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name = "orderBy", required = false) String orderBy, ModelMap model) {
 
-		List<CourseQaComment> questions = courseQaCommentSvc.getQuestionsByPsychId(psychId);
+		if (page < 1)
+			page = 1;
+		if(psychId == null)
+			return "redirect:/psych/course/select_course";
+		Psychologist psychologist = psychologistService.getOnePsychologist(psychId);
+		Integer currentPage = page;
 
+		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
+		Page<CourseQaComment> questions = courseQaCommentSvc.searchCourseQaByPsychId(keyword, psychId, currentPage - 1,
+				sortField);
+
+		model.addAttribute("psychologist", psychologist);
 		model.addAttribute("questions", questions);// 前面的是對外面的(HTML)
 
 		return "front-end/psych/course/psychCourseQa";
 	}
-	
+
 	@PostMapping("answer_qa")
-    public String answerQuestion(
-            @RequestParam("questionId") Integer questionId,
-            @RequestParam("courseAnswer") String courseAnswer) {
+	public String answerQuestion(
+			@RequestParam("questionId") Integer questionId, @RequestParam("courseAnswer") String courseAnswer) {
 
-		courseQaCommentSvc.answerUpdateQuestion(
-        		questionId, courseAnswer
-        );
+		courseQaCommentSvc.answerUpdateQuestion(questionId, courseAnswer);
 
-        return "redirect:/psych/course/psych_qa";
-    }
+		return "redirect:/psych/course/psych_qa";
+	}
 
 	@PostMapping("/answer_course")
 	public String psychAnswerdCourse(ModelMap model, @RequestParam("questionId") Integer questionId,

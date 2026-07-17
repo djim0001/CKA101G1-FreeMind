@@ -21,6 +21,31 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
 	Page<Course> findByCourseIdIn(List<Integer> courseIds, Pageable pageable);
 
 	long countByPsychologist_PsychId(Integer psychId);
+	
+	@Query("""
+		    SELECT DISTINCT c
+		    FROM Course c
+		    LEFT JOIN c.courseCategories cc
+		    WHERE c.psychologist.psychId = :psychId
+		      AND (
+		            :keyword IS NULL
+		            OR :keyword = ''
+		            OR LOWER(c.courseName)
+		                LIKE LOWER(CONCAT('%', :keyword, '%'))
+		            OR LOWER(cc.courseCatName)
+		                LIKE LOWER(CONCAT('%', :keyword, '%'))
+		          )
+		      AND (
+		            :courseStatus IS NULL
+		            OR c.courseStatus = :courseStatus
+		          )
+		    """)
+		Page<Course> searchCourseByPsychologist(
+		        @Param("keyword") String keyword,
+		        @Param("psychId") Integer psychId,
+		        @Param("courseStatus") Byte courseStatus,
+		        Pageable pageable
+		);
 
 	// admin_function
 	int countByCourseStatus(Byte courseStatus);

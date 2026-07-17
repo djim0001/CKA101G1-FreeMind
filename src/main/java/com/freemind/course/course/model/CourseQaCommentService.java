@@ -4,24 +4,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.freemind.course.util.CourseSortUtil;
 import com.freemind.login.member.model.Member;
-import com.freemind.login.psychologist.entity.Psychologist;
 
 @Service
 public class CourseQaCommentService {
 
-    @Autowired
-    private CourseQaCommentRepository repository;
-    @Autowired
-    private CourseRepository courseRepository;
+	@Autowired
+	private CourseQaCommentRepository repository;
+	@Autowired
+	private CourseRepository courseRepository;
+	
+	@Value("${app.course.page-size:5}")
+	private int coursePageSize;
 
-    // 會員新增提問
-    public CourseQaComment addQuestion(
-            Course course,
-            Member member,
-            String courseQuestion) {
+	// 會員新增提問
+	public CourseQaComment addQuestion(Course course, Member member, String courseQuestion) {
 
 //        if (course == null) {
 //            throw new IllegalArgumentException("課程不可為空");
@@ -39,114 +44,125 @@ public class CourseQaCommentService {
 //            throw new IllegalArgumentException("提問內容不可超過 500 字");
 //        }
 
-        CourseQaComment comment = new CourseQaComment();
-        comment.setCourse(course);
-        comment.setMember(member);
-        comment.setCourseQuestion(courseQuestion);
-        comment.setAskedAt(LocalDateTime.now());
-        course.setCommentCount(course.getCommentCount()+1);
+		CourseQaComment comment = new CourseQaComment();
+		comment.setCourse(course);
+		comment.setMember(member);
+		comment.setCourseQuestion(courseQuestion);
+		comment.setAskedAt(LocalDateTime.now());
+		course.setCommentCount(course.getCommentCount() + 1);
 
-        return repository.save(comment);
-    }
-    
+		return repository.save(comment);
+	}
 
-    // 查詢某一堂課的所有 QA，照提問時間排序
-    public List<CourseQaComment> getAllCourseQaByCourseId(Integer courseId){
-    		return repository.findByCourse_CourseIdOrderByAskedAtDesc(courseId);
-    }
-    
+	// 查詢某一堂課的所有 QA，照提問時間排序
+	public List<CourseQaComment> getAllCourseQaByCourseId(Integer courseId) {
+		return repository.findByCourse_CourseIdOrderByAskedAtDesc(courseId);
+	}
 
-    // 根據留言編號查詢單筆提問
-    public CourseQaComment getOneQuestion(Integer questionId) {
-        return repository.findById(questionId).orElse(null);
-    }
+	// 根據留言編號查詢單筆提問
+	public CourseQaComment getOneQuestion(Integer questionId) {
+		return repository.findById(questionId).orElse(null);
+	}
 
-    // 心理師回覆提問
-    public CourseQaComment answerQuestion(
-            Integer questionId,
-            Integer psychId,
-            String courseAnswer) {
+	// 心理師回覆提問
+	public CourseQaComment answerQuestion(Integer questionId, Integer psychId, String courseAnswer) {
 
-        CourseQaComment comment = getOneQuestion(questionId);
+		CourseQaComment comment = getOneQuestion(questionId);
 
-        if (comment == null) {
-            throw new IllegalArgumentException("找不到此課程提問");
-        }
+		if (comment == null) {
+			throw new IllegalArgumentException("找不到此課程提問");
+		}
 
-        if (courseAnswer == null || courseAnswer.isBlank()) {
-            throw new IllegalArgumentException("回覆內容不可為空");
-        }
+		if (courseAnswer == null || courseAnswer.isBlank()) {
+			throw new IllegalArgumentException("回覆內容不可為空");
+		}
 
-        if (courseAnswer.length() > 500) {
-            throw new IllegalArgumentException("回覆內容不可超過 500 字");
-        }
+		if (courseAnswer.length() > 500) {
+			throw new IllegalArgumentException("回覆內容不可超過 500 字");
+		}
 
-        Integer ownerPsychId =
-                comment.getCourse()
-                       .getPsychologist()
-                       .getPsychId();
+		Integer ownerPsychId = comment.getCourse().getPsychologist().getPsychId();
 
-        if (psychId == null || !psychId.equals(ownerPsychId)) {
-            throw new IllegalArgumentException("你無權回覆此課程提問");
-        }
+		if (psychId == null || !psychId.equals(ownerPsychId)) {
+			throw new IllegalArgumentException("你無權回覆此課程提問");
+		}
 
-        if (comment.getCourseAnswer() != null
-                || comment.getAnsweredAt() != null) {
+		if (comment.getCourseAnswer() != null || comment.getAnsweredAt() != null) {
 
-            throw new IllegalArgumentException(
-                    "此課程提問已經回覆，不能再次修改"
-            );
-        }
+			throw new IllegalArgumentException("此課程提問已經回覆，不能再次修改");
+		}
 
-        comment.setCourseAnswer(courseAnswer);
-        comment.setAnsweredAt(LocalDateTime.now());
+		comment.setCourseAnswer(courseAnswer);
+		comment.setAnsweredAt(LocalDateTime.now());
 
-        return repository.save(comment);
-    }
-    
-    // 心理師回覆提問-2
-    //接收問題編號（questionId）與課程回答內容（courseAnswer），
-    //先依據問題編號查詢該筆問題資料，再將新的回答內容設定到 courseAnswer 欄位，
-    //並將回答時間設定為目前時間，最後使用 repository.save() 將修改後的資料更新回資料庫。
-    public void answerUpdateQuestion(Integer questionId,String courseAnswer) {
-    	CourseQaComment comment = getOneQuestion(questionId);
-    	comment.setCourseAnswer(courseAnswer);
-    	comment.setAnsweredAt(LocalDateTime.now());
-    	repository.save(comment);
-    }
-    
-    //查詢
-    
+		return repository.save(comment);
+	}
 
-    // 查詢心理師所有課程收到的提問
-    public List<CourseQaComment> getQuestionsByPsychId(
-            Integer psychId) {
+	// 心理師回覆提問-2
+	// 接收問題編號（questionId）與課程回答內容（courseAnswer），
+	// 先依據問題編號查詢該筆問題資料，再將新的回答內容設定到 courseAnswer 欄位，
+	// 並將回答時間設定為目前時間，最後使用 repository.save() 將修改後的資料更新回資料庫。
+	public void answerUpdateQuestion(Integer questionId, String courseAnswer) {
+		CourseQaComment comment = getOneQuestion(questionId);
+		comment.setCourseAnswer(courseAnswer);
+		comment.setAnsweredAt(LocalDateTime.now());
+		repository.save(comment);
+	}
 
-        return repository
-                .findByCoursePsychologistPsychIdOrderByAskedAtDesc(
-                        psychId
-                );
-    }
+	// 查詢
 
-    // 查詢會員在某門課提出的問題
-    public List<CourseQaComment> getQuestionsByCourseAndMember(
-            Integer courseId,
-            Integer memberId) {
+	// 查詢心理師所有課程收到的提問
+	public List<CourseQaComment> getQuestionsByPsychId(Integer psychId) {
 
-        return repository
-                .findByCourseCourseIdAndMemberMemberIdOrderByAskedAtDesc(
-                        courseId,
-                        memberId
-                );
-    }
-    
-    public int countUnansweredQuestions(Integer psychId) {
-        if (psychId == null) {
-            throw new IllegalArgumentException("心理師編號不能為空");
-        }
+		return repository.findByCoursePsychologistPsychIdOrderByAskedAtDesc(psychId);
+	}
 
-        return repository
-                .countByCoursePsychologistPsychIdAndCourseAnswerIsNull(psychId);
-    }
-    
+	public Page<CourseQaComment> searchCourseQaByPsychId(
+			String keyword, Integer psychId, Integer page,
+			String orderBy) {
+		if (psychId == null) {
+			throw new IllegalArgumentException("心理師編號不能為空");
+		}
+
+		if (page == null || page < 1) {
+			page = 0;
+		}
+
+		String normalizedKeyword = keyword == null ? "" : keyword.trim();
+		
+		Sort sort = switch (
+	            orderBy == null ? "askedAtDesc" : orderBy
+	    ) {
+	        case "askedAtAsc" ->
+	                Sort.by("askedAt").ascending();
+
+	        case "courseIdAsc" ->
+	                Sort.by("course.courseId").ascending();
+
+	        case "courseIdDesc" ->
+	                Sort.by("course.courseId").descending();
+
+	        default ->
+	                Sort.by("askedAt").descending();
+	    };
+
+		Pageable pageable = PageRequest.of(page, coursePageSize, sort);
+
+		return repository.searchCourseQaByPsychId(normalizedKeyword, psychId, pageable);
+	}
+
+	// 查詢會員在某門課提出的問題
+	public List<CourseQaComment> getQuestionsByCourseAndMember(Integer courseId, Integer memberId) {
+
+		return repository.findByCourseCourseIdAndMemberMemberIdOrderByAskedAtDesc(courseId, memberId);
+	}
+
+	public int countUnansweredQuestions(Integer psychId) {
+		if (psychId == null) {
+			throw new IllegalArgumentException("心理師編號不能為空");
+		}
+
+		return repository.countByCoursePsychologistPsychIdAndCourseAnswerIsNull(psychId);
+	}
+
 }
