@@ -86,4 +86,39 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('input[name="returnUrl"]').forEach(input => {
     input.value = window.location.pathname + window.location.search;
   });
+
+  document.querySelectorAll('[data-sales-chart]').forEach(chart => {
+    const bars = [...chart.querySelectorAll('[data-sales-bar]')];
+    const values = bars.map(bar => Number(bar.dataset.salesValue) || 0);
+    const maximum = Math.max(...values, 0);
+
+    bars.forEach((bar, index) => {
+      const value = values[index];
+      const percentage = maximum > 0 ? (value / maximum) * 100 : 0;
+      bar.style.width = `${percentage}%`;
+      bar.setAttribute('role', 'img');
+      bar.setAttribute('aria-label', `銷售額 NT$ ${value.toLocaleString('zh-TW')}`);
+    });
+  });
+
+  [
+    ['[data-course-search-form]', '[data-course-search-pagination]'],
+    ['[data-qa-search-form]', '[data-qa-search-pagination]']
+  ].forEach(([formSelector, paginationSelector]) => {
+    document.querySelectorAll(formSelector).forEach(form => {
+      const pagination = document.querySelector(paginationSelector);
+      if (!pagination) return;
+
+      const searchParameters = new URLSearchParams();
+      new FormData(form).forEach((value, name) => {
+        if (name !== 'page' && String(value).trim() !== '') searchParameters.set(name, value);
+      });
+
+      pagination.querySelectorAll('a[href]').forEach(link => {
+        const target = new URL(link.href, window.location.href);
+        searchParameters.forEach((value, name) => target.searchParams.set(name, value));
+        link.href = target.pathname + target.search;
+      });
+    });
+  });
 });

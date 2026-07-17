@@ -95,37 +95,26 @@ public class CourseService {
 
 		return repository.findAll(spec, pageable);
 	}
-	
-	 /**
-     * 搜尋已上架課程。
-     * courseStatus 固定限制為 4。
-     */
-	 public Page<Course> searchListedCourses(
-	            String keyword,
-	            Integer page,
-	            Integer size,
-	            String orderBy
-	    ) {
 
-	        if (page == null || page < 1) {
-	            page = 1;
-	        }
+	/**
+	 * 搜尋已上架課程。 courseStatus 固定限制為 4。
+	 */
+	public Page<Course> searchListedCourses(String keyword, Integer page, Integer size, String orderBy) {
 
-	        if (size == null || size <= 0) {
-	            size = 10;
-	        }
+		if (page == null || page < 1) {
+			page = 1;
+		}
 
-	        Pageable pageable = PageRequest.of(
-	                page - 1,
-	                size,
-	                CourseSortUtil.getCourseSort(orderBy)
-	        );
+		if (size == null || size <= 0) {
+			size = 10;
+		}
 
-	        Specification<Course> spec =
-	                CourseSpecification.keywordContains(keyword);
+		Pageable pageable = PageRequest.of(page - 1, size, CourseSortUtil.getCourseSort(orderBy));
 
-	        return repository.findAll(spec, pageable);
-	    }
+		Specification<Course> spec = CourseSpecification.keywordContains(keyword);
+
+		return repository.findAll(spec, pageable);
+	}
 
 	@Transactional
 	public Page<Course> adminSearchCourses(CourseSearchCondition condition, Integer page) {
@@ -167,6 +156,22 @@ public class CourseService {
 		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 
 		return repository.findByPsychologistPsychId(psychId, pageable);
+	}
+
+	public Page<Course> searchCourseByPsychologist(String keyword, Integer psychId, Integer page, String orderBy,
+			Byte courseStatus) {
+		if (psychId == null) {
+			throw new IllegalArgumentException("心理師編號不能為空");
+		}
+
+		if (keyword == null) {
+			keyword = "";
+		}
+
+		int pageIndex = page == null || page < 0 ? 0 : page;
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+
+		return repository.searchCourseByPsychologist(keyword.trim(), psychId, courseStatus, pageable);
 	}
 
 	// admin_function
