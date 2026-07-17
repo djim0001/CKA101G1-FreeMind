@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.unit.DataSize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -32,6 +34,7 @@ import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.activity.util.PageUtils;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
+import com.freemind.util.ImageUploadValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,6 +57,9 @@ public class ActivityController {
     private ActivityFollowService followSvc;
     
     private static final int PAGE_SIZE = 3;
+    
+    @Value("${app.activity.image.max-size}")
+    private DataSize maxImageSize;
 
     @GetMapping("listAllActivity")
     public String listAllActivity(@AuthenticationPrincipal MemberUserDetails userDetails,
@@ -138,6 +144,13 @@ public class ActivityController {
 
         // 再把圖片設定好      
         if (!pictureFile.isEmpty()) {
+            try {
+                ImageUploadValidator.validateImageSize(pictureFile, maxImageSize);
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("errorMessage", ex.getMessage());
+                return "front-end/member/activity/addActivity";
+            }
+
             String savedFileName = saveUploadedPicture(pictureFile);
             activity.setPicture(savedFileName);
         }
@@ -150,8 +163,12 @@ public class ActivityController {
             return "front-end/member/activity/addActivity";
         }
 
-        model.addAttribute("success", "- (新增成功，待審核)");
-        return "front-end/member/activity/addActivitySuccess";
+        return "redirect:/member/activity/insertSuccess";
+    }
+    
+    @GetMapping("insertSuccess")
+    public String insertSuccess() {
+    	return "front-end/member/activity/addActivitySuccess";
     }
     
     @ModelAttribute("activityCatListData")
@@ -159,7 +176,8 @@ public class ActivityController {
         return activityCatSvc.getAll();
     }
     
-    @PostMapping("getOne_For_Update")
+    
+    @GetMapping("getOne_For_Update")
     public String getOneForUpdate(@RequestParam("activityId") Integer activityId, ModelMap model) {
         
     	Activity activity = activitySvc.getOneActivity(activityId);
@@ -182,6 +200,13 @@ public class ActivityController {
 
         String oldPictureFileName = null;
         if (!pictureFile.isEmpty()) {
+        	 	try {
+        	        ImageUploadValidator.validateImageSize(pictureFile, maxImageSize);
+        	    } catch (IllegalArgumentException ex) {
+        	        model.addAttribute("errorMessage", ex.getMessage());
+        	        return "front-end/member/activity/update_activity_input";
+        	    }
+        	
             // 先記住(換照片前)資料庫裡原本的舊檔名，更新成功才刪除舊圖
             Activity existing = activitySvc.getOneActivity(activity.getActivityId());
             oldPictureFileName = existing.getPicture();
