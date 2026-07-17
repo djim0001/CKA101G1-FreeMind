@@ -8,7 +8,9 @@ public class IndexTempController {
 
 	@GetMapping("/index_temp")
 	public String frontHome() {
-		return "front-end/index_temp"; // 本來的首頁
+
+		return "/index_temp"; // 本來的首頁
+
 	}
 
 	@GetMapping("/course_index")
