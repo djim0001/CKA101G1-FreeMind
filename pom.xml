@@ -234,7 +234,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 
-			 <version>1.18.46</version> 
+			<version>1.18.46</version>
 
 			<scope>provided</scope>      <!-- ※provided只提供編譯，jar檔不匯出 -->
 		</dependency>
@@ -262,25 +262,35 @@
 
 		<!-- ●●●Spring Security-->
 		<!-- ●●●沒用到時請勿下載-->
-		        <dependency>
-		            <groupId>org.springframework.boot</groupId>
-		            <artifactId>spring-boot-starter-security</artifactId>
-		        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 
 		<!-- ●●●thymeleaf Spring Security-->
 		<!-- ●●●與前面配合使用，沒用到時不用下載-->
 		<!-- ●●●如果是舊版 Spring Boot 2.x，請使用 springsecurity5 -->
-		        <dependency>
-		            <groupId>org.thymeleaf.extras</groupId>
-		            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
-		        </dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
 
-		
+
 		<!--
 		========================================================================================== -->
-		<!-- ●以下為 json 例外使用0703● --><dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
+		<!-- ●以下為 json 例外使用0703● -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!--
+		========================================================================================== -->
+		<!-- Google ID Token 驗證（GIS 登入用，免 client-secret） -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>2.7.0</version>
 		</dependency>
 	</dependencies>
 

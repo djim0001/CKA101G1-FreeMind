@@ -1,302 +1,190 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>會員登入系統</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        /* 基礎全域設定 */
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --indigo-600: #667eea;
-            --indigo-700: #5568d3;
-            --text-color: #333;
-            --error-color: #ff4d4d;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+<title>會員登入系統</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+	rel="stylesheet">
+<link th:href="@{/css/login/login.css}" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        /* 登入卡片主體 */
-        .login-card {
-            width: 100%;
-            max-width: 28rem;
-            padding: 2rem;
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            margin: 0 1rem;
-        }
-
-        /* 卡片內的垂直間距 */
-        .login-card > * + * {
-            margin-top: 1.5rem;
-        }
-
-        /* 標題區域 */
-        .title-area {
-            text-align: center;
-        }
-
-        .title-area h2 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        /* 測試提示區 */
-        .test-info {
-            background: #f0f2f5;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            color: #333;
-            line-height: 1.8;
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .test-info strong {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--primary-color);
-        }
-
-        .test-info code {
-            background: #e8e8e8;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-
-        /* 錯誤訊息提示 */
-        .error-message {
-            padding: 0.75rem;
-            font-size: 0.875rem;
-            color: #b91c1c;
-            background-color: #fee2e2;
-            border: 1px solid #fca5a5;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .error-message svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.5rem;
-            fill: currentColor;
-        }
-
-        /* 登出訊息提示 */
-        .logout-message {
-            padding: 0.75rem;
-            font-size: 0.875rem;
-            color: #166534;
-            background-color: #dcfce7;
-            border: 1px solid #86efac;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-        
-           /* 驗證成功訊息提示 */
-        .verified-message {
-            padding: 0.75rem;
-            font-size: 0.875rem;
-            color: #166534;
-            background-color: #dcfce7;
-            border: 1px solid #86efac;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-        
-   
-
-        /* 表單區域 */
-        .login-form > * + * {
-            margin-top: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            outline: none;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .form-control:focus {
-            border-color: var(--indigo-600);
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.5);
-        }
-
-        /* 記住我與忘記密碼 */
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.875rem;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            color: #4b5563;
-            cursor: pointer;
-        }
-
-        .checkbox-label input {
-            width: 1rem;
-            height: 1rem;
-            border-radius: 0.25rem;
-            border-color: #d1d5db;
-            margin-right: 0.5rem;
-        }
-
-        .link-primary {
-            color: var(--indigo-600);
-            text-decoration: none;
-        }
-
-        .link-primary:hover {
-            text-decoration: underline;
-        }
-
-        /* 登入按鈕 */
-        .btn-submit {
-            width: 100%;
-            padding: 0.75rem 0;
-            font-weight: 600;
-            color: #ffffff;
-            background-color: var(--indigo-600);
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--indigo-700);
-        }
-
-        .btn-submit:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--indigo-600);
-        }
-
-        .btn-submit:active {
-            transform: scale(0.98);
-        }
-
-        /* 底部註冊文字 */
-        .footer-text {
-            text-align: center;
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-
-        .footer-text .weight-bold {
-            font-weight: 700;
-        }
-    </style>
+<script th:src="@{/js/login/login.js}" defer></script>
 </head>
-<body>
+<body class="login-page theme-member">
 
-    <div class="login-card">
+	<div class="login-card">
 
-        <!-- 標題區域 -->
-        <div class="title-area">
-            <h2>👤 會員登入系統</h2>
-        </div>
+		<!-- 左欄：大標題 + 測試帳號 -->
+		<div class="panel-brand">
+			<div class="title-area">
+				<h2>👤 會員登入系統</h2>
+				<p class="subtitle">FreeMind 心理健康平台</p>
+			</div>
 
-        <!-- 錯誤訊息 -->
-        <div th:if="${param.error}" class="error-message">
-            <svg viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+			<!-- 測試提示區 -->
+			<div class="test-info">
+				<strong>💡 測試會員帳號 (開發使用)</strong> 帳號：
+				<code>user01</code>
+				密碼：
+				<code>pwd12345</code>
+				<br> 帳號：
+				<code>user02</code>
+				密碼：
+				<code>pwd23456</code>
+				<br> 帳號：
+				<code>user03</code>
+				密碼：
+				<code>pwd34567</code>
+				<br> 帳號：
+				<code>user04</code>
+				密碼：
+				<code>pwd45678</code>
+			</div>
+		</div>
+
+		<!-- 右欄：登入表單 -->
+		<div class="panel-form">
+
+			<!-- 錯誤訊息（帳密登入失敗：?error=true） -->
+			<div th:if="${param.error != null and param.error[0] == 'true'}"
+				class="alert alert-error">
+				<svg viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+						d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+						clip-rule="evenodd"></path>
             </svg>
-            <span>帳號或密碼錯誤，請稍後再試。</span>
-        </div>
+				<span>帳號或密碼錯誤，請稍後再試。</span>
+			</div>
 
+			<!-- Google 授權失敗：?error=google -->
+			<div th:if="${param.error != null and param.error[0] == 'google'}"
+				class="alert alert-error">
+				<svg viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+						d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+						clip-rule="evenodd"></path>
+            </svg>
+				<span>Google 登入失敗，請再試一次。</span>
+			</div>
 
-        <!-- 登出訊息 -->
-        <div th:if="${param.logout}" class="logout-message">
-            ✓ 已成功登出
-        </div>
-        
-          <!-- 登出訊息 -->
-        <div th:if="${param.verified}" class="verified-message">
-            ✓ 驗證完成，帳號已啟用
-        </div>
-       
+			<!-- 帳號停權：?error=disabled -->
+			<div th:if="${param.error != null and param.error[0] == 'disabled'}"
+				class="alert alert-error">
+				<svg viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+						d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+						clip-rule="evenodd"></path>
+            </svg>
+				<span>此帳號已停權，無法登入，請聯繫客服。</span>
+			</div>
 
-        <!-- 測試提示區 -->
-        <div class="test-info">
-            <strong>💡 測試會員帳號 (開發使用)</strong>
-            帳號：<code>user01</code> 密碼：<code>pwd12345</code><br>
-            帳號：<code>user02</code> 密碼：<code>pwd23456</code><br>
-            帳號：<code>user03</code> 密碼：<code>pwd34567</code><br>
-            帳號：<code>user04</code> 密碼：<code>pwd45678</code>
-        </div>
+			<!-- 登出訊息（JS 會在數秒後自動淡出） -->
+			<div th:if="${param.logout}" class="alert alert-success">✓
+				已成功登出</div>
 
-        <!-- 登入表單 -->
-        <form th:action="@{/front-end/login}" method="post" class="login-form">
-       	 <input type="hidden" name="redirect" th:value="${param.redirect}">
-            <div class="form-group">
-                <label for="memberAccount">帳號或信箱</label>
-				<input type="text" id="memberAccount" name="memberAccount" required class="form-control" placeholder="請輸入帳號或信箱" autofocus>
-            </div>
+			<!-- 驗證完成訊息（JS 會在數秒後自動淡出） -->
+			<div th:if="${param.verified}" class="alert alert-success">✓
+				驗證完成，帳號已啟用</div>
 
-            <div class="form-group">
-                <label for="memberPassword">密碼</label>
-                <input type="password" id="memberPassword" name="memberPassword" required class="form-control" placeholder="••••••••">
-            </div>
+			<!-- 登入表單 -->
+			<form th:action="@{/front-end/login}" method="post"
+				class="login-form">
+				<input type="hidden" name="redirect" th:value="${param.redirect}">
 
-            <div class="form-options">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="remember-me" id="remember-me">
-                    <span>記住我</span>
-                </label>
-               <!-- 改後 -->
-				<a th:href="@{/front-end/forgot}" class="link-primary">忘記密碼？</a>
-            </div>
+				<div class="form-group">
+					<label for="memberAccount">帳號或信箱</label> <input type="text"
+						id="memberAccount" name="memberAccount" required
+						class="form-control" placeholder="請輸入帳號或信箱" autofocus>
+				</div>
 
-            <button type="submit" class="btn-submit">
-                立即登入
-            </button>
-        </form>
+				<div class="form-group">
+					<label for="memberPassword">密碼</label>
+					<div class="pw-wrap">
+						<input type="password" id="memberPassword" name="memberPassword"
+							required class="form-control" placeholder="••••••••">
+						<button type="button" class="pw-toggle" aria-label="顯示密碼">
+							<svg class="icon-eye" viewBox="0 0 24 24">
+                            <path
+									d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+							<svg class="icon-eye-off" viewBox="0 0 24 24">
+                            <path
+									d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+						</button>
+					</div>
+				</div>
 
-        <!-- 底部連結 -->
-        <p class="footer-text">
-            還沒有帳號？ <a th:href="@{/front-end/register}" class="link-primary weight-bold">註冊一個</a>
-        </p>
-    </div>
+				<div class="form-options">
+					<label class="checkbox-label"> <input type="checkbox"
+						name="remember-me" id="remember-me"> <span>記住我</span>
+					</label> <a th:href="@{/front-end/forgot}" class="link-primary">忘記密碼？</a>
+				</div>
 
+				<button type="submit" class="btn-submit">
+					<span class="spinner"></span> <span class="btn-label">立即登入</span>
+				</button>
+			</form>
+
+			<!-- 分隔線 -->
+			<div class="divider">
+				<span>或</span>
+			</div>
+
+			<div id="googleBtn"></div>
+			<!-- 底部連結 -->
+			<p class="footer-text">
+				還沒有帳號？ <a th:href="@{/front-end/register}"
+					class="link-primary weight-bold">註冊一個</a>
+			</p>
+
+		</div>
+		<!-- /panel-form -->
+	</div>
+	<script th:inline="javascript">
+		window.onload = function() {
+			google.accounts.id
+					.initialize({
+						client_id : /*[[${googleClientId}]]*/'',
+						callback : function(resp) {
+							var token = document
+									.querySelector('meta[name="_csrf"]').content;
+							var header = document
+									.querySelector('meta[name="_csrf_header"]').content;
+							var headers = {
+								'Content-Type' : 'application/x-www-form-urlencoded',
+								'X-Requested-With' : 'XMLHttpRequest'
+							};
+							headers[header] = token;
+							fetch(
+									'/front-end/login/google',
+									{
+										method : 'POST',
+										headers : headers,
+										body : 'credential='
+												+ encodeURIComponent(resp.credential)
+									}).then(function(r) {
+								return r.json();
+							}).then(function(data) {
+								window.location.href = data.redirectUrl;
+							});
+						}
+					});
+			google.accounts.id.renderButton(document
+					.getElementById('googleBtn'), {
+				theme : 'outline',
+				size : 'large',
+				width : 320,
+				text : 'signin_with'
+			});
+		};
+	</script>
 </body>
 </html>
