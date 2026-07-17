@@ -31,6 +31,15 @@
         border-bottom: 2px solid #e8b4b4;
     }
 
+    .error-msg {
+        background: #fbeaea;
+        color: #c62828;
+        font-size: 14px;
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+
     .info-row {
         margin-bottom: 8px;
         font-size: 14px;
@@ -99,6 +108,8 @@
 <body>
 	<div class="card">
 		<h3>選擇時段並填寫預約資料</h3>
+
+		<div class="error-msg" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
 
 		<div class="info-row"><span class="label">心理師編號：</span><span th:text="${slots.psychologist.psychId}"></span></div>
 		<div class="info-row"><span class="label">心理師姓名：</span><span th:text="${psychologist.name}"></span></div>

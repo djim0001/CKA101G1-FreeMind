@@ -2,36 +2,181 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>回覆諮商問題回報</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background: #faf6f4;
+        color: #4a3e3e;
+        line-height: 1.7;
+        padding: 44px 20px;
+    }
+
+    .card {
+        max-width: 640px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 6px 24px rgba(160, 120, 120, 0.1);
+        overflow: hidden;
+    }
+
+    /* 頂部標題列 */
+    .head {
+        background: linear-gradient(135deg, #e8b4b4 0%, #d39393 100%);
+        color: #fff;
+        padding: 26px 34px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .head .title { font-size: 20px; font-weight: 700; }
+    .head .rid { font-size: 13px; opacity: 0.9; margin-top: 2px; }
+    .head .back {
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.7);
+        border-radius: 6px;
+        padding: 7px 16px;
+        font-size: 13px;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+    .head .back:hover { background: rgba(255,255,255,0.2); }
+
+    .body { padding: 30px 34px 34px; }
+
+    /* 目前狀態標籤 */
+    .cur-status { margin-bottom: 24px; }
+    .cur-status .k { font-size: 13px; color: #b3a5a0; margin-right: 8px; }
+    .badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .b-pending    { background: #fdf3e2; color: #b8860b; }
+    .b-processing { background: #e8f0fb; color: #1565c0; }
+    .b-resolved   { background: #e7f4e9; color: #2e7d43; }
+
+    /* 資訊列 */
+    .info-list { border-top: 1px solid #f2e9e5; margin-bottom: 26px; }
+    .info-list .row {
+        display: flex;
+        padding: 13px 2px;
+        border-bottom: 1px solid #f2e9e5;
+        font-size: 14px;
+    }
+    .info-list .row .label { width: 110px; color: #b3a5a0; flex-shrink: 0; }
+    .info-list .row .val { color: #4a3e3e; }
+
+    /* 問題描述引言 */
+    .issue {
+        background: #fbf2f2;
+        border-left: 4px solid #e8b4b4;
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 28px;
+    }
+    .issue .label { font-size: 12.5px; color: #b3a5a0; margin-bottom: 5px; }
+    .issue .text { font-size: 14.5px; color: #5c4f4b; }
+
+    /* 表單 */
+    .field { margin-bottom: 20px; }
+    .field > label {
+        display: block; font-size: 13px; font-weight: 600;
+        color: #7a6b6b; margin-bottom: 8px;
+    }
+    select, textarea {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #e0d5d5;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        color: #4a3e3e;
+        background: #fff;
+    }
+    select:focus, textarea:focus { outline: none; border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232,180,180,0.2); }
+    textarea { height: 110px; resize: none; }
+
+    .submit {
+        width: 100%;
+        padding: 13px 0;
+        background: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .submit:hover { background: #d39393; }
+</style>
 </head>
 <body>
-	<h3>回覆諮商問題回報</h3>
+    <div class="card">
+        <div class="head">
+            <div>
+                <div class="title">回覆問題回報</div>
+                <div class="rid">問題編號 #<span th:text="${reports.reportId}"></span></div>
+            </div>
+            <a class="back" th:href="@{/admin/reports/listAllReports}">← 回列表</a>
+        </div>
 
-	<form method="post" th:action="@{/admin/reports/reply}">
-		<input type="hidden" name="reportId" th:value="${reports.reportId}">
+        <div class="body">
+            <div class="cur-status">
+                <span class="k">目前狀態</span>
+                <span th:switch="${reports.reportStatus}">
+                    <span th:case="0" class="badge b-pending">待處理</span>
+                    <span th:case="1" class="badge b-processing">處理中</span>
+                    <span th:case="2" class="badge b-resolved">已解決</span>
+                </span>
+            </div>
 
-		諮商問題編號：<span th:text="${reports.reportId}"></span><br>
-		會員編號：<span th:text="${reports.member.memberId}"></span><br>
-		諮詢訂單編號：<span th:text="${reports.orders != null ? reports.orders.orderId : '無'}"></span><br>
-		問題描述：<span th:text="${reports.issueDesc}"></span><br>
-		回報日期：<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
+            <div class="info-list">
+                <div class="row">
+                    <span class="label">會員編號</span>
+                    <span class="val" th:text="${reports.member.memberId}"></span>
+                </div>
+                <div class="row">
+                    <span class="label">諮詢訂單</span>
+                    <span class="val" th:text="${reports.orders != null ? reports.orders.orderId : '無'}"></span>
+                </div>
+                <div class="row">
+                    <span class="label">回報日期</span>
+                    <span class="val" th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm')}"></span>
+                </div>
+            </div>
 
-		員工編號：<input type="text" name="adminId" th:value="${reports.admin != null ? reports.admin.adminId : ''}"><br>
+            <div class="issue">
+                <div class="label">會員回報的問題</div>
+                <div class="text" th:text="${reports.issueDesc}"></div>
+            </div>
 
-		處理狀態：
-		<select name="reportStatus">
-			<option value="0" th:selected="${reports.reportStatus == 0}">待處理</option>
-			<option value="1" th:selected="${reports.reportStatus == 1}">處理中</option>
-			<option value="2" th:selected="${reports.reportStatus == 2}">已解決</option>
-		</select><br>
+            <form method="post" th:action="@{/admin/reports/reply}">
+                <input type="hidden" name="reportId" th:value="${reports.reportId}">
 
-		處理備註：<br>
-		<textarea name="reportNote" rows="3" cols="30" th:text="${reports.reportNote}"></textarea><br>
+                <div class="field">
+                    <label>更新處理狀態</label>
+                    <select name="reportStatus">
+                        <option value="0" th:selected="${reports.reportStatus == 0}">待處理</option>
+                        <option value="1" th:selected="${reports.reportStatus == 1}">處理中</option>
+                        <option value="2" th:selected="${reports.reportStatus == 2}">已解決</option>
+                    </select>
+                </div>
 
-		<input type="submit" value="送出回覆">
-	</form>
+                <div class="field">
+                    <label>處理備註（會員看得到）</label>
+                    <textarea name="reportNote" placeholder="說明處理方式或給會員的回覆…" th:text="${reports.reportNote}"></textarea>
+                </div>
 
-	<a th:href="@{/admin/reports/listAllReports}">回列表</a>
-
+                <button type="submit" class="submit">送出回覆</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

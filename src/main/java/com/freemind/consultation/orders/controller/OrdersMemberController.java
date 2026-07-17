@@ -33,6 +33,9 @@ public class OrdersMemberController {
 
 	@Autowired
 	private PsychologistRepository psychologistRepository;
+	
+	@Autowired
+	private com.freemind.consultation.reports.model.ReportsService reportsSvc;
 
 	private List<Psychologist> getActivePsychologists() {
 		return psychologistRepository.findAll().stream()
@@ -139,20 +142,47 @@ public class OrdersMemberController {
 
 		int hour = Integer.parseInt(hourStr);
 		Integer tid = Integer.valueOf(timeslotId);
+		Integer pid = Integer.valueOf(psychId);
 
 		Slots slot = slotsSvc.getOneSlots(tid);
+		java.time.LocalDateTime consStart = slot.getSlotDate().atTime(hour, 0);
+
+		// 檢查：同一會員是否已經預約過「這位心理師的這個時段」（待確認或已確認）
+		boolean duplicate = ordersSvc.getByMemberId(memberId).stream()
+				.anyMatch(o -> o.getPsychologist() != null
+						&& o.getPsychologist().getPsychId().equals(pid)
+						&& o.getConsStart() != null
+						&& o.getConsStart().equals(consStart)
+						&& (o.getOrderStatus() == 0 || o.getOrderStatus() == 1));
+
+		if (duplicate) {
+			// 重新組回 bookInput 需要的資料，帶錯誤訊息回去
+			List<Integer> availableHours = new java.util.ArrayList<>();
+			String status = slot.getConsStatus();
+			for (int h = 0; h < 24; h++) {
+				if (status.charAt(h) == '1' || status.charAt(h) == '4') {
+					availableHours.add(h);
+				}
+			}
+			Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
+			model.addAttribute("slots", slot);
+			model.addAttribute("availableHours", availableHours);
+			model.addAttribute("psychologist", psychologist);
+			model.addAttribute("errorMessage", "你已經預約過這位心理師的這個時段了，請勿重複預約。");
+			return "front-end/member/consultation/orders/bookInput";
+		}
 
 		Member member = new Member();
 		member.setMemberId(memberId);
 
 		Psychologist psychologist = new Psychologist();
-		psychologist.setPsychId(Integer.valueOf(psychId));
+		psychologist.setPsychId(pid);
 
 		Orders orders = new Orders();
 		orders.setSlot(slot);
 		orders.setMember(member);
 		orders.setPsychologist(psychologist);
-		orders.setConsStart(slot.getSlotDate().atTime(hour, 0));
+		orders.setConsStart(consStart);
 		orders.setConsEnd(slot.getSlotDate().atTime(hour + 1, 0));
 		orders.setPsychLoc(psychLoc);
 		orders.setPsychFee(Integer.valueOf(psychFee));
@@ -175,7 +205,18 @@ public class OrdersMemberController {
 		}
 		Integer memberId = prinUserDetails.getMember().getMemberId();
 		List<Orders> list = ordersSvc.getByMemberId(memberId);
+
+		// 建立 訂單編號 -> 回報處理狀態 的對照，用來顯示問題回報欄
+		List<com.freemind.consultation.reports.model.Reports> myReports = reportsSvc.getByMemberId(memberId);
+		java.util.Map<Integer, Integer> reportStatusMap = new java.util.HashMap<>();
+		for (com.freemind.consultation.reports.model.Reports r : myReports) {
+			if (r.getOrders() != null) {
+				reportStatusMap.put(r.getOrders().getOrderId(), r.getReportStatus());
+			}
+		}
+
 		model.addAttribute("ordersListData", list);
+		model.addAttribute("reportStatusMap", reportStatusMap);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/myOrdersList";
 	}
