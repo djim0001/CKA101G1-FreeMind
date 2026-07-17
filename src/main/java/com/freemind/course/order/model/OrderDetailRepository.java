@@ -1,5 +1,6 @@
 package com.freemind.course.order.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 public interface OrderDetailRepository
         extends JpaRepository<OrderDetail, OrderDetail.CompositeOrderDetail> {
@@ -127,4 +129,59 @@ public interface OrderDetailRepository
     	        @Param("courseOrderId") Integer courseOrderId,
     	        @Param("courseId") Integer courseId
     	);
+    // 加總該心理師課程的成交金額
+    @Query("""
+            SELECT COALESCE(SUM(od.discountedPrice), 0)
+            FROM OrderDetail od
+            JOIN od.course c
+            JOIN c.psychologist p
+            JOIN od.courseOrder co
+            WHERE p.psychId = :psychId
+              AND co.paymentStatus = 1
+              AND co.orderedAt >= :startDateTime
+              AND co.orderedAt < :endDateTime
+        """)
+        Long sumMonthlySalesByPsychologist(
+                @Param("psychId") Integer psychId,
+                @Param("startDateTime") LocalDateTime startDateTime,
+                @Param("endDateTime") LocalDateTime endDateTime
+        );
+    // 一個心理師歷史總售出課程數
+    @Query("""
+    	    SELECT COUNT(od)
+    	    FROM OrderDetail od
+    	    WHERE od.course.psychologist.psychId = :psychId
+    	      AND od.courseOrder.paymentStatus = 1
+    	""")
+    	int countAllSoldCoursesByPsychologist(
+    	        @Param("psychId") Integer psychId
+    	);
+    // 心理師營收排平
+    @Query("""
+            SELECT p
+            FROM OrderDetail od
+            JOIN od.course c
+            JOIN c.psychologist p
+            JOIN od.courseOrder co
+            WHERE co.paymentStatus = 1
+            GROUP BY p
+            ORDER BY SUM(od.discountedPrice) DESC
+        """)
+        List<Psychologist> findTopPsychologistsByRevenue(Pageable pageable);
+    
+    @Query("""
+            SELECT COUNT(DISTINCT co)
+            FROM OrderDetail od
+            JOIN od.courseOrder co
+            JOIN od.course c
+            JOIN c.psychologist p
+            WHERE p.psychId = :psychId
+              AND co.orderedAt >= :startAt
+              AND co.orderedAt < :endAt
+        """)
+        long countMonthlyOrdersByPsychologist(
+                @Param("psychId") Integer psychId,
+                @Param("startAt") LocalDateTime startAt,
+                @Param("endAt") LocalDateTime endAt
+        );
 }

@@ -84,6 +84,9 @@
 .th2-page .error { color:#b64f57; font-size:12px; }
 .th2-page .required { color:#b64f57; }
 .th2-page .page-actions,.th2-page .inline-actions { display:flex; align-items:center; justify-content:flex-end; gap:9px; flex-wrap:wrap; }
+.th2-page .payout-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
+@media(max-width:900px){.th2-page .payout-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.th2-page .payout-stats{grid-template-columns:1fr}}
 .th2-page .inline-actions { justify-content:flex-start; }
 .th2-page form.inline-form { display:inline-flex; margin:0; }
 .th2-page .course-summary { display:grid; gap:3px; min-width:220px; }

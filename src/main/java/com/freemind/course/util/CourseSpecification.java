@@ -84,6 +84,21 @@ public class CourseSpecification {
         };
     }
     
+    public static Specification<Course> courseStatusNotEquals(Byte courseStatus) {
+
+        return (root, query, cb) -> {
+
+            if (courseStatus == null) {
+                return cb.conjunction();
+            }
+
+            return cb.notEqual(
+                    root.get("courseStatus"),
+                    courseStatus
+            );
+        };
+    }
+    
     /**
 	 * 搜尋課程名稱或心理師姓名
 	 */
@@ -114,6 +129,41 @@ public class CourseSpecification {
         };
     }
 
+    public static Specification<Course> keywordContains(
+            String keyword,
+            Byte courseStatus
+    ) {
+        return (root, query, cb) -> {
+
+            Predicate statusPredicate =
+                    cb.equal(root.get("courseStatus"), courseStatus);
+
+            if (keyword == null || keyword.isBlank()) {
+                return statusPredicate;
+            }
+
+            String pattern =
+                    "%" + keyword.trim().toLowerCase() + "%";
+
+            Join<Course, Psychologist> psychologist =
+                    root.join("psychologist", JoinType.LEFT);
+
+            return cb.and(
+                    statusPredicate,
+                    cb.or(
+                            cb.like(
+                                    cb.lower(root.get("courseName")),
+                                    pattern
+                            ),
+                            cb.like(
+                                    cb.lower(psychologist.get("name")),
+                                    pattern
+                            )
+                    )
+            );
+        };
+    }
+    
 	/**
 	 * 依課程分類查詢
 	 */

@@ -9,7 +9,7 @@
 <body class="thy2-page">
 	<div class="layout">
 		<aside class="sidebar">
-			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+			<a class="brand" href="/admin/home" th:href="@{/admin/home}">諮由自在 Free Mind<small>ADMIN
 					CONSOLE</small></a>
 			<p class="nav-label">課程商城管理</p>
 			<nav class="nav"><a th:href="@{/admin/course/select_course}">課程發布管理</a><a class="active" th:href="@{/admin/course/select_course_order}">訂單與退款</a><a th:href="@{/admin/adminPayout/listAll}">營運與撥款</a><a th:href="@{/admin/coupon/select_coupon}">優惠券管理</a><a th:href="@{/admin/course/select_course_categories}">課程分類</a></nav>
@@ -17,9 +17,7 @@
 		<div class="main">
 			<header class="topbar">
 				<span>後台管理／訂單管理</span>
-				<div class="admin-id">
-					<span class="avatar">管</span>系統管理員
-				</div>
+				<div class="admin-id"><span class="avatar">管</span><b th:text="${admin != null ? admin.name : '系統管理員'}">系統管理員</b></div>
 			</header>
 			<main class="content">
 				<div class="page-head">
@@ -43,6 +41,7 @@
 							<option value="0">未付款</option>
 							<option value="1">已付款</option>
 							<option value="2">取消訂單</option>
+							<option value="3">已退款</option>
 						</select>
 						<input class="field" type="date" th:field="*{orderedDate}">
 						<button class="btn secondary" type="submit">查詢</button>
@@ -84,7 +83,9 @@
 									<td th:text="${order.paymentMethod == 0 ? '信用卡支付' : '第三方支付'}">—</td>
 									<td><span class="status-paid"
 										th:if="${order.paymentStatus == 1}">已付款</span><span
-										class="status-unpaid" th:if="${order.paymentStatus == 0}">未付款</span></td>
+										class="status-unpaid" th:if="${order.paymentStatus == 0}">未付款</span><span
+										class="status-cancelled" th:if="${order.paymentStatus == 2}">取消訂單</span><span
+										class="status-refunded" th:if="${order.paymentStatus == 3}">已退款</span></td>
 									<td
 										th:text="${#temporals.format(order.orderedAt,'yyyy-MM-dd HH:mm:ss')}">—</td>
 									<td><a class="btn ghost"
@@ -113,7 +114,7 @@
 							<thead>
 								<tr>
 									<th>訂單編號</th>
-									<th>會員編號</th>
+									<th>會員</th>
 									<th>退款金額</th>
 									<th>申請時間</th>
 									<th>退款時間</th>
@@ -127,7 +128,7 @@
 								</tr>
 								<tr th:each="refundItem : ${refundList}">
 									<td th:text="${refundItem.courseOrder.courseOrderId}">—</td>
-									<td th:text="${refundItem.member.memberId}">—</td>
+									<td th:text="${refundItem.member.name}">—</td>
 									<td>NT$ <span th:text="${refundItem.refundAmount}">0</span></td>
 									<td
 										th:text="${#temporals.format(refundItem.createdAt,'yyyy-MM-dd HH:mm:ss')}">—</td>
@@ -161,8 +162,8 @@
 										<dd th:text="${refund.courseOrder.courseOrderId}">—</dd>
 									</div>
 									<div>
-										<dt>會員編號</dt>
-										<dd th:text="${refund.member.memberId}">—</dd>
+										<dt>會員</dt>
+										<dd th:text="${refund.member.name}">—</dd>
 									</div>
 									<div>
 										<dt>退款金額</dt>
@@ -223,7 +224,8 @@
 								</table>
 							</div>
 						</section>
-						<div class="page-actions" style="margin-top: 20px">
+						<div class="page-actions" style="margin-top: 20px"
+							th:if="${refund != null and refund.refundStatus == 0}">
 							<form method="post"
 								th:action="@{/admin/refund/approve/{orderId}/{memberId}(orderId=${refund.courseOrder.courseOrderId},memberId=${refund.member.memberId})}"
 								data-confirm-form="確定核准此退款？">

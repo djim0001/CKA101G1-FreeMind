@@ -1,4 +1,11 @@
 package com.freemind.course.dto;
 
-public record PlaybackPositionReq(Integer courseOrderId, Integer courseId, Long playbackSeconds) {
+import java.math.BigDecimal;
+
+public record PlaybackPositionReq(
+        Integer courseOrderId,
+        Integer courseId,
+        Integer playbackSeconds,
+        BigDecimal playbackPercentage
+) {
 }

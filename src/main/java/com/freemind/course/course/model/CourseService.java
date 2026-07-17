@@ -75,41 +75,83 @@ public class CourseService {
 
 		return repository.findByCourseStatus(COURSE_STATUS_LISTED, pageable);
 	}
+
 	@Transactional
-    public Page<Course> searchCourses(
-            CourseSearchCondition condition,
-            Integer page) {
+	public Page<Course> searchCourses(CourseSearchCondition condition, Integer page) {
 
-        if (page == null || page < 1) {
-            page = 1;
-        }
+		if (page == null || page < 0) {
+			page = 0;
+		}
 
-        if (condition == null) {
-            condition = new CourseSearchCondition();
-        }
+		if (condition == null) {
+			condition = new CourseSearchCondition();
+		}
 
-        Specification<Course> spec =
-                CourseSpecification
-                        .keywordContains(condition.getKeyword())
-                        .and(
-                            CourseSpecification.categoryEquals(
-                                condition.getCategoryId()
-                            )
-                        )
-                        .and(
-                            CourseSpecification.courseStatusEquals(
-                                condition.getCourseStatus()
-                            )
-                        );
+		Specification<Course> spec = CourseSpecification.keywordContains(condition.getKeyword())
+				.and(CourseSpecification.categoryEquals(condition.getCategoryId()))
+				.and(CourseSpecification.courseStatusEquals(condition.getCourseStatus()));
 
-        Pageable pageable = PageRequest.of(
-                page,
-                coursePageSize,
-                Sort.by("courseId").descending()
-        );
+		Pageable pageable = PageRequest.of(page, coursePageSize, Sort.by("courseId").descending());
 
-        return repository.findAll(spec, pageable);
-    }
+		return repository.findAll(spec, pageable);
+	}
+	
+	 /**
+     * 搜尋已上架課程。
+     * courseStatus 固定限制為 4。
+     */
+	 public Page<Course> searchListedCourses(
+	            String keyword,
+	            Integer page,
+	            Integer size,
+	            String orderBy
+	    ) {
+
+	        if (page == null || page < 1) {
+	            page = 1;
+	        }
+
+	        if (size == null || size <= 0) {
+	            size = 10;
+	        }
+
+	        Pageable pageable = PageRequest.of(
+	                page - 1,
+	                size,
+	                CourseSortUtil.getCourseSort(orderBy)
+	        );
+
+	        Specification<Course> spec =
+	                CourseSpecification.keywordContains(keyword);
+
+	        return repository.findAll(spec, pageable);
+	    }
+
+	@Transactional
+	public Page<Course> adminSearchCourses(CourseSearchCondition condition, Integer page) {
+
+		int pageIndex = page == null || page < 0 ? 0 : page;
+
+		if (condition == null) {
+			condition = new CourseSearchCondition();
+		}
+
+		Byte selectedStatus = condition.getCourseStatus();
+
+		// 管理員審核清單不允許使用狀態 0 作為搜尋條件
+		if (selectedStatus != null && selectedStatus.byteValue() == 0) {
+			selectedStatus = null;
+		}
+
+		Specification<Course> spec = Specification.where(CourseSpecification.courseStatusNotEquals((byte) 0))
+				.and(CourseSpecification.keywordContains(condition.getKeyword()))
+				.and(CourseSpecification.categoryEquals(condition.getCategoryId()))
+				.and(CourseSpecification.courseStatusEquals(selectedStatus));
+
+		Pageable pageable = PageRequest.of(pageIndex, coursePageSize, Sort.by(Sort.Direction.DESC, "courseId"));
+
+		return repository.findAll(spec, pageable);
+	}
 
 	// psych_function
 	public Page<Course> getCoursesByPsychId(Integer psychId, Integer page, String orderBy) {
@@ -146,29 +188,22 @@ public class CourseService {
 		return repository.countByCourseStatus(courseStatus);
 	}
 
-	 public Page<Course> searchListedCourses(
-	            String keyword,
-	            Integer page,
-	            String orderBy
-	    ) {
-	        if (page == null || page < 0) {
-	            page = 0;
-	        }
+	public Page<Course> searchListedCourses(String keyword, Integer page, String orderBy) {
+		if (page == null || page < 0) {
+			page = 0;
+		}
 
-	        if (keyword == null) {
-	            keyword = "";
-	        }
+		if (keyword == null) {
+			keyword = "";
+		}
 
-	        keyword = keyword.trim();
+		keyword = keyword.trim();
 
-	        Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
+		Pageable pageable = PageRequest.of(page, coursePageSize, CourseSortUtil.getCourseSort(orderBy));
 
-	        return repository.searchByCourseOrPsychologist(
-	                keyword,
-	                COURSE_STATUS_LISTED,
-	                pageable
-	        );
-	    }
+		return repository.searchByCourseOrPsychologist(keyword, COURSE_STATUS_LISTED, pageable);
+	}
+
 	// member_function
 	public void checkAllCourseStatus() {
 		List<Course> allCourse = getAllCourse();
@@ -203,7 +238,6 @@ public class CourseService {
 		return repository.findByCourseStatusAndCourseCategories_CourseCatId(COURSE_STATUS_LISTED, courseCatId,
 				pageable);
 	}
-	
 
 	// 收藏課程
 	public void addCourseBookmark(Integer memberId, Integer courseId) {

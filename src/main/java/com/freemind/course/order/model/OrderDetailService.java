@@ -1,6 +1,9 @@
 package com.freemind.course.order.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.freemind.course.order.model.OrderDetail.CompositeOrderDetail;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.psychologist.entity.Psychologist;
 
 import jakarta.transaction.Transactional;
 
@@ -171,7 +175,9 @@ public class OrderDetailService {
 	        Integer memberId,
 	        Integer courseOrderId,
 	        Integer courseId,
-	        Long playbackSeconds) {
+	        Integer playbackSeconds,
+	        BigDecimal courseProgress
+	){
 
 	    if (courseOrderId == null) {
 	        throw new IllegalArgumentException(
@@ -203,7 +209,7 @@ public class OrderDetailService {
 	                "使用 LocalTime 時，影片時間不能超過 24 小時"
 	        );
 	    }
-
+	    
 	    OrderDetail orderDetail =
 	            repository.findAccessibleOrderDetail(
 	                    memberId,
@@ -220,5 +226,80 @@ public class OrderDetailService {
 	            LocalTime.ofSecondOfDay(playbackSeconds);
 
 	    orderDetail.setPlaybackPosition(playbackPosition);
+	    orderDetail.setCourseProgress(courseProgress);
 	}
+	
+	public long getMonthlySales(
+            Integer psychId,
+            YearMonth yearMonth) {
+
+        if (psychId == null) {
+            throw new IllegalArgumentException("心理師編號不能為空");
+        }
+
+        if (yearMonth == null) {
+            throw new IllegalArgumentException("查詢月份不能為空");
+        }
+
+        LocalDateTime startDateTime =
+                yearMonth.atDay(1).atStartOfDay();
+
+        LocalDateTime endDateTime =
+                yearMonth.plusMonths(1)
+                         .atDay(1)
+                         .atStartOfDay();
+
+        Long total = repository.sumMonthlySalesByPsychologist(
+                psychId,
+                startDateTime,
+                endDateTime
+        );
+
+        return total == null ? 0L : total;
+    }
+	
+	 public int countAllOrderDetails() {
+	        return Math.toIntExact(repository.count());
+	    }
+	 
+	 public List<Psychologist> getTopPsychologistsByRevenue(int limit) {
+
+	        if (limit <= 0) {
+	            throw new IllegalArgumentException("查詢筆數必須大於 0");
+	        }
+
+	        Pageable pageable = PageRequest.of(0, limit);
+
+	        return repository.findTopPsychologistsByRevenue(pageable);
+	    }
+	 // 心理師單月訂單量
+	 public int getMonthlyOrderCount(
+	            Integer psychId,
+	            YearMonth yearMonth
+	    ) {
+	        if (psychId == null) {
+	            throw new IllegalArgumentException("心理師編號不能為空");
+	        }
+
+	        if (yearMonth == null) {
+	            yearMonth = YearMonth.now();
+	        }
+
+	        LocalDateTime startAt =
+	                yearMonth.atDay(1).atStartOfDay();
+
+	        LocalDateTime endAt =
+	                yearMonth.plusMonths(1)
+	                         .atDay(1)
+	                         .atStartOfDay();
+
+	        long count = repository.countMonthlyOrdersByPsychologist(
+	                psychId,
+	                startAt,
+	                endAt
+	        );
+
+	        return Math.toIntExact(count);
+	    }
+	
 }

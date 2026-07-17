@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -21,6 +22,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.course.coupon.model.Coupon;
 import com.freemind.course.coupon.model.CouponService;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolationException;
@@ -31,11 +34,18 @@ import jakarta.validation.Valid;
 public class CouponController {
 
 	private final CouponService couponSvc;
+	private final AdminService adminSvc;
 
-	public CouponController(CouponService couponSvc) {
+	public CouponController(AdminService adminSvc, CouponService couponSvc) {
 		this.couponSvc = couponSvc;
+		this.adminSvc = adminSvc;
 	}
 
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+		return adminSvc.findByAccount(authentication.getName());
+	}
+	
 	@GetMapping("/select_coupon")
 	public String selectCoupon(
 			@RequestParam(defaultValue = "1") Integer page, 
