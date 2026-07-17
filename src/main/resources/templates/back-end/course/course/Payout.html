@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>撥款管理</title>
 </head>
 <body>
+
+<form th:action="@{/admin/adminPayout/listAll}" method="get">
+    <label>心理師ID：</label>
+    <input type="number" name="psychId" th:value="${psychId}">
+    <button type="submit">搜尋</button>
+    <a th:href="@{/admin/adminPayout/listAll}">顯示全部</a>
+</form>
+
+<br>
+
 <table border="1">
     <thead>
         <tr>
@@ -21,7 +31,6 @@
     </thead>
 
     <tbody>
-
         <tr th:each="onePayout : ${allPayout}">
             <td th:text="${onePayout.payoutId}"></td>
             <td th:text="${onePayout.billingMonth}"></td>
@@ -33,8 +42,8 @@
             <td th:text="${onePayout.paidAt}"></td>
             <td th:text="${onePayout.payoutStatusText}"></td>
         </tr>
-
     </tbody>
 </table>
+
 </body>
 </html>
