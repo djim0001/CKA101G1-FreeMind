@@ -6,6 +6,9 @@
 </head>
 <body>
     <h1 th:text="${activity.activityName}"></h1>
+	
+	<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
+	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
 
     <img th:if="${activity.picture != null}" 
          th:src="@{/admin/activity/activityImage(activityId=${activity.activityId})}" 
@@ -30,8 +33,48 @@
     </p>
     <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
-
+	<div class="admin-actions">
+        <div class="action-block" th:if="${activity.activityStatus == 0}" >
+	    <form th:action="@{/admin/activity/approve}" method="post"
+	          onsubmit="return confirm('確定審核通過嗎？')" style="display:inline;">
+	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	        <button type="submit">審核通過</button>
+	    </form>
+	
+	    <button type="button" onclick="toggleRejectForm()">退回</button>
+	
+		    <div class="action-block" id="rejectForm" style="display:none;">
+		        <form th:action="@{/admin/activity/reject}" method="post"
+		              onsubmit="return confirm('確定要退回這個活動嗎？')">
+		            <input type="hidden" name="activityId" th:value="${activity.activityId}">
+		            <select name="rejectReason">
+		                <option value="0">資訊不完整</option>
+		                <option value="1">內容不當</option>
+		                <option value="2">名額設定異常</option>
+		                <option value="3">其他</option>
+		            </select>
+		            <input type="text" name="rejectNote" placeholder="退回原因說明">
+		            <button type="submit">確認退回</button>
+		        </form>
+		    	</div>
+	    </div>
+	    
+	    <div class="action-block" th:if="${activity.activityStatus == 1}">
+	        <form th:action="@{/admin/activity/publish}" method="post"
+	              onsubmit="return confirm('確定要發布這個活動嗎？')">
+	            <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	            <button type="submit">發布</button>
+	        </form>
+	    </div>
+	</div>
+	
     <a th:href="@{/admin/activity/listAllActivity}">返回活動列表</a>
 
+<script>
+function toggleRejectForm() {
+    const form = document.getElementById('rejectForm');
+    form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+}
+</script>
 </body>
 </html>

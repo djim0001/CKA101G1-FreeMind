@@ -8,7 +8,7 @@
 
     <h1>新增活動分類</h1>
 
-    <form th:action="@{/activityCat/insert}" th:object="${activityCat}" method="post">
+    <form th:action="@{/admin/activityCat/insert}" th:object="${activityCat}" method="post">
 <!--                 表單要送去哪個網址                   要綁定的物件是activityCat -->
         <p>
 			<!--因為上面<form>已經宣告了th:object="${activityCat}"，所以底下可以直接寫*{activityCatName}，等同於${activityCat.activityCatName} -->
