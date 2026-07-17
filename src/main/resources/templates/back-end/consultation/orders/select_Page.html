@@ -3,78 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <title>查詢諮商訂單</title>
-    <style>
-        .search-field {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-right: 24px;
-            margin-bottom: 16px;
-        }
-        .search-form-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-    </style>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 1000px;
+        margin: 0 auto 24px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+    .card-header h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0;
+    }
+
+    h4 {
+        font-size: 16px;
+        color: #4a3e3e;
+        margin: 0 0 12px;
+    }
+
+    .error { color: #c62828; font-size: 14px; margin-bottom: 12px; }
+
+    .search-form-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 24px;
+        margin-bottom: 18px;
+    }
+    .search-field {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #7a6b6b;
+    }
+    .search-field input[type="text"],
+    .search-field input[type="date"],
+    .search-field select {
+        padding: 7px 10px;
+        border: 1px solid #e0d5d5;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+    }
+    .search-field input:focus, .search-field select:focus {
+        outline: none;
+        border-color: #e8b4b4;
+    }
+
+    .search-btn {
+        padding: 9px 26px;
+        background-color: #e8b4b4;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .search-btn:hover { background-color: #d39393; }
+
+    .back-link {
+        display: inline-block;
+        padding: 9px 22px;
+        background-color: #e8b4b4;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    .back-link:hover { background-color: #d39393; }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 6px;
+    }
+    th, td {
+        border: 1px solid #f2dddd;
+        padding: 10px 12px;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+    th {
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        font-weight: 600;
+        white-space: nowrap;
+        text-align: center;
+    }
+    td { text-align: center; }
+
+    .detail-table th { text-align: left; width: 35%; }
+    .detail-table td { text-align: left; }
+
+    .nowrap { white-space: nowrap; }
+</style>
 </head>
 <body>
-    <h3>查詢諮商訂單</h3>
-
-    <span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
-
-    <form method="post" th:action="@{/admin/orders/search}">
-        <div class="search-form-wrap">
-            <span class="search-field">訂單編號：<input type="text" name="orderId"></span>
-            <span class="search-field">會員編號：<input type="text" name="memberId"></span>
-            <span class="search-field">心理師編號：<input type="text" name="psychId"></span>
+    <div class="card">
+        <div class="card-header">
+            <h3>查詢諮商訂單</h3>
+            <a class="back-link" th:href="@{/admin/orders/listAllOrders}">回列表</a>
         </div>
-        <div class="search-form-wrap">
-            <span class="search-field">
-                訂單狀態：
-                <select name="orderStatus">
-                    <option value="">請選擇</option>
-                    <option value="0">待確認</option>
-                    <option value="1">已確認</option>
-                    <option value="2">已取消</option>
-                    <option value="3">未出席</option>
-                    <option value="4">已完成</option>
-                </select>
-            </span>
-            <span class="search-field">
-                是否為政府補助：
-                <select name="govSubsidy">
-                    <option value="">請選擇</option>
-                    <option value="false">否</option>
-                    <option value="true">是</option>
-                </select>
-            </span>
-            <span class="search-field">
-                諮商參與形式：
-                <select name="sessionType">
-                    <option value="">請選擇</option>
-                    <option value="0">單人諮商</option>
-                    <option value="1">伴侶諮商</option>
-                    <option value="2">家庭諮商</option>
-                    <option value="3">團體諮商</option>
-                </select>
-            </span>
-            <span class="search-field">時段日期：<input type="date" name="slotDate"></span>
-        </div>
-        <input type="submit" value="查詢">
-    </form>
+
+        <span class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
+
+        <form method="post" th:action="@{/admin/orders/search}">
+            <div class="search-form-wrap">
+                <span class="search-field">訂單編號：<input type="text" name="orderId"></span>
+                <span class="search-field">會員編號：<input type="text" name="memberId"></span>
+                <span class="search-field">心理師編號：<input type="text" name="psychId"></span>
+                <span class="search-field">
+                    訂單狀態：
+                    <select name="orderStatus">
+                        <option value="">請選擇</option>
+                        <option value="0">待確認</option>
+                        <option value="1">已確認</option>
+                        <option value="2">已取消</option>
+                        <option value="3">未出席</option>
+                        <option value="4">已完成</option>
+                    </select>
+                </span>
+                <span class="search-field">
+                    是否為政府補助：
+                    <select name="govSubsidy">
+                        <option value="">請選擇</option>
+                        <option value="false">否</option>
+                        <option value="true">是</option>
+                    </select>
+                </span>
+                <span class="search-field">
+                    諮商參與形式：
+                    <select name="sessionType">
+                        <option value="">請選擇</option>
+                        <option value="0">單人諮商</option>
+                        <option value="1">伴侶諮商</option>
+                        <option value="2">家庭諮商</option>
+                        <option value="3">團體諮商</option>
+                    </select>
+                </span>
+                <span class="search-field">時段日期：<input type="date" name="slotDate"></span>
+            </div>
+            <input type="submit" class="search-btn" value="查詢">
+        </form>
+    </div>
 
     <!-- 單筆查詢結果 -->
-    <div th:if="${orders != null}">
+    <div class="card" th:if="${orders != null}">
         <h4>查詢結果（單筆）</h4>
-        <table border="1">
+        <table class="detail-table">
             <tr><th>訂單編號</th><td th:text="${orders.orderId}"></td></tr>
-            <tr><th>時段編號</th><td th:text="${orders.slot.timeslotId}"></td></tr>
             <tr><th>會員編號</th><td th:text="${orders.member.memberId}"></td></tr>
+            <tr><th>會員名稱</th><td th:text="${orders.member.name}"></td></tr>
             <tr><th>心理師編號</th><td th:text="${orders.psychologist.psychId}"></td></tr>
-            <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
-            <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
-            <tr><th>建立時間</th><td th:text="${#temporals.format(orders.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td></tr>
+            <tr><th>心理師名稱</th><td th:text="${orders.psychologist.name}"></td></tr>
+            <tr><th>開始時間</th><td th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm')}"></td></tr>
+            <tr><th>結束時間</th><td th:text="${#temporals.format(orders.consEnd, 'yyyy-MM-dd HH:mm')}"></td></tr>
             <tr><th>心理師工作地點</th><td th:text="${orders.psychLoc}"></td></tr>
             <tr><th>是否為政府補助</th><td th:text="${orders.govSubsidy ? '是' : '否'}"></td></tr>
             <tr><th>心理師諮詢費</th><td th:text="${orders.psychFee}"></td></tr>
@@ -99,6 +206,7 @@
                     <span th:case="'sleep'">睡眠問題</span>
                     <span th:case="'anxiety'">焦慮傾向</span>
                     <span th:case="'other'">其他</span>
+                    <span th:case="*" th:text="${orders.visitPurpose}"></span>
                 </td>
             </tr>
             <tr><th>來訪目的備註</th><td th:text="${orders.visitPurposeNote}"></td></tr>
@@ -110,22 +218,19 @@
                     <span th:case="3">團體諮商</span>
                 </td>
             </tr>
-            <tr><th>心理師晤談筆記</th><td th:text="${orders.psychNote != null ? orders.psychNote : '尚無筆記'}"></td></tr>
-            <tr><th>會員評分</th><td th:text="${orders.rating != null ? orders.rating : '尚未評論'}"></td></tr>
-            <tr><th>評論內容</th><td th:text="${orders.reviewContent != null ? orders.reviewContent : '-'}"></td></tr>
-            <tr><th>評論時間</th><td th:text="${orders.reviewedAt != null ? #temporals.format(orders.reviewedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></td></tr>
         </table>
     </div>
 
     <!-- 多筆查詢結果 -->
-    <div th:if="${ordersListData != null}">
+    <div class="card" th:if="${ordersListData != null}">
         <h4>查詢結果（多筆）</h4>
-        <table border="1">
+        <table>
             <tr>
                 <th>訂單編號</th>
-                <th>時段編號</th>
                 <th>會員編號</th>
+                <th>會員名稱</th>
                 <th>心理師編號</th>
+                <th>心理師名稱</th>
                 <th>開始時間</th>
                 <th>結束時間</th>
                 <th>訂單狀態</th>
@@ -133,11 +238,12 @@
             </tr>
             <tr th:each="order : ${ordersListData}">
                 <td th:text="${order.orderId}"></td>
-                <td th:text="${order.slot.timeslotId}"></td>
                 <td th:text="${order.member.memberId}"></td>
+                <td class="nowrap" th:text="${order.member.name}"></td>
                 <td th:text="${order.psychologist.psychId}"></td>
-                <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td class="nowrap" th:text="${order.psychologist.name}"></td>
+                <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:switch="${order.orderStatus}">
                     <span th:case="0">待確認</span>
                     <span th:case="1">已確認</span>
@@ -149,8 +255,6 @@
             </tr>
         </table>
     </div>
-
-    <a th:href="@{/admin/orders/listAllOrders}">回列表</a>
 
 </body>
 </html>

@@ -3,70 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <title>諮商訂單列表</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 1300px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 36px 40px;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e8b4b4;
+    }
+    .header h3 {
+        font-size: 22px;
+        color: #4a3e3e;
+        margin: 0;
+    }
+    .header .actions a {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 8px 18px;
+        background-color: #e8b4b4;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: background-color 0.2s;
+    }
+    .header .actions a:hover {
+        background-color: #d39393;
+    }
+
+    .success {
+        color: #2e7d43;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #f2dddd;
+        padding: 10px 8px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 13px;
+    }
+
+    th {
+        background-color: #fbf2f2;
+        color: #7a6b6b;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    tr:nth-child(even) td {
+        background-color: #fdfafa;
+    }
+
+    .nowrap { white-space: nowrap; }
+
+    .op-form {
+        margin-bottom: 4px;
+    }
+    .op-btn {
+        width: 100%;
+        padding: 5px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        color: #fff;
+        font-size: 12px;
+        transition: opacity 0.2s;
+    }
+    .op-btn:hover { opacity: 0.85; }
+    .op-view   { background-color: #1565c0; }
+    .op-edit   { background-color: #b8860b; }
+    .op-delete { background-color: #c62828; }
+</style>
 </head>
 <body>
-    <h3>諮商訂單列表</h3>
+    <div class="card">
+        <div class="header">
+            <h3>諮商訂單列表</h3>
+            <div class="actions">
+                <a th:href="@{/admin/orders/addOrders}">新增訂單</a>
+                <a th:href="@{/admin/orders/select_Page}">查詢</a>
+            </div>
+        </div>
 
-    <span style="color:green;" th:if="${success != null}" th:text="${success}"></span>
+        <span class="success" th:if="${success != null}" th:text="${success}"></span>
 
-    <table border="1">
-        <tr>
-            <th>訂單編號</th>
-            <th>會員編號</th>
-            <th>心理師編號</th>
-            <th>開始時間</th>
-            <th>結束時間</th>
-            <th>訂單狀態</th>
-            <th>諮詢費</th>
-            <th>來訪目的</th>
-            <th>操作</th>
-        </tr>
-        <tr th:each="order : ${ordersListData}">
-            <td th:text="${order.orderId}"></td>
-            <td th:text="${order.member.memberId}"></td>
-            <td th:text="${order.psychologist.psychId}"></td>
-            <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td th:switch="${order.orderStatus}">
-                <span th:case="0">待確認</span>
-                <span th:case="1">已確認</span>
-                <span th:case="2">已取消</span>
-                <span th:case="3">未出席</span>
-                <span th:case="4">已完成</span>
-            </td>
-            <td th:text="${order.psychFee}"></td>
-            <td th:switch="${order.visitPurpose}">
-                <span th:case="'emotion'">情緒困擾</span>
-                <span th:case="'stress'">壓力調適</span>
-                <span th:case="'relationship'">人際關係</span>
-                <span th:case="'family'">家庭問題</span>
-                <span th:case="'career'">職涯困惑</span>
-                <span th:case="'academic'">課業壓力</span>
-                <span th:case="'self_growth'">自我探索</span>
-                <span th:case="'sleep'">睡眠問題</span>
-                <span th:case="'anxiety'">焦慮傾向</span>
-                <span th:case="'other'">其他</span>
-            </td>
-            <td>
-                <form method="post" th:action="@{/admin/orders/viewDetail}">
-					<input type="hidden" name="orderId" th:value="${order.orderId}">
-					<input type="submit" value="查看詳情">
-				</form>
-                <form method="post" th:action="@{/admin/orders/getOne_For_Update}">
-                    <input type="hidden" name="orderId" th:value="${order.orderId}">
-                    <input type="submit" value="修改">
-                </form>
-                <form method="post" th:action="@{/admin/orders/delete}">
-                    <input type="hidden" name="orderId" th:value="${order.orderId}">
-                    <input type="submit" value="刪除"
-                           onclick="return confirm('確定要刪除此筆訂單嗎？')">
-                </form>
-            </td>
-        </tr>
-    </table>
-
-    <a th:href="@{/admin/orders/addOrders}">新增訂單</a>
-    <a th:href="@{/admin/orders/select_Page}">查詢</a>
-
+        <table>
+            <tr>
+                <th>訂單編號</th>
+                <th>會員編號</th>
+                <th>會員名稱</th>
+                <th>心理師編號</th>
+                <th>心理師名稱</th>
+                <th>開始時間</th>
+                <th>結束時間</th>
+                <th>訂單狀態</th>
+                <th>諮詢費</th>
+                <th>來訪目的</th>
+                <th>操作</th>
+            </tr>
+            <tr th:each="order : ${ordersListData}">
+                <td th:text="${order.orderId}"></td>
+                <td th:text="${order.member.memberId}"></td>
+                <td class="nowrap" th:text="${order.member.name}"></td>
+                <td th:text="${order.psychologist.psychId}"></td>
+                <td class="nowrap" th:text="${order.psychologist.name}"></td>
+                <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:switch="${order.orderStatus}">
+                    <span th:case="0">待確認</span>
+                    <span th:case="1">已確認</span>
+                    <span th:case="2">已取消</span>
+                    <span th:case="3">未出席</span>
+                    <span th:case="4">已完成</span>
+                </td>
+                <td th:text="${order.psychFee}"></td>
+                <td th:switch="${order.visitPurpose}">
+                    <span th:case="'emotion'">情緒困擾</span>
+                    <span th:case="'stress'">壓力調適</span>
+                    <span th:case="'relationship'">人際關係</span>
+                    <span th:case="'family'">家庭問題</span>
+                    <span th:case="'career'">職涯困惑</span>
+                    <span th:case="'academic'">課業壓力</span>
+                    <span th:case="'self_growth'">自我探索</span>
+                    <span th:case="'sleep'">睡眠問題</span>
+                    <span th:case="'anxiety'">焦慮傾向</span>
+                    <span th:case="'other'">其他</span>
+                    <span th:case="*" th:text="${order.visitPurpose}"></span>
+                </td>
+                <td class="nowrap">
+                    <form method="post" th:action="@{/admin/orders/viewDetail}" class="op-form">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <input type="submit" class="op-btn op-view" value="查看詳情">
+                    </form>
+                    <form method="post" th:action="@{/admin/orders/getOne_For_Update}" class="op-form">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <input type="submit" class="op-btn op-edit" value="修改">
+                    </form>
+                    <form method="post" th:action="@{/admin/orders/delete}" class="op-form">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <input type="submit" class="op-btn op-delete" value="刪除"
+                               onclick="return confirm('確定要刪除此筆訂單嗎？')">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>

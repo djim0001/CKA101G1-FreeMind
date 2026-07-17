@@ -10,19 +10,12 @@ public class IndexController {
     
     @GetMapping("/")
     public String index() {
-           
-        return "index"; //view
+        return "index"; 
     }
     
-    @GetMapping("/course_index")
-    public String selectCourse() {
-    	return "back-end/course/courseIndex"; //view
-    }
-    
-    @GetMapping("/consultation")
-    public String consultationIndex() {
-        return "back-end/consultation/consultationIndex";
-    }
-    
-
+    @GetMapping("/admin/home")   
+	public String adminHome() {
+		return "back-end/adminHome";
+	}
+  
 }
