@@ -53,7 +53,7 @@ public class AdminSecurityConfig {
                 .loginProcessingUrl("/back-end/login")
                 .usernameParameter("adminAccount")
                 .passwordParameter("adminPassword")
-                .defaultSuccessUrl("/", false)
+                .defaultSuccessUrl("/index_temp", false)
                 .failureUrl("/back-end/login?error=true")
                 .permitAll()
             )
