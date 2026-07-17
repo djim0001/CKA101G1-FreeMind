@@ -34,14 +34,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 	});
 
-	// ---------- 3. 成功訊息自動淡出 ----------
-	document.querySelectorAll('.alert-success').forEach(function (el) {
-		setTimeout(function () {
-			el.classList.add('fade-out');
-			el.addEventListener('transitionend', function () {
-				el.remove();
-			}, { once: true });
-		}, 4000);
-	});
+	
 
 });

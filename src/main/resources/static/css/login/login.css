@@ -183,9 +183,6 @@
     border-radius: 0.625rem;
     display: flex;
     align-items: center;
-    transition: opacity 0.5s ease, margin 0.5s ease, max-height 0.5s ease;
-    max-height: 6rem;
-    overflow: hidden;
 }
 
 .alert svg {
@@ -208,14 +205,7 @@
     border: 1px solid rgba(134, 239, 172, 0.9);
 }
 
-/* JS 加上 .fade-out 後淡出收合，transition 結束移除節點 */
-.alert.fade-out {
-    opacity: 0;
-    max-height: 0;
-    margin-top: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-}
+
 
 /* ---------- 測試帳號提示區 ---------- */
 
@@ -446,6 +436,12 @@
 
 .divider span {
     padding: 0 0.75rem;
+}
+
+#googleBtn {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
 }
 
 .btn-google {

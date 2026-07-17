@@ -17,7 +17,7 @@ import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 import com.freemind.login.member.otp.OtpMailService;
 import com.freemind.login.member.otp.OtpService;
-import com.freemind.login.security.membersecurity.GoogleLoginSuccessHandler;
+import com.freemind.login.security.membersecurity.GoogleLoginController;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -58,7 +58,7 @@ public class MemberAuthController {
 	public String registerForm(ModelMap model, HttpSession session) {
 		RegisterForm form = new RegisterForm();
 		// Google 登入導過來的：email 已通過 Google 驗證，預填並鎖定（模板設 readonly）
-		String googleEmail = (String) session.getAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+		String googleEmail = (String) session.getAttribute(GoogleLoginController.GOOGLE_REGISTER_EMAIL);
 		if (googleEmail != null) {
 			form.setEmail(googleEmail);
 			model.addAttribute("googleRegister", true);
@@ -73,7 +73,7 @@ public class MemberAuthController {
 
 		// 是否為「Google 帳號註冊」：以 session 存的 email 為準（表單欄位雖 readonly 仍可能被改造），
 		// 送出的 email 與 Google 驗證過的一致才算，否則一律走一般 OTP 流程
-		String googleEmail = (String) session.getAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+		String googleEmail = (String) session.getAttribute(GoogleLoginController.GOOGLE_REGISTER_EMAIL);
 		boolean googleRegister = googleEmail != null && googleEmail.equals(form.getEmail());
 
 		// 帳號、信箱不可重複
@@ -118,7 +118,7 @@ public class MemberAuthController {
 
 		if (googleRegister) {
 			// 免 OTP，直接完成註冊，之後即可用 Google 一鍵登入
-			session.removeAttribute(GoogleLoginSuccessHandler.GOOGLE_REGISTER_EMAIL);
+			session.removeAttribute(GoogleLoginController.GOOGLE_REGISTER_EMAIL);
 			return "redirect:/front-end/login?verified";
 		}
 
