@@ -97,7 +97,7 @@
 		    
 			<td>
 			    <div class="action-block" th:if="${a.activityStatus == 0 || a.activityStatus == 3}">
-			        <form th:action="@{/member/activity/getOne_For_Update}" method="post" style="display:inline;">
+			        <form th:action="@{/member/activity/getOne_For_Update}" method="get" style="display:inline;">
 			            <input type="hidden" name="activityId" th:value="${a.activityId}">
 			            <button type="submit">修改</button>
 			        </form>
