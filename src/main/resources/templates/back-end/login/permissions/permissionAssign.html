@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新增權限</title>
+    <title>管理員權限設定</title>
     <style>
         * {
             margin: 0;
@@ -56,43 +56,51 @@
 
         .form-card h1 {
             color: #2c3e50;
-            margin-bottom: 20px;
+            margin-bottom: 8px;
             font-size: 24px;
         }
 
-        .form-group {
+        .admin-info {
+            color: #7f8c8d;
             margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 600;
             font-size: 14px;
         }
 
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
+        .perm-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border: 1px solid #ecf0f1;
             border-radius: 4px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.3s;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #2c3e50;
-            box-shadow: 0 0 5px rgba(44, 62, 80, 0.2);
+        .perm-item:hover {
+            background-color: #f8f9fa;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
+        .perm-item input[type="checkbox"] {
+            margin-top: 3px;
+        }
+
+        .perm-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .perm-detail {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
         }
 
         .button-group {
@@ -139,31 +147,38 @@
 <body>
     <div class="navbar">
         <div class="navbar-content">
-            <a href="/admin/permissions">← 返回權限列表</a>
+            <a href="/admin/listAllAdmin">← 返回管理員列表</a>
         </div>
     </div>
 
     <div class="container">
         <div class="form-card">
-            <h1>新增權限</h1>
+            <h1>🔐 權限設定</h1>
+            <p class="admin-info">
+                管理員：<span th:text="${adminVO.name}"></span>
+                （帳號 <span th:text="${adminVO.adminAccount}"></span>，編號 <span th:text="${adminVO.adminId}"></span>）
+            </p>
 
-            <form method="post" th:action="@{/admin/permissions/save}">
-                <div class="form-group">
-                    <label for="permName">權限名稱 *</label>
-                    <input type="text" id="permName" name="permName" required
-                           placeholder="例如：VIEW_ADMIN, EDIT_COURSE"
-                           autofocus>
-                </div>
+            <form method="post" th:action="@{/admin/permissions/assign}">
+                <input type="hidden" name="adminId" th:value="${adminVO.adminId}">
 
-                <div class="form-group">
-                    <label for="permDetail">權限說明 *</label>
-                    <textarea id="permDetail" name="permDetail" required
-                              placeholder="例如：查看管理面板，編輯課程等"></textarea>
+                <!-- Permission 沒覆寫 equals，勾選判斷用 permId 投影比對 -->
+                <label class="perm-item" th:each="perm : ${allPermissions}">
+                    <input type="checkbox" name="permIds" th:value="${perm.permId}"
+                           th:checked="${#lists.contains(adminVO.permissions.![permId], perm.permId)}">
+                    <span>
+                        <span class="perm-name" th:text="${perm.permName}"></span>
+                        <div class="perm-detail" th:text="${perm.permDetail}"></div>
+                    </span>
+                </label>
+
+                <div class="empty-message" th:if="${allPermissions.isEmpty()}">
+                    尚無可指派的權限，請先到「權限管理」新增
                 </div>
 
                 <div class="button-group">
                     <button type="submit" class="btn-submit">保存</button>
-                    <a href="/admin/permissions" class="btn-cancel">取消</a>
+                    <a href="/admin/listAllAdmin" class="btn-cancel">取消</a>
                 </div>
             </form>
         </div>
