@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.freemind.article.dto.ArticleCreateForm;
 import com.freemind.article.dto.ArticleInteractionStatsDTO;
 import com.freemind.article.dto.ArticleWithStatsDTO;
+import com.freemind.article.dto.StatsSummaryDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.exception.ArticleValidationException;
@@ -91,6 +92,52 @@ public class PsychArticleController {
 		model.addAttribute("currentPage", page);
 		model.addAttribute("articleList", articleList);
 		return "front-end/psych/article/myArticles";
+	}
+	
+	
+	@GetMapping("/myArticles/statsDashboard")
+	public String statsDashboard(Model model,
+								 @AuthenticationPrincipal PsychUserDetails prinPsychUser) {
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
+		List<Article> articles = articleService.getMyArticles(psychId);
+		long totalPublishedCount = 0L;
+		long totalUnPublishedCount = 0L;
+		long totalViewCount = 0L;
+		long totalLikeCount = 0L;
+		long totalBookmarkCount = 0L;
+		long totalShareCount = 0L;
+		
+		for (Article article : articles) {
+			int status = article.getArticleStatus();
+			
+			switch (status) {
+			case 2:
+				totalPublishedCount += 1;
+				break;
+			case 4:
+				totalPublishedCount += 1;
+				break;
+			}
+			
+			if (status == 2 || status == 4) {
+				totalViewCount += article.getViewCount();
+				totalLikeCount += article.getLikeBaseCount() + articleInteractionService.getLikeCount(article.getArticleId());
+				totalBookmarkCount += article.getBookmarkBaseCount() + articleInteractionService.getBookmarkCount(article.getArticleId());
+				totalShareCount += article.getShareCount();
+			}
+		}
+		
+		StatsSummaryDTO summary = StatsSummaryDTO.builder()
+										 .totalPublishedCount(totalPublishedCount)
+										 .totalUnPublishedCount(totalUnPublishedCount)
+										 .totalLikeCount(totalLikeCount)
+										 .totalBookmarkCount(totalBookmarkCount)
+										 .totalViewCount(totalViewCount)
+										 .totalShareCount(totalShareCount)
+										 .build();
+		
+		model.addAttribute("summary", summary);
+		return "front-end/psych/article/statsDashboard";
 	}
 	
 	@GetMapping("/create")
@@ -226,7 +273,7 @@ public class PsychArticleController {
 		}
 
 	}
-
+	
 	@PostMapping("/{articleId}/edit")
 	public String updateArticle(Model model, 
 			@ModelAttribute ArticleCreateForm form,

@@ -15,6 +15,8 @@ public interface ArticleService {
 	
 	Article submitExistingDraft(Integer articleId, Integer psychId);
 	
+	List<Article> getMyArticles(Integer psychId);
+	
 	Page<Article> getMyArticles(Integer psychId, Integer page);
 	
 	Page<Article> getPublishedArticles(Integer catId, String keyword, Integer page);
@@ -56,5 +58,5 @@ public interface ArticleService {
 	Page<Article> getReviewedArticles(Integer status, Integer page);
 
 	long incrementAndGetShareCount(Integer articleId);
-	
+
 }

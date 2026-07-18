@@ -44,7 +44,7 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 			throw new IllegalArgumentException("請輸入分類名稱");
 		}
 		
-		if (articleCatRepository.existsSimilarName(catName.trim())) {
+		if (articleCatRepository.existsCatName(catName.trim())) {
 			throw new IllegalArgumentException("此分類已存在");
 		}
 		

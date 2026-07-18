@@ -11,7 +11,14 @@ public class IndexController {
     @GetMapping("/")
     public String index() {
            
-        return "index"; //view
+        return "index2"; //view
+    }
+    
+
+    @GetMapping("/3")
+    public String index3() {
+           
+        return "index3"; //view
     }
     
     @GetMapping("/course_index")

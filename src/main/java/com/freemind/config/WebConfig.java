@@ -19,7 +19,6 @@ public class WebConfig implements WebMvcConfigurer {
 	
 	@Value("${article.upload.url-path}")
     private String articleUrlPath;
-	
 
 	@Value("${psych.upload.dir}")
 	private String psychUploadDir;

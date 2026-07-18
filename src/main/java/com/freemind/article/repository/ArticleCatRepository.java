@@ -16,9 +16,6 @@ public interface ArticleCatRepository extends JpaRepository<ArticleCat, Integer>
 	
 	Page<ArticleCat> findByArticleCatId(Integer catId, Pageable pageable);
 
-	@Query("SELECT COUNT(c) > 0 FROM ArticleCat c WHERE c.articleCatName LIKE %:catName%"
-			+ " OR :catName LIKE CONCAT('%', c.articleCatName, '%')")
-	boolean existsSimilarName(@Param("catName") String catName);
-
-
+	@Query("SELECT COUNT(c) > 0 FROM ArticleCat c WHERE LOWER(TRIM(c.articleCatName)) = LOWER(TRIM(:catName))")
+	boolean existsCatName(@Param("catName") String catName);
 }

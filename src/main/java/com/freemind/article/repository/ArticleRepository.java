@@ -13,6 +13,9 @@ import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 
 public interface ArticleRepository extends JpaRepository<Article, Integer>{
+	
+	@Query("SELECT a FROM Article a WHERE a.psychologist.psychId = :psychId")
+	List<Article> findArticlesByPsychId(Integer psychId);
 
 	@Query("SELECT a FROM Article a WHERE a.psychologist.psychId = :psychId")
 	Page<Article> findArticlesByPsychId(@Param("psychId") Integer psychId, Pageable pageable);
@@ -47,5 +50,6 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Modifying
 	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count WHERE a.articleId = :articleId")
 	void incrementViewCount(@Param("articleId")Integer articleId, long count);
+
 
 }
