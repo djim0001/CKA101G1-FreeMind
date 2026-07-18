@@ -1,0 +1,55 @@
+/* 後台「主內容區」profile 綠色主題覆蓋（scoped）。
+   使用方式：在既有 admin-base.css 之後再 <link> 本檔，且 body 掛 class="thy2-page thy2-profile"。
+   只作用於主內容區；側欄顏色由 admin-base.css 全域統一（不在此覆蓋）。
+   色票沿用 member-base.css（profile）。 */
+
+.thy2-page.thy2-profile {
+  --ink: #333d37;
+  --muted: #6f7a72;
+  --brand: #769382;
+  --brand-dark: #5e7668;
+  --soft: #efe5d3;
+  --line: #c0c3b9;
+  --bg: #f3efe3;
+  --green: #5e7668;
+  --shadow: 0 10px 28px rgba(90, 84, 66, .12);
+}
+
+/* admin-base.css 中主內容區的硬編碼色（非變數），需個別覆蓋成綠色系 */
+
+/* 表格標題列 */
+.thy2-profile th {
+  color: var(--brand-dark);
+  background: #efe9dc;
+}
+/* 表格分隔線 */
+.thy2-profile td,
+.thy2-profile th {
+  border-bottom-color: #e3ddcf;
+}
+
+/* 輸入欄位底色（原 #fbfcfe） */
+.thy2-profile .field {
+  background: #faf7f0;
+}
+.thy2-profile .field:focus {
+  box-shadow: 0 0 0 3px rgba(118, 147, 130, .2);
+}
+
+/* 狀態標籤：綠色（顯示/啟用）；amber/red 沿用 admin-base */
+.thy2-profile .status.green {
+  color: #4a6b5b;
+  background: #e8f1ec;
+}
+
+/* 按鈕 hover 用品牌深色而非亮度濾鏡，綠色更自然 */
+.thy2-profile .btn:hover {
+  filter: none;
+  background: var(--brand-dark);
+}
+.thy2-profile .btn.ghost:hover {
+  background: #f0ece1;
+}
+.thy2-profile .btn.danger {
+  background: var(--red);
+}

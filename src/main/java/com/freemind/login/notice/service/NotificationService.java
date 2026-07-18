@@ -36,4 +36,27 @@ public class NotificationService {
 		return repository.findAll();
 	}
 
+	// 首頁用：取得已發布(顯示)的公告，新到舊排序
+	public List<Notification> getPublished() {
+		return repository.findByNoticeStatusOrderByCreatedAtDesc((byte) 1);
+	}
+
+	// 發布：將公告狀態設為顯示(1)
+	public void publish(Integer noticeId) {
+		Notification notification = repository.findById(noticeId).orElse(null);
+		if (notification != null) {
+			notification.setNoticeStatus((byte) 1);
+			repository.save(notification);
+		}
+	}
+
+	// 撤下：將公告狀態設為隱藏(0)
+	public void unpublish(Integer noticeId) {
+		Notification notification = repository.findById(noticeId).orElse(null);
+		if (notification != null) {
+			notification.setNoticeStatus((byte) 0);
+			repository.save(notification);
+		}
+	}
+
 }
