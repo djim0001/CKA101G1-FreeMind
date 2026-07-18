@@ -12,24 +12,47 @@
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
 	
-	
 	<p>活動時間：
 	    <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~
 	    <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
 	</p>
-	<p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	<p>正取名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	<p>備取名額：<span th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
+
+	<!-- 分頁籤 -->
+	<div>
+	    <a th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, tab='pending')}">
+	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold;' : ''">待審核</button>
+	    </a>
+	    <a th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, tab='confirmed')}">
+	        <button type="button" th:style="${currentTab == 'confirmed'} ? 'font-weight:bold;' : ''">正取</button>
+	    </a>
+	    <a th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, tab='waitlist')}">
+	        <button type="button" th:style="${currentTab == 'waitlist'} ? 'font-weight:bold;' : ''">備取</button>
+	    </a>
+	    <a th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, tab='closed')}">
+	        <button type="button" th:style="${currentTab == 'closed'} ? 'font-weight:bold;' : ''">已取消/未通過</button>
+	    </a>
+	</div>
 	
     <table border="1">
         <tr>
             <th>報名者</th>
             <th>報名時間</th>
+            <th>報名動機</th>
             <th>報名狀態</th>
             <th></th>
         </tr>
         <tr th:each="r : ${regisListData}">
-            <td th:text="${#strings.isEmpty(r.member.nickname) ? r.member.name : r.member.nickname}"></td>
-            <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
-            <td th:text="${r.regisStatusText}"></td>
+		    <td th:text="${#strings.isEmpty(r.member.nickname) ? r.member.name : r.member.nickname}"></td>
+		    <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+		    <td th:text="${r.motivation}"></td>
+		    <td>
+		        <span th:text="${r.regisStatusText}"></span>
+		        <span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
+		            （<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）
+		        </span>
+		    </td>
             <td>
 				<div th:if="${r.regisStatus == 0}">
 					<form th:action="@{/member/activity/registration/approve}" method="post"
@@ -38,6 +61,28 @@
 						  <input type="hidden" name="activityId" th:value="${activity.activityId}">
 						  <button type="submit">通過審核</button>
 					</form>
+					
+					<form th:action="@{/member/activity/registration/reject}" method="post"
+						  onsubmit="return confirm('確定要拒絕此報名嗎？')" style="display:inline-block;">
+						  <input type="hidden" name="regisId" th:value="${r.regisId}">
+						  <input type="hidden" name="activityId" th:value="${activity.activityId}">
+						  <select name="rejectReason" required>
+						      <option value="0">報名表單填寫不明確</option>
+						      <option value="1">不符合活動資格條件</option>
+						      <option value="2">其他</option>
+						  </select>
+						  <input type="text" name="rejectNote" placeholder="補充說明(選填)" maxlength="200">
+						  <button type="submit">拒絕</button>
+					</form>
+				</div>
+				
+				<div th:if="${r.regisStatus == 4 && activity.regisCount < activity.capacity}">
+				    <form th:action="@{/member/activity/registration/promote}" method="post"
+				          onsubmit="return confirm('確定要將此人從備取遞補為正取嗎？')">
+				        <input type="hidden" name="regisId" th:value="${r.regisId}">
+				        <input type="hidden" name="activityId" th:value="${activity.activityId}">
+				        <button type="submit">遞補為正取</button>
+				    </form>
 				</div>
 			</td>
 
@@ -48,7 +93,7 @@
     
     <div th:if="${totalPages > 1}">
 	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, currentPage=${i})}"
+	       th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, tab=${currentTab}, currentPage=${i})}"
 	       th:text="${i}"
 	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
 	    </a>

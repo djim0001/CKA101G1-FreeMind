@@ -116,7 +116,7 @@
 		<p>
 		    活動圖片：
 		    <img id="originalPicture" th:if="*{picture != null}"
-     		th:src="@{/member/activity/activityImage(activityId=*{activityId})}"
+     		th:src="@{'/activity-images/' + *{picture}}"
      		style="max-width:200px;">
 		    <input type="file" name="pictureFile" onchange="previewImage(event)">
 		    <br>

@@ -71,7 +71,7 @@
         <tr th:each="a : ${activityListData}">
 		    <td>
 		        <img th:if="${a.picture != null}" 
-		             th:src="@{/member/activity/activityImage(activityId=${a.activityId})}" 
+		             th:src="@{'/activity-images/' + ${a.picture}}" 
 		             style="max-width: 100px;">
 		        <img th:unless="${a.picture != null}" 
 		             th:src="@{/images/no-image.jpg}" 

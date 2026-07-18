@@ -59,7 +59,10 @@
             <th>縣市</th>
             <th>區域</th>
 		    <th>活動時間</th>
-		    <th>名額</th>
+		    <td>
+			    正取 <span th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+			    備取 <span th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span>
+			</td>
 		    <th>報名時間</th>
 		    <th>報名狀態</th>
 		    <th>活動狀態</th>
@@ -69,7 +72,7 @@
         <tr th:each="a : ${activityListData}">
              <td>
 		        <img th:if="${a.picture != null}" 
-		             th:src="@{/admin/activity/activityImage(activityId=${a.activityId})}"
+		             th:src="@{'/activity-images/' + ${a.picture}}"
 		             style="max-width: 100px;">
 		        <img th:unless="${a.picture != null}" 
 		             th:src="@{/images/no-image.jpg}" 
