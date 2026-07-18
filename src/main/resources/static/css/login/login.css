@@ -13,33 +13,34 @@
 /* ---------- 主題變數 ---------- */
 
 .login-page {
-    /* 共用預設（會被主題 class 覆寫） */
-    --bg-gradient: linear-gradient(135deg, #7afec6 0%, #2dd4bf 45%, #0f766e 100%);
-    --blob-1: rgba(122, 254, 198, 0.9);
-    --blob-2: rgba(15, 118, 110, 0.8);
-    --brand: #0f9d78;            /* 連結、強調線 */
-    --brand-dark: #0b7a5d;
-    --focus-border: #2dd4bf;
-    --focus-ring: rgba(122, 254, 198, 0.45);
-    --btn-bg: linear-gradient(135deg, #7afec6 0%, #34d399 100%);
-    --btn-bg-hover: linear-gradient(135deg, #8dfed0 0%, #4ade9f 100%);
-    --btn-text: #04382a;         /* 薄荷綠偏亮，按鈕字用深色保對比 */
+    /* 共用預設（會被主題 class 覆寫）＝會員大地色系，與 profile 一致 */
+    --bg-gradient: linear-gradient(135deg, #a9c0b2 0%, #769382 50%, #5e7668 100%);
+    --blob-1: rgba(118, 147, 130, 0.85);
+    --blob-2: rgba(94, 118, 104, 0.8);
+    --brand: #5e7668;            /* 連結、強調線 */
+    --brand-dark: #4a5f53;
+    --focus-border: #769382;
+    --focus-ring: rgba(118, 147, 130, 0.4);
+    --btn-bg: linear-gradient(135deg, #769382 0%, #5e7668 100%);
+    --btn-bg-hover: linear-gradient(135deg, #84a08f 0%, #6b8575 100%);
+    --btn-text: #ffffff;         /* 鼠尾草綠偏中深，按鈕字用白色保對比 */
 }
 
+/* 會員登入：鼠尾草綠大地色系（#769382 / 奶油底），與 profile 頁一致 */
 .login-page.theme-member {
-    --bg-gradient: linear-gradient(135deg, #7afec6 0%, #2dd4bf 45%, #0f766e 100%);
-    --blob-1: rgba(122, 254, 198, 0.9);
-    --blob-2: rgba(15, 118, 110, 0.8);
-    --brand: #0f9d78;
-    --brand-dark: #0b7a5d;
-    --focus-border: #2dd4bf;
-    --focus-ring: rgba(122, 254, 198, 0.45);
-    --btn-bg: linear-gradient(135deg, #7afec6 0%, #34d399 100%);
-    --btn-bg-hover: linear-gradient(135deg, #8dfed0 0%, #4ade9f 100%);
-    --btn-text: #04382a;
-    --panel-bg: linear-gradient(160deg, rgba(122, 254, 198, 0.55) 0%, rgba(45, 212, 191, 0.45) 55%, rgba(15, 118, 110, 0.4) 100%);
-    --panel-title: #043c2c;
-    --panel-text: #0b5c46;
+    --bg-gradient: linear-gradient(135deg, #a9c0b2 0%, #769382 50%, #5e7668 100%);
+    --blob-1: rgba(118, 147, 130, 0.85);
+    --blob-2: rgba(94, 118, 104, 0.8);
+    --brand: #5e7668;
+    --brand-dark: #4a5f53;
+    --focus-border: #769382;
+    --focus-ring: rgba(118, 147, 130, 0.4);
+    --btn-bg: linear-gradient(135deg, #769382 0%, #5e7668 100%);
+    --btn-bg-hover: linear-gradient(135deg, #84a08f 0%, #6b8575 100%);
+    --btn-text: #ffffff;
+    --panel-bg: linear-gradient(160deg, rgba(118, 147, 130, 0.5) 0%, rgba(94, 118, 104, 0.45) 55%, rgba(74, 95, 83, 0.42) 100%);
+    --panel-title: #ffffff;
+    --panel-text: #f3efe3;
 }
 
 .login-page.theme-admin {

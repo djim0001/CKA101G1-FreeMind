@@ -1,93 +1,102 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>編輯會員資料</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>編輯會員資料｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
 </head>
-<body>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Edit profile</p>
+				<h2>編輯會員資料</h2>
+			</div>
+			<div class="section-head-actions">
+				<a class="btn ghost" th:href="@{/member/profile}">取消，回會員資料</a>
+			</div>
+		</div>
 
-    <h1>編輯會員資料</h1>
+		<div class="panel">
+			<form class="form-grid" th:action="@{/member/update}" th:object="${member}"
+				method="post" enctype="multipart/form-data">
 
-    <form th:action="@{/member/update}" th:object="${member}" method="post" enctype="multipart/form-data">
+				<div class="form-group full">
+					<label for="profilePicFile">頭像</label>
+					<input class="field" type="file" id="profilePicFile" name="profilePicFile"
+						accept="image/*" data-pic-preview="#picPreview">
+					<img class="avatar-photo" id="picPreview"
+						th:src="${member.profilePic != null} ? @{/member/profilePic} : ''"
+						th:hidden="${member.profilePic == null}" alt="頭像預覽">
+				</div>
 
-        <p>
-            <label>頭像：<input type="file" name="profilePicFile" accept="image/*" onchange="previewPic(this)"></label><br>
-            <img id="picPreview" width="150"
-                 th:src="${member.profilePic != null} ? @{/member/profilePic} : ''"
-                 th:style="${member.profilePic != null} ? '' : 'display:none'">
-        </p>
+				<div class="form-group">
+					<label for="name">姓名</label>
+					<input class="field" type="text" th:field="*{name}">
+					<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+				</div>
 
-        <p>
-            <label>姓名：<input type="text" th:field="*{name}"></label>
-            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-        </p>
+				<div class="form-group">
+					<label for="nickname">暱稱</label>
+					<input class="field" type="text" th:field="*{nickname}">
+					<span class="error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+				</div>
 
-        <p>
-            <label>暱稱：<input type="text" th:field="*{nickname}"></label>
-            <span th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
-        </p>
+				<div class="form-group">
+					<label for="gender">性別</label>
+					<select class="field" th:field="*{gender}">
+						<option value="男">男</option>
+						<option value="女">女</option>
+					</select>
+					<span class="error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+				</div>
 
-        <p>
-            <label>性別：
-                <select th:field="*{gender}">
-                    <option value="男">男</option>
-                    <option value="女">女</option>
-                </select>
-            </label>
-            <span th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
-        </p>
+				<div class="form-group">
+					<label for="birthday">生日</label>
+					<input class="field" type="date" th:field="*{birthday}">
+					<span class="error" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
+				</div>
 
-        <p>
-            <label>生日：<input type="date" th:field="*{birthday}"></label>
-            <span th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
-        </p>
+				<div class="form-group">
+					<label for="phoneNumber">手機號碼</label>
+					<input class="field" type="text" th:field="*{phoneNumber}">
+					<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+				</div>
 
-        <p>
-            <label>手機號碼：<input type="text" th:field="*{phoneNumber}"></label>
-            <span th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
-        </p>
+				<div class="form-group">
+					<label for="email">信箱</label>
+					<input class="field" type="text" th:field="*{email}">
+					<span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+				</div>
 
-        <p>
-            <label>信箱：<input type="text" th:field="*{email}"></label>
-            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-        </p>
+				<div class="form-group">
+					<label for="city">城市</label>
+					<input class="field" type="text" th:field="*{city}">
+					<span class="error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+				</div>
 
-        <p>
-            <label>城市：<input type="text" th:field="*{city}"></label>
-            <span th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
-        </p>
+				<div class="form-group">
+					<label for="dist">地區</label>
+					<input class="field" type="text" th:field="*{dist}">
+					<span class="error" th:if="${#fields.hasErrors('dist')}" th:errors="*{dist}"></span>
+				</div>
 
-        <p>
-            <label>地區：<input type="text" th:field="*{dist}"></label>
-            <span th:if="${#fields.hasErrors('dist')}" th:errors="*{dist}"></span>
-        </p>
+				<div class="form-group full">
+					<label for="address">地址</label>
+					<input class="field" type="text" th:field="*{address}">
+					<span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+				</div>
 
-        <p>
-            <label>地址：<input type="text" th:field="*{address}"></label>
-            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
-        </p>
-
-        <button type="submit">儲存</button>
-    </form>
-
-    <p>
-        <a th:href="@{/member/profile}">取消，回會員資料</a>
-    </p>
-
-    <script>
-        // 選了新頭像後立即在頁面上預覽（尚未上傳，只是本機讀檔）
-        function previewPic(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = document.getElementById('picPreview');
-                img.src = e.target.result;
-                img.style.display = '';
-            };
-            reader.readAsDataURL(file);
-        }
-    </script>
-
+				<div class="form-group full section-head-actions">
+					<a class="btn ghost" th:href="@{/member/profile}">取消</a>
+					<button class="btn" type="submit">儲存</button>
+				</div>
+			</form>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

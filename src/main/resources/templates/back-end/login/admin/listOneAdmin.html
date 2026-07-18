@@ -1,24 +1,72 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8">
-	<title>管理員詳細資料</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>管理員詳細資料｜諮由自在後台</title>
+<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
 </head>
-<body>
-	<h3>管理員詳細資料</h3>
+<body class="thy2-page">
+	<div class="layout">
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('admin-list')}"></aside>
+		<div class="main">
+			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>管理員詳細資料</h1>
+						<p>編號 <span th:text="${adminVO.adminId}"></span> 的帳號資訊。</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn secondary" th:href="@{/admin/permissions/assign(adminId=${adminVO.adminId})}">權限設定</a>
+						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+					</div>
+				</div>
 
-	<p style="color:green;" th:if="${success != null}" th:text="${success}"></p>
+				<div class="notice" th:if="${success != null}" th:text="${success}" data-flash-message></div>
 
-	<table border="1">
-		<tr><th>編號</th><td th:text="${adminVO.adminId}"></td></tr>
-		<tr><th>帳號</th><td th:text="${adminVO.adminAccount}"></td></tr>
-		<tr><th>帳號狀態</th><td th:text="${accountStatusMap.get(adminVO.accountStatus)}"></td></tr>
-		<tr><th>姓名</th><td th:text="${adminVO.name}"></td></tr>
-		<tr><th>手機號碼</th><td th:text="${adminVO.phoneNumber}"></td></tr>
-		<tr><th>入職日期</th><td th:text="${adminVO.hiredate}"></td></tr>
-		<tr><th>照片</th><td><img th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" width="150px"></td></tr>
-	</table>
-
-	<a th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+				<div class="grid-2">
+					<div class="panel">
+						<h2>基本資料</h2>
+						<dl class="summary-list">
+							<div>
+								<dt>編號</dt>
+								<dd th:text="${adminVO.adminId}"></dd>
+							</div>
+							<div>
+								<dt>帳號</dt>
+								<dd th:text="${adminVO.adminAccount}"></dd>
+							</div>
+							<div>
+								<dt>帳號狀態</dt>
+								<dd>
+									<span class="status"
+										th:classappend="${adminVO.accountStatus == 1} ? 'green' : (${adminVO.accountStatus == 2} ? 'red' : 'amber')"
+										th:text="${accountStatusMap.get(adminVO.accountStatus)}"></span>
+								</dd>
+							</div>
+							<div>
+								<dt>姓名</dt>
+								<dd th:text="${adminVO.name}"></dd>
+							</div>
+							<div>
+								<dt>手機號碼</dt>
+								<dd th:text="${adminVO.phoneNumber}"></dd>
+							</div>
+							<div>
+								<dt>入職日期</dt>
+								<dd th:text="${adminVO.hiredate}"></dd>
+							</div>
+						</dl>
+					</div>
+					<div class="panel">
+						<h2>照片</h2>
+						<img class="photo-preview" th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" alt="管理員照片">
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

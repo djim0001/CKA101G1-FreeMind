@@ -1,37 +1,74 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>會員資料</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>會員資料｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
 </head>
-<body>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">My profile</p>
+				<h2>會員資料</h2>
+			</div>
+			<div class="section-head-actions">
+				<a class="btn ghost" th:href="@{/member/dashboard}">我的療癒足跡</a>
+				<a class="btn" th:href="@{/member/update}">編輯資料</a>
+			</div>
+		</div>
 
-    <h1>會員資料</h1>
+		<div class="notice member-message" th:if="${success}" th:text="${success}" data-flash-message></div>
 
-    <!-- 修改成功訊息 -->
-    <p th:if="${success}" th:text="${success}"></p>
-
-    <!-- 頭像（沒設定頭像就不顯示） -->
-    <p><img th:if="${member.profilePic != null}" th:src="@{/member/profilePic}" width="150"></p>
-
-    <table border="1">
-        <tr><th>會員帳號</th><td th:text="${member.memberAccount}"></td></tr>
-        <tr><th>姓名</th><td th:text="${member.name}"></td></tr>
-        <tr><th>暱稱</th><td th:text="${member.nickname}"></td></tr>
-        <tr><th>性別</th><td th:text="${member.gender}"></td></tr>
-        <tr><th>生日</th><td th:text="${member.birthday}"></td></tr>
-        <tr><th>手機號碼</th><td th:text="${member.phoneNumber}"></td></tr>
-        <tr><th>信箱</th><td th:text="${member.email}"></td></tr>
-        <tr><th>城市</th><td th:text="${member.city}"></td></tr>
-        <tr><th>地區</th><td th:text="${member.dist}"></td></tr>
-        <tr><th>地址</th><td th:text="${member.address}"></td></tr>
-        <tr><th>註冊時間</th><td th:text="${#temporals.format(member.regisAt, 'yyyy-MM-dd HH:mm')}"></td></tr>
-    </table>
-
-    <p>
-        <a th:href="@{/member/update}">編輯資料</a> |
-        <a th:href="@{/}">回首頁</a>
-    </p>
-
+		<div class="panel">
+			<h2>會員資料</h2>
+			<img class="avatar-photo" th:if="${member.profilePic != null}" th:src="@{/member/profilePic}" alt="會員頭像">
+			<p class="meta" th:if="${member.profilePic == null}">尚未設定頭像，到「編輯資料」上傳一張吧。</p>
+			<dl class="summary-list">
+					<div>
+						<dt>會員帳號</dt>
+						<dd th:text="${member.memberAccount}"></dd>
+					</div>
+					<div>
+						<dt>姓名</dt>
+						<dd th:text="${member.name}"></dd>
+					</div>
+					<div>
+						<dt>暱稱</dt>
+						<dd th:text="${member.nickname}"></dd>
+					</div>
+					<div>
+						<dt>性別</dt>
+						<dd th:text="${member.gender}"></dd>
+					</div>
+					<div>
+						<dt>生日</dt>
+						<dd th:text="${member.birthday}"></dd>
+					</div>
+					<div>
+						<dt>手機號碼</dt>
+						<dd th:text="${member.phoneNumber}"></dd>
+					</div>
+					<div>
+						<dt>信箱</dt>
+						<dd th:text="${member.email}"></dd>
+					</div>
+					<div>
+						<dt>地址</dt>
+						<dd>
+							<span th:text="${member.city}"></span><span th:text="${member.dist}"></span><span th:text="${member.address}"></span>
+						</dd>
+					</div>
+					<div>
+						<dt>註冊時間</dt>
+						<dd th:text="${#temporals.format(member.regisAt, 'yyyy-MM-dd HH:mm')}"></dd>
+					</div>
+			</dl>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

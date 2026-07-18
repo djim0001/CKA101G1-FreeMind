@@ -1,31 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>我的療癒足跡</title>
-<style>
-body {
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start; 
-    gap: 12px;  
-    padding: 20px;  
-}
-h1, a {
-    text-decoration: none;
-    color: #333;
-}
-a:hover {
-    color: #d39393; 
-}
-</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>我的療癒足跡｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
 </head>
-<body>
-<h1>我的療癒足跡</h1>
-<a th:href="@{/member/dashboard/myAppointment}">我的預約</a>
-<a th:href="@{/member/dashboard/myLearning}">個人學習空間</a>
-<a th:href="@{/member/dashboard/myActivityRegistration}">我的活動</a>
-<a th:href="@{/member/dashboard/myCollection}">我的收藏</a>
-<a th:href="@{/}">返回</a>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">My Healing Journey</p>
+				<h2>我的療癒足跡</h2>
+				<p class="meta">管理你的預約、學習、活動與收藏，一站掌握專屬的療癒歷程。</p>
+			</div>
+			<div class="section-head-actions">
+				<a class="btn" th:href="@{/member/profile}">會員資料</a>
+			</div>
+		</div>
+
+		<div class="card-grid">
+			<a class="content-card dash-card" th:href="@{/member/dashboard/myAppointment}">
+				<div class="card-body">
+					<div class="dash-icon">📅</div>
+					<h3>我的預約</h3>
+					<p>查看諮商預約紀錄與即將到來的會談時段。</p>
+					<span class="dash-go">前往查看 →</span>
+				</div>
+			</a>
+			<a class="content-card dash-card" th:href="@{/member/dashboard/myLearning}">
+				<div class="card-body">
+					<div class="dash-icon">📚</div>
+					<h3>個人學習空間</h3>
+					<p>進入已購買的課程，隨時繼續你的學習進度。</p>
+					<span class="dash-go">開始學習 →</span>
+				</div>
+			</a>
+			<a class="content-card dash-card" th:href="@{/member/dashboard/myActivityRegistration}">
+				<div class="card-body">
+					<div class="dash-icon">🤝</div>
+					<h3>我的活動</h3>
+					<p>管理你報名的揪團活動與參與紀錄。</p>
+					<span class="dash-go">查看活動 →</span>
+				</div>
+			</a>
+			<a class="content-card dash-card" th:href="@{/member/dashboard/myCollection}">
+				<div class="card-body">
+					<div class="dash-icon">🔖</div>
+					<h3>我的收藏</h3>
+					<p>回顧收藏的課程與文章，隨時再次探索。</p>
+					<span class="dash-go">瀏覽收藏 →</span>
+				</div>
+			</a>
+			<a class="content-card dash-card" th:href="@{/member/profile}">
+				<div class="card-body">
+					<div class="dash-icon">👤</div>
+					<h3>會員資料</h3>
+					<p>檢視與編輯個人資料，維護帳號資訊。</p>
+					<span class="dash-go">前往管理 →</span>
+				</div>
+			</a>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>
