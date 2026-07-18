@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我的通知</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5; color: #333; line-height: 1.6; padding: 40px 20px;
+}
+h1 {
+	max-width: 720px; margin: 0 auto 28px; font-size: 28px; font-weight: 700;
+	color: #4a3e3e; padding-bottom: 16px; border-bottom: 2px solid #e8b4b4;
+	display: flex; align-items: center; justify-content: space-between;
+}
+h1 a {
+	padding: 8px 20px; background-color: #e8b4b4; color: #fff;
+	text-decoration: none; border-radius: 6px; font-size: 14px;
+}
+h1 a:hover { background-color: #d39393; }
+.unread-count { font-size: 14px; color: #b26a00; font-weight: 400; margin-left: 10px; }
+
+.notice-list { max-width: 720px; margin: 0 auto; }
+.notice-card {
+	background: #fff; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); border-left: 4px solid transparent;
+}
+.notice-card.unread {
+	border-left-color: #e8b4b4; background: #fffafa; cursor: pointer;
+}
+.notice-card.unread:hover { box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12); }
+.notice-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.type-badge {
+	padding: 2px 10px; border-radius: 999px; font-size: 12px;
+	background: #fbf2f2; color: #b96f6f;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #e8b4b4; }
+.time { font-size: 12px; color: #aaa; margin-left: auto; }
+.content { font-size: 15px; color: #444; white-space: pre-wrap; word-break: break-all; }
+.notice-card:not(.unread) .content { color: #888; }
+.empty-hint { text-align: center; color: #999; padding: 40px 0; }
+
+/* 篩選列與一鍵已讀 */
+.toolbar {
+	max-width: 720px; margin: 0 auto 16px;
+	display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.toolbar a.filter-btn {
+	padding: 6px 16px; border-radius: 999px; font-size: 14px;
+	background: #fbf2f2; color: #7a6b6b; border: 1px solid #f2dddd;
+	text-decoration: none;
+}
+.toolbar a.filter-btn.active { background: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+.toolbar a.filter-btn:hover { background: #e8b4b4; color: #fff; }
+.toolbar form { margin-left: auto; }
+.toolbar button {
+	padding: 6px 16px; border-radius: 6px; font-size: 14px; cursor: pointer;
+	background: #fff; color: #7a6b6b; border: 1px solid #f2dddd;
+}
+.toolbar button:hover { background: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+
+</style>
+</head>
+<body>
+	<h1>
+		<span>我的通知
+			<span class="unread-count" th:if="${unreadCount > 0}"
+				th:text="'(' + ${unreadCount} + ' 則未讀)'"></span>
+		</span>
+		<a th:href="@{/psych/profile}">返回個人頁</a>
+	</h1>
+
+	<div class="toolbar">
+		<a class="filter-btn" th:classappend="${type == null} ? 'active'" th:href="@{/psych/notice}">全部</a>
+		<a class="filter-btn" th:classappend="${type != null && type == 0} ? 'active'"
+			th:href="@{/psych/notice(type=0)}" th:text="'文章審核'">文章審核</a>
+		<a class="filter-btn" th:classappend="${type != null && type == 1} ? 'active'"
+			th:href="@{/psych/notice(type=1)}" th:text="'預約'">預約</a>
+		<a class="filter-btn" th:classappend="${type != null && type == 2} ? 'active'"
+			th:href="@{/psych/notice(type=2)}" th:text="'課程'">課程</a>
+		<form th:action="@{/psych/notice/readAll}" method="post">
+			<input type="hidden" name="type" th:value="${type}" th:if="${type != null}" />
+			<button type="submit" th:if="${unreadCount > 0}">全部標為已讀</button>
+		</form>
+	</div>
+
+	<div class="notice-list">
+		<!-- 未讀:整張卡可點,點了送出隱藏表單標已讀 -->
+		<div th:each="n : ${notices}"
+			th:classappend="${!n.isRead} ? 'unread'"
+			class="notice-card"
+			th:attr="data-form-id='readForm-' + ${n.psychNoticeId}"
+			onclick="var f=document.getElementById(this.dataset.formId); if(f) f.submit();">
+
+			<div class="notice-head">
+				<span class="dot" th:if="${!n.isRead}"></span>
+				<span class="type-badge" th:text="${n.noticeTypeMsg}">預約通知</span>
+				<span class="time"
+					th:text="${#dates.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-15 10:00</span>
+			</div>
+			<p class="content" th:text="${n.noticeContent}">通知內容</p>
+
+			<form th:if="${!n.isRead}" th:id="'readForm-' + ${n.psychNoticeId}"
+				th:action="@{/psych/notice/{id}/read(id=${n.psychNoticeId})}" method="post"
+				style="display: none;">
+				<input type="hidden" name="type" th:value="${type}" th:if="${type != null}" />
+			</form>
+		</div>
+
+		<p class="empty-hint" th:if="${#lists.isEmpty(notices)}">目前沒有任何通知</p>
+	</div>
+</body>
+</html>
