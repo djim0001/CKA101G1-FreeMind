@@ -1,33 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8">
-	<title>修改系統公告</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>修改系統公告｜諮由自在後台</title>
+<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
+<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
 </head>
-<body>
-	<h3>修改系統公告</h3>
+<body class="thy2-page thy2-profile">
+	<div class="layout">
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('notification')}"></aside>
+		<div class="main">
+			<div th:replace="~{fragments/admin/adminTopbar :: topbar('訊息與公告')}"></div>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>修改系統公告</h1>
+						<p>調整公告內容與顯示狀態。</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn ghost" th:href="@{/admin/notifications/listAllNotification}">回公告列表</a>
+					</div>
+				</div>
 
-	<form method="post" th:action="@{/admin/notifications/update}" th:object="${notification}">
+				<div class="panel">
+					<form class="form-grid" method="post" th:action="@{/admin/notifications/update}" th:object="${notification}">
+						<input type="hidden" th:field="*{noticeId}">
 
-		<input type="hidden" th:field="*{noticeId}">
+						<dl class="summary-list full">
+							<div>
+								<dt>公告編號</dt>
+								<dd th:text="*{noticeId}"></dd>
+							</div>
+							<div>
+								<dt>建立時間</dt>
+								<dd th:text="${notification.createdAt != null ? #dates.format(notification.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></dd>
+							</div>
+						</dl>
 
-		公告編號: <span th:text="*{noticeId}"></span><br>
+						<div class="form-group full">
+							<label for="systemContent">公告內容</label>
+							<textarea class="field" id="systemContent" th:field="*{systemContent}" maxlength="1000"></textarea>
+							<span class="error" th:if="${#fields.hasErrors('systemContent')}" th:errors="*{systemContent}"></span>
+						</div>
 
-		建立時間: <span th:text="${notification.createdAt != null ? #dates.format(notification.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span><br>
+						<div class="form-group">
+							<label for="noticeStatus">公告狀態</label>
+							<select class="field" id="noticeStatus" th:field="*{noticeStatus}">
+								<option th:each="entry : ${noticeStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+							</select>
+							<span class="error" th:if="${#fields.hasErrors('noticeStatus')}" th:errors="*{noticeStatus}"></span>
+						</div>
 
-		公告內容:<br>
-		<textarea th:field="*{systemContent}" rows="6" cols="60" maxlength="1000"></textarea>
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('systemContent')}" th:errors="*{systemContent}"></span><br>
-
-		公告狀態:
-		<select th:field="*{noticeStatus}">
-			<option th:each="entry : ${noticeStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
-		</select>
-		<span style="color:red; margin-left:10px;" th:if="${#fields.hasErrors('noticeStatus')}" th:errors="*{noticeStatus}"></span><br>
-
-		<input type="submit" value="修改">
-	</form>
-
-	<a th:href="@{/admin/notifications/listAllNotification}">回系統公告列表</a>
+						<div class="form-group full page-actions">
+							<a class="btn ghost" th:href="@{/admin/notifications/listAllNotification}">取消</a>
+							<button class="btn" type="submit">修改</button>
+						</div>
+					</form>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

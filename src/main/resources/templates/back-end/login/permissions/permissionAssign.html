@@ -1,187 +1,65 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理員權限設定</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-
-        .navbar {
-            background-color: #2c3e50;
-            padding: 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-        }
-
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .form-card {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-card h1 {
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 24px;
-        }
-
-        .admin-info {
-            color: #7f8c8d;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .perm-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 12px;
-            border: 1px solid #ecf0f1;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .perm-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .perm-item input[type="checkbox"] {
-            margin-top: 3px;
-        }
-
-        .perm-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .perm-detail {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-top: 2px;
-        }
-
-        .empty-message {
-            text-align: center;
-            padding: 20px;
-            color: #7f8c8d;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .btn-submit,
-        .btn-cancel {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-
-        .btn-submit {
-            background-color: #27ae60;
-            color: white;
-        }
-
-        .btn-submit:hover {
-            opacity: 0.9;
-        }
-
-        .btn-cancel {
-            background-color: #95a5a6;
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-cancel:hover {
-            opacity: 0.9;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>管理員權限設定｜諮由自在後台</title>
+<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
+<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+<style>
+	.thy2-profile .perm-item { display:flex; align-items:flex-start; gap:10px; padding:14px 16px; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; cursor:pointer; transition:background-color .2s; }
+	.thy2-profile .perm-item:hover { background:#f0ece1; }
+	.thy2-profile .perm-item input[type="checkbox"] { margin-top:3px; }
+	.thy2-profile .perm-name { font-weight:700; color:var(--ink); }
+	.thy2-profile .perm-detail { font-size:13px; color:var(--muted); margin-top:2px; }
+</style>
 </head>
-<body>
-    <div class="navbar">
-        <div class="navbar-content">
-            <a href="/admin/listAllAdmin">← 返回管理員列表</a>
-        </div>
-    </div>
+<body class="thy2-page thy2-profile">
+	<div class="layout">
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('permission-list')}"></aside>
+		<div class="main">
+			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>權限設定</h1>
+						<p>
+							管理員：<span th:text="${adminVO.name}"></span>
+							（帳號 <span th:text="${adminVO.adminAccount}"></span>，編號 <span th:text="${adminVO.adminId}"></span>）
+						</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+					</div>
+				</div>
 
-    <div class="container">
-        <div class="form-card">
-            <h1>🔐 權限設定</h1>
-            <p class="admin-info">
-                管理員：<span th:text="${adminVO.name}"></span>
-                （帳號 <span th:text="${adminVO.adminAccount}"></span>，編號 <span th:text="${adminVO.adminId}"></span>）
-            </p>
+				<div class="panel">
+					<form method="post" th:action="@{/admin/permissions/assign}">
+						<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
 
-            <form method="post" th:action="@{/admin/permissions/assign}">
-                <input type="hidden" name="adminId" th:value="${adminVO.adminId}">
+						<!-- Permission 沒覆寫 equals，勾選判斷用 permId 投影比對 -->
+						<label class="perm-item" th:each="perm : ${allPermissions}">
+							<input type="checkbox" name="permIds" th:value="${perm.permId}"
+								th:checked="${#lists.contains(adminVO.permissions.![permId], perm.permId)}">
+							<span>
+								<span class="perm-name" th:text="${perm.permName}"></span>
+								<div class="perm-detail" th:text="${perm.permDetail}"></div>
+							</span>
+						</label>
 
-                <!-- Permission 沒覆寫 equals，勾選判斷用 permId 投影比對 -->
-                <label class="perm-item" th:each="perm : ${allPermissions}">
-                    <input type="checkbox" name="permIds" th:value="${perm.permId}"
-                           th:checked="${#lists.contains(adminVO.permissions.![permId], perm.permId)}">
-                    <span>
-                        <span class="perm-name" th:text="${perm.permName}"></span>
-                        <div class="perm-detail" th:text="${perm.permDetail}"></div>
-                    </span>
-                </label>
+						<div class="empty-state" th:if="${allPermissions.isEmpty()}">
+							尚無可指派的權限，請先到「權限清單」新增
+						</div>
 
-                <div class="empty-message" th:if="${allPermissions.isEmpty()}">
-                    尚無可指派的權限，請先到「權限管理」新增
-                </div>
-
-                <div class="button-group">
-                    <button type="submit" class="btn-submit">保存</button>
-                    <a href="/admin/listAllAdmin" class="btn-cancel">取消</a>
-                </div>
-            </form>
-        </div>
-    </div>
+						<div class="page-actions" style="margin-top:20px;">
+							<a class="btn ghost" th:href="@{/admin/listAllAdmin}">取消</a>
+							<button class="btn" type="submit">保存</button>
+						</div>
+					</form>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

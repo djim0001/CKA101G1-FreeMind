@@ -8,11 +8,11 @@
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-        --green: #4a9d7f;
-        --green-dark: #37836a;
-        --green-light: #eaf5f0;
-        --ink: #2f3e39;
-        --gray: #7c8a85;
+        --green: #769382;
+        --green-dark: #5e7668;
+        --green-light: #efe5d3;
+        --ink: #333d37;
+        --gray: #6f7a72;
     }
     body {
         font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
@@ -47,7 +47,7 @@
     .btn-solid:hover { background: var(--green-light); }
 
     .hero {
-        background: linear-gradient(135deg, #4a9d7f 0%, #37836a 100%);
+        background: linear-gradient(135deg, #769382 0%, #5e7668 100%);
         color: #fff;
         text-align: center;
         padding: 130px 40px 90px;
@@ -83,6 +83,22 @@
     .card .go { color: var(--green); font-weight: 600; font-size: 14px; }
 
     footer { background: var(--ink); color: #cdd8d3; text-align: center; padding: 30px; font-size: 13px; }
+
+    /* 系統公告區塊 */
+    .notice-section { background: var(--green-light); }
+    .notice-wrap { max-width: 1080px; margin: 0 auto; padding: 40px; }
+    .notice-wrap h2 {
+        font-size: 22px; color: var(--green-dark);
+        display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+    }
+    .notice-list { display: flex; flex-direction: column; gap: 12px; }
+    .notice-item {
+        background: #fff; border-radius: 12px; padding: 16px 20px;
+        display: flex; align-items: flex-start; gap: 14px;
+        box-shadow: 0 2px 8px rgba(47,62,57,0.06);
+    }
+    .notice-item .date { color: var(--green); font-size: 13px; font-weight: 600; white-space: nowrap; padding-top: 2px; }
+    .notice-item .content { color: var(--ink); font-size: 15px; white-space: pre-line; }
 
     /* 會員登入後的頭像下拉菜單 */
     .profile-wrapper { position: relative; }
@@ -130,6 +146,7 @@
                     <span sec:authentication="principal.member.name">會員</span>
                 </button>
                 <div class="profile-menu" id="index-profile-dropdown">
+                    <a class="menu-item" th:href="@{/member/notice}">會員通知</a>
                     <a class="menu-item" th:href="@{/member/profile}">會員資料</a>
                     <a class="menu-item" th:href="@{/member/dashboard}">我的療癒足跡</a>
                     <form class="menu-item-form" th:action="@{/front-end/logout}" method="post">
@@ -145,6 +162,18 @@
         <h1>線上預約心理師<br>讓心理照護不中斷</h1>
         <p>專業、安全且重視隱私的心理諮商平台，陪你安放每一種情緒。</p>
         <a class="cta" th:href="@{/search}">開始預約</a>
+    </div>
+
+    <div class="notice-section" th:if="${notifications != null and !notifications.isEmpty()}">
+        <div class="notice-wrap">
+            <h2>📢 系統公告</h2>
+            <div class="notice-list">
+                <div class="notice-item" th:each="notice : ${notifications}">
+                    <span class="date" th:text="${#dates.format(notice.createdAt, 'yyyy-MM-dd')}"></span>
+                    <span class="content" th:text="${notice.systemContent}"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="section">
