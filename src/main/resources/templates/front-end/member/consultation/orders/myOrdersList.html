@@ -60,7 +60,6 @@
     .b-noshow    { background: #fdece0; color: #ef6c00; }
     .b-completed { background: #e8f0fb; color: #1565c0; }
 
-    /* 星星 + 心得內容 同一行 */
     .review-inline { display: flex; align-items: center; gap: 10px; }
     .review-inline .stars { color: #f2b01e; letter-spacing: 1px; font-size: 15px; white-space: nowrap; }
     .review-inline .content { color: #5c4f4b; font-size: 13.5px; }
@@ -173,27 +172,41 @@
                 <div th:if="${order.psychNote == null}" class="note empty">尚無晤談筆記</div>
 
                 <div class="actions">
+                    <!-- 問題回報：已回報顯示狀態，否則給按鈕（每筆都能報） -->
                     <span th:if="${reportStatusMap.containsKey(order.orderId)}"
                           th:switch="${reportStatusMap.get(order.orderId)}">
                         <span th:case="0" class="chip c-pending">回報待處理</span>
                         <span th:case="1" class="chip c-processing">回報處理中</span>
                         <span th:case="2" class="chip c-resolved">問題已解決</span>
                     </span>
-                    <a th:unless="${reportStatusMap.containsKey(order.orderId)}"
-                       class="btn-line" th:href="@{/member/reports/reportLookupForm}">問題回報</a>
+                    <form th:unless="${reportStatusMap.containsKey(order.orderId)}"
+                          method="post" th:action="@{/member/reports/reportSelect}">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <button type="submit" class="btn-line">問題回報</button>
+                    </form>
 
-                    <form th:if="${order.reviewContent == null and order.orderStatus == 4}"
+                    <!-- 撰寫心得評論：在可撰寫期限內才顯示 -->
+                    <form th:if="${canWriteReview.contains(order.orderId)}"
                           method="post" th:action="@{/member/orders/reviewSelect}">
                         <input type="hidden" name="orderId" th:value="${order.orderId}">
                         <button type="submit" class="btn-line">撰寫心得評論</button>
                     </form>
+                    <!-- 已完成、未評論、但已超過 3 天 -->
+                    <span th:if="${order.orderStatus == 4 and order.reviewContent == null and !canWriteReview.contains(order.orderId)}"
+                          style="color:#c4b8b3; font-size:13px;">已超過評論期限</span>
 
-                    <form th:if="${order.reviewContent != null}"
+                    <!-- 修改評論：在可修改期限內才顯示 -->
+                    <form th:if="${canEditReview.contains(order.orderId)}"
                           method="post" th:action="@{/member/orders/reviewSelect}">
                         <input type="hidden" name="orderId" th:value="${order.orderId}">
                         <button type="submit" class="btn-line btn-plain">修改評論</button>
                     </form>
+                    <!-- 已評論但已超過 3 天，鎖住 -->
+                    <span th:if="${order.reviewContent != null and !canEditReview.contains(order.orderId)}"
+                          style="color:#c4b8b3; font-size:13px;">評論已鎖定</span>
                 </div>
+                
+                
             </div>
         </div>
     </div>

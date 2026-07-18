@@ -61,18 +61,25 @@ public class OrdersController {
 		Integer orderStatusVal = (orderStatus != null && !orderStatus.isBlank()) ? Integer.valueOf(orderStatus) : null;
 		Boolean govSubsidyVal = (govSubsidy != null && !govSubsidy.isBlank()) ? Boolean.valueOf(govSubsidy) : null;
 		Integer sessionTypeVal = (sessionType != null && !sessionType.isBlank()) ? Integer.valueOf(sessionType) : null;
-		java.time.LocalDate slotDateVal = (slotDate != null && !slotDate.isBlank())
+		java.time.LocalDate dateVal = (slotDate != null && !slotDate.isBlank())
 				? java.time.LocalDate.parse(slotDate) : null;
 
-		// 完全沒填 → 顯示全部
-		if (memberIdVal == null && psychIdVal == null && orderStatusVal == null && govSubsidyVal == null
-				&& sessionTypeVal == null && slotDateVal == null) {
-			model.addAttribute("ordersListData", ordersSvc.getAll());
-			return "back-end/consultation/orders/listAllOrders";
+		// 除了日期以外的條件都沒填 → 拿全部；有填才用 search
+		List<Orders> list;
+		if (memberIdVal == null && psychIdVal == null && orderStatusVal == null
+				&& govSubsidyVal == null && sessionTypeVal == null) {
+			list = ordersSvc.getAll();
+		} else {
+			list = ordersSvc.search(memberIdVal, psychIdVal, orderStatusVal, govSubsidyVal, sessionTypeVal, null);
 		}
 
-		List<Orders> list = ordersSvc.search(memberIdVal, psychIdVal, orderStatusVal, govSubsidyVal, sessionTypeVal,
-				slotDateVal);
+		// 時段日期改用「開始時間(consStart)的日期」來比對，跟畫面顯示一致
+		if (dateVal != null) {
+			list = list.stream()
+					.filter(o -> o.getConsStart() != null && o.getConsStart().toLocalDate().equals(dateVal))
+					.collect(java.util.stream.Collectors.toList());
+		}
+
 		model.addAttribute("ordersListData", list);
 		return "back-end/consultation/orders/listAllOrders";
 	}

@@ -112,6 +112,10 @@ public class OrdersPsychController {
 	@PostMapping("complete")
 	public String complete(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			@RequestParam(value = "psychNote", required = false) String psychNote, ModelMap model) {
+		// 沒寫晤談筆記就不允許標記完成
+		if (psychNote == null || psychNote.isBlank()) {
+			return "redirect:/psych/orders/psychOrders";
+		}
 		ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
 		return "redirect:/psych/orders/psychOrders";
 	}
@@ -131,6 +135,18 @@ public class OrdersPsychController {
 		}
 		Integer psychId = prinUserDetails.getPsychologist().getPsychId();
 		List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(psychId);
+
+		// 已確認、且「諮商結束+3天」已過的訂單 → 標記逾期
+		java.time.LocalDateTime now = java.time.LocalDateTime.now();
+		java.util.Set<Integer> overdueOrders = new java.util.HashSet<>();
+		for (Orders o : list) {
+			if (o.getOrderStatus() != null && o.getOrderStatus() == 1
+					&& o.getConsEnd() != null && now.isAfter(o.getConsEnd().plusDays(3))) {
+				overdueOrders.add(o.getOrderId());
+			}
+		}
+
+		model.addAttribute("overdueOrders", overdueOrders);
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("psychId", psychId);
 		return "front-end/psych/consultation/orders/psychOrdersForm";
