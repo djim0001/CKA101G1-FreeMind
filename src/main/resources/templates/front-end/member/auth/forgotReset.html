@@ -1,34 +1,67 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>重設密碼</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>重設密碼｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
 </head>
-<body>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: authHeader}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Reset password</p>
+				<h2>重設密碼</h2>
+			</div>
+		</div>
 
-    <h1>重設密碼</h1>
+		<div class="auth-card">
+			<div class="panel">
+				<p class="meta">
+					驗證碼已寄至：<b th:text="${email}"></b>（5 分鐘內有效）
+				</p>
 
-    <p>驗證碼已寄至：<b th:text="${email}"></b>（5 分鐘內有效）</p>
+				<div class="notice" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
 
-    <p style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
-
-    <form th:action="@{/front-end/forgot/reset}" method="post">
-        <input type="hidden" name="email" th:value="${email}">
-        <p>
-            <label>驗證碼：<input type="text" name="otp" maxlength="8" autocomplete="one-time-code" autofocus></label>
-        </p>
-        <p>
-            <label>新密碼：<input type="password" name="newPassword" maxlength="20"></label>
-        </p>
-        <p>
-            <label>確認新密碼：<input type="password" name="confirmPassword" maxlength="20"></label>
-        </p>
-        <button type="submit">重設密碼</button>
-    </form>
-
-    <p>
-        <a th:href="@{/front-end/login}">回登入頁</a>
-    </p>
-
+				<form th:action="@{/front-end/forgot/reset}" method="post">
+					<input type="hidden" name="email" th:value="${email}">
+					<div class="form-grid">
+						<div class="form-group full">
+							<label>驗證碼</label>
+							<input type="text" name="otp" class="field" maxlength="8"
+								autocomplete="one-time-code" autofocus>
+						</div>
+						<div class="form-group full">
+							<label>新密碼</label>
+							<div class="pw-wrap">
+								<input type="password" name="newPassword" class="field" maxlength="20">
+								<button type="button" class="pw-toggle" aria-label="顯示密碼">
+									<svg class="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+									<svg class="icon-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+								</button>
+							</div>
+						</div>
+						<div class="form-group full">
+							<label>確認新密碼</label>
+							<div class="pw-wrap">
+								<input type="password" name="confirmPassword" class="field" maxlength="20">
+								<button type="button" class="pw-toggle" aria-label="顯示密碼">
+									<svg class="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+									<svg class="icon-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="section-head-actions" style="margin-top:20px;">
+						<a class="btn ghost" th:href="@{/front-end/login}">回登入頁</a>
+						<button type="submit" class="btn">重設密碼</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

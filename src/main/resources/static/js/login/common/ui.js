@@ -120,6 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 密碼顯示/隱藏切換：<div class="pw-wrap"><input type="password">…<button class="pw-toggle">眼睛</button></div>
+  document.querySelectorAll('.pw-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const input = button.closest('.pw-wrap')?.querySelector('input');
+      if (!input) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.classList.toggle('showing', show);
+      button.setAttribute('aria-label', show ? '隱藏密碼' : '顯示密碼');
+      input.focus();
+    });
+  });
+
   // 下拉菜單：<button type="button" data-toggle-menu="menuId">...</button> + <div id="menuId" class="profile-menu">...</div>
   document.querySelectorAll('[data-toggle-menu]').forEach(button => {
     const menuId = button.dataset.toggleMenu;
