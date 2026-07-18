@@ -94,18 +94,9 @@ public class CourseForAdminController {
 		Integer delistCurrentPage = delistPage;
 		String reviewSortField = (reviewOrderBy == null || reviewOrderBy.isBlank()) ? "courseId" : reviewOrderBy;
 		String delistSortField = (delistOrderBy == null || delistOrderBy.isBlank()) ? "courseId" : delistOrderBy;
-//		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus(
-//									(byte) 0, reviewCurrentPage - 1, reviewSortField);
 		Page<Course> courseListSubmit = courseSvc.adminSearchCourses(condition, reviewCurrentPage - 1);
 		Page<Course> courseList = courseSvc.findCourseByCourseStstus(
 									(byte) 4, delistCurrentPage - 1, delistSortField);
-		
-		courseListSubmit.getContent().forEach(course -> {
-		    System.out.println(
-		            "courseId = " + course.getCourseId()
-		            + ", status = " + course.getCourseStatus()
-		    );
-		});
 		
 		int wait = courseSvc.countCoursesByStatus((byte) 1);
 		int success = courseSvc.countCoursesByStatus((byte) 2);
