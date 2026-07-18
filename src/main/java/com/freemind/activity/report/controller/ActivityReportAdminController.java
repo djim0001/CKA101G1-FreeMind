@@ -1,5 +1,8 @@
 package com.freemind.activity.report.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -10,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.activity.report.model.ActivityReport;
 import com.freemind.activity.report.model.ActivityReportService;
+import com.freemind.activity.util.PageUtils;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
 @Controller
@@ -19,12 +24,32 @@ public class ActivityReportAdminController {
 
 	@Autowired
 	private ActivityReportService reportSvc;
+	
+	private static final int PAGE_SIZE = 3;
 
-	// 回報列表(先做「全部」,狀態篩選之後再加)
+	// 回報列表
 	@GetMapping("list")
-	public String list(@AuthenticationPrincipal AdminUserDetails userDetails,
+	public String list(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+						@AuthenticationPrincipal AdminUserDetails userDetails,
 						ModelMap model) {
-		model.addAttribute("reportListData", reportSvc.getAllReports());
+		List<ActivityReport> allList = reportSvc.getAllReports();
+		
+		int totalPages = PageUtils.calculateTotalPages(allList.size(), PAGE_SIZE);
+		if (currentPage < 1) {
+			currentPage = 1;
+		} else if (currentPage > totalPages) {
+			currentPage = totalPages;
+		}
+
+		int fromIndex = (currentPage - 1) * PAGE_SIZE;
+		int toIndex = Math.min(fromIndex + PAGE_SIZE, allList.size());
+		List<ActivityReport> pageData = fromIndex < toIndex 
+				? allList.subList(fromIndex, toIndex) 
+				: new ArrayList<>();
+		
+		model.addAttribute("reportListData", pageData);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentAdminId", userDetails.getAdmin().getAdminId());
 		return "back-end/activity/report/reportList";
 	}

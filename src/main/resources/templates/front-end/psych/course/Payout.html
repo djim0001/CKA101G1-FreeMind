@@ -1,2 +1,124 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>營運與成長｜心理師中心</title><link rel="stylesheet" th:href="@{/css/course/psych-style.css}" /></head><body class="th2-page"><div class="layout"><aside class="sidebar"><a class="brand" th:href="@{/psych/course/select_course}">諮由自在 Free Mind<small>THERAPIST STUDIO</small></a><nav class="nav"><a th:href="@{/psych/course/select_course}">課程管理</a><a th:href="@{/psych/course/add_course}">新增／編輯課程</a><a class="active" th:href="@{/psych/payout/selectPayout}">營運與成長</a><a th:href="@{/psych/course/psych_qa}">學員提問</a></nav></aside><div class="main"><header class="topbar"><p>課程商城／營運與成長</p><select class="field" style="width:150px"><option>本月</option><option>上月</option></select></header><main class="content"><div class="page-head"><div><h1>營運與成長</h1><p>掌握課程銷售、收益與撥款紀錄。</p></div><button class="btn ghost" type="button" data-toast="報表 CSV 已準備下載">匯出報表</button></div><section class="stats"><div class="stat"><span>本月銷售額</span><strong class="pending-data" data-thymeleaf-pending>—</strong></div><div class="stat"><span>本月訂單</span><strong class="pending-data" data-thymeleaf-pending>—</strong></div><div class="stat"><span>課程完課率</span><strong class="pending-data" data-thymeleaf-pending>—</strong></div><div class="stat"><span>待撥款</span><strong class="pending-data" data-thymeleaf-pending>—</strong></div></section><section class="panel"><h2>課程銷售表現</h2><div class="empty-state"><span class="pending-data">待後端提供課程銷售彙總</span></div></section><section class="panel" style="margin-top:20px" th:if="${session.psychId != null}"><h2>撥款狀態與紀錄</h2><div class="table-wrap"><table><thead><tr><th>撥款編號</th><th>銷售月份</th><th>應撥金額</th><th>平台抽成</th><th>退款扣除</th><th>實際撥款</th><th>撥款時間</th><th>狀態</th></tr></thead><tbody><th:block th:if="${allPayout != null}"><tr th:each="onePayout : ${allPayout}"><td th:text="${onePayout.payoutId}">—</td><td th:text="${onePayout.billingMonth}">—</td><td>NT$ <span th:text="${onePayout.grossPayoutAmount}">0</span></td><td>NT$ <span th:text="${onePayout.platformCommission}">0</span></td><td>NT$ <span th:text="${onePayout.billingOffset}">0</span></td><td><strong>NT$ <span th:text="${onePayout.netPayoutAmount}">0</span></strong></td><td th:text="${onePayout.paidAt}">—</td><td><span class="status" th:text="${onePayout.payoutStatusText}">狀態</span></td></tr></th:block></tbody></table></div></section></main></div></div><script th:src="@{/js/course/psych-js.js}"></script></body></html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>營運與成長｜心理師中心</title>
+  <link rel="stylesheet" th:href="@{/css/course/psych-style.css}" />
+</head>
+<body class="th2-page">
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" th:href="@{/psych/course/select_course}">
+        諮由自在 Free Mind
+        <small>THERAPIST STUDIO</small>
+      </a>
+      <nav class="nav">
+        <a th:href="@{/psych/course/select_course}">課程管理</a>
+        <a th:href="@{/psych/course/add_course}">新增／編輯課程</a>
+        <a class="active" th:href="@{/psych/payout/selectPayout}">營運與成長</a>
+        <a th:href="@{/psych/course/psych_qa}">學員提問</a>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <p>課程商城／營運與成長</p>
+        <div class="topbar-actions">
+          <a class="profile-entry" th:href="@{/psych/profile}">
+            <span class="profile-entry-avatar" aria-hidden="true">心</span>
+            <span th:text="${psychologist.name}">心理師</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <h1>營運與成長</h1>
+            <p>掌握課程銷售、收益與撥款紀錄。</p>
+          </div>
+          <button class="btn ghost" type="button" data-toast="報表 CSV 已準備下載">匯出報表</button>
+        </div>
+
+        <section class="stats payout-stats">
+          <div class="stat">
+            <span>本月銷售額</span>
+            <strong th:text="${monthlySales != null and !monthlySales.isEmpty()
+              ? 'NT$ ' + #numbers.formatInteger(monthlySales[monthlySales.size() - 1], 0, 'COMMA')
+              : 'NT$ 0'}">NT$ 0</strong>
+          </div>
+          <div class="stat">
+            <span>本月訂單</span>
+            <strong th:text="${orderCount != null ? orderCount : 0}">0</strong>
+          </div>
+          <div class="stat">
+            <span>待撥款</span>
+            <strong th:text="${countPendingPayouts != null ? countPendingPayouts : 0}">0</strong>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>課程銷售表現</h2>
+          <div class="bar-list payout-sales-chart"
+               data-sales-chart
+               th:if="${monthlyLabels != null and monthlySales != null and !monthlyLabels.isEmpty()}">
+            <div class="bar-row"
+                 th:each="monthLabel, monthStat : ${monthlyLabels}">
+              <span th:text="${monthLabel}">2026年07月</span>
+              <div class="bar">
+                <span data-sales-bar
+                      th:attr="data-sales-value=${monthlySales[monthStat.index]}"></span>
+              </div>
+              <strong th:text="${'NT$ ' + #numbers.formatInteger(monthlySales[monthStat.index], 0, 'COMMA')}">
+                NT$ 0
+              </strong>
+            </div>
+          </div>
+          <div class="empty-state"
+               th:if="${monthlyLabels == null or monthlySales == null or monthlyLabels.isEmpty()}">
+            目前沒有銷售資料
+          </div>
+        </section>
+
+        <section class="panel payout-records"
+                 th:if="${session.psychId != null}">
+          <h2>撥款狀態與紀錄</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>撥款編號</th>
+                  <th>銷售月份</th>
+                  <th>應撥金額</th>
+                  <th>平台抽成</th>
+                  <th>退款扣除</th>
+                  <th>實際撥款</th>
+                  <th>撥款時間</th>
+                  <th>狀態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${psychPayout == null or psychPayout.isEmpty()}">
+                  <td class="empty-state" colspan="8">目前沒有撥款紀錄</td>
+                </tr>
+                <tr th:each="onePayout : ${psychPayout}">
+                  <td th:text="${onePayout.payoutId}">—</td>
+                  <td th:text="${onePayout.billingMonth}">—</td>
+                  <td>NT$ <span th:text="${onePayout.grossPayoutAmount}">0</span></td>
+                  <td>NT$ <span th:text="${onePayout.platformCommission}">0</span></td>
+                  <td>NT$ <span th:text="${onePayout.billingOffset}">0</span></td>
+                  <td><strong>NT$ <span th:text="${onePayout.netPayoutAmount}">0</span></strong></td>
+                  <td th:text="${onePayout.paidAt}">—</td>
+                  <td><span class="status" th:text="${onePayout.payoutStatusText}">狀態</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script th:src="@{/js/course/psych-js.js}"></script>
+</body>
+</html>

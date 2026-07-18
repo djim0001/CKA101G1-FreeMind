@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>管理員權限設定｜諮由自在後台</title>
+<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
+<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+<style>
+	.thy2-profile .perm-item { display:flex; align-items:flex-start; gap:10px; padding:14px 16px; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; cursor:pointer; transition:background-color .2s; }
+	.thy2-profile .perm-item:hover { background:#f0ece1; }
+	.thy2-profile .perm-item input[type="checkbox"] { margin-top:3px; }
+	.thy2-profile .perm-name { font-weight:700; color:var(--ink); }
+	.thy2-profile .perm-detail { font-size:13px; color:var(--muted); margin-top:2px; }
+</style>
+</head>
+<body class="thy2-page thy2-profile">
+	<div class="layout">
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('permission-list')}"></aside>
+		<div class="main">
+			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1>權限設定</h1>
+						<p>
+							管理員：<span th:text="${adminVO.name}"></span>
+							（帳號 <span th:text="${adminVO.adminAccount}"></span>，編號 <span th:text="${adminVO.adminId}"></span>）
+						</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
+					</div>
+				</div>
+
+				<div class="panel">
+					<form method="post" th:action="@{/admin/permissions/assign}">
+						<input type="hidden" name="adminId" th:value="${adminVO.adminId}">
+
+						<!-- Permission 沒覆寫 equals，勾選判斷用 permId 投影比對 -->
+						<label class="perm-item" th:each="perm : ${allPermissions}">
+							<input type="checkbox" name="permIds" th:value="${perm.permId}"
+								th:checked="${#lists.contains(adminVO.permissions.![permId], perm.permId)}">
+							<span>
+								<span class="perm-name" th:text="${perm.permName}"></span>
+								<div class="perm-detail" th:text="${perm.permDetail}"></div>
+							</span>
+						</label>
+
+						<div class="empty-state" th:if="${allPermissions.isEmpty()}">
+							尚無可指派的權限，請先到「權限清單」新增
+						</div>
+
+						<div class="page-actions" style="margin-top:20px;">
+							<a class="btn ghost" th:href="@{/admin/listAllAdmin}">取消</a>
+							<button class="btn" type="submit">保存</button>
+						</div>
+					</form>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script th:src="@{/js/login/common/ui.js}"></script>
+</body>
+</html>

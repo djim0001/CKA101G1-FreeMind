@@ -36,6 +36,15 @@
     </table>
 
     <p th:if="${#lists.isEmpty(followListData)}">目前沒有關注任何活動。</p>
+	
+	<div th:if="${totalPages > 1}">
+	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+	       th:href="@{/member/activity/follow/myFollows(currentPage=${i})}"
+	       th:text="${i}"
+	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
+	    </a>
+	</div>
+	
 	<br>
     <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/activity/select_page}">活動首頁</a>｜<a th:href="@{/member/dashboard/myCollection}">我的收藏</a>
 

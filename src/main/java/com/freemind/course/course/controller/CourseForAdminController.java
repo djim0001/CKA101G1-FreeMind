@@ -79,14 +79,13 @@ public class CourseForAdminController {
 	@GetMapping("/select_course")
 	public String admunSelectCourse(@ModelAttribute("admin") Admin admin,
 			@ModelAttribute("condition") CourseSearchCondition condition,
-//			@RequestParam(defaultValue = "1") Integer page,
-//			@RequestParam(name = "orderBy", required = false) String orderBy,
 			@RequestParam(defaultValue = "1") Integer reviewPage, 
 			@RequestParam(defaultValue = "1") Integer delistPage,
 			@RequestParam(defaultValue = "courseIdDesc") String reviewOrderBy,
 			@RequestParam(defaultValue = "courseIdDesc") String delistOrderBy, 
-			ModelMap model, HttpSession session) {
+			ModelMap model) {
 
+//		if(condition.getCourseStatus()==null) condition.setCourseStatus((byte)1);
 		if (reviewPage < 1)
 			reviewPage = 1;
 		Integer reviewCurrentPage = reviewPage;
@@ -95,10 +94,19 @@ public class CourseForAdminController {
 		Integer delistCurrentPage = delistPage;
 		String reviewSortField = (reviewOrderBy == null || reviewOrderBy.isBlank()) ? "courseId" : reviewOrderBy;
 		String delistSortField = (delistOrderBy == null || delistOrderBy.isBlank()) ? "courseId" : delistOrderBy;
-		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus(
-									(byte) 0, reviewCurrentPage - 1, reviewSortField);
+//		Page<Course> courseListSubmit = courseSvc.findCoursesExcludeStatus(
+//									(byte) 0, reviewCurrentPage - 1, reviewSortField);
+		Page<Course> courseListSubmit = courseSvc.adminSearchCourses(condition, reviewCurrentPage - 1);
 		Page<Course> courseList = courseSvc.findCourseByCourseStstus(
 									(byte) 4, delistCurrentPage - 1, delistSortField);
+		
+		courseListSubmit.getContent().forEach(course -> {
+		    System.out.println(
+		            "courseId = " + course.getCourseId()
+		            + ", status = " + course.getCourseStatus()
+		    );
+		});
+		
 		int wait = courseSvc.countCoursesByStatus((byte) 1);
 		int success = courseSvc.countCoursesByStatus((byte) 2);
 		int fail = courseSvc.countCoursesByStatus((byte) 3);
@@ -123,52 +131,6 @@ public class CourseForAdminController {
 		
 		if (delistSortField != null)
 			model.addAttribute("delistSortField", delistSortField);
-
-		return "back-end/course/course/selectCourse";
-	}
-	@GetMapping("/search")
-	public String searchCourses(
-			@ModelAttribute("condition") CourseSearchCondition condition,
-			@RequestParam(defaultValue = "1") Integer reviewPage, 
-			@RequestParam(defaultValue = "1") Integer delistPage,
-			@RequestParam(defaultValue = "courseIdDesc") String reviewOrderBy,
-			@RequestParam(defaultValue = "courseIdDesc") String delistOrderBy, 
-			Model model) {
-
-		if (reviewPage < 1)
-			reviewPage = 1;
-		Integer reviewCurrentPage = reviewPage;
-		Page<Course> coursePage = courseSvc.searchCourses(condition, reviewCurrentPage - 1);
-
-		List<CourseCategories> categoryList = courseCategoriesSvc.getAllCourseCategories();
-		String reviewSortField = (reviewOrderBy == null || reviewOrderBy.isBlank()) ? "courseId" : reviewOrderBy;
-		
-		
-//		model.addAttribute("coursePage", coursePage);
-//		model.addAttribute("courseList", coursePage.getContent());
-//		model.addAttribute("currentPage", reviewPage);
-//		model.addAttribute("totalPages", coursePage.getTotalPages());
-		
-		model.addAttribute("courseListSubmit", coursePage);
-		model.addAttribute("reviewCurrentPage", reviewCurrentPage);
-		model.addAttribute("reviewTotalPages", coursePage.getTotalPages());
-		if (reviewSortField != null)
-			model.addAttribute("reviewSortField", reviewSortField);
-
-		model.addAttribute("categoryList", categoryList);
-		model.addAttribute("totalElements", coursePage.getTotalElements());
-		
-		int wait = courseSvc.countCoursesByStatus((byte) 1);
-		int success = courseSvc.countCoursesByStatus((byte) 2);
-		int fail = courseSvc.countCoursesByStatus((byte) 3);
-		int listed = courseSvc.countCoursesByStatus((byte) 4);
-		int delisted = courseSvc.countCoursesByStatus((byte) 5);
-
-		model.addAttribute("courseCountAwait", wait);
-		model.addAttribute("courseCountSuccess", success);
-		model.addAttribute("courseCountFail", fail);
-		model.addAttribute("courseCountListed", listed);
-		model.addAttribute("courseCountDelisted", delisted);
 
 		return "back-end/course/course/selectCourse";
 	}
@@ -213,7 +175,7 @@ public class CourseForAdminController {
 		Page<CourseOrder> orderPage = courseOrderSvc.searchOrders(condition, page);
 
 		model.addAttribute("allCourseOrder", orderPage);
-
+		model.addAttribute("refundList", refundService.getAllRefund());
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", orderPage.getTotalPages());
 

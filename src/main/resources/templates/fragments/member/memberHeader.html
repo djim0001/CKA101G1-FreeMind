@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+	<!-- 會員端共用頁首：active 傳入目前模組 key（course / consultation / activity / article / psych / dashboard）
+	     用法：<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header> -->
+	<header class="site-header" th:fragment="siteHeader(active)">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>FREE MIND</small></a>
+		<nav class="main-nav">
+			<a th:href="@{/member/course/select_course}" th:classappend="${active == 'course'} ? 'active'">探索課程</a>
+			<a th:href="@{/member/orders/bookForm}" th:classappend="${active == 'consultation'} ? 'active'">諮商預約</a>
+			<a th:href="@{/member/activity/select_page}" th:classappend="${active == 'activity'} ? 'active'">揪團活動</a>
+			<a th:href="@{/article}" th:classappend="${active == 'article'} ? 'active'">專欄文章</a>
+			<a th:href="@{/member/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">我的療癒足跡</a>
+		</nav>
+		<div class="header-actions">
+			<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+			<div class="profile-wrapper">
+				<button class="profile-entry" type="button" data-toggle-menu="profile-dropdown">
+					<span th:text="${member != null ? member.name : '會員'}">會員</span>
+				</button>
+				<div class="profile-menu" id="profile-dropdown">
+					<a class="menu-item" th:href="@{/member/profile}">會員資料</a>
+					<a class="menu-item" th:href="@{/member/notice}">會員通知</a>
+					<form class="menu-item-form" th:action="@{/front-end/logout}" method="post">
+						<button class="menu-item logout-btn" type="submit">登出</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- 未登入頁（註冊 / 忘記密碼）用的簡化頁首：只有品牌與回登入連結
+	     用法：<header th:replace="~{fragments/member/memberHeader :: authHeader}"></header> -->
+	<header class="site-header" th:fragment="authHeader">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>FREE MIND</small></a>
+		<div class="header-actions">
+			<a class="cart-link" th:href="@{/front-end/login}">會員登入</a>
+		</div>
+	</header>
+
+</body>
+</html>

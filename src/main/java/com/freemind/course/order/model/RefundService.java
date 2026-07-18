@@ -79,7 +79,7 @@ public class RefundService {
     // ==========================
     // 審核成功
     // ==========================
-    public void approveRefund(Integer courseOrderId, Integer memberId) {
+    public void approveRefund(Integer courseOrderId, Integer memberId, Integer amount) {
 
         Refund.CompositeRefund id =
                 new Refund.CompositeRefund(courseOrderId, memberId);
@@ -88,6 +88,7 @@ public class RefundService {
 
         if (refund != null) {
             refund.setRefundStatus(3); // 已退款
+            refund.setRefundAmount(amount);
             refund.setRefundedAt(LocalDateTime.now());
             repository.save(refund);
         }

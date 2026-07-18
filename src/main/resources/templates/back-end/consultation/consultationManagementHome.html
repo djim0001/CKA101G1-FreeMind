@@ -2,45 +2,62 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>諮商預約管理</title>
 <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-        font-family: "Microsoft JhengHei", Arial, sans-serif;
-        margin: 30px;
-        color: #333;
+        font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif;
+        background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 60px 20px;
     }
-    h3 {
-        margin-bottom: 20px;
+    .wrap { max-width: 900px; margin: 0 auto; }
+
+    .head { text-align: center; margin-bottom: 40px; }
+    .head h1 { font-size: 30px; font-weight: 700; }
+    .head p { color: #a99a95; font-size: 15px; margin-top: 6px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .tile {
+        display: block; text-decoration: none; color: inherit;
+        background: #fff; border-radius: 16px; padding: 30px 26px;
+        box-shadow: 0 3px 16px rgba(160,120,120,0.08);
+        border: 1px solid #f2e9e5;
+        transition: transform 0.15s, box-shadow 0.2s;
     }
-    .menu {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        max-width: 320px;
+    .tile:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(232,180,180,0.28); }
+    .tile .icon {
+        width: 56px; height: 56px; border-radius: 14px;
+        background: #fbf2f2; display: flex; align-items: center; justify-content: center;
+        font-size: 26px; margin-bottom: 18px;
     }
-    .menu a {
-        display: block;
-        padding: 14px 18px;
-        background-color: #f2f2f2;
-        border-radius: 6px;
-        text-decoration: none;
-        color: #333;
-        font-size: 1rem;
-        transition: background-color 0.15s;
-    }
-    .menu a:hover {
-        background-color: #e0e0e0;
-    }
+    .tile h3 { font-size: 18px; margin-bottom: 6px; }
+    .tile p { font-size: 13px; color: #a99a95; }
 </style>
 </head>
 <body>
-	<h3>諮商預約管理</h3>
+    <div class="wrap">
+        <div class="head">
+            <h1>諮商預約管理</h1>
+            <p>綜覽並維護所有諮商預約、問題回報與時段狀態</p>
+        </div>
 
-	<div class="menu">
-		<a th:href="@{/admin/orders/listAllOrders}">查看諮商預約紀錄與詳情</a>
-		<a th:href="@{/admin/reports/listAllReports}">會員回報與問題處理</a>
-		<a th:href="@{/admin/slots/listAllSlots}">預約時段表調整</a>
-	</div>
-
+        <div class="grid">
+            <a class="tile" th:href="@{/admin/orders/listAllOrders}">
+                <div class="icon">📋</div>
+                <h3>諮商預約紀錄</h3>
+                <p>查看所有諮商訂單與詳情、依條件查詢</p>
+            </a>
+            <a class="tile" th:href="@{/admin/reports/listAllReports}">
+                <div class="icon">💬</div>
+                <h3>會員問題回報</h3>
+                <p>處理會員回報的問題並回覆處理進度</p>
+            </a>
+            <a class="tile" th:href="@{/admin/slots/listAllSlots}">
+                <div class="icon">🗓️</div>
+                <h3>預約時段檢視</h3>
+                <p>依月份檢視各心理師的預約行事曆</p>
+            </a>
+        </div>
+    </div>
 </body>
 </html>

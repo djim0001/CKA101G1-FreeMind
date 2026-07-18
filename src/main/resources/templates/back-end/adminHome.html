@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>諮由自在｜後台管理</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+        --green: #769382;
+        --green-dark: #5e7668;
+        --ink: #333d37;
+        --gray: #6f7a72;
+    }
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        color: var(--ink);
+        background: #f3efe3;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    .topbar {
+        display: flex; align-items: center; justify-content: space-between;
+        background: #37473f; color: #fff;
+        padding: 16px 36px;
+    }
+    .topbar .logo { font-size: 20px; font-weight: 800; letter-spacing: 2px; }
+    .topbar .right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+    .topbar form { margin: 0; }
+    .topbar button {
+        background: rgba(255,255,255,0.15); color: #fff;
+        border: 1px solid rgba(255,255,255,0.4); border-radius: 6px;
+        padding: 6px 14px; font-size: 13px; cursor: pointer;
+    }
+    .topbar button:hover { background: rgba(255,255,255,0.3); }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 36px; }
+    .page-title { font-size: 24px; margin-bottom: 4px; }
+    .page-sub { color: var(--gray); font-size: 14px; margin-bottom: 32px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .tile {
+        display: block; background: #fff; border-radius: 14px;
+        padding: 26px 24px; border: 1px solid #e3ddcf;
+        transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .tile:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(74,157,127,0.15); }
+    .tile .icon {
+        width: 50px; height: 50px; border-radius: 12px;
+        background: #efe5d3; display: flex; align-items: center; justify-content: center;
+        font-size: 24px; margin-bottom: 16px;
+    }
+    .tile h3 { font-size: 17px; margin-bottom: 6px; }
+    .tile p { font-size: 13px; color: var(--gray); }
+</style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="logo">諮由自在　後台管理</div>
+        <div class="right">
+            <a th:href="@{/admin/select_page}">管理員檔案</a>
+            <form th:action="@{/back-end/logout}" method="post"><button type="submit">登出</button></form>
+        </div>
+    </div>
+
+    <div class="wrap">
+        <h1 class="page-title">管理後台</h1>
+        <p class="page-sub">綜覽並維護平台各項服務與資料。</p>
+
+        <div class="grid">
+            <a class="tile" th:href="@{/admin/orders/home}">
+                <div class="icon">🗓️</div>
+                <h3>諮商預約管理</h3>
+                <p>預約紀錄、會員回報處理、預約時段表調整</p>
+            </a>
+            <a class="tile" th:href="@{/admin/psych}">
+                <div class="icon">🧑‍⚕️</div>
+                <h3>心理師管理</h3>
+                <p>審核與管理心理師帳號及執業資格</p>
+            </a>
+            <a class="tile" th:href="@{/admin/course/select_course}">
+                <div class="icon">📚</div>
+                <h3>課程管理</h3>
+                <p>課程審核、上架與訂單管理</p>
+            </a>
+            <a class="tile" th:href="@{/admin/article}">
+                <div class="icon">📰</div>
+                <h3>文章管理</h3>
+                <p>專欄文章審核與內容維護</p>
+            </a>
+            <a class="tile" th:href="@{/admin/activity/activityAdminIndex}">
+                <div class="icon">🤝</div>
+                <h3>活動管理</h3>
+                <p>揪團活動審核與管理</p>
+            </a>
+            <a class="tile" th:href="@{/admin/notifications/listAllNotification}">
+                <div class="icon">📢</div>
+                <h3>系統公告</h3>
+                <p>發佈與管理平台系統公告</p>
+            </a>
+            <a class="tile" th:href="@{/admin/notice/listAllNoticeTemplate}">
+                <div class="icon">✉️</div>
+                <h3>通知範本</h3>
+                <p>管理系統通知訊息範本</p>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

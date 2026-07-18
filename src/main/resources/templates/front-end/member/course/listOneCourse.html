@@ -15,11 +15,16 @@
 				MARKET</small></a>
 		<nav class="main-nav">
 			<a class="active" th:href="@{/member/course/select_course}">探索課程</a><a
-				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
-				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/dashboard}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection}">我的收藏</a><a
 				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
 		</nav>
-		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+		<div class="header-actions">
+			<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a
+				class="profile-entry" th:href="@{/member/profile}"><span
+				class="profile-entry-avatar" aria-hidden="true">會</span><span
+				th:text="${member.name}">會員</span></a>
+		</div>
 	</header>
 	<main class="container">
 		<p class="meta">
@@ -41,7 +46,8 @@
 					<div class="playback-status" th:if="${coursePermission}">
 						<span>上次播放位置：<strong
 							th:text="${orderDetail.playbackPosition != null ? #temporals.format(orderDetail.playbackPosition, 'HH:mm:ss') : '尚未觀看'}">尚未觀看</strong></span><span>目前播放位置：<strong
-							data-current-playback-time>00:00:00</strong></span>
+							data-current-playback-time>00:00:00</strong></span><span>觀看進度：<strong
+							data-playback-percentage>0%</strong></span>
 					</div>
 					<video id="coursePreviewVideo" controls preload="metadata"
 						style="width: 100%; border-radius: 22px"
@@ -69,7 +75,7 @@
 					</div>
 					<div data-panel="questions" hidden>
 						<h2>我的課堂提問</h2>
-						<form th:action="@{/member/dashboard/my_course_comment}"
+						<form th:action="@{/member/course/my_course_comment}"
 							method="post">
 							<input type="hidden" name="courseId"
 								th:value="${course.courseId}"><input type="hidden"

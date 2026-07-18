@@ -1,0 +1,532 @@
+/* ============================================================
+   登入頁共用樣式（玻璃擬態）
+   會員頁：<body class="login-page theme-member">（薄荷綠 #7AFEC6）
+   管理員頁：<body class="login-page theme-admin">（深藍灰）
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- 主題變數 ---------- */
+
+.login-page {
+    /* 共用預設（會被主題 class 覆寫）＝會員大地色系，與 profile 一致 */
+    --bg-gradient: linear-gradient(135deg, #a9c0b2 0%, #769382 50%, #5e7668 100%);
+    --blob-1: rgba(118, 147, 130, 0.85);
+    --blob-2: rgba(94, 118, 104, 0.8);
+    --brand: #5e7668;            /* 連結、強調線 */
+    --brand-dark: #4a5f53;
+    --focus-border: #769382;
+    --focus-ring: rgba(118, 147, 130, 0.4);
+    --btn-bg: linear-gradient(135deg, #769382 0%, #5e7668 100%);
+    --btn-bg-hover: linear-gradient(135deg, #84a08f 0%, #6b8575 100%);
+    --btn-text: #ffffff;         /* 鼠尾草綠偏中深，按鈕字用白色保對比 */
+}
+
+/* 會員登入：鼠尾草綠大地色系（#769382 / 奶油底），與 profile 頁一致 */
+.login-page.theme-member {
+    --bg-gradient: linear-gradient(135deg, #a9c0b2 0%, #769382 50%, #5e7668 100%);
+    --blob-1: rgba(118, 147, 130, 0.85);
+    --blob-2: rgba(94, 118, 104, 0.8);
+    --brand: #5e7668;
+    --brand-dark: #4a5f53;
+    --focus-border: #769382;
+    --focus-ring: rgba(118, 147, 130, 0.4);
+    --btn-bg: linear-gradient(135deg, #769382 0%, #5e7668 100%);
+    --btn-bg-hover: linear-gradient(135deg, #84a08f 0%, #6b8575 100%);
+    --btn-text: #ffffff;
+    --panel-bg: linear-gradient(160deg, rgba(118, 147, 130, 0.5) 0%, rgba(94, 118, 104, 0.45) 55%, rgba(74, 95, 83, 0.42) 100%);
+    --panel-title: #ffffff;
+    --panel-text: #f3efe3;
+}
+
+.login-page.theme-admin {
+    --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 60%, #1a252f 100%);
+    --blob-1: rgba(93, 128, 163, 0.75);
+    --blob-2: rgba(26, 37, 47, 0.9);
+    --brand: #2c3e50;
+    --brand-dark: #1a252f;
+    --focus-border: #46627e;
+    --focus-ring: rgba(44, 62, 80, 0.35);
+    --btn-bg: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+    --btn-bg-hover: linear-gradient(135deg, #3d566e 0%, #34495e 100%);
+    --btn-text: #ffffff;
+    --panel-bg: linear-gradient(160deg, rgba(44, 62, 80, 0.55) 0%, rgba(52, 73, 94, 0.5) 55%, rgba(26, 37, 47, 0.55) 100%);
+    --panel-title: #ffffff;
+    --panel-text: #d3dce6;
+}
+
+/* ---------- 頁面背景 ---------- */
+
+.login-page {
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 背景裝飾光暈（增加玻璃層次感） */
+.login-page::before,
+.login-page::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.login-page::before {
+    width: 26rem;
+    height: 26rem;
+    background: var(--blob-1);
+    top: -6rem;
+    left: -8rem;
+}
+
+.login-page::after {
+    width: 22rem;
+    height: 22rem;
+    background: var(--blob-2);
+    bottom: -6rem;
+    right: -6rem;
+}
+
+/* ---------- 玻璃卡片（左右分欄） ---------- */
+
+.login-card {
+    width: 100%;
+    max-width: 58rem;
+    display: flex;
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 1.25rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    animation: card-in 0.45s ease-out both;
+}
+
+@keyframes card-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 左欄：大標題 + 測試帳號 */
+.panel-brand {
+    flex: 1 1 44%;
+    padding: 2.5rem 2rem;
+    background: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.panel-brand > * + * {
+    margin-top: 1.5rem;
+}
+
+/* 右欄：登入表單 */
+.panel-form {
+    flex: 1 1 56%;
+    padding: 2.5rem 2.25rem;
+}
+
+.panel-form > * + * {
+    margin-top: 1.5rem;
+}
+
+/* ---------- 標題（左欄） ---------- */
+
+.title-area {
+    text-align: left;
+}
+
+.title-area h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--panel-title);
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+}
+
+.title-area .subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--panel-text);
+}
+
+/* ---------- 提示訊息 ---------- */
+
+.alert {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.625rem;
+    display: flex;
+    align-items: center;
+}
+
+.alert svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.alert-error {
+    color: #b91c1c;
+    background: rgba(254, 226, 226, 0.85);
+    border: 1px solid rgba(252, 165, 165, 0.9);
+}
+
+.alert-success {
+    color: #166534;
+    background: rgba(220, 252, 231, 0.85);
+    border: 1px solid rgba(134, 239, 172, 0.9);
+}
+
+
+
+/* ---------- 測試帳號提示區 ---------- */
+
+.test-info {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-left: 4px solid var(--brand);
+    padding: 0.875rem 1rem;
+    border-radius: 0.625rem;
+    font-size: 0.85rem;
+    color: #333;
+    line-height: 1.8;
+}
+
+.test-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--brand-dark);
+}
+
+.test-info code {
+    background: rgba(0, 0, 0, 0.07);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+}
+
+/* ---------- 表單 ---------- */
+
+.login-form > * + * {
+    margin-top: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(209, 213, 219, 0.9);
+    border-radius: 0.625rem;
+    outline: none;
+    font-size: 1rem;
+    color: #1f2937;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.form-control::placeholder {
+    color: #9ca3af;
+}
+
+.form-control:focus {
+    background: #ffffff;
+    border-color: var(--focus-border);
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* 密碼欄位 + 顯示/隱藏切換鈕 */
+.pw-wrap {
+    position: relative;
+}
+
+.pw-wrap .form-control {
+    padding-right: 2.75rem;
+}
+
+.pw-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.625rem;
+    transform: translateY(-50%);
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 0.375rem;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.pw-toggle:hover {
+    color: var(--brand-dark);
+}
+
+.pw-toggle svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* 預設顯示「眼睛」，切成明碼時顯示「劃線眼睛」 */
+.pw-toggle .icon-eye-off {
+    display: none;
+}
+
+.pw-toggle.showing .icon-eye {
+    display: none;
+}
+
+.pw-toggle.showing .icon-eye-off {
+    display: block;
+}
+
+/* ---------- 記住我 / 忘記密碼 ---------- */
+
+.form-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    accent-color: var(--brand);
+}
+
+.link-primary {
+    color: var(--brand-dark);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.link-primary:hover {
+    text-decoration: underline;
+}
+
+/* ---------- 登入按鈕（含 loading） ---------- */
+
+.btn-submit {
+    width: 100%;
+    padding: 0.8rem 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--btn-text);
+    background: var(--btn-bg);
+    border: none;
+    border-radius: 0.625rem;
+    cursor: pointer;
+    box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+
+.btn-submit:hover {
+    background: var(--btn-bg-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px -8px rgba(0, 0, 0, 0.4);
+}
+
+.btn-submit:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+.btn-submit:disabled {
+    cursor: not-allowed;
+    filter: saturate(0.7) brightness(0.95);
+}
+
+/* 轉圈：JS 在 submit 時加 .is-loading */
+.btn-submit .spinner {
+    display: none;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.btn-submit.is-loading .spinner {
+    display: inline-block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- 分隔線與 Google 按鈕 ---------- */
+
+.divider {
+    display: flex;
+    align-items: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(107, 114, 128, 0.35);
+}
+
+.divider span {
+    padding: 0 0.75rem;
+}
+
+#googleBtn {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.75rem 0;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #374151;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(209, 213, 219, 0.9);
+    border-radius: 0.625rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.btn-google:hover {
+    background: #ffffff;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+.btn-google:active {
+    transform: scale(0.98);
+}
+
+.btn-google svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+}
+
+/* ---------- 底部文字 ---------- */
+
+.footer-text {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.footer-text .weight-bold {
+    font-weight: 700;
+}
+
+/* ---------- 響應式 ---------- */
+
+/* 窄螢幕：左右欄改上下堆疊（品牌區在上） */
+@media (max-width: 860px) {
+    .login-card {
+        flex-direction: column;
+        max-width: 28rem;
+    }
+
+    .panel-brand {
+        padding: 2rem 1.5rem;
+    }
+
+    .panel-form {
+        padding: 2rem 1.5rem;
+    }
+
+    .title-area {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-page {
+        padding: 1rem 0.5rem;
+    }
+
+    .login-card {
+        border-radius: 1rem;
+    }
+
+    .panel-brand,
+    .panel-form {
+        padding: 1.75rem 1.25rem;
+    }
+
+    .title-area h2 {
+        font-size: 1.5rem;
+    }
+}

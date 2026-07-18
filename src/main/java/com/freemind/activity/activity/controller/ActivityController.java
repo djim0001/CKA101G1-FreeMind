@@ -10,10 +10,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.unit.DataSize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
@@ -29,7 +32,9 @@ import com.freemind.activity.category.model.ActivityCatService;
 import com.freemind.activity.follow.model.ActivityFollowService;
 import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
+import com.freemind.activity.util.PageUtils;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
+import com.freemind.util.ImageUploadValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,6 +55,11 @@ public class ActivityController {
     
     @Autowired
     private ActivityFollowService followSvc;
+    
+    private static final int PAGE_SIZE = 3;
+    
+    @Value("${app.activity.image.max-size}")
+    private DataSize maxImageSize;
 
     @GetMapping("listAllActivity")
     public String listAllActivity(@AuthenticationPrincipal MemberUserDetails userDetails,
@@ -62,12 +72,7 @@ public class ActivityController {
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForMember(emptyMap);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
         model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));
         return "front-end/member/activity/listAllActivity";
     }
@@ -88,12 +93,7 @@ public class ActivityController {
         model.addAttribute("currentPage", currentPage);
         
         long total = activitySvc.getTotalCountForMember(map);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
         
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
@@ -117,7 +117,25 @@ public class ActivityController {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
-    	
+    	    		
+    		LocalDateTime now = LocalDateTime.now();
+
+    	    if (activity.getRegisStart() != null && !activity.getRegisStart().isAfter(now)) {
+    	        result.rejectValue("regisStart", null, "報名開始時間，必須晚於現在時間");
+    	    }
+    	    if (activity.getRegisStart() != null && activity.getRegisEnd() != null
+    	            && !activity.getRegisEnd().isAfter(activity.getRegisStart())) {
+    	        result.rejectValue("regisEnd", null, "報名截止時間，必須晚於報名開始時間");
+    	    }
+    	    if (activity.getRegisEnd() != null && activity.getActivityStart() != null
+    	            && !activity.getActivityStart().isAfter(activity.getRegisEnd())) {
+    	        result.rejectValue("activityStart", null, "活動開始時間，必須晚於報名截止時間");
+    	    }
+    	    if (activity.getActivityStart() != null && activity.getActivityEnd() != null
+    	            && !activity.getActivityEnd().isAfter(activity.getActivityStart())) {
+    	        result.rejectValue("activityEnd", null, "活動結束時間，必須晚於活動開始時間");
+    	    }
+    		
     		if (result.hasErrors()) {
             return "front-end/member/activity/addActivity";
         }
@@ -126,6 +144,13 @@ public class ActivityController {
 
         // 再把圖片設定好      
         if (!pictureFile.isEmpty()) {
+            try {
+                ImageUploadValidator.validateImageSize(pictureFile, maxImageSize);
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("errorMessage", ex.getMessage());
+                return "front-end/member/activity/addActivity";
+            }
+
             String savedFileName = saveUploadedPicture(pictureFile);
             activity.setPicture(savedFileName);
         }
@@ -138,8 +163,12 @@ public class ActivityController {
             return "front-end/member/activity/addActivity";
         }
 
-        model.addAttribute("success", "- (新增成功，待審核)");
-        return "front-end/member/activity/addActivitySuccess";
+        return "redirect:/member/activity/insertSuccess";
+    }
+    
+    @GetMapping("insertSuccess")
+    public String insertSuccess() {
+    	return "front-end/member/activity/addActivitySuccess";
     }
     
     @ModelAttribute("activityCatListData")
@@ -147,7 +176,8 @@ public class ActivityController {
         return activityCatSvc.getAll();
     }
     
-    @PostMapping("getOne_For_Update")
+    
+    @GetMapping("getOne_For_Update")
     public String getOneForUpdate(@RequestParam("activityId") Integer activityId, ModelMap model) {
         
     	Activity activity = activitySvc.getOneActivity(activityId);
@@ -159,7 +189,8 @@ public class ActivityController {
     public String update(@Valid Activity activity, BindingResult result,
                           @RequestParam("pictureFile") MultipartFile pictureFile,
                           @AuthenticationPrincipal MemberUserDetails userDetails,
-                          ModelMap model) throws IOException {
+                          ModelMap model,
+                          RedirectAttributes redirectAttributes) throws IOException {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
@@ -169,6 +200,13 @@ public class ActivityController {
 
         String oldPictureFileName = null;
         if (!pictureFile.isEmpty()) {
+        	 	try {
+        	        ImageUploadValidator.validateImageSize(pictureFile, maxImageSize);
+        	    } catch (IllegalArgumentException ex) {
+        	        model.addAttribute("errorMessage", ex.getMessage());
+        	        return "front-end/member/activity/update_activity_input";
+        	    }
+        	
             // 先記住(換照片前)資料庫裡原本的舊檔名，更新成功才刪除舊圖
             Activity existing = activitySvc.getOneActivity(activity.getActivityId());
             oldPictureFileName = existing.getPicture();
@@ -194,23 +232,8 @@ public class ActivityController {
             return "front-end/member/activity/update_activity_input";
         }
 
-        Integer memberId = userDetails.getMember().getMemberId();
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-
-        long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-
-        model.addAttribute("success", "- (修改成功)");
-        return "front-end/member/activity/ownedActivities";
+        redirectAttributes.addFlashAttribute("success", "修改成功");
+        return "redirect:/member/activity/ownedActivities";
     }
     
     // 查看我發起的活動
@@ -230,12 +253,7 @@ public class ActivityController {
         model.addAttribute("currentPage", currentPage);
         
         long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
         return "front-end/member/activity/ownedActivities";
     }
  
@@ -261,12 +279,7 @@ public class ActivityController {
         model.addAttribute("currentPage", currentPage);
         
         long total = activitySvc.getTotalCountForOwner(map, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
         
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
@@ -278,7 +291,7 @@ public class ActivityController {
     public String cancel(@RequestParam("activityId") Integer activityId,
                          @RequestParam("cancelNote") String cancelNote,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
-                         ModelMap model) {
+                         RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
@@ -290,33 +303,19 @@ public class ActivityController {
                 throw new IllegalStateException("無權操作此活動");
             }
             activitySvc.cancelActivity(activityId, cancelNote);
+            redirectAttributes.addFlashAttribute("success", "取消成功");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+        		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = userDetails.getMember().getMemberId();
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        return "front-end/member/activity/ownedActivities";
+        return "redirect:/member/activity/ownedActivities";
     }
     
     @PostMapping("postpone")
     public String postpone(@RequestParam("activityId") Integer activityId,
                             @RequestParam("postponeNote") String postponeNote,
                             @AuthenticationPrincipal MemberUserDetails userDetails,
-                            ModelMap model) {
+                            RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
@@ -327,26 +326,12 @@ public class ActivityController {
                 throw new IllegalStateException("無權操作此活動");
             }
             activitySvc.postponeActivity(activityId, postponeNote);
+            redirectAttributes.addFlashAttribute("success", "延期成功");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+        		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = userDetails.getMember().getMemberId();
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        return "front-end/member/activity/ownedActivities";
+    		return "redirect:/member/activity/ownedActivities";
     }
     
     @PostMapping("confirmNewSchedule")
@@ -356,7 +341,7 @@ public class ActivityController {
                                       @RequestParam(value = "regisStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisStart,
                                       @RequestParam(value = "regisEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisEnd,
                                       @AuthenticationPrincipal MemberUserDetails userDetails,
-                                      ModelMap model) {
+                                      RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
@@ -367,26 +352,12 @@ public class ActivityController {
                 throw new IllegalStateException("無權操作此活動");
             }
             activitySvc.confirmNewSchedule(activityId, activityStart, activityEnd, regisStart, regisEnd);
+            redirectAttributes.addFlashAttribute("success", "成功更新活動時間");
         } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+        		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        Integer memberId = userDetails.getMember().getMemberId();
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
-        int pageSize = 3;
-        int totalPages = (int) (total % pageSize == 0 ? (total / pageSize) : (total / pageSize + 1));
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        model.addAttribute("totalPages", totalPages);
-        
-        return "front-end/member/activity/ownedActivities";
+    		return "redirect:/member/activity/ownedActivities";
     }
     
     @GetMapping("activityImage")

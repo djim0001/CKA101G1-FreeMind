@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title th:text="${permission != null} ? '編輯權限｜諮由自在後台' : '新增權限｜諮由自在後台'">新增權限｜諮由自在後台</title>
+<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
+<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+</head>
+<body class="thy2-page thy2-profile">
+	<div class="layout">
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('permission-list')}"></aside>
+		<div class="main">
+			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
+			<main class="content">
+				<div class="page-head">
+					<div>
+						<h1 th:text="${permission != null} ? '編輯權限' : '新增權限'">新增權限</h1>
+						<p>設定權限名稱與說明。</p>
+					</div>
+					<div class="page-actions">
+						<a class="btn ghost" th:href="@{/admin/permissions}">回權限清單</a>
+					</div>
+				</div>
+
+				<div class="panel">
+					<form class="form-grid" method="post" th:action="@{/admin/permissions/save}">
+						<!-- 編輯模式才帶 permId，save() 依此分流新增/更新 -->
+						<input type="hidden" name="permId" th:if="${permission != null}" th:value="${permission.permId}">
+
+						<div class="form-group full">
+							<label for="permName">權限名稱 *</label>
+							<input class="field" type="text" id="permName" name="permName" required
+								placeholder="例如：VIEW_ADMIN, EDIT_COURSE"
+								th:value="${permission != null} ? ${permission.permName} : ''" autofocus>
+						</div>
+
+						<div class="form-group full">
+							<label for="permDetail">權限說明 *</label>
+							<textarea class="field" id="permDetail" name="permDetail" required
+								placeholder="例如：查看管理面板，編輯課程等"
+								th:text="${permission != null} ? ${permission.permDetail} : ''"></textarea>
+						</div>
+
+						<div class="form-group full page-actions">
+							<a class="btn ghost" th:href="@{/admin/permissions}">取消</a>
+							<button class="btn" type="submit">保存</button>
+						</div>
+					</form>
+				</div>
+			</main>
+		</div>
+	</div>
+	<script th:src="@{/js/login/common/ui.js}"></script>
+</body>
+</html>

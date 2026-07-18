@@ -21,6 +21,7 @@ import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.activity.report.model.ActivityReportService;
+import com.freemind.activity.util.PageUtils;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
@@ -36,11 +37,14 @@ public class RegistrationController {
     
     @Autowired
     private ActivityReportService reportSvc;
+    
+    private static final int PAGE_SIZE = 3;
 
     // 一、我的報名清單
     @GetMapping("myRegistrations")
     public String myRegistrations(@RequestParam(value = "tab", defaultValue = "upcoming") String tab,
-    								 @AuthenticationPrincipal MemberUserDetails userDetails,
+    								@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage, 
+    								@AuthenticationPrincipal MemberUserDetails userDetails,
                                   ModelMap model) {
       
     		Member member = userDetails.getMember();
@@ -86,7 +90,25 @@ public class RegistrationController {
     	    	    }
     	    	});
     }
-    	    model.addAttribute("regisListData", filtered);
+    	    
+    	    // === 新增：對 filtered 做分頁切割 ===
+    	    int totalPages = PageUtils.calculateTotalPages(filtered.size(), PAGE_SIZE);
+    	    if (currentPage < 1) {
+    	        currentPage = 1;
+    	    } else if (currentPage > totalPages) {
+    	        currentPage = totalPages;
+    	    }
+
+    	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
+    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, filtered.size());
+    	    List<Registration> pageData = fromIndex < toIndex  
+    	            ? filtered.subList(fromIndex, toIndex) // subList頭包含尾不包含
+    	            : new ArrayList<>(); // 如果完全沒資料, 回傳空清單
+    	    
+    	    
+    	    model.addAttribute("regisListData", pageData); //把切好的這一頁資料放進model
+    	    model.addAttribute("currentPage", currentPage);
+    	    model.addAttribute("totalPages", totalPages);
     	    model.addAttribute("currentTab", tab);
     		
     		
@@ -144,12 +166,29 @@ public class RegistrationController {
     // 四、活動報名名單(給發起人檢視)
     @GetMapping("activityRegistrations")
     public String activityRegistrations(@RequestParam("activityId") Integer activityId,
+    									   @RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
                                         @AuthenticationPrincipal MemberUserDetails userDetails,
                                         ModelMap model) {
     		Activity activity = activitySvc.getOneActivity(activityId);
     		List<Registration> list = regisSvc.getRegistrationsByActivity(activity, userDetails.getMember());
-    		model.addAttribute("regisListData", list);
-    		model.addAttribute("activity", activity);
+    		
+    		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+    	    if (currentPage < 1) {
+    	        currentPage = 1;
+    	    } else if (currentPage > totalPages) {
+    	        currentPage = totalPages;
+    	    }
+
+    	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
+    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+    	    List<Registration> pageData = fromIndex < toIndex 
+    	            ? list.subList(fromIndex, toIndex) 
+    	            : new ArrayList<>();
+    		
+    	    model.addAttribute("regisListData", pageData);
+    	    model.addAttribute("activity", activity);
+    	    model.addAttribute("currentPage", currentPage);
+    	    model.addAttribute("totalPages", totalPages);
     		
         return "front-end/member/activity/registration/activityRegistrations";
     }

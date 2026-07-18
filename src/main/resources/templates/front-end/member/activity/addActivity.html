@@ -76,6 +76,10 @@
 		    </select>
 		    <span th:if="${#fields.hasErrors('activityDist')}" th:errors="*{activityDist}" style="color:red;"></span>
 		</p>
+		
+		<!-- 保留原本的縣市、區域值給 JS -->
+		<input type="hidden" id="originalCity" th:value="*{activityCity}" />
+		<input type="hidden" id="originalDist" th:value="*{activityDist}" />
 
         <p>
             詳細地點：
@@ -167,7 +171,7 @@ const cityDistrictMap = {
     "連江縣": ["南竿鄉", "北竿鄉", "莒光鄉", "東引鄉"]
 };
 
-function updateDistrictOptions() {
+function updateDistrictOptions(selectedDist) {
     const city = document.getElementById("activityCity").value;
     const distSelect = document.getElementById("activityDist");
 
@@ -178,10 +182,24 @@ function updateDistrictOptions() {
             const option = document.createElement("option");
             option.value = dist;
             option.textContent = dist;
+            if (dist === selectedDist) {
+                option.selected = true;
+            }
             distSelect.appendChild(option);
         });
     }
 }
+
+//載入原本填的縣市區域
+window.onload = function() {
+    const originalCity = document.getElementById("originalCity").value;
+    const originalDist = document.getElementById("originalDist").value;
+
+    if (originalCity) {
+        document.getElementById("activityCity").value = originalCity;
+        updateDistrictOptions(originalDist);
+    }
+};
 </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.freemind.activity.follow.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.follow.model.ActivityFollowService;
+import com.freemind.activity.util.PageUtils;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 @Controller
@@ -22,6 +24,8 @@ public class ActivityFollowController {
 
     @Autowired
     private ActivityFollowService followSvc;
+    
+    private static final int PAGE_SIZE = 3;
 
     @PostMapping("follow")
     public String follow(@RequestParam("activityId") Integer activityId,
@@ -54,11 +58,28 @@ public class ActivityFollowController {
 
     // 我的關注清單
     @GetMapping("myFollows")
-    public String myFollows(@AuthenticationPrincipal MemberUserDetails userDetails,
-    							  ModelMap model) {
+    public String myFollows(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+    							@AuthenticationPrincipal MemberUserDetails userDetails,
+    							ModelMap model) {
     		Integer memberId = userDetails.getMember().getMemberId();
     		List<Activity> list = followSvc.myFollows(memberId);
-    		model.addAttribute("followListData", list);
+    		
+    		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+    	    if (currentPage < 1) {
+    	        currentPage = 1;
+    	    } else if (currentPage > totalPages) {
+    	        currentPage = totalPages;
+    	    }
+
+    	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
+    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+    	    List<Activity> pageData = fromIndex < toIndex 
+    	            ? list.subList(fromIndex, toIndex) 
+    	            : new ArrayList<>();
+
+    	    model.addAttribute("followListData", pageData);
+    	    model.addAttribute("currentPage", currentPage);
+    	    model.addAttribute("totalPages", totalPages);
     		
     		return "front-end/member/activity/follow/myFollows";
     }

@@ -9,5 +9,11 @@ public interface PayoutRepository extends JpaRepository<Payout, Integer> {
     List<Payout> findByPsychologistPsychId(Integer psychId);
 
     List<Payout> findByBillingMonth(String billingMonth);
+    
+    int countByPayoutStatus(Integer payoutStatus);
 
+    int countByPsychologist_PsychIdAndPayoutStatus(
+            Integer psychId,
+            Integer payoutStatus
+    );
 }

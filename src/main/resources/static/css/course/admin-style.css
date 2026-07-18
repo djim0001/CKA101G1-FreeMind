@@ -118,6 +118,35 @@
 .thy2-page .coupon-management-grid > .panel { min-width:0; }
 .thy2-page .panel-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:16px; }
 .thy2-page .panel-heading h2, .thy2-page .panel-heading p { margin:0; }
+.thy2-page .payout-stats { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.thy2-page .revenue-panel { overflow:hidden; }
+.thy2-page .revenue-chart { display:grid; gap:14px; }
+.thy2-page .revenue-chart-row { display:grid; grid-template-columns:36px minmax(110px,170px) minmax(180px,1fr) 140px; align-items:center; gap:14px; }
+.thy2-page .revenue-rank { display:grid; place-items:center; width:30px; height:30px; color:var(--brand); background:var(--soft); border-radius:50%; font-size:13px; font-weight:800; }
+.thy2-page .revenue-chart-row:first-child .revenue-rank { color:#7b581c; background:#fff0c9; }
+.thy2-page .revenue-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.thy2-page .revenue-bar-track { height:16px; overflow:hidden; background:#e8edf4; border-radius:999px; }
+.thy2-page .revenue-bar-track span { display:block; width:0; height:100%; background:linear-gradient(90deg,#465d87,#7794bd); border-radius:inherit; transition:width .55s ease; }
+.thy2-page .revenue-amount { color:var(--brand); text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.thy2-page .payout-search-form { grid-template-columns:auto minmax(190px,260px) auto auto; align-items:center; justify-content:start; }
+.thy2-page .payout-search-form label { font-size:13px; font-weight:700; white-space:nowrap; }
+.thy2-page .payout-records-table { min-width:1260px; table-layout:auto; }
+.thy2-page .payout-records-table th,
+.thy2-page .payout-records-table td {
+  padding:14px 18px;
+  white-space:nowrap;
+  word-break:keep-all;
+  vertical-align:middle;
+  font-variant-numeric:tabular-nums;
+}
+.thy2-page .payout-records-table th:nth-child(1) { min-width:105px; }
+.thy2-page .payout-records-table th:nth-child(2) { min-width:100px; }
+.thy2-page .payout-records-table th:nth-child(3) { min-width:130px; }
+.thy2-page .payout-records-table th:nth-child(n+4):nth-child(-n+7) { min-width:135px; }
+.thy2-page .payout-records-table th:nth-child(8) { min-width:190px; }
+.thy2-page .payout-records-table th:nth-child(9) { min-width:100px; }
+@media(max-width:920px){.thy2-page .payout-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.thy2-page .payout-stats,.thy2-page .payout-search-form{grid-template-columns:1fr}.thy2-page .payout-search-form .btn{width:100%}.thy2-page .revenue-chart-row{grid-template-columns:32px minmax(0,1fr) auto;gap:9px}.thy2-page .revenue-bar-track{grid-column:2/-1}.thy2-page .revenue-amount{text-align:left}}
 .thy2-page .pending-data { color:#8a6a3c; background:#fff7e8; border:1px dashed #dfc594; border-radius:7px; padding:3px 7px; font-size:12px; }
 .thy2-page .empty-state { padding:34px 18px; color:var(--muted); text-align:center; }
 .thy2-page .nowrap { white-space:nowrap; }
@@ -139,7 +168,7 @@
 .thy2-page .order-management-table th:nth-child(9) { width:90px; }
 .thy2-page .order-management-table .meta { white-space:nowrap; }
 .thy2-page .order-management-table .order-net-amount { margin-left:8px; }
-.thy2-page .order-management-table .status-paid, .thy2-page .order-management-table .status-unpaid { white-space:nowrap; }
+.thy2-page .order-management-table .status-paid, .thy2-page .order-management-table .status-unpaid, .thy2-page .order-management-table .status-cancelled, .thy2-page .order-management-table .status-refunded { white-space:nowrap; }
 .thy2-page .form-note { margin-top:6px; color:var(--muted); font-size:12px; }
 .thy2-page .error { color:var(--red); font-size:12px; }
 .thy2-page .required { color:var(--red); }
@@ -176,7 +205,9 @@
 .thy2-page .modal-content, .thy2-page .coupon-modal-content { width:min(820px,100%); max-height:85vh; overflow:auto; padding:24px; background:white; border-radius:15px; box-shadow:0 24px 70px rgba(24,34,52,.28); }
 .thy2-page .status-paid { color:var(--green); background:#e8f3ef; }
 .thy2-page .status-unpaid { color:#9f454c; background:#fbe8ea; }
-.thy2-page .status-paid, .thy2-page .status-unpaid { display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px; font-weight:700; }
+.thy2-page .status-cancelled { color:#7b6466; background:#f0e9ea; }
+.thy2-page .status-refunded { color:#486781; background:#e8f0f6; }
+.thy2-page .status-paid, .thy2-page .status-unpaid, .thy2-page .status-cancelled, .thy2-page .status-refunded { display:inline-block; padding:4px 9px; border-radius:999px; font-size:12px; font-weight:700; }
 .thy2-page [data-panel][hidden], .thy2-page [hidden] { display:none!important; }
 
 /* 課程下架對話框：直接放在 thy-2 樣式中，避免部署後的 @import 相對路徑失效。 */

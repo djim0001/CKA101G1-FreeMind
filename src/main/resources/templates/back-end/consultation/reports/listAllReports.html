@@ -2,50 +2,152 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>諮商問題回報列表</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif; background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 44px 20px; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+
+    .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .top h1 { font-size: 26px; font-weight: 700; }
+    .back-btn { flex-shrink: 0; padding: 9px 20px; background: #fff; color: #c07d7d; border: 1.5px solid #e8b4b4; border-radius: 8px; font-size: 14px; text-decoration: none; transition: all 0.2s; }
+    .back-btn:hover { background: #e8b4b4; color: #fff; }
+
+    .success { color: #2e7d43; font-size: 14px; margin-bottom: 12px; }
+
+    .tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid #f2e0dc; }
+    .tab { display: flex; align-items: center; gap: 8px; padding: 11px 22px; font-size: 15px; font-weight: 600; color: #a99a95; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .tab:hover { color: #c07d7d; }
+    .tab.active { color: #c07d7d; border-bottom-color: #e8b4b4; }
+    .tab .count { background: #f2dddd; color: #c07d7d; font-size: 12.5px; font-weight: 600; padding: 1px 10px; border-radius: 999px; }
+    .tab.active .count { background: #e8b4b4; color: #fff; }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 14px rgba(160, 120, 120, 0.07); }
+    thead th { background: #fbf2f2; color: #7a6b6b; font-weight: 600; font-size: 13.5px; padding: 13px 12px; white-space: nowrap; text-align: center; }
+    tbody td { padding: 13px 12px; font-size: 13.5px; border-bottom: 1px solid #f2e9e5; text-align: center; vertical-align: middle; }
+    .nowrap { white-space: nowrap; }
+    .desc { text-align: left; word-break: break-word; }
+
+    .status-pending    { color: #b8860b; font-weight: bold; }
+    .status-processing { color: #1565c0; font-weight: bold; }
+    .status-resolved   { color: #2e7d43; font-weight: bold; }
+
+    .op-btn { padding: 6px 16px; border: none; border-radius: 5px; cursor: pointer; color: #fff; font-size: 13px; background: #e8b4b4; transition: opacity 0.2s; }
+    .op-btn:hover { opacity: 0.85; }
+
+    .empty { color: #b3a5a0; font-size: 14px; padding: 40px; text-align: center; background: #fff; border-radius: 12px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+</style>
 </head>
 <body>
-    <h3>諮商問題回報列表</h3>
+    <div class="wrap">
+        <div class="top">
+            <h1>諮商問題回報</h1>
+            <a class="back-btn" th:href="@{/admin/orders/home}">← 回諮商預約管理</a>
+        </div>
 
-	<span style="color:green;" th:if="${success != null}" th:text="${success}"></span>
+        <span class="success" th:if="${success != null}" th:text="${success}"></span>
 
-	<a th:href="@{/admin/reports/addReports}">新增回報</a>
-    <a th:href="@{/admin/reports/select_Page}">查詢</a>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('pending', this)">
+                待處理中 <span class="count" th:text="${#lists.size(reportsListData.?[reportStatus != 2])}"></span>
+            </button>
+            <button class="tab" onclick="showTab('resolved', this)">
+                已解決 <span class="count" th:text="${#lists.size(reportsListData.?[reportStatus == 2])}"></span>
+            </button>
+        </div>
 
-    <table border="1">
-        <tr>
-            <th>編號</th>
-            <th>會員編號</th>
-            <th>問題描述</th>
-            <th>回報日期</th>
-            <th>處理狀態</th>
-            <th>操作</th>
-        </tr>
-        <tr th:each="report : ${reportsListData}">
-            <td th:text="${report.reportId}"></td>
-            <td th:text="${report.member.memberId}"></td>
-            <td th:text="${report.issueDesc}"></td>
-            <td th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td th:switch="${report.reportStatus}">
-                <span th:case="0">待處理</span>
-                <span th:case="1">處理中</span>
-                <span th:case="2">已解決</span>
-            </td>
-            <td>
-                <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
-					<input type="hidden" name="reportId" th:value="${report.reportId}">
-					<input type="submit" value="回覆">
-				</form>
-                <form method="post" th:action="@{/admin/reports/delete}">
-				    <input type="hidden" name="reportId" th:value="${report.reportId}">
-				    <input type="submit" value="刪除"
-				           onclick="return confirm('確定要刪除此筆資料嗎？')">
-				</form>
-            </td>
-        </tr>
-    </table>
+        <!-- 待處理中 -->
+        <div id="pending" class="panel active">
+            <table th:if="${!#lists.isEmpty(reportsListData.?[reportStatus != 2])}">
+                <thead>
+                    <tr>
+                        <th>回報編號</th>
+                        <th>會員編號</th>
+                        <th>會員姓名</th>
+                        <th>訂單編號</th>
+                        <th>諮商日期</th>
+                        <th>問題描述</th>
+                        <th>回報日期</th>
+                        <th>處理狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="report : ${reportsListData}" th:if="${report.reportStatus != 2}">
+                        <td th:text="${report.reportId}"></td>
+                        <td th:text="${report.member.memberId}"></td>
+                        <td class="nowrap" th:text="${report.member.name}"></td>
+                        <td th:text="${report.orders != null ? report.orders.orderId : '-'}"></td>
+                        <td class="nowrap" th:text="${report.orders != null ? #temporals.format(report.orders.consStart, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                        <td class="desc" th:text="${report.issueDesc}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:switch="${report.reportStatus}">
+                            <span th:case="0" class="status-pending">待處理</span>
+                            <span th:case="1" class="status-processing">處理中</span>
+                        </td>
+                        <td class="nowrap">
+                            <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
+                                <input type="hidden" name="reportId" th:value="${report.reportId}">
+                                <input type="submit" class="op-btn" value="回覆">
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(reportsListData.?[reportStatus != 2])}">目前沒有待處理的回報。</div>
+        </div>
 
+        <!-- 已解決 -->
+        <div id="resolved" class="panel">
+            <table th:if="${!#lists.isEmpty(reportsListData.?[reportStatus == 2])}">
+                <thead>
+                    <tr>
+                        <th>回報編號</th>
+                        <th>會員編號</th>
+                        <th>會員姓名</th>
+                        <th>訂單編號</th>
+                        <th>諮商日期</th>
+                        <th>問題描述</th>
+                        <th>回報日期</th>
+                        <th>處理備註</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="report : ${reportsListData}" th:if="${report.reportStatus == 2}">
+                        <td th:text="${report.reportId}"></td>
+                        <td th:text="${report.member.memberId}"></td>
+                        <td class="nowrap" th:text="${report.member.name}"></td>
+                        <td th:text="${report.orders != null ? report.orders.orderId : '-'}"></td>
+                        <td class="nowrap" th:text="${report.orders != null ? #temporals.format(report.orders.consStart, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                        <td class="desc" th:text="${report.issueDesc}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="desc" th:text="${report.reportNote != null ? report.reportNote : '-'}"></td>
+                        <td><span class="status-resolved">已解決</span></td>
+                        <td class="nowrap">
+                            <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
+                                <input type="hidden" name="reportId" th:value="${report.reportId}">
+                                <input type="submit" class="op-btn" value="回覆">
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="empty" th:if="${#lists.isEmpty(reportsListData.?[reportStatus == 2])}">目前沒有已解決的回報。</div>
+        </div>
+    </div>
 
-
+    <script>
+        function showTab(id, btn) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
+        }
+    </script>
 </body>
 </html>

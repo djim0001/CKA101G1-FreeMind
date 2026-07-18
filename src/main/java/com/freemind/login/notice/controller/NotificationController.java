@@ -63,6 +63,7 @@ public class NotificationController {
 		AdminUserDetails userDetails = (AdminUserDetails) authentication.getPrincipal();
 		notification.setAdminId(userDetails.getAdmin().getAdminId());
 		notification.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+		notification.setNoticeStatus((byte) 0); // 新增時預設為隱藏(0)，之後由「發布」按鈕上架
 
 		notificationSvc.addNotification(notification);
 
@@ -99,6 +100,24 @@ public class NotificationController {
 
 		notificationSvc.updateNotification(notification);
 
+		return "redirect:/admin/notifications/listAllNotification";
+	}
+
+	/*
+	 * 發布：將公告上架至首頁（狀態設為顯示1）
+	 */
+	@PostMapping("publish")
+	public String publish(@RequestParam("noticeId") Integer noticeId) {
+		notificationSvc.publish(noticeId);
+		return "redirect:/admin/notifications/listAllNotification";
+	}
+
+	/*
+	 * 撤下：將公告從首頁下架（狀態設為隱藏0）
+	 */
+	@PostMapping("unpublish")
+	public String unpublish(@RequestParam("noticeId") Integer noticeId) {
+		notificationSvc.unpublish(noticeId);
 		return "redirect:/admin/notifications/listAllNotification";
 	}
 

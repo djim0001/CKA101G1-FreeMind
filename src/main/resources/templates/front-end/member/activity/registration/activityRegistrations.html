@@ -45,6 +45,14 @@
     </table>
 
     <p th:if="${#lists.isEmpty(regisListData)}">目前沒有任何報名紀錄。</p>
+    
+    <div th:if="${totalPages > 1}">
+	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
+	       th:href="@{/member/activity/registration/activityRegistrations(activityId=${activity.activityId}, currentPage=${i})}"
+	       th:text="${i}"
+	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
+	    </a>
+	</div>
 	<br>
     <a th:href="@{/member/activity/ownedActivities}">返回我發起的活動</a>
 

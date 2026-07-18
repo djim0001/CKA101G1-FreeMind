@@ -9,7 +9,7 @@
 <body class="thy2-page">
 	<div class="layout">
 		<aside class="sidebar">
-			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
+			<a class="brand" th:href="@{/admin/home}">諮由自在 Free Mind<small>ADMIN
 					CONSOLE</small></a>
 			<p class="nav-label">課程商城管理</p>
 			<nav class="nav">
@@ -63,17 +63,16 @@
 					<button data-tab="take-down">課程下架管理</button>
 				</div>
 				<section class="tab-panel" data-panel="review">
-					<form th:action="@{/admin/course/search}" method="get"
+					<form th:action="@{/admin/course/select_course}" method="get"
 						th:object="${condition}" class="toolbar course-search-form">
 						<input class="field" type="text" th:field="*{keyword}"
 							placeholder="搜尋課程或心理師……"><select class="field"
 							th:field="*{categoryId}"><option value="">課程分類－</option>
-							<option th:each="category : ${categoryList}"
+							<option th:each="category : ${courseCategoriesListAll}"
 								th:value="${category.courseCatId}"
 								th:text="${category.courseCatName}"></option></select><select
 							class="field" th:field="*{courseStatus}"><option
 								value="">課程申請狀態－</option>
-							<option value="0">草稿</option>
 							<option value="1">待審核</option>
 							<option value="2">審核通過</option>
 							<option value="3">審核未通過</option>
@@ -138,17 +137,17 @@
 					<nav class="pagination-ui" aria-label="上架審核分頁"
 						th:if="${reviewTotalPages != null and reviewTotalPages > 1}">
 						<a
-							th:href="@{/admin/course/search(reviewPage=1,delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:href="@{/admin/course/select_course(reviewPage=1,delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
 							th:attr="aria-disabled=${reviewCurrentPage <= 1}">第一頁</a><a
-							th:href="@{/admin/course/search(reviewPage=${reviewCurrentPage > 1 ? reviewCurrentPage - 1 : 1},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage > 1 ? reviewCurrentPage - 1 : 1},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
 							th:attr="aria-disabled=${reviewCurrentPage <= 1}">上一頁</a><a
 							th:each="pageNumber : ${#numbers.sequence(1,reviewTotalPages)}"
-							th:href="@{/admin/course/search(reviewPage=${pageNumber},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:href="@{/admin/course/select_course(reviewPage=${pageNumber},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
 							th:text="${pageNumber}"
 							th:attr="aria-current=${pageNumber == reviewCurrentPage ? 'page' : null}">1</a><a
-							th:href="@{/admin/course/search(reviewPage=${reviewCurrentPage < reviewTotalPages ? reviewCurrentPage + 1 : reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:href="@{/admin/course/select_course(reviewPage=${reviewCurrentPage < reviewTotalPages ? reviewCurrentPage + 1 : reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
 							th:attr="aria-disabled=${reviewCurrentPage >= reviewTotalPages}">下一頁</a><a
-							th:href="@{/admin/course/search(reviewPage=${reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
+							th:href="@{/admin/course/select_course(reviewPage=${reviewTotalPages},delistPage=${delistCurrentPage},reviewOrderBy=${reviewSortField},delistOrderBy=${delistSortField},tab='review',keyword=${condition.keyword},categoryId=${condition.categoryId},courseStatus=${condition.courseStatus})}"
 							th:attr="aria-disabled=${reviewCurrentPage >= reviewTotalPages}">最後一頁</a>
 					</nav>
 				</section>

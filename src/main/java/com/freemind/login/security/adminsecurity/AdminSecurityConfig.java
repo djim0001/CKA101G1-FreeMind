@@ -36,9 +36,36 @@ public class AdminSecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 // 登入頁面允許所有人訪問
-                .requestMatchers("/","/back-end/login").permitAll()
-//                .requestMatchers("/course_index/**").hasAnyRole("super_admin","courses")
-                .requestMatchers("/admin/select_page").hasRole("super_admin")
+                .requestMatchers("/","/back-end/login","/admin/home").permitAll()
+                
+                //課程管理
+                .requestMatchers("/admin/adminPayout","/admin/refund").hasAnyRole("super_admin","courses")
+                
+                //超級管理員
+             // 改前
+              //超級管理員
+              .requestMatchers("/admin/select_page").hasRole("super_admin")
+
+              // 改後
+              // 超級管理員專區：管理員帳號 CRUD ＋ 權限 CRUD
+              .requestMatchers(
+                      // 管理員查詢頁（AdminIdController）
+                      "/admin/select_page",
+                      "/admin/getOne_For_Display",
+                      // 管理員 CRUD（AdminController）
+                      "/admin/addAdmin",
+                      "/admin/insert",
+                      "/admin/getOne_For_Update",
+                      "/admin/update",
+                      "/admin/delete",
+                      "/admin/listAllAdmin",
+                      "/admin/listAdmins_ByCompositeQuery",
+                      "/admin/DBGifReader",
+                      // 權限 CRUD（PermissionController）
+                      "/admin/permissions/**"
+              ).hasRole("super_admin")
+                
+                
                 // 其他所有 /back-end/** 和 /admin/** 都需要「管理員」身分
                 // （不能用 authenticated()：兩條 chain 共用 session，會員登入也算已認證）
                 .anyRequest().hasRole("ADMIN")
@@ -53,7 +80,7 @@ public class AdminSecurityConfig {
                 .loginProcessingUrl("/back-end/login")
                 .usernameParameter("adminAccount")
                 .passwordParameter("adminPassword")
-                .defaultSuccessUrl("/", false)
+                .defaultSuccessUrl("/admin/home", false)
                 .failureUrl("/back-end/login?error=true")
                 .permitAll()
             )

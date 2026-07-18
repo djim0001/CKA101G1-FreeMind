@@ -1,1059 +1,228 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>諮由自在 Free Mind｜線上心理諮商平台</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>諮由自在｜線上心理諮商平台</title>
 <style>
-@font-face{
-  font-family:'OpenHuninn';
-  src:url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
-      url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
-  font-weight:400;
-  font-style:normal;
-  font-display:swap;
-}
-:root{
-  --cream:#FBF7F0;
-  --blush:#F6E8DD;
-  --blush-deep:#F0DACB;
-  --ink:#463F38;
-  --soft:#8C7E71;
-  --line:#E8DCCE;
-  --coral:#E29276;
-  --coral-deep:#C97656;
-  --sun:#EFB65E;
-  --sage:#9BB893;
-  --sky:#8FB2C9;
-  --rose:#DB93A9;
-  --teal:#71B7A5;
-  --lav:#A99AC7;
-  --peach:#F4A57E;
-  --mint:#7FCDB3;
-  --skyc:#8FC6E3;
-  --blushc:#F0A0BC;
-  --butter:#F5CB74;
-  --lilac:#B49BD6;
-  --serif:'Zen Maru Gothic', 'OpenHuninn', 'Noto Sans TC', sans-serif;
-  --sans:'Noto Sans TC', sans-serif;
-  --display-en:'Baloo 2', var(--sans);
-  
-  /* 區塊微調專用輕療癒色 */
-  --blush-light:#FBF2EA;
-  
-  /* [優化] 由 Logo 顏色衍生的高透明度輕透背景色（保證風格一致、色彩不沉重） */
-  --logo-yellow-bg: rgba(245, 203, 116, 0.12); /* Logo黃透明版 - 給此刻的你 */
-  --logo-blue-bg:   rgba(143, 198, 227, 0.15); /* Logo藍透明版 - 心理健康課程 */
-  --logo-green-bg:  rgba(155, 184, 147, 0.15); /* Logo綠透明版 - 揪團活動 */
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{
-  font-family:var(--sans);
-  background:var(--cream);
-  color:var(--ink);
-  line-height:1.8;
-  -webkit-font-smoothing:antialiased;
-}
-a{color:inherit;text-decoration:none;}
-img,svg{display:block;}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+        --green: #769382;
+        --green-dark: #5e7668;
+        --green-light: #efe5d3;
+        --ink: #333d37;
+        --gray: #6f7a72;
+    }
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        color: var(--ink);
+        background: #fff;
+        line-height: 1.7;
+    }
+    a { text-decoration: none; color: inherit; }
 
-/* ---------- 頂部細條 ---------- */
-.topbar{
-  background:var(--blush);
-  text-align:center;
-  font-size:.72rem;
-  letter-spacing:.35em;
-  padding:.55em 1em .55em 1.35em;
-  color:var(--soft);
-}
+    .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 40px;
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        z-index: 10;
+    }
+    .nav .logo { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; }
+    .nav .auth { display: flex; gap: 10px; }
+    .btn {
+        padding: 9px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        transition: all 0.2s;
+        cursor: pointer;
+        border: none;
+    }
+    .btn-outline { border: 1.5px solid #fff; color: #fff; background: transparent; }
+    .btn-outline:hover { background: rgba(255,255,255,0.18); }
+    .btn-solid { background: #fff; color: var(--green-dark); font-weight: 600; }
+    .btn-solid:hover { background: var(--green-light); }
 
-/* ---------- 導覽列 ---------- */
-.nav{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:1.5rem;
-  padding:.9rem clamp(1.2rem,5vw,4rem);
-  border-bottom:1px solid var(--line);
-  background:var(--cream);
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-.brand{display:flex;align-items:center;gap:.85rem;}
+    .hero {
+        background: linear-gradient(135deg, #769382 0%, #5e7668 100%);
+        color: #fff;
+        text-align: center;
+        padding: 130px 40px 90px;
+    }
+    .hero .tag { font-size: 15px; font-weight: 600; opacity: 0.9; margin-bottom: 14px; letter-spacing: 2px; }
+    .hero h1 { font-size: 42px; line-height: 1.35; margin-bottom: 20px; }
+    .hero p { font-size: 17px; opacity: 0.92; margin-bottom: 32px; }
+    .hero .cta { background: #fff; color: var(--green-dark); padding: 14px 42px; font-size: 16px; font-weight: 600; border-radius: 999px; display: inline-block; transition: background 0.2s; }
+    .hero .cta:hover { background: var(--green-light); }
 
-/* mind wordmark logo */
-.logo-mind{display:flex;flex-direction:column;align-items:flex-start;line-height:1;user-select:none;}
-.logo-mind .word{display:flex;align-items:flex-end;}
-.logo-mind .word span{
-  font-family:var(--display-en);
-  font-weight:700;
-  font-size:1.5rem;
-  letter-spacing:-.03em;
-  display:inline-block;
-  text-align:center;
-}
-.logo-mind .m{width:24px;color:var(--sun);}
-.logo-mind .i{width:9px;color:var(--rose);}
-.logo-mind .n{width:17px;color:var(--sky);}
-.logo-mind .d{width:17px;color:var(--sage);}
-.logo-mind .faces{display:flex;align-items:flex-start;margin-top:-1px;}
-.logo-mind .faces svg{display:block;}
-.logo-mind .faces .fm{width:24px;height:11px;}
-.logo-mind .faces .fi{width:9px;height:11px;}
-.logo-mind .faces .fn{width:17px;height:11px;}
-.logo-mind .faces .fd{width:17px;height:11px;}
+    .section { max-width: 1080px; margin: 0 auto; padding: 70px 40px; }
+    .section-head { text-align: center; margin-bottom: 44px; }
+    .section-head .sub { color: var(--green); font-weight: 600; margin-bottom: 8px; }
+    .section-head h2 { font-size: 30px; }
 
-.brand-text{display:flex;flex-direction:column;line-height:1.15;}
-.brand-text .logo{
-  font-family:var(--serif);
-  font-size:1.28rem;
-  font-weight:700;
-  letter-spacing:.1em;
-}
-.brand-text .en{
-  font-size:.55rem;
-  font-family:var(--sans);
-  font-weight:500;
-  letter-spacing:.3em;
-  color:var(--soft);
-  text-transform:uppercase;
-  margin-top:.15em;
-}
-.nav-links{display:flex;gap:2.2rem;font-size:.85rem;letter-spacing:.18em;}
-.nav-links a{position:relative;padding:.2em 0;color:var(--ink);}
-.nav-links a::after{
-  content:"";position:absolute;left:0;bottom:-2px;height:2px;width:0;
-  background:var(--coral);border-radius:2px;transition:width .25s ease;
-}
-.nav-links a:hover::after{width:100%;}
-.auth{display:flex;gap:.7rem;}
-.btn{
-  display:inline-block;
-  font-size:.8rem;
-  letter-spacing:.22em;
-  padding:.55em 1.4em .55em 1.6em;
-  border-radius:999px;
-  border:1.5px solid var(--ink);
-  transition:transform .2s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
-}
-.btn:hover{transform:translateY(-2px);}
-.btn-outline{background:transparent;color:var(--ink);}
-.btn-outline:hover{background:var(--ink);color:var(--cream);}
-.btn-solid{background:var(--ink);color:var(--cream);border-color:var(--ink);}
-.btn-solid:hover{box-shadow:0 6px 16px rgba(70,63,56,.25);}
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
+    .card {
+        border: 1px solid #eee;
+        border-radius: 16px;
+        padding: 34px 26px;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(74,157,127,0.15); }
+    .card .icon {
+        width: 66px; height: 66px; margin: 0 auto 18px;
+        background: var(--green-light); border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 30px;
+    }
+    .card h3 { font-size: 20px; margin-bottom: 10px; }
+    .card p { font-size: 14px; color: var(--gray); margin-bottom: 18px; }
+    .card .go { color: var(--green); font-weight: 600; font-size: 14px; }
 
-/* ---------- Hero ---------- */
-.hero{
-  display:grid;
-  grid-template-columns:1.05fr .95fr;
-  align-items:center;
-  gap:clamp(2rem,5vw,5rem);
-  max-width:1180px;
-  margin:0 auto;
-  padding:clamp(3rem,7vw,5.5rem) clamp(1.2rem,5vw,3rem) clamp(3.5rem,7vw,6rem);
-}
-.tag{
-  display:inline-flex;
-  align-items:center;
-  gap:.6em;
-  font-size:.72rem;
-  letter-spacing:.32em;
-  color:var(--soft);
-  border:1px solid var(--line);
-  background:#fff;
-  border-radius:999px;
-  padding:.5em 1.2em .5em 1em;
-  margin-bottom:1.6rem;
-}
-.tag .dot{width:.55em;height:.55em;border-radius:50%;background:var(--coral);}
-.hero h1{
-  font-family:var(--serif);
-  font-weight:900;
-  font-size:clamp(2rem,4.2vw,2.9rem);
-  line-height:1.55;
-  letter-spacing:.03em;
-  margin-bottom:1.3rem;
-}
-.hero h1 em{
-  font-style:normal;
-  color:var(--coral-deep);
-  position:relative;
-  white-space:nowrap;
-}
-.hero h1 em::after{
-  content:"";
-  position:absolute;left:0;right:0;bottom:.08em;height:.32em;
-  background:var(--blush-deep);
-  z-index:-1;border-radius:3px;
-}
-.hero p{
-  color:var(--soft);
-  max-width:27em;
-  margin-bottom:2.2rem;
-}
-.hero-actions{display:flex;align-items:center;gap:1.6rem;flex-wrap:wrap;}
-.cta{
-  display:inline-block;
-  background:var(--coral);
-  color:#fff;
-  font-size:.9rem;
-  letter-spacing:.28em;
-  padding:.9em 2.2em .9em 2.5em;
-  border-radius:999px;
-  box-shadow:0 8px 22px rgba(226,146,118,.35);
-  transition:transform .2s ease, box-shadow .2s ease;
-}
-.cta:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(226,146,118,.45);}
-.link-quiet{
-  font-size:.82rem;
-  letter-spacing:.22em;
-  color:var(--soft);
-  border-bottom:1px solid var(--line);
-  padding-bottom:.2em;
-  transition:color .2s ease, border-color .2s ease;
-}
-.link-quiet:hover{color:var(--ink);border-color:var(--ink);}
+    footer { background: var(--ink); color: #cdd8d3; text-align: center; padding: 30px; font-size: 13px; }
 
-/* hero 情緒小夥伴 */
-.hero-art{position:relative;}
-.hero-art svg{width:100%;height:auto;}
-.bob-a,.bob-b,.bob-c{transform-origin:center;}
-.bob-a{animation:bob 5s ease-in-out infinite;}
-.bob-b{animation:bob 6.5s ease-in-out .8s infinite;}
-.bob-c{animation:bob 7.5s ease-in-out 1.6s infinite;}
-@keyframes bob{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-8px);}
-}
-@media (prefers-reduced-motion: reduce){
-  .bob-a,.bob-b,.bob-c{animation:none;}
-  html{scroll-behavior:auto;}
-}
+    /* 系統公告區塊 */
+    .notice-section { background: var(--green-light); }
+    .notice-wrap { max-width: 1080px; margin: 0 auto; padding: 40px; }
+    .notice-wrap h2 {
+        font-size: 22px; color: var(--green-dark);
+        display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
+    }
+    .notice-list { display: flex; flex-direction: column; gap: 12px; }
+    .notice-item {
+        background: #fff; border-radius: 12px; padding: 16px 20px;
+        display: flex; align-items: flex-start; gap: 14px;
+        box-shadow: 0 2px 8px rgba(47,62,57,0.06);
+    }
+    .notice-item .date { color: var(--green); font-size: 13px; font-weight: 600; white-space: nowrap; padding-top: 2px; }
+    .notice-item .content { color: var(--ink); font-size: 15px; white-space: pre-line; }
 
-/* ---------- 區塊共版與外包覆樣式 ---------- */
-.section{
-  padding:clamp(4.5rem,7vw,6.5rem) clamp(1.2rem,5vw,3rem);
-}
-.section-inner{
-  max-width:1180px;
-  margin:0 auto;
-}
-
-/* 探索我們的服務：極淡粉橘 */
-#services-wrap {
-  background: var(--blush-light);
-}
-
-/* [1. 校正修復] 我們的堅持外層：恢復精緻對稱的圖片排版外觀 */
-#standard-wrap {
-  background: var(--blush); /* 恢復為圖片中柔和粉橘底色 */
-  position: relative;
-  overflow: hidden;
-}
-
-/* [2. 修改] 給此刻的你外層：改用 Logo 的黃色微透療癒光感 */
-#closing-wrap {
-  background: var(--logo-yellow-bg);
-}
-
-/* [2. 修改] 心理健康課程外層：改用 Logo 的晴空藍微透光感 */
-#courses-wrap {
-  background: var(--logo-blue-bg);
-}
-
-/* [2. 修改] 揪團活動外層：改用 Logo 的嫩草綠微透光感 */
-#activities-wrap {
-  background: var(--logo-green-bg);
-}
-
-.section-head{text-align:center;margin-bottom:3rem;}
-.section-head .sprig{margin:0 auto 1rem;width:34px;height:auto;opacity:.7;}
-.section-head .sub{
-  font-size:.72rem;
-  letter-spacing:.4em;
-  color:var(--soft);
-  margin-bottom:.6rem;
-  padding-left:.4em;
-}
-.section-head h2{
-  font-family:var(--serif);
-  font-weight:700;
-  font-size:clamp(1.5rem,3vw,2.1rem);
-  letter-spacing:.08em;
-}
-.section-head .desc{
-  color:var(--soft);
-  font-size:.9rem;
-  margin-top:.8rem;
-}
-.section-foot{text-align:center;margin-top:2.6rem;}
-
-/* ---------- 服務卡片 ---------- */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:1.4rem;
-}
-.card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:2rem 1.6rem 1.8rem;
-  display:flex;
-  flex-direction:column;
-  gap:.5rem;
-  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-}
-.card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 16px 32px rgba(140,126,113,.14);
-  border-color:transparent;
-}
-.card .icon{width:54px;height:54px;margin-bottom:.5rem;}
-.card .icon svg{width:100%;height:100%;}
-.card h3{
-  font-family:var(--serif);
-  font-weight:700;
-  font-size:1.05rem;
-  letter-spacing:.08em;
-}
-.card p{font-size:.86rem;color:var(--soft);flex:1;}
-.card .go{
-  font-size:.76rem;
-  letter-spacing:.24em;
-  color:var(--coral-deep);
-  margin-top:.4rem;
-  transition:letter-spacing .25s ease;
-}
-.card:hover .go{letter-spacing:.34em;}
-
-/* ---------- 療癒足跡 banner ---------- */
-.trace-banner{
-  margin-top:2.5rem;
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:1.6rem;
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:1.7rem 2rem;
-}
-.trace-banner .badge{width:56px;height:56px;flex-shrink:0;}
-.trace-banner .copy h3{
-  font-family:var(--serif);
-  font-weight:700;
-  font-size:1.06rem;
-  letter-spacing:.06em;
-  margin-bottom:.35rem;
-}
-.trace-banner .copy p{font-size:.85rem;color:var(--soft);}
-.trace-banner .btn{white-space:nowrap;}
-
-/* ---------- [1. 校正修復] 我們的堅持排版區塊 ---------- */
-.standard .strokes{
-  position:absolute;inset:0;width:100%;height:100%;
-  pointer-events:none;
-}
-.standard-inner{
-  position:relative;
-  max-width:1180px; /* 強制收回水平限制 */
-  margin:0 auto;
-  display:grid;
-  grid-template-columns:1.1fr .9fr;
-  align-items:center;
-  gap:3rem;
-  padding:clamp(4.5rem,7vw,6.5rem) clamp(1.2rem,5vw,3rem); /* 完美貼齊圖片間距 */
-}
-.standard .sub{
-  font-size:.72rem;letter-spacing:.4em;color:var(--soft);
-  margin-bottom:.8rem;padding-left:.4em;
-}
-.standard h2{
-  font-family:var(--serif);font-weight:700;
-  font-size:clamp(1.5rem,3.2vw,2.1rem);
-  letter-spacing:.08em;
-  margin-bottom:1.2rem;
-}
-.standard p{color:var(--soft);max-width:32em;margin-bottom:1.8rem;}
-.btn-ghost{
-  display:inline-block;
-  background:#fff;
-  border:1.5px solid var(--ink);
-  border-radius:999px;
-  font-size:.82rem;letter-spacing:.26em;
-  padding:.75em 2em .75em 2.3em;
-  transition:background .2s ease,color .2s ease,transform .2s ease;
-}
-.btn-ghost:hover{background:var(--ink);color:#fff;transform:translateY(-2px);}
-
-.article-feature{
-  background:#fff;
-  border-radius:22px;
-  padding:1.8rem 1.8rem 1.6rem;
-  box-shadow:0 18px 36px rgba(140,126,113,.16);
-}
-.article-feature .eyebrow{
-  font-size:.68rem;letter-spacing:.3em;color:var(--coral-deep);
-  margin-bottom:.8rem;
-}
-.article-feature .thumb{
-  width:100%;height:120px;border-radius:14px;margin-bottom:1.1rem;
-  background:linear-gradient(135deg,#EFD9C7,#E7B6A8);
-  position:relative;overflow:hidden;
-}
-.article-feature .thumb svg{position:absolute;right:-6px;bottom:-10px;width:96px;height:96px;}
-.article-feature h3{
-  font-family:var(--serif);font-weight:700;font-size:1.04rem;letter-spacing:.04em;
-  margin-bottom:.55rem;line-height:1.6;
-}
-.article-feature p{font-size:.83rem;color:var(--soft);margin-bottom:1rem;}
-.article-feature .go{font-size:.76rem;letter-spacing:.24em;color:var(--coral-deep);}
-
-/* ---------- 課程 / 活動 共用卡片列 ---------- */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;}
-.tile{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:22px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  transition:transform .25s ease, box-shadow .25s ease;
-}
-.tile:hover{transform:translateY(-6px);box-shadow:0 16px 32px rgba(140,126,113,.14);}
-
-.tile .cover{
-  height:140px;
-  position:relative;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-}
-.tile .cover svg{width:84px;height:84px;}
-.tile .body{padding:1.3rem 1.4rem 1.5rem;display:flex;flex-direction:column;gap:.5rem;flex:1;}
-.tile .kicker{font-size:.68rem;letter-spacing:.22em;color:var(--soft);}
-.tile h3{font-family:var(--serif);font-weight:700;font-size:.98rem;letter-spacing:.03em;line-height:1.6;}
-.tile .meta{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:auto;padding-top:.6rem;
-  font-size:.78rem;color:var(--soft);
-}
-.tile .meta .price{color:var(--coral-deep);font-weight:500;letter-spacing:.04em;}
-.tile .go{font-size:.75rem;letter-spacing:.22em;color:var(--coral-deep);margin-top:.3rem;}
-
-.cover-course-1{background:linear-gradient(135deg,#DCE9D6,#A9C2A0);}
-.cover-course-2{background:linear-gradient(135deg,#E4DCF0,#A99AC7);}
-.cover-course-3{background:linear-gradient(135deg,#D9E7EE,#8FB2C9);}
-.cover-activity-1{background:linear-gradient(135deg,#F3E0DB,#DB93A9);}
-.cover-activity-2{background:linear-gradient(135deg,#F6E7C9,#EFB65E);}
-.cover-activity-3{background:linear-gradient(135deg,#DCEEE7,#71B7A5);}
-
-.tag-pill{
-  display:inline-block;
-  font-size:.68rem;letter-spacing:.14em;
-  background:var(--blush);
-  color:var(--coral-deep);
-  padding:.3em .9em;
-  border-radius:999px;
-  width:fit-content;
-}
-
-/* ---------- 結尾 CTA (給此刻的你) ---------- */
-.closing{
-  text-align:center;
-}
-.closing-inner {
-  max-width:820px;
-  margin:0 auto;
-}
-.closing .buddies{
-  display:flex;justify-content:center;gap:.4rem;
-  margin-bottom:1.6rem;
-}
-.closing .buddies svg{width:46px;height:46px;}
-.closing h2{
-  font-family:var(--serif);font-weight:700;
-  font-size:clamp(1.4rem,3vw,2rem);
-  letter-spacing:.08em;
-  margin-bottom:.9rem;
-}
-.closing p{color:var(--soft);margin-bottom:2rem;}
-
-/* ---------- 頁尾 ---------- */
-/* [優化] 頁尾改回低調優雅的牛奶底色搭配細上邊框，讓視覺焦點完美停留在上面的色彩橫帶 */
-footer{
-  background:var(--cream);
-  border-top:1px solid var(--line);
-  padding:clamp(3.5rem,6vw,5rem) clamp(1.2rem,5vw,4rem) 2rem;
-}
-.foot-grid{
-  max-width:1180px;margin:0 auto;
-  display:grid;
-  grid-template-columns:1.3fr 1fr 1fr 1fr;
-  gap:2.5rem;
-  padding-bottom:2.5rem;
-}
-.foot-brand{display:flex;align-items:flex-start;gap:.85rem;}
-.foot-brand .logo-mind{margin-top:.1rem;}
-.foot-brand .logo{
-  font-family:var(--serif);font-size:1.18rem;font-weight:700;letter-spacing:.1em;
-}
-.foot-brand .en{font-size:.55rem;letter-spacing:.3em;color:var(--soft);text-transform:uppercase;margin-top:.15em;}
-.foot-brand p{font-size:.82rem;color:var(--soft);margin-top:.8rem;max-width:18em;}
-.foot-col h4{
-  font-size:.72rem;letter-spacing:.35em;color:var(--soft);
-  font-weight:500;margin-bottom:1rem;
-}
-.foot-col a{
-  display:block;font-size:.85rem;letter-spacing:.1em;
-  margin-bottom:.55rem;color:var(--ink);
-  transition:color .2s ease;
-}
-.foot-col a:hover{color:var(--coral-deep);}
-.copyright{
-  max-width:1180px;margin:0 auto;
-  border-top:1px solid var(--line);
-  padding-top:1.3rem;
-  text-align:center;
-  font-size:.72rem;letter-spacing:.25em;color:var(--soft);
-}
-
-/* ---------- RWD ---------- */
-@media (max-width: 960px){
-  .cards{grid-template-columns:repeat(2,1fr);}
-  .grid3{grid-template-columns:repeat(2,1fr);}
-  .hero{grid-template-columns:1fr;text-align:center;}
-  .hero p{margin-left:auto;margin-right:auto;}
-  .hero-actions{justify-content:center;}
-  .hero-art{max-width:440px;margin:0 auto;}
-  .foot-grid{grid-template-columns:1fr 1fr;}
-  .nav-links{display:none;}
-  .standard-inner{grid-template-columns:1fr;}
-  .trace-banner{grid-template-columns:1fr;text-align:center;}
-  .trace-banner .badge{margin:0 auto;}
-}
-@media (max-width: 600px){
-  .cards{grid-template-columns:1fr;}
-  .grid3{grid-template-columns:1fr;}
-  .auth{gap:.4rem;}
-  .btn{padding:.5em 1em .5em 1.2em;font-size:.72rem;}
-  .foot-grid{grid-template-columns:1fr;gap:1.8rem;}
-}
-a:focus-visible,.btn:focus-visible,.cta:focus-visible{
-  outline:2.5px solid var(--coral);
-  outline-offset:3px;
-  border-radius:999px;
-}
+    /* 會員登入後的頭像下拉菜單 */
+    .profile-wrapper { position: relative; }
+    .profile-entry {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 9px 20px; border-radius: 999px;
+        background: #fff; color: var(--green-dark); font-weight: 600;
+        border: none; font-size: 14px; cursor: pointer;
+        font-family: inherit; transition: background 0.2s;
+    }
+    .profile-entry::before {
+        content: "👤"; font-size: 15px; line-height: 1;
+    }
+    .profile-entry:hover { background: var(--green-light); }
+    .profile-menu {
+        position: absolute; top: 100%; right: 0; margin-top: 10px;
+        min-width: 170px; background: #fff; border-radius: 14px;
+        box-shadow: 0 12px 32px rgba(47,62,57,0.18);
+        overflow: hidden; display: none; z-index: 20;
+    }
+    .profile-menu[data-open] { display: block; }
+    .menu-item {
+        display: block; width: 100%; padding: 12px 18px;
+        text-align: left; color: var(--ink); font-size: 14px;
+        background: none; border: none; cursor: pointer;
+        font-family: inherit; transition: background 0.15s;
+    }
+    .menu-item:hover { background: var(--green-light); color: var(--green-dark); }
+    .menu-item-form { margin: 0; }
+    .logout-btn { color: #c0554e; border-top: 1px solid #f0f0f0; }
+    .logout-btn:hover { background: #c0554e; color: #fff; }
 </style>
 </head>
 <body>
 
-<div class="topbar">陪你安放每一種情緒 ✳ FREE&nbsp;MIND</div>
-
-<!-- 導覽列 -->
-<nav class="nav">
-  <a class="brand" th:href="@{/}" href="/">
-    <span class="logo-mind" aria-hidden="true">
-      <span class="word">
-        <span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-      </span>
-      <span class="faces">
-        <svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-        <svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-        <svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-        <svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-      </span>
-    </span>
-    <span class="brand-text">
-      <span class="logo">諮由自在</span>
-      <span class="en">Free&nbsp;Mind</span>
-    </span>
-  </a>
-  <div class="nav-links">
-    <a th:href="@{/search}" href="/search">預約諮商</a>
-    <a th:href="@{/member/course/select_course}" href="/member/course/select_course">課程商城</a>
-    <a th:href="@{/article}" href="/article">專欄文章</a>
-    <a th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">揪團活動</a>
-  </div>
-  <div class="auth">
-    <a class="btn btn-outline" th:href="@{/front-end/login}" href="/front-end/login">會員登入</a>
-    <a class="btn btn-solid" th:href="@{/psych/psychologistLogin}" href="/psych/psychologistLogin">心理師登入</a>
-  </div>
-</nav>
-
-<!-- Hero -->
-<header class="hero">
-  <div class="hero-copy">
-    <span class="tag"><span class="dot"></span>讓心理健康成為日常</span>
-    <h1>今天，過得如何？<br>找個適合的人，<em>聊聊</em>心情</h1>
-    <p>就像運動、睡眠一樣，心理諮商也是日常保養的一部分。無論心情是什麼形狀，都歡迎在這裡，好好被接住。</p>
-    <div class="hero-actions">
-      <a class="cta" th:href="@{/search}" href="/search">開始預約</a>
-      <a class="link-quiet" th:href="@{/member/course/select_course}" href="/member/course/select_course">先逛逛課程 →</a>
-    </div>
-  </div>
-
-  <!-- 情緒小夥伴主視覺 -->
-  <div class="hero-art" aria-hidden="true">
-    <svg viewBox="0 0 520 470" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="gPeach" x1="280" y1="0" x2="520" y2="270" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#FCCBA9"/><stop offset="1" stop-color="#F4A57E"/>
-        </linearGradient>
-        <linearGradient id="gMint" x1="80" y1="20" x2="330" y2="230" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#C9EEDF"/><stop offset="1" stop-color="#7FCDB3"/>
-        </linearGradient>
-        <linearGradient id="gButter" x1="0" y1="120" x2="180" y2="270" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#FBE6AE"/><stop offset="1" stop-color="#F5CB74"/>
-        </linearGradient>
-        <linearGradient id="gBlush" x1="150" y1="160" x2="330" y2="330" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#FBD6E2"/><stop offset="1" stop-color="#F0A0BC"/>
-        </linearGradient>
-        <linearGradient id="gSky" x1="250" y1="230" x2="450" y2="380" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#D3EAF6"/><stop offset="1" stop-color="#8FC6E3"/>
-        </linearGradient>
-        <linearGradient id="gLilac" x1="90" y1="300" x2="280" y2="460" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#E4D6F3"/><stop offset="1" stop-color="#B49BD6"/>
-        </linearGradient>
-        <linearGradient id="gCoral" x1="10" y1="340" x2="100" y2="460" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#F5C3AD"/><stop offset="1" stop-color="#E29276"/>
-        </linearGradient>
-      </defs>
-
-      <!-- 薄荷雲朵：溫柔閉眼笑 -->
-      <g class="bob-b">
-        <g transform="translate(0,-26)">
-          <path d="M150 150 C118 150 96 122 106 92 C114 68 140 60 158 70 C168 40 210 32 232 56 C252 40 288 48 296 78 C324 78 342 106 328 132 C338 156 320 182 292 182 L172 182 C154 182 144 168 150 150 Z" fill="url(#gMint)"/>
-          <g stroke="#2E8A6C" stroke-width="5" stroke-linecap="round" fill="none">
-            <path d="M186 118 c4 -6 12 -6 16 0"/>
-            <path d="M226 118 c4 -6 12 -6 16 0"/>
-            <path d="M198 138 c6 5 16 5 22 0"/>
-          </g>
-        </g>
-      </g>
-
-      <!-- 桃杏圓：驚喜 wow -->
-      <g class="bob-a">
-        <circle cx="400" cy="120" r="82" fill="url(#gPeach)"/>
-        <g stroke="#B8663C" stroke-width="6" stroke-linecap="round" fill="none">
-          <path d="M372 100 c4 -9 14 -9 18 0"/>
-          <path d="M412 100 c4 -9 14 -9 18 0"/>
-          <ellipse cx="400" cy="140" rx="13" ry="15"/>
-        </g>
-      </g>
-
-      <!-- 奶油黃花朵：害羞瞇眼笑 -->
-      <g class="bob-c">
-        <g transform="translate(-40,26)">
-          <path d="M84 236 C58 224 52 190 78 176 C68 152 88 124 116 128 C118 100 152 84 174 102 C198 88 228 106 226 134 C252 138 262 168 244 188 C252 212 232 236 206 232 C198 254 168 262 150 244 C130 254 100 254 84 236 Z" fill="url(#gButter)"/>
-          <g stroke="#9C7A2E" stroke-width="5" stroke-linecap="round" fill="none">
-            <path d="M132 178 c3 -5 9 -5 12 0"/>
-            <path d="M172 178 c3 -5 9 -5 12 0"/>
-            <path d="M138 196 c8 6 20 6 28 0"/>
-          </g>
-        </g>
-      </g>
-
-      <!-- 玫瑰粉圓：平靜 -->
-      <g class="bob-b">
-        <circle cx="238" cy="266" r="74" fill="url(#gBlush)"/>
-        <g stroke="#B8577B" stroke-width="5.5" stroke-linecap="round" fill="none">
-          <circle cx="216" cy="258" r="3.2" fill="#B8577B"/>
-          <circle cx="262" cy="258" r="3.2" fill="#B8577B"/>
-          <path d="M222 282 q16 8 32 0"/>
-        </g>
-      </g>
-
-      <!-- 天空藍雲：小小不開心 -->
-      <g class="bob-c">
-        <path d="M330 300 C304 300 284 276 292 250 C298 228 322 220 338 228 C346 202 382 194 402 216 C420 202 452 210 458 236 C482 236 498 260 486 284 C494 306 478 328 452 328 L352 328 C338 328 326 316 330 300 Z" fill="url(#gSky)"/>
-        <g stroke="#2E6E93" stroke-width="5" stroke-linecap="round" fill="none">
-          <circle cx="374" cy="266" r="3.2" fill="#2E6E93"/>
-          <circle cx="414" cy="266" r="3.2" fill="#2E6E93"/>
-          <path d="M378 290 q16 -6 32 0"/>
-        </g>
-      </g>
-
-      <!-- 丁香紫小山：有點難過 -->
-      <g class="bob-a">
-        <g transform="translate(128,0)">
-          <path d="M186 340 C230 340 268 372 280 412 C290 444 268 456 240 452 C212 460 176 456 152 440 C126 444 100 428 106 402 C110 378 140 356 186 340 Z" fill="url(#gLilac)"/>
-          <g stroke="#7A5CA0" stroke-width="5" stroke-linecap="round" fill="none">
-            <path d="M172 396 c4 -5 10 -5 14 0"/>
-            <circle cx="174" cy="410" r="2.6" fill="#7A5CA0"/>
-            <circle cx="206" cy="410" r="2.6" fill="#7A5CA0"/>
-            <path d="M182 428 c5 -4 12 -4 17 0"/>
-          </g>
-        </g>
-      </g>
-
-      <!-- 珊瑚愛心：喜歡 -->
-      <g class="bob-b">
-        <path d="M56 372 C40 356 44 332 66 328 C78 326 88 332 92 342 C96 332 106 326 118 328 C140 332 144 356 128 372 L92 406 Z" fill="url(#gCoral)"/>
-      </g>
-    </svg>
-  </div>
-</header>
-
-<!-- [服務區塊]：極淡粉橘 -->
-<div id="services-wrap">
-  <section class="section" id="services">
-    <div class="section-inner">
-      <div class="section-head">
-        <svg class="sprig" viewBox="0 0 40 56" fill="none" stroke="#8C7E71" stroke-width="2" stroke-linecap="round">
-          <path d="M20 54 C20 36 20 24 20 12"/>
-          <path d="M20 16 C12 12 6 6 8 2 C14 4 19 9 20 16 Z"/>
-          <path d="M20 16 C28 12 34 6 32 2 C26 4 21 9 20 16 Z"/>
-          <path d="M20 30 C13 27 9 23 10 20 C15 22 19 25 20 30 Z"/>
-          <path d="M20 30 C27 27 31 23 30 20 C25 22 21 25 20 30 Z"/>
-        </svg>
-        <div class="sub">雙向流動的療癒</div>
-        <h2>探索我們的服務</h2>
-      </div>
-
-      <div class="cards">
-        <a class="card" th:href="@{/search}" href="/search">
-          <span class="icon">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M29 5 L34 18 L48 15 L40 27 L52 34 L38 37 L42 51 L29 42 L16 51 L20 37 L6 34 L18 27 L10 15 L24 18 Z" fill="#EFB65E"/>
-              <g stroke="#B8813A" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <path d="M23 27 c1.6 -2 4 -2 5.6 0"/><path d="M32 27 c1.6 -2 4 -2 5.6 0"/>
-                <path d="M25 34 c2.5 2.5 6 2.5 8.5 0"/>
-              </g>
-            </svg>
-          </span>
-          <h3>預約諮商</h3>
-          <p>搜尋合適的心理師，選擇方便的時段，線上快速完成預約。</p>
-          <span class="go">立即預約 →</span>
-        </a>
-
-        <a class="card" th:href="@{/member/course/select_course}" href="/member/course/select_course">
-          <span class="icon">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M12 40 C4 32 6 16 20 11 C34 6 50 14 51 27 C52 40 42 50 29 50 C21 50 16 45 12 40 Z" fill="#9BB893"/>
-              <g stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <circle cx="23" cy="27" r="1.4" fill="#5A7A57"/><circle cx="36" cy="27" r="1.4" fill="#5A7A57"/>
-                <path d="M24 35 q3 3 6 0 q3 -3 6 0"/>
-              </g>
-            </svg>
-          </span>
-          <h3>課程商城</h3>
-          <p>豐富的線上心理健康課程，隨時隨地照顧自己的內在。</p>
-          <span class="go">瀏覽課程 →</span>
-        </a>
-
-        <a class="card" th:href="@{/article}" href="/article">
-          <span class="icon">
-            <svg viewBox="0 0 58 58" fill="none">
-              <rect x="9" y="12" width="40" height="34" rx="10" fill="#8FB2C9"/>
-              <g stroke="#4F7B96" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <path d="M22 25 c1.5 -1.8 3.6 -1.8 5 0"/>
-                <circle cx="37" cy="25" r="1.4" fill="#4F7B96"/>
-                <path d="M25 34 c3 2.4 6 2.4 9 0"/>
-              </g>
-            </svg>
-          </span>
-          <h3>專欄文章</h3>
-          <p>由專業心理師撰寫的身心健康文章，陪你認識自己。</p>
-          <span class="go">閱讀文章 →</span>
-        </a>
-
-        <a class="card" th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">
-          <span class="icon">
-            <svg viewBox="0 0 58 58" fill="none">
-              <circle cx="22" cy="30" r="16" fill="#DB93A9"/>
-              <circle cx="38" cy="28" r="14" fill="#E29276" opacity=".92"/>
-              <g stroke="#A85974" stroke-width="2.2" stroke-linecap="round" fill="none">
-                <circle cx="17" cy="28" r="1.3" fill="#A85974"/><circle cx="25" cy="28" r="1.3" fill="#A85974"/>
-                <path d="M18 34 c2.4 2 5 2 7.5 0"/>
-              </g>
-              <g stroke="#A85B3F" stroke-width="2.2" stroke-linecap="round" fill="none">
-                <circle cx="36" cy="25" r="1.3" fill="#A85B3F"/><circle cx="43" cy="25" r="1.3" fill="#A85B3F"/>
-                <path d="M36 31 c2.2 1.8 4.8 1.8 7 0"/>
-              </g>
-            </svg>
-          </span>
-          <h3>揪團活動</h3>
-          <p>參加或發起心理健康相關活動，在連結中獲得支持。</p>
-          <span class="go">探索活動 →</span>
-        </a>
-      </div>
-
-      <!-- 我的療癒足跡（會員專屬） -->
-      <div class="trace-banner">
-        <span class="badge">
-          <svg viewBox="0 0 58 58" fill="none">
-            <path d="M40 8 C50 16 52 34 42 44 C34 52 20 52 14 44 C8 36 12 28 20 26 C27 24 30 18 30 12 C30 8 35 4 40 8 Z" fill="#71B7A5"/>
-            <g stroke="#2E7D6C" stroke-width="2.4" stroke-linecap="round" fill="none">
-              <path d="M26 31 c1.5 -1.8 3.6 -1.8 5 0"/><path d="M35 31 c1.5 -1.8 3.6 -1.8 5 0"/>
-              <path d="M29 39 c2.6 2.2 6 2.2 8.6 0"/>
-            </g>
-          </svg>
-        </span>
-        <span class="copy">
-          <h3>我的療癒足跡</h3>
-          <p>登入後，查看你的預約、學習、活動與收藏，一步步累積屬於你的療癒歷程。</p>
-        </span>
-        <a class="btn btn-outline" th:href="@{/front-end/login}" href="/front-end/login">會員登入查看</a>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- [我們的堅持]：已修復排版，完全對齊原圖限制寬度與對稱排版 -->
-<div id="standard-wrap">
-  <section class="standard">
-    <svg class="strokes" viewBox="0 0 1400 520" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
-      <path d="M-60 420 C160 220 300 560 520 340 C700 160 560 60 380 140" stroke="#F0DACB" stroke-width="70" stroke-linecap="round" opacity=".5"/>
-      <path d="M1460 120 C1240 320 1120 -20 900 180 C740 330 900 470 1060 380" stroke="#EFD3C6" stroke-width="70" stroke-linecap="round" opacity=".4"/>
-    </svg>
-    <div class="standard-inner">
-      <div>
-        <div class="sub">ABOVE AND BEYOND</div>
-        <h2>我們的堅持</h2>
-        <p>心理照護不該是遙遠或難以啟齒的事。在諮由自在，我們相信每一種情緒都值得被溫柔對待——以專業的心理師團隊、嚴謹的隱私保護，陪你把照顧自己變成一種日常習慣。</p>
-        <a class="btn-ghost" th:href="@{/article}" href="/article">認識更多 →</a>
-      </div>
-      <a class="article-feature" th:href="@{/article}" href="/article">
-        <div class="eyebrow">精選文章</div>
-        <div class="thumb">
-          <svg viewBox="0 0 96 96" fill="none">
-            <circle cx="48" cy="48" r="40" fill="#E29276" opacity=".9"/>
-            <g stroke="#A85B3F" stroke-width="3" stroke-linecap="round" fill="none">
-              <circle cx="36" cy="44" r="2" fill="#A85B3F"/><circle cx="60" cy="44" r="2" fill="#A85B3F"/>
-              <path d="M36 56 c4 4 20 4 24 0"/>
-            </g>
-          </svg>
+    <div class="nav">
+        <a class="logo" th:href="@{/}">諮由自在</a>
+        <div class="auth" sec:authorize="!hasRole('MEMBER')">
+            <a class="btn btn-outline" th:href="@{/front-end/login}">會員登入</a>
+            <a class="btn btn-solid" th:href="@{/psych/psychologistLogin}">心理師登入</a>
         </div>
-        <h3>「累了就休息」是允許，不是逃避——三個重新認識疲憊的角度</h3>
-        <p>心理師分享如何分辨真正的休息與逃避性拖延，找回屬於自己的節奏。</p>
-        <span class="go">閱讀文章 →</span>
-      </a>
+        <div class="auth" sec:authorize="hasRole('MEMBER')">
+            <div class="profile-wrapper">
+                <button class="profile-entry" type="button" data-toggle-menu="index-profile-dropdown">
+                    <span sec:authentication="principal.member.name">會員</span>
+                </button>
+                <div class="profile-menu" id="index-profile-dropdown">
+                    <a class="menu-item" th:href="@{/member/notice}">會員通知</a>
+                    <a class="menu-item" th:href="@{/member/profile}">會員資料</a>
+                    <a class="menu-item" th:href="@{/member/dashboard}">我的療癒足跡</a>
+                    <form class="menu-item-form" th:action="@{/front-end/logout}" method="post">
+                        <button class="menu-item logout-btn" type="submit">登出</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </section>
-</div>
 
-<!-- [給此刻的你]：改用高透輕盈的 Logo 奶油黃 -->
-<div id="closing-wrap">
-  <section class="section closing">
-    <div class="closing-inner">
-      <div class="buddies" aria-hidden="true">
-        <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="#F4A57E"/><g stroke="#B8663C" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M15 21 c1.6 -2.4 4 -2.4 5.6 0"/><path d="M25 21 c1.6 -2.4 4 -2.4 5.6 0"/><ellipse cx="23" cy="29" rx="4" ry="4.4"/></g></svg>
-        <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="#F0A0BC"/><g stroke="#B8577B" stroke-width="2.2" stroke-linecap="round" fill="none"><circle cx="17" cy="21" r="1.4" fill="#B8577B"/><circle cx="29" cy="21" r="1.4" fill="#B8577B"/><path d="M17 29 l12 0"/></g></svg>
-        <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="#8FC6E3"/><g stroke="#3E7FA3" stroke-width="2.2" stroke-linecap="round" fill="none"><circle cx="18" cy="21" r="1.3" fill="#3E7FA3"/><circle cx="28" cy="21" r="1.3" fill="#3E7FA3"/><path d="M18 28 c2.4 2.4 6 2.4 10 0"/></g></svg>
-        <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="#F5CB74"/><g stroke="#9C7A2E" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M15 21 c1.4 -2 3.4 -2 4.8 0"/><path d="M26 21 c1.4 -2 3.4 -2 4.8 0"/><path d="M17 29 q6 5 12 0"/></g></svg>
-        <svg viewBox="0 0 46 46"><circle cx="23" cy="23" r="19" fill="#7FCDB3"/><g stroke="#2E8A6C" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M15 21 c1.4 -1.8 3.6 -1.8 5 0"/><circle cx="29" cy="21" r="1.4" fill="#2E8A6C"/><path d="M18 29 c3 2.4 7 2.4 10 0"/></g></svg>
-      </div>
-      <h2>給此刻的你</h2>
-      <p>不必等到準備好才開始。從一次預約、一堂課、一篇文章開始，都很好。</p>
-      <a class="cta" th:href="@{/search}" href="/search">開始預約</a>
-    </div>
-  </section>
-</div>
-
-<!-- [心理健康課程]：改用高透療癒的 Logo 晴空藍 -->
-<div id="courses-wrap">
-  <section class="section" id="courses">
-    <div class="section-inner">
-      <div class="section-head">
-        <svg class="sprig" viewBox="0 0 40 56" fill="none" stroke="#8C7E71" stroke-width="2" stroke-linecap="round">
-          <path d="M20 54 C20 36 20 24 20 12"/>
-          <path d="M20 16 C12 12 6 6 8 2 C14 4 19 9 20 16 Z"/>
-          <path d="M20 16 C28 12 34 6 32 2 C26 4 21 9 20 16 Z"/>
-        </svg>
-        <div class="sub">SELF-CARE COURSES</div>
-        <h2>心理健康課程</h2>
-        <p class="desc">不需要空出一整天，每天十分鐘，也能練習更懂自己。</p>
-      </div>
-
-      <div class="grid3">
-        <a class="tile" th:href="@{/member/course/select_course}" href="/member/course/select_course">
-          <div class="cover cover-course-1">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M12 40 C4 32 6 16 20 11 C34 6 50 14 51 27 C52 40 42 50 29 50 C21 50 16 45 12 40 Z" fill="#fff" opacity=".9"/>
-              <g stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <circle cx="23" cy="27" r="1.4" fill="#5A7A57"/><circle cx="36" cy="27" r="1.4" fill="#5A7A57"/>
-                <path d="M24 35 q3 3 6 0 q3 -3 6 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">情緒調節</span>
-            <h3>與焦慮共處：日常減壓的 8 堂練習</h3>
-            <div class="meta"><span>共 8 堂・線上</span><span class="price">NT$ 1,280</span></div>
-            <span class="go">查看課程 →</span>
-          </div>
-        </a>
-
-        <a class="tile" th:href="@{/member/course/select_course}" href="/member/course/select_course">
-          <div class="cover cover-course-2">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M29 6 C42 6 50 16 49 28 C48 42 39 51 28 51 C17 51 8 42 9 28 C10 16 17 6 29 6 Z" fill="#fff" opacity=".9"/>
-              <g stroke="#6E5D93" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <circle cx="23" cy="27" r="1.4" fill="#6E5D93"/><circle cx="35" cy="27" r="1.4" fill="#6E5D93"/>
-                <path d="M24 35 c2.6 2.2 7 2.2 9.6 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">自我覺察</span>
-            <h3>好好認識自己：探索內在需求工作坊</h3>
-            <div class="meta"><span>共 6 堂・線上</span><span class="price">NT$ 990</span></div>
-            <span class="go">查看課程 →</span>
-          </div>
-        </a>
-
-        <a class="tile" th:href="@{/member/course/select_course}" href="/member/course/select_course">
-          <div class="cover cover-course-3">
-            <svg viewBox="0 0 58 58" fill="none">
-              <rect x="9" y="12" width="40" height="34" rx="10" fill="#fff" opacity=".9"/>
-              <g stroke="#4F7B96" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <path d="M22 25 c1.5 -1.8 3.6 -1.8 5 0"/>
-                <circle cx="37" cy="25" r="1.4" fill="#4F7B96"/>
-                <path d="M25 34 c3 2.4 6 2.4 9 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">睡眠品質</span>
-            <h3>睡得好一點：晚安儀式與呼吸練習</h3>
-            <div class="meta"><span>共 5 堂・線上</span><span class="price">NT$ 780</span></div>
-            <span class="go">查看課程 →</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="section-foot">
-        <a class="btn-ghost" th:href="@{/member/course/select_course}" href="/member/course/select_course">瀏覽所有課程 →</a>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- [揪團活動]：改用高透輕舒的 Logo 嫩草綠 -->
-<div id="activities-wrap">
-  <section class="section" id="activities">
-    <div class="section-inner">
-      <div class="section-head">
-        <svg class="sprig" viewBox="0 0 40 56" fill="none" stroke="#8C7E71" stroke-width="2" stroke-linecap="round">
-          <path d="M20 30 C13 27 9 23 10 20 C15 22 19 25 20 30 Z"/>
-          <path d="M20 30 C27 27 31 23 30 20 C25 22 21 25 20 30 Z"/>
-          <path d="M20 54 C20 44 20 36 20 30"/>
-        </svg>
-        <div class="sub">JOIN TOGETHER</div>
-        <h2>揪團活動</h2>
-        <p class="desc">一個人走比較快，一群人走比較久。找到一起同行的夥伴。</p>
-      </div>
-
-      <div class="grid3">
-        <a class="tile" th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">
-          <div class="cover cover-activity-1">
-            <svg viewBox="0 0 58 58" fill="none">
-              <circle cx="29" cy="29" r="23" fill="#fff" opacity=".9"/>
-              <g stroke="#A85974" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <circle cx="21" cy="27" r="1.4" fill="#A85974"/><circle cx="37" cy="27" r="1.4" fill="#A85974"/>
-                <path d="M22 35 c3 2.6 11 2.6 14 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">台北・線下</span>
-            <h3>情緒書寫小聚：用文字梳理這一週</h3>
-            <div class="meta"><span>8/2（六）14:00</span><span>已報名 12 人</span></div>
-            <span class="go">查看詳情 →</span>
-          </div>
-        </a>
-
-        <a class="tile" th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">
-          <div class="cover cover-activity-2">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M29 5 L34 18 L48 15 L40 27 L52 34 L38 37 L42 51 L29 42 L16 51 L20 37 L6 34 L18 27 L10 15 L24 18 Z" fill="#fff" opacity=".9"/>
-              <g stroke="#B8813A" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <path d="M23 27 c1.6 -2 4 -2 5.6 0"/><path d="M32 27 c1.6 -2 4 -2 5.6 0"/>
-                <path d="M25 34 c2.5 2.5 6 2.5 8.5 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">線上・免費</span>
-            <h3>親子溝通交流會：聽懂孩子沒說出口的話</h3>
-            <div class="meta"><span>8/9（六）19:30</span><span>已報名 24 人</span></div>
-            <span class="go">查看詳情 →</span>
-          </div>
-        </a>
-
-        <a class="tile" th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">
-          <div class="cover cover-activity-3">
-            <svg viewBox="0 0 58 58" fill="none">
-              <path d="M40 8 C50 16 52 34 42 44 C34 52 20 52 14 44 C8 36 12 28 20 26 C27 24 30 18 30 12 C30 8 35 4 40 8 Z" fill="#fff" opacity=".9"/>
-              <g stroke="#2E7D6C" stroke-width="2.4" stroke-linecap="round" fill="none">
-                <path d="M26 31 c1.5 -1.8 3.6 -1.8 5 0"/><path d="M35 31 c1.5 -1.8 3.6 -1.8 5 0"/>
-                <path d="M29 39 c2.6 2.2 6 2.2 8.6 0"/>
-              </g>
-            </svg>
-          </div>
-          <div class="body">
-            <span class="tag-pill">台中・線下</span>
-            <h3>週末療癒走走：森林療癒散步團</h3>
-            <div class="meta"><span>8/16（六）09:00</span><span>已報名 9 人</span></div>
-            <span class="go">查看詳情 →</span>
-          </div>
-        </a>
-      </div>
-
-      <div class="section-foot">
-        <a class="btn-ghost" th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">探索所有活動 →</a>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- 頁尾 -->
-<footer>
-  <div class="foot-grid">
-    <div class="foot-brand">
-      <span class="logo-mind" aria-hidden="true">
-        <span class="word">
-          <span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-        </span>
-        <span class="faces">
-          <svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-          <svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-          <svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-          <svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-        </span>
-      </span>
-      <span>
-        <div class="logo">諮由自在</div>
-        <div class="en">Free&nbsp;Mind</div>
+    <div class="hero">
+        <div class="tag">讓心理健康成為日常</div>
+        <h1>線上預約心理師<br>讓心理照護不中斷</h1>
         <p>專業、安全且重視隱私的心理諮商平台，陪你安放每一種情緒。</p>
-      </span>
+        <a class="cta" th:href="@{/search}">開始預約</a>
     </div>
-    <div class="foot-col">
-      <h4>服務</h4>
-      <a th:href="@{/search}" href="/search">預約諮商</a>
-      <a th:href="@{/member/course/select_course}" href="/member/course/select_course">課程商城</a>
-      <a th:href="@{/article}" href="/article">專欄文章</a>
-      <a th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">揪團活動</a>
-    </div>
-    <div class="foot-col">
-      <h4>會員</h4>
-      <a th:href="@{/member/dashboard}" href="/member/dashboard">我的療癒足跡</a>
-      <a th:href="@{/member/profile}" href="/member/profile">會員個人檔案</a>
-      <a th:href="@{/front-end/login}" href="/front-end/login">會員登入</a>
-    </div>
-    <div class="foot-col">
-      <h4>心理師</h4>
-      <a th:href="@{/psych/psychologistLogin}" href="/psych/psychologistLogin">心理師登入</a>
-    </div>
-  </div>
-  <div class="copyright">© 2026 諮由自在 FreeMind｜CKA101G1</div>
-</footer>
 
+    <div class="notice-section" th:if="${notifications != null and !notifications.isEmpty()}">
+        <div class="notice-wrap">
+            <h2>📢 系統公告</h2>
+            <div class="notice-list">
+                <div class="notice-item" th:each="notice : ${notifications}">
+                    <span class="date" th:text="${#dates.format(notice.createdAt, 'yyyy-MM-dd')}"></span>
+                    <span class="content" th:text="${notice.systemContent}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-head">
+            <div class="sub">諮由自在服務</div>
+            <h2>探索我們的服務</h2>
+        </div>
+        <div class="cards">
+            <a class="card" th:href="@{/search}">
+                <div class="icon">🗓️</div>
+                <h3>預約諮商</h3>
+                <p>搜尋合適的心理師，選擇方便的時段，線上快速完成預約。</p>
+                <span class="go">立即預約 →</span>
+            </a>
+            <a class="card" th:href="@{/member/course/select_course}">
+                <div class="icon">📚</div>
+                <h3>課程商城</h3>
+                <p>豐富的線上心理健康課程，隨時隨地照顧自己的內在。</p>
+                <span class="go">瀏覽課程 →</span>
+            </a>
+            <a class="card" th:href="@{/article}">
+                <div class="icon">📰</div>
+                <h3>專欄文章</h3>
+                <p>由專業心理師撰寫的身心健康文章，陪你認識自己。</p>
+                <span class="go">閱讀文章 →</span>
+            </a>
+            <a class="card" th:href="@{/member/activity/activityIndex}">
+                <div class="icon">🤝</div>
+                <h3>揪團活動</h3>
+                <p>參加或發起心理健康相關活動，在連結中獲得支持。</p>
+                <span class="go">探索活動 →</span>
+            </a>
+            <a class="card" th:href="@{/member/dashboard}">
+                <div class="icon">🌿</div>
+                <h3>我的療癒足跡</h3>
+                <p>查看你的預約、學習、活動與收藏，管理專屬的療癒歷程。</p>
+                <span class="go">前往查看 →</span>
+            </a>
+            <a class="card" th:href="@{/member/profile}">
+                <div class="icon">👤</div>
+                <h3>會員個人檔案</h3>
+                <p>檢視與編輯你的個人資料，維護帳號資訊。</p>
+                <span class="go">前往管理 →</span>
+            </a>
+        </div>
+    </div>
+
+    <footer>© 2026 諮由自在 FreeMind｜CKA101G1</footer>
+
+    <script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

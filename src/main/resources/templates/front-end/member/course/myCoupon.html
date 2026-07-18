@@ -12,12 +12,16 @@
 				CENTER</small></a>
 		<nav class="main-nav">
 			<a th:href="@{/member/course/select_course}">探索課程</a><a
-				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
-				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/dashboard}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection}">我的收藏</a><a
 				class="active" th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
 				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
 		</nav>
-		<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a>
+		<div class="header-actions">
+			<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a
+				class="profile-entry" th:href="@{/member/profile}"><span
+				th:text="${member.name}">會員</span></a>
+		</div>
 	</header>
 	<main class="container">
 		<div class="section-head">

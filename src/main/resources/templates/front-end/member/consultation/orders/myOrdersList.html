@@ -2,129 +2,213 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>我的預約紀錄</title>
 <style>
-    * { box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
         font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
-    }
-
-    .card {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
-
-    h3 {
-        font-size: 22px;
+        background: #faf6f4;
         color: #4a3e3e;
-        margin: 0 0 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
+        line-height: 1.7;
+        padding: 48px 20px;
     }
+
+    .wrap { max-width: 860px; margin: 0 auto; }
+
+    .page-head { text-align: center; margin-bottom: 40px; }
+    .page-head h1 { font-size: 27px; font-weight: 700; }
+    .page-head p { color: #a99a95; font-size: 14px; }
+
+    .order { margin-bottom: 40px; }
+    .order-no { font-size: 15px; color: #8a7b76; margin-bottom: 12px; padding-left: 2px; }
+    .order-no b { color: #4a3e3e; }
 
     table {
-        border-collapse: collapse;
         width: 100%;
-        margin-top: 10px;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 14px rgba(160, 120, 120, 0.07);
     }
-
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 12px 10px;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 14px;
-    }
-
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    tr:nth-child(even) td {
-        background-color: #fdfafa;
-    }
-
-    .nowrap { white-space: nowrap; }
-
-    .note-cell {
-        text-align: left;
-        white-space: normal;
-        word-break: break-word;
-    }
-
-    .status-pending   { color: #b8860b; font-weight: bold; }
-    .status-confirmed { color: #1a7a1a; font-weight: bold; }
-    .status-cancelled { color: #c62828; font-weight: bold; }
-    .status-noshow    { color: #ef6c00; font-weight: bold; }
-    .status-completed { color: #1565c0; font-weight: bold; }
-
-    .rebook-btn {
-        display: inline-block;
-        padding: 6px 14px;
-        background-color: #e8b4b4;
+    thead th {
+        background: #5a4a45;
         color: #fff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 13px;
-        white-space: nowrap;
-        transition: background-color 0.2s;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 13px 16px;
+        text-align: left;
     }
-    .rebook-btn:hover {
-        background-color: #d39393;
+    tbody td {
+        padding: 15px 16px;
+        font-size: 14.5px;
+        border-bottom: 1px solid #f2e9e5;
+        vertical-align: middle;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 13px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .b-pending   { background: #fdf3e2; color: #b8860b; }
+    .b-confirmed { background: #e7f4e9; color: #1a7a1a; }
+    .b-cancelled { background: #fbeaea; color: #c62828; }
+    .b-noshow    { background: #fdece0; color: #ef6c00; }
+    .b-completed { background: #e8f0fb; color: #1565c0; }
+
+    .review-inline { display: flex; align-items: center; gap: 10px; }
+    .review-inline .stars { color: #f2b01e; letter-spacing: 1px; font-size: 15px; white-space: nowrap; }
+    .review-inline .content { color: #5c4f4b; font-size: 13.5px; }
+    .review-none { color: #c4b8b3; }
+
+    .order-foot {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 16px 4px 0;
+        flex-wrap: wrap;
+    }
+    .note {
+        flex: 1;
+        min-width: 240px;
+        font-size: 14px;
+        color: #8a7b76;
+    }
+    .note .label { color: #b3a5a0; font-size: 12.5px; margin-right: 6px; }
+    .note.empty { color: #c4b8b3; font-style: italic; }
+
+    .actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .actions form { display: inline; margin: 0; }
+
+    .btn-line {
+        display: inline-block;
+        padding: 8px 18px;
+        border: 1.5px solid #e8b4b4;
+        color: #c07d7d;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 13.5px;
+        font-family: inherit;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-line:hover { background: #e8b4b4; color: #fff; }
+    .btn-plain { border-color: #ddd0cb; color: #a08d87; }
+    .btn-plain:hover { background: #ede2de; color: #6b5a54; }
+
+    .chip {
+        padding: 5px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .c-pending    { background: #fdf3e2; color: #b8860b; }
+    .c-processing { background: #e8f0fb; color: #1565c0; }
+    .c-resolved   { background: #e7f4e9; color: #2e7d43; }
+
+    .empty-state {
+        text-align: center;
+        color: #b3a5a0;
+        padding: 70px 20px;
+        font-size: 15px;
     }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>會員編號 <span th:text="${memberId}"></span> 的預約紀錄</h3>
+    <div class="wrap">
+        <div class="page-head">
+            <h1>我的預約紀錄</h1>
+            <p>陪你回顧每一段對話與療癒的足跡</p>
+        </div>
 
-		<table>
-			<tr>
-				<th>訂單編號</th>
-				<th>心理師編號</th>
-				<th>姓名</th>
-				<th>開始時間</th>
-				<th>結束時間</th>
-				<th>訂單狀態</th>
-				<th>心理師晤談筆記</th>
-				<th>評分</th>
-				<th>心得內容</th>
-				<th>操作</th>
-			</tr>
-			<tr th:each="order : ${ordersListData}">
-				<td th:text="${order.orderId}"></td>
-				<td th:text="${order.psychologist.psychId}"></td>
-				<td class="nowrap" th:text="${order.psychologist.name}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-				<td th:switch="${order.orderStatus}">
-					<span th:case="0" class="status-pending">待確認</span>
-					<span th:case="1" class="status-confirmed">已確認</span>
-					<span th:case="2" class="status-cancelled">已取消</span>
-					<span th:case="3" class="status-noshow">未出席</span>
-					<span th:case="4" class="status-completed">已完成</span>
-				</td>
-				<td class="note-cell" th:text="${order.psychNote != null ? order.psychNote : '尚無筆記'}"></td>
-				<td class="nowrap" th:text="${order.rating != null ? order.rating : '尚未評論'}"></td>
-				<td th:text="${order.reviewContent != null ? order.reviewContent : '-'}"></td>
-				<td>
-					<a class="rebook-btn"
-					   th:href="@{'/search/detail/' + ${order.psychologist.psychId}}">再次預約</a>
-				</td>
-			</tr>
-		</table>
-	</div>
+        <div th:if="${#lists.isEmpty(ordersListData)}" class="empty-state">
+            目前還沒有任何預約紀錄。
+        </div>
+
+        <div class="order" th:each="order : ${ordersListData}">
+            <div class="order-no">諮商編號：<b th:text="${order.orderId}"></b></div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:25%;">諮商日期</th>
+                        <th style="width:25%;">心理師</th>
+                        <th style="width:25%;">諮商狀態</th>
+                        <th style="width:25%;">心得評論</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${order.psychologist.name}"></td>
+                        <td th:switch="${order.orderStatus}">
+                            <span th:case="0" class="badge b-pending">待確認</span>
+                            <span th:case="1" class="badge b-confirmed">已確認</span>
+                            <span th:case="2" class="badge b-cancelled">已取消</span>
+                            <span th:case="3" class="badge b-noshow">未出席</span>
+                            <span th:case="4" class="badge b-completed">已完成</span>
+                        </td>
+                        <td>
+                            <div th:if="${order.reviewContent != null}" class="review-inline">
+                                <span class="stars" th:text="${'★'.repeat(order.rating != null ? order.rating : 0)}"></span>
+                                <span class="content" th:text="${order.reviewContent}"></span>
+                            </div>
+                            <span th:if="${order.reviewContent == null}" class="review-none">尚未評論</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="order-foot">
+                <div th:if="${order.psychNote != null}" class="note">
+                    <span class="label">心理師晤談筆記</span><span th:text="${order.psychNote}"></span>
+                </div>
+                <div th:if="${order.psychNote == null}" class="note empty">尚無晤談筆記</div>
+
+                <div class="actions">
+                    <!-- 問題回報：已回報顯示狀態，否則給按鈕（每筆都能報） -->
+                    <span th:if="${reportStatusMap.containsKey(order.orderId)}"
+                          th:switch="${reportStatusMap.get(order.orderId)}">
+                        <span th:case="0" class="chip c-pending">回報待處理</span>
+                        <span th:case="1" class="chip c-processing">回報處理中</span>
+                        <span th:case="2" class="chip c-resolved">問題已解決</span>
+                    </span>
+                    <form th:unless="${reportStatusMap.containsKey(order.orderId)}"
+                          method="post" th:action="@{/member/reports/reportSelect}">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <button type="submit" class="btn-line">問題回報</button>
+                    </form>
+
+                    <!-- 撰寫心得評論：在可撰寫期限內才顯示 -->
+                    <form th:if="${canWriteReview.contains(order.orderId)}"
+                          method="post" th:action="@{/member/orders/reviewSelect}">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <button type="submit" class="btn-line">撰寫心得評論</button>
+                    </form>
+                    <!-- 已完成、未評論、但已超過 3 天 -->
+                    <span th:if="${order.orderStatus == 4 and order.reviewContent == null and !canWriteReview.contains(order.orderId)}"
+                          style="color:#c4b8b3; font-size:13px;">已超過評論期限</span>
+
+                    <!-- 修改評論：在可修改期限內才顯示 -->
+                    <form th:if="${canEditReview.contains(order.orderId)}"
+                          method="post" th:action="@{/member/orders/reviewSelect}">
+                        <input type="hidden" name="orderId" th:value="${order.orderId}">
+                        <button type="submit" class="btn-line btn-plain">修改評論</button>
+                    </form>
+                    <!-- 已評論但已超過 3 天，鎖住 -->
+                    <span th:if="${order.reviewContent != null and !canEditReview.contains(order.orderId)}"
+                          style="color:#c4b8b3; font-size:13px;">評論已鎖定</span>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
 </body>
 </html>
