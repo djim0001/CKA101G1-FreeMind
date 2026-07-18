@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -82,15 +83,60 @@
     .card .go { color: var(--green); font-weight: 600; font-size: 14px; }
 
     footer { background: var(--ink); color: #cdd8d3; text-align: center; padding: 30px; font-size: 13px; }
+
+    /* 會員登入後的頭像下拉菜單 */
+    .profile-wrapper { position: relative; }
+    .profile-entry {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 9px 20px; border-radius: 999px;
+        background: #fff; color: var(--green-dark); font-weight: 600;
+        border: none; font-size: 14px; cursor: pointer;
+        font-family: inherit; transition: background 0.2s;
+    }
+    .profile-entry::before {
+        content: "👤"; font-size: 15px; line-height: 1;
+    }
+    .profile-entry:hover { background: var(--green-light); }
+    .profile-menu {
+        position: absolute; top: 100%; right: 0; margin-top: 10px;
+        min-width: 170px; background: #fff; border-radius: 14px;
+        box-shadow: 0 12px 32px rgba(47,62,57,0.18);
+        overflow: hidden; display: none; z-index: 20;
+    }
+    .profile-menu[data-open] { display: block; }
+    .menu-item {
+        display: block; width: 100%; padding: 12px 18px;
+        text-align: left; color: var(--ink); font-size: 14px;
+        background: none; border: none; cursor: pointer;
+        font-family: inherit; transition: background 0.15s;
+    }
+    .menu-item:hover { background: var(--green-light); color: var(--green-dark); }
+    .menu-item-form { margin: 0; }
+    .logout-btn { color: #c0554e; border-top: 1px solid #f0f0f0; }
+    .logout-btn:hover { background: #c0554e; color: #fff; }
 </style>
 </head>
 <body>
 
     <div class="nav">
         <a class="logo" th:href="@{/}">諮由自在</a>
-        <div class="auth">
+        <div class="auth" sec:authorize="!hasRole('MEMBER')">
             <a class="btn btn-outline" th:href="@{/front-end/login}">會員登入</a>
             <a class="btn btn-solid" th:href="@{/psych/psychologistLogin}">心理師登入</a>
+        </div>
+        <div class="auth" sec:authorize="hasRole('MEMBER')">
+            <div class="profile-wrapper">
+                <button class="profile-entry" type="button" data-toggle-menu="index-profile-dropdown">
+                    <span sec:authentication="principal.member.name">會員</span>
+                </button>
+                <div class="profile-menu" id="index-profile-dropdown">
+                    <a class="menu-item" th:href="@{/member/profile}">會員資料</a>
+                    <a class="menu-item" th:href="@{/member/dashboard}">我的療癒足跡</a>
+                    <form class="menu-item-form" th:action="@{/front-end/logout}" method="post">
+                        <button class="menu-item logout-btn" type="submit">登出</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -148,5 +194,6 @@
 
     <footer>© 2026 諮由自在 FreeMind｜CKA101G1</footer>
 
+    <script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

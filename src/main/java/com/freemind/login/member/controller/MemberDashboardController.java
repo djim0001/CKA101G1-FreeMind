@@ -26,12 +26,13 @@ import com.freemind.login.member.model.MemberService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 
-@Controller      
+@Controller
 @RequestMapping("/member/dashboard")
-public class MemberDashboardController {  
-	
+public class MemberDashboardController {
+
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
+
 	@Autowired
 	private CourseService courseSvc;
 	@Autowired

@@ -36,7 +36,7 @@ public class AdminSecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 // 登入頁面允許所有人訪問
-                .requestMatchers("/","/back-end/login").permitAll()
+                .requestMatchers("/","/back-end/login","/admin/home").permitAll()
                 
                 //課程管理
                 .requestMatchers("/admin/adminPayout","/admin/refund").hasAnyRole("super_admin","courses")
@@ -80,7 +80,7 @@ public class AdminSecurityConfig {
                 .loginProcessingUrl("/back-end/login")
                 .usernameParameter("adminAccount")
                 .passwordParameter("adminPassword")
-                .defaultSuccessUrl("/index_temp", false)
+                .defaultSuccessUrl("/admin/home", false)
                 .failureUrl("/back-end/login?error=true")
                 .permitAll()
             )

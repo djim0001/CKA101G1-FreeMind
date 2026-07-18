@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+	<!-- 後台共用側欄：active 傳入目前頁面的 route key（見各連結的 classappend）
+	     用法：<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('admin-list')}"></aside> -->
+	<aside class="sidebar" th:fragment="sidebar(active)">
+		<a class="brand" th:href="@{/admin/home}">諮由自在 Free Mind<small>ADMIN CONSOLE</small></a>
+
+		<p class="nav-label">總覽</p>
+		<nav class="nav">
+			<a th:href="@{/admin/home}" th:classappend="${active == 'home'} ? 'active'">管理後台首頁</a>
+		</nav>
+
+		<p class="nav-label">帳號與權限</p>
+		<nav class="nav">
+			<a th:href="@{/admin/listAllAdmin}" th:classappend="${active == 'admin-list'} ? 'active'">管理員列表</a>
+			<a th:href="@{/admin/addAdmin}" th:classappend="${active == 'admin-add'} ? 'active'">新增管理員</a>
+			<a th:href="@{/admin/select_page}" th:classappend="${active == 'admin-query'} ? 'active'">管理員查詢</a>
+			<a th:href="@{/admin/permissions}" th:classappend="${active == 'permission-list'} ? 'active'">權限清單</a>
+		</nav>
+
+		<p class="nav-label">平台服務</p>
+		<nav class="nav">
+			<a th:href="@{/admin/orders/home}" th:classappend="${active == 'consultation'} ? 'active'">諮商預約管理</a>
+			<a th:href="@{/admin/psych}" th:classappend="${active == 'psych'} ? 'active'">心理師管理</a>
+			<a th:href="@{/admin/course/select_course}" th:classappend="${active == 'course'} ? 'active'">課程管理</a>
+			<a th:href="@{/admin/article}" th:classappend="${active == 'article'} ? 'active'">文章管理</a>
+			<a th:href="@{/admin/activity/activityAdminIndex}" th:classappend="${active == 'activity'} ? 'active'">活動管理</a>
+		</nav>
+
+		<p class="nav-label">訊息與公告</p>
+		<nav class="nav">
+			<a th:href="@{/admin/notifications/listAllNotification}" th:classappend="${active == 'notification'} ? 'active'">系統公告</a>
+			<a th:href="@{/admin/notice/listAllNoticeTemplate}" th:classappend="${active == 'notice-template'} ? 'active'">通知範本</a>
+		</nav>
+	</aside>
+
+</body>
+</html>
