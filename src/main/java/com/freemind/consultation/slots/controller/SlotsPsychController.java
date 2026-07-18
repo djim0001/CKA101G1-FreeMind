@@ -48,12 +48,22 @@ public class SlotsPsychController {
 			return "redirect:/front-end/login";
 		}
 		Integer pid = prinUserDetails.getPsychologist().getPsychId();
+
 		if (slotDateStr == null || slotDateStr.isBlank()) {
 			model.addAttribute("errorMessage", "請選擇日期");
 			model.addAttribute("todayDate", java.time.LocalDate.now().toString());
 			return "front-end/psych/consultation/slots/manageSlotsForm";
 		}
+
 		LocalDate date = LocalDate.parse(slotDateStr);
+
+		// 擋過去的日期
+		if (date.isBefore(LocalDate.now())) {
+			model.addAttribute("errorMessage", "不能選擇過去的日期，請重新選擇。");
+			model.addAttribute("todayDate", java.time.LocalDate.now().toString());
+			return "front-end/psych/consultation/slots/manageSlotsForm";
+		}
+
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 		if (slots == null) {
 			slots = new Slots();
@@ -63,6 +73,11 @@ public class SlotsPsychController {
 			slots.setSlotDate(date);
 			slots.setConsStatus("0".repeat(24));
 		}
+
+		// 傳給勾選頁：用來鎖住今天已過的小時
+		model.addAttribute("isToday", date.equals(LocalDate.now()));
+		model.addAttribute("currentHour", java.time.LocalTime.now().getHour());
+
 		model.addAttribute("slots", slots);
 		return "front-end/psych/consultation/slots/manageSlotsInput";
 	}
@@ -76,6 +91,14 @@ public class SlotsPsychController {
 		}
 		Integer pid = prinUserDetails.getPsychologist().getPsychId();
 		LocalDate date = LocalDate.parse(slotDateStr);
+
+		// 擋過去的日期（後端保險）
+		if (date.isBefore(LocalDate.now())) {
+			model.addAttribute("errorMessage", "不能設定過去的日期。");
+			model.addAttribute("todayDate", java.time.LocalDate.now().toString());
+			return "front-end/psych/consultation/slots/manageSlotsForm";
+		}
+
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 		boolean isNew = (slots == null);
 		if (isNew) {
@@ -85,11 +108,18 @@ public class SlotsPsychController {
 			slots.setPsychologist(p);
 			slots.setSlotDate(date);
 		}
+
+		boolean isToday = date.equals(LocalDate.now());
+		int currentHour = java.time.LocalTime.now().getHour();
+
 		String currentStatus = isNew ? "0".repeat(24) : slots.getConsStatus();
 		StringBuilder sb = new StringBuilder(currentStatus);
 		List<Integer> blockedHours = new java.util.ArrayList<>();
 		for (int h = 0; h < 24; h++) {
 			if (sb.charAt(h) == '2') {
+				continue;
+			}
+			if (isToday && h <= currentHour) { // 今天已過的小時不動
 				continue;
 			}
 			boolean checked = openHours != null && openHours.contains(h);

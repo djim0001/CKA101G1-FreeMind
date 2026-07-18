@@ -33,7 +33,7 @@ public class OrdersMemberController {
 
 	@Autowired
 	private PsychologistRepository psychologistRepository;
-	
+
 	@Autowired
 	private com.freemind.consultation.reports.model.ReportsService reportsSvc;
 
@@ -41,6 +41,20 @@ public class OrdersMemberController {
 		return psychologistRepository.findAll().stream()
 				.filter(p -> p.getAccountStatus() != null && p.getAccountStatus() == 1)
 				.collect(java.util.stream.Collectors.toList());
+	}
+
+	// 算某天的可預約時段：可預約(1/4) 且 若為今天則排除已過去的小時
+	private List<Integer> computeAvailableHours(Slots slot, LocalDate date) {
+		int currentHour = date.equals(LocalDate.now()) ? java.time.LocalTime.now().getHour() : -1;
+		List<Integer> hours = new java.util.ArrayList<>();
+		String status = slot.getConsStatus();
+		for (int h = 0; h < 24; h++) {
+			boolean open = (status.charAt(h) == '1' || status.charAt(h) == '4');
+			if (open && h > currentHour) { // 今天只留現在之後的小時；未來日期全留
+				hours.add(h);
+			}
+		}
+		return hours;
 	}
 
 	@GetMapping("bookForm")
@@ -61,12 +75,9 @@ public class OrdersMemberController {
 		Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
 		Slots slots = slotsSvc.getOneByPsychAndDate(pid, date);
 
-		List<Integer> availableHours = new java.util.ArrayList<>();
-		String status = slots.getConsStatus();
-		for (int h = 0; h < 24; h++) {
-			if (status.charAt(h) == '1' || status.charAt(h) == '4') {
-				availableHours.add(h);
-			}
+		List<Integer> availableHours = computeAvailableHours(slots, date);
+		if (availableHours.isEmpty()) {
+			model.addAttribute("errorMessage", "這一天已經沒有可預約的時段了。");
 		}
 
 		model.addAttribute("slots", slots);
@@ -106,14 +117,7 @@ public class OrdersMemberController {
 			return "front-end/member/consultation/orders/bookForm";
 		}
 
-		List<Integer> availableHours = new java.util.ArrayList<>();
-		String status = slots.getConsStatus();
-		for (int h = 0; h < 24; h++) {
-			if (status.charAt(h) == '1' || status.charAt(h) == '4') {
-				availableHours.add(h);
-			}
-		}
-
+		List<Integer> availableHours = computeAvailableHours(slots, date);
 		if (availableHours.isEmpty()) {
 			model.addAttribute("errorMessage", "該心理師這天已無可預約時段");
 			return "front-end/member/consultation/orders/bookForm";
@@ -147,6 +151,16 @@ public class OrdersMemberController {
 		Slots slot = slotsSvc.getOneSlots(tid);
 		java.time.LocalDateTime consStart = slot.getSlotDate().atTime(hour, 0);
 
+		// 防線：送出前再確認這個時段還沒過去
+		if (consStart.isBefore(java.time.LocalDateTime.now())) {
+			Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
+			model.addAttribute("slots", slot);
+			model.addAttribute("availableHours", computeAvailableHours(slot, slot.getSlotDate()));
+			model.addAttribute("psychologist", psychologist);
+			model.addAttribute("errorMessage", "這個時段已經過了，無法預約，請重新選擇。");
+			return "front-end/member/consultation/orders/bookInput";
+		}
+
 		// 檢查：同一會員是否已經預約過「這位心理師的這個時段」（待確認或已確認）
 		boolean duplicate = ordersSvc.getByMemberId(memberId).stream()
 				.anyMatch(o -> o.getPsychologist() != null
@@ -156,17 +170,9 @@ public class OrdersMemberController {
 						&& (o.getOrderStatus() == 0 || o.getOrderStatus() == 1));
 
 		if (duplicate) {
-			// 重新組回 bookInput 需要的資料，帶錯誤訊息回去
-			List<Integer> availableHours = new java.util.ArrayList<>();
-			String status = slot.getConsStatus();
-			for (int h = 0; h < 24; h++) {
-				if (status.charAt(h) == '1' || status.charAt(h) == '4') {
-					availableHours.add(h);
-				}
-			}
 			Psychologist psychologist = psychologistRepository.findById(pid).orElse(null);
 			model.addAttribute("slots", slot);
-			model.addAttribute("availableHours", availableHours);
+			model.addAttribute("availableHours", computeAvailableHours(slot, slot.getSlotDate()));
 			model.addAttribute("psychologist", psychologist);
 			model.addAttribute("errorMessage", "你已經預約過這位心理師的這個時段了，請勿重複預約。");
 			return "front-end/member/consultation/orders/bookInput";
@@ -206,7 +212,7 @@ public class OrdersMemberController {
 		Integer memberId = prinUserDetails.getMember().getMemberId();
 		List<Orders> list = ordersSvc.getByMemberId(memberId);
 
-		// 建立 訂單編號 -> 回報處理狀態 的對照，用來顯示問題回報欄
+		// 問題回報狀態對照（原本就有）
 		List<com.freemind.consultation.reports.model.Reports> myReports = reportsSvc.getByMemberId(memberId);
 		java.util.Map<Integer, Integer> reportStatusMap = new java.util.HashMap<>();
 		for (com.freemind.consultation.reports.model.Reports r : myReports) {
@@ -215,8 +221,27 @@ public class OrdersMemberController {
 			}
 		}
 
+		// 心得評論的 3 天視窗
+		java.time.LocalDateTime now = java.time.LocalDateTime.now();
+		java.util.Set<Integer> canWriteReview = new java.util.HashSet<>();
+		java.util.Set<Integer> canEditReview = new java.util.HashSet<>();
+		for (Orders o : list) {
+			// 可撰寫：已完成(4)、未評論、且諮商結束後 3 天內
+			if (o.getOrderStatus() != null && o.getOrderStatus() == 4 && o.getReviewContent() == null
+					&& o.getConsEnd() != null && now.isBefore(o.getConsEnd().plusDays(3))) {
+				canWriteReview.add(o.getOrderId());
+			}
+			// 可修改：已評論、且送出評論後 3 天內
+			if (o.getReviewContent() != null && o.getReviewedAt() != null
+					&& now.isBefore(o.getReviewedAt().plusDays(3))) {
+				canEditReview.add(o.getOrderId());
+			}
+		}
+
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("reportStatusMap", reportStatusMap);
+		model.addAttribute("canWriteReview", canWriteReview);
+		model.addAttribute("canEditReview", canEditReview);
 		model.addAttribute("memberId", memberId);
 		return "front-end/member/consultation/orders/myOrdersList";
 	}
@@ -233,7 +258,6 @@ public class OrdersMemberController {
 		return "front-end/member/consultation/orders/reviewList";
 	}
 
-
 	@PostMapping("reviewSelect")
 	public String reviewSelect(@RequestParam("orderId") String orderId, ModelMap model) {
 		Orders orders = ordersSvc.getOneOrders(Integer.valueOf(orderId));
@@ -248,5 +272,4 @@ public class OrdersMemberController {
 		model.addAttribute("success", "感謝您的評價！");
 		return "front-end/member/consultation/orders/reviewSuccess";
 	}
-
 }

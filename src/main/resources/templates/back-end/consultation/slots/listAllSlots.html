@@ -8,7 +8,26 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif; background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 44px 20px; }
     .wrap { max-width: 1000px; margin: 0 auto; }
-    .top { margin-bottom: 10px; }
+    .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 10px;
+    }
+    .back-btn {
+        flex-shrink: 0;
+        display: inline-block;
+        padding: 9px 20px;
+        background: #fff;
+        color: #c07d7d;
+        border: 1.5px solid #e8b4b4;
+        border-radius: 8px;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .back-btn:hover { background: #e8b4b4; color: #fff; }
     .top h1 { font-size: 26px; font-weight: 700; }
     .top p { color: #a99a95; font-size: 14px; }
 
@@ -77,8 +96,11 @@
 <body>
     <div class="wrap">
         <div class="top">
-            <h1>心理師預約行事曆</h1>
-            <p>依月份檢視心理師的預約情況，點有訂單的日期可查看當日訂單（僅供查看）</p>
+            <div>
+                <h1>心理師預約行事曆</h1>
+                <p>依月份檢視心理師的預約情況，點有訂單的日期可查看當日訂單（僅供查看）</p>
+            </div>
+            <a class="back-btn" th:href="@{/admin/orders/home}">← 回諮商預約管理</a>
         </div>
 
         <form class="search-card" method="get" th:action="@{/admin/slots/listAllSlots}">
