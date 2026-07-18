@@ -41,7 +41,7 @@ public class NoticeService {
 		
 		PsychologistNotice n = new PsychologistNotice();
 		n.setPsychId(psychId);
-		n.setAdminId(adminId == null ? 0 : adminId); 
+		n.setAdminId(adminId == null ? 1 : adminId); 
 		n.setNoticeContent(content);
 		n.setNoticeType(noticeType);
 		n.setCreatedAt(new Timestamp(System.currentTimeMillis()));
