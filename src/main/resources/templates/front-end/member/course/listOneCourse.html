@@ -1,7 +1,147 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"><meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"><title th:text="${course.courseName} + '｜課程詳情'">課程詳情</title><link rel="stylesheet" th:href="@{/css/course/member-style.css}" /></head>
-<body class="thy2-member"><header class="site-header"><a class="brand" th:href="@{/}">諮由自在 Free Mind<small>COURSE MARKET</small></a><nav class="main-nav"><a class="active" th:href="@{/member/course/select_course}">探索課程</a><a th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a th:href="@{/member/course/my_course_order}">訂單紀錄</a></nav><div class="header-actions"><a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a class="profile-entry" th:href="@{/member/profile}"><span class="profile-entry-avatar" aria-hidden="true">會</span><span th:text="${member.name}">會員</span></a></div></header>
-<main class="container"><p class="meta"><a th:href="@{/member/course/select_course}">課程商城</a> ／ <span th:text="${course.courseCategories.courseCatName}">分類</span> ／ <span th:text="${course.courseName}">課程</span></p><div class="notice member-message" th:if="${cartMsg != null}" th:text="${cartMsg}"></div>
-<section class="two-col"><div><div class="detail-cover"><video id="courseVideo" controls preload="metadata" style="width:100%;border-radius:22px" th:if="${coursePermission}" th:attr="data-course-order-id=${orderDetail.courseOrder.courseOrderId},data-course-id=${course.courseId},data-playback-seconds=${orderDetail.playbackPosition != null ? orderDetail.playbackPosition.toSecondOfDay() : 0}"><source th:src="${course.videoSrc}" type="video/mp4"></video><div class="playback-status" th:if="${coursePermission}"><span>上次播放位置：<strong th:text="${orderDetail.playbackPosition != null ? #temporals.format(orderDetail.playbackPosition, 'HH:mm:ss') : '尚未觀看'}">尚未觀看</strong></span><span>目前播放位置：<strong data-current-playback-time>00:00:00</strong></span><span>觀看進度：<strong data-playback-percentage>0%</strong></span></div><video id="coursePreviewVideo" controls preload="metadata" style="width:100%;border-radius:22px" th:if="${!coursePermission}"><source th:src="@{${course.videoSrcPre}}" type="video/mp4"></video></div><section class="panel" style="margin-top:22px"><div class="tabs" data-tabs><button class="active" data-tab="intro" type="button">課程介紹</button><button data-tab="outline" type="button">內容大綱</button><button data-tab="questions" type="button">課堂提問</button></div><div data-panel="intro"><h2 th:text="${course.courseName}">課程名稱</h2><p th:text="${course.outline}">課程介紹</p><p class="meta" th:if="${course.courseStatus == 4}">上架時間：<span th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}">—</span></p></div><div data-panel="outline" hidden><h2>內容大綱</h2><p style="white-space:pre-wrap" th:text="${course.outline}">課程內容大綱</p></div><div data-panel="questions" hidden><h2>我的課堂提問</h2><form th:action="@{/member/dashboard/my_course_comment}" method="post"><input type="hidden" name="courseId" th:value="${course.courseId}"><input type="hidden" name="returnUrl"><textarea class="field" name="courseQuestion" th:placeholder="${courseQuestionMsg == null ? '寫下學習時遇到的疑問……' : courseQuestionMsg}" required></textarea><button class="btn" type="submit" style="margin-top:12px">送出提問</button></form></div></section></div>
-<aside class="panel"><span class="tag" th:text="${course.courseCategories.courseCatName}">分類</span><h1 style="font-size:36px" th:text="${course.courseName}">課程名稱</h1><p class="meta"><span th:text="${course.psychologist.name}">心理師</span> 心理師</p><div class="course-stats"><span>收藏 <b th:text="${course.saveCount}">0</b></span><span>評價 <b th:text="${course.reviewCount}">0</b></span><span>提問 <b th:text="${course.commentCount}">0</b></span></div><p class="price" th:if="${!coursePermission}">NT$ <span th:text="${course.price}">0</span></p><div class="stack"><form method="post" th:action="@{/member/course/add_cart}" th:if="${!coursePermission}"><input type="hidden" name="courseId" th:value="${course.courseId}"><input type="hidden" name="returnUrl"><button class="btn" type="submit" style="width:100%">加入購物車</button></form><a class="btn" th:if="${coursePermission}" th:href="@{/member/course/get_all_qa/{courseId}(courseId=${course.courseId})}">查看課程提問</a><form method="post" th:action="@{/member/dashboard/favorite/toggle}"><input type="hidden" name="courseId" th:value="${course.courseId}"><input type="hidden" name="currentPage" th:value="${currentPage}"><input type="hidden" name="orderBy" th:value="${orderBy}"><input type="hidden" name="returnUrl"><button class="btn ghost" type="submit" style="width:100%"><span class="favorite-heart" aria-hidden="true" th:text="${course.saved} ? '♥' : '♡'">♡</span><span th:text="${course.saved} ? '已收藏' : '收藏課程'">收藏課程</span></button></form></div></aside></section>
-<section class="panel" style="margin-top:24px" th:if="${comments != null}"><h2>課程提問紀錄</h2><div class="stack"><article class="question-item" th:each="comment : ${comments}"><strong th:text="${comment.member.name} + '：'">會員：</strong><p th:text="${comment.courseQuestion}">問題</p><div class="answer-box" th:if="${comment.courseAnswer != null}"><strong th:text="${comment.course.psychologist.name} + ' 心理師回覆'">心理師回覆</strong><p th:text="${comment.courseAnswer}">回答</p></div></article></div></section></main><footer class="site-footer">安心學習，依自己的步調前進。</footer><script th:src="@{/js/course/member-js.js}"></script></body></html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:if="${_csrf != null}"
+	th:content="${_csrf.headerName}">
+<title th:text="${course.courseName} + '｜課程詳情'">課程詳情</title>
+<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
+</head>
+<body class="thy2-member">
+	<header class="site-header">
+		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>COURSE
+				MARKET</small></a>
+		<nav class="main-nav">
+			<a class="active" th:href="@{/member/course/select_course}">探索課程</a><a
+				th:href="@{/member/dashboard}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection}">我的收藏</a><a
+				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
+		</nav>
+		<div class="header-actions">
+			<a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a
+				class="profile-entry" th:href="@{/member/profile}"><span
+				class="profile-entry-avatar" aria-hidden="true">會</span><span
+				th:text="${member.name}">會員</span></a>
+		</div>
+	</header>
+	<main class="container">
+		<p class="meta">
+			<a th:href="@{/member/course/select_course}">課程商城</a> ／ <span
+				th:text="${course.courseCategories.courseCatName}">分類</span> ／ <span
+				th:text="${course.courseName}">課程</span>
+		</p>
+		<div class="notice member-message" th:if="${cartMsg != null}"
+			th:text="${cartMsg}"></div>
+		<section class="two-col">
+			<div>
+				<div class="detail-cover">
+					<video id="courseVideo" controls preload="metadata"
+						style="width: 100%; border-radius: 22px"
+						th:if="${coursePermission}"
+						th:attr="data-course-order-id=${orderDetail.courseOrder.courseOrderId},data-course-id=${course.courseId},data-playback-seconds=${orderDetail.playbackPosition != null ? orderDetail.playbackPosition.toSecondOfDay() : 0}">
+						<source th:src="${course.videoSrc}" type="video/mp4">
+					</video>
+					<div class="playback-status" th:if="${coursePermission}">
+						<span>上次播放位置：<strong
+							th:text="${orderDetail.playbackPosition != null ? #temporals.format(orderDetail.playbackPosition, 'HH:mm:ss') : '尚未觀看'}">尚未觀看</strong></span><span>目前播放位置：<strong
+							data-current-playback-time>00:00:00</strong></span><span>觀看進度：<strong
+							data-playback-percentage>0%</strong></span>
+					</div>
+					<video id="coursePreviewVideo" controls preload="metadata"
+						style="width: 100%; border-radius: 22px"
+						th:if="${!coursePermission}">
+						<source th:src="@{${course.videoSrcPre}}" type="video/mp4">
+					</video>
+				</div>
+				<section class="panel" style="margin-top: 22px">
+					<div class="tabs" data-tabs>
+						<button class="active" data-tab="intro" type="button">課程介紹</button>
+						<button data-tab="outline" type="button">內容大綱</button>
+						<button data-tab="questions" type="button">課堂提問</button>
+					</div>
+					<div data-panel="intro">
+						<h2 th:text="${course.courseName}">課程名稱</h2>
+						<p th:text="${course.outline}">課程介紹</p>
+						<p class="meta" th:if="${course.courseStatus == 4}">
+							上架時間：<span
+								th:text="${#temporals.format(course.listedAt, 'yyyy年MM月dd日 HH:mm')}">—</span>
+						</p>
+					</div>
+					<div data-panel="outline" hidden>
+						<h2>內容大綱</h2>
+						<p style="white-space: pre-wrap" th:text="${course.outline}">課程內容大綱</p>
+					</div>
+					<div data-panel="questions" hidden>
+						<h2>我的課堂提問</h2>
+						<form th:action="@{/member/course/my_course_comment}"
+							method="post">
+							<input type="hidden" name="courseId"
+								th:value="${course.courseId}"><input type="hidden"
+								name="returnUrl">
+							<textarea class="field" name="courseQuestion"
+								th:placeholder="${courseQuestionMsg == null ? '寫下學習時遇到的疑問……' : courseQuestionMsg}"
+								required></textarea>
+							<button class="btn" type="submit" style="margin-top: 12px">送出提問</button>
+						</form>
+					</div>
+				</section>
+			</div>
+			<aside class="panel">
+				<span class="tag" th:text="${course.courseCategories.courseCatName}">分類</span>
+				<h1 style="font-size: 36px" th:text="${course.courseName}">課程名稱</h1>
+				<p class="meta">
+					<span th:text="${course.psychologist.name}">心理師</span> 心理師
+				</p>
+				<div class="course-stats">
+					<span>收藏 <b th:text="${course.saveCount}">0</b></span><span>評價
+						<b th:text="${course.reviewCount}">0</b>
+					</span><span>提問 <b th:text="${course.commentCount}">0</b></span>
+				</div>
+				<p class="price" th:if="${!coursePermission}">
+					NT$ <span th:text="${course.price}">0</span>
+				</p>
+				<div class="stack">
+					<form method="post" th:action="@{/member/course/add_cart}"
+						th:if="${!coursePermission}">
+						<input type="hidden" name="courseId" th:value="${course.courseId}"><input
+							type="hidden" name="returnUrl">
+						<button class="btn" type="submit" style="width: 100%">加入購物車</button>
+					</form>
+					<a class="btn" th:if="${coursePermission}"
+						th:href="@{/member/course/get_all_qa/{courseId}(courseId=${course.courseId})}">查看課程提問</a>
+					<form method="post"
+						th:action="@{/member/dashboard/favorite/toggle}">
+						<input type="hidden" name="courseId" th:value="${course.courseId}"><input
+							type="hidden" name="currentPage" th:value="${currentPage}"><input
+							type="hidden" name="orderBy" th:value="${orderBy}"><input
+							type="hidden" name="returnUrl">
+						<button class="btn ghost" type="submit" style="width: 100%">
+							<span class="favorite-heart" aria-hidden="true"
+								th:text="${course.saved} ? '♥' : '♡'">♡</span><span
+								th:text="${course.saved} ? '已收藏' : '收藏課程'">收藏課程</span>
+						</button>
+					</form>
+				</div>
+			</aside>
+		</section>
+		<section class="panel" style="margin-top: 24px"
+			th:if="${comments != null}">
+			<h2>課程提問紀錄</h2>
+			<div class="stack">
+				<article class="question-item" th:each="comment : ${comments}">
+					<strong th:text="${comment.member.name} + '：'">會員：</strong>
+					<p th:text="${comment.courseQuestion}">問題</p>
+					<div class="answer-box" th:if="${comment.courseAnswer != null}">
+						<strong th:text="${comment.course.psychologist.name} + ' 心理師回覆'">心理師回覆</strong>
+						<p th:text="${comment.courseAnswer}">回答</p>
+					</div>
+				</article>
+			</div>
+		</section>
+	</main>
+	<footer class="site-footer">安心學習，依自己的步調前進。</footer>
+	<script th:src="@{/js/course/member-js.js}"></script>
+</body>
+</html>

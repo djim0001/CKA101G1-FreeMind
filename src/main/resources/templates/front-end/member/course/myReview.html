@@ -12,8 +12,8 @@
 				HEALING JOURNEY</small></a>
 		<nav class="main-nav">
 			<a th:href="@{/member/course/select_course}">探索課程</a><a
-				th:href="@{/member/dashboard/myLearning}">我的療癒足跡</a><a
-				th:href="@{/member/dashboard/myCollection/course}">我的收藏</a><a
+				th:href="@{/member/dashboard}">我的療癒足跡</a><a
+				th:href="@{/member/dashboard/myCollection}">我的收藏</a><a
 				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a class="active"
 				th:href="@{/member/dashboard/my_review}">我的評價</a><a
 				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
@@ -62,7 +62,7 @@
 				</div>
 				<button class="icon-button" type="button" data-close-modal>×</button>
 			</div>
-			<form th:action="@{/member/dashboard/review}" method="post"
+			<form th:action="@{/member/course/review}" method="post"
 				th:object="${review}">
 				<div class="form-group">
 					<label for="reviewCourse">選擇課程 <span class="required">＊</span></label><select

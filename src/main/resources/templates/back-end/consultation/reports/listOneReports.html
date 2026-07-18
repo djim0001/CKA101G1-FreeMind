@@ -1,24 +1,81 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>諮商問題回報詳細</title>
+<meta charset="UTF-8">
+<title>處理完成</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 40px 20px;
+        color: #333;
+    }
+
+    .card {
+        max-width: 480px;
+        margin: 60px auto 0;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        padding: 48px 40px;
+        text-align: center;
+    }
+
+    .check {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: #eaf6ec;
+        color: #2e7d43;
+        font-size: 34px;
+        line-height: 64px;
+    }
+
+    h3 {
+        font-size: 20px;
+        color: #4a3e3e;
+        margin: 0 0 10px;
+    }
+    .sub {
+        font-size: 14px;
+        color: #a99a95;
+        margin-bottom: 28px;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .btn {
+        display: inline-block;
+        padding: 11px 26px;
+        border-radius: 6px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-solid { background-color: #e8b4b4; color: #fff; }
+    .btn-solid:hover { background-color: #d39393; }
+    .btn-outline { border: 1.5px solid #e8b4b4; color: #c07d7d; background: #fff; }
+    .btn-outline:hover { background: #fbf2f2; }
+</style>
 </head>
 <body>
-    <h3>諮商問題回報詳細</h3>
-
-    <span style="color:green;" th:if="${success != null}" th:text="${success}"></span><br>
-
-    諮商問題編號：<span th:text="${reports.reportId}"></span><br>
-    會員編號：<span th:text="${reports.member.memberId}"></span><br>
-    諮詢訂單編號：<span th:text="${reports.orders.orderId}"></span><br>
-    員工編號：<span th:text="${reports.admin != null ? reports.admin.adminId : '未指派'}"></span><br>
-    問題描述：<span th:text="${reports.issueDesc}"></span><br>
-    回報日期：<span th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm:ss')}"></span><br>
-    處理狀態：<span th:text="${reports.reportStatus}"></span><br>
-    處理備註：<span th:text="${reports.reportNote}"></span><br>
-
-    <a th:href="@{/admin/reports/listAllReports}">回列表</a>
-
+    <div class="card">
+        <div class="check">✓</div>
+        <h3>回覆已送出！</h3>
+        <p class="sub">會員將能看到最新的處理狀態與備註。</p>
+        <div class="btn-group">
+            <a class="btn btn-outline" th:href="@{/admin/reports/listAllReports}">回問題回報列表</a>
+            <a class="btn btn-solid" th:href="@{/back-end/home}">回後台首頁</a>
+        </div>
+    </div>
 </body>
 </html>

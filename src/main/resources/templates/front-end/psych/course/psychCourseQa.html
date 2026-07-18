@@ -1,2 +1,123 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>學員提問｜心理師中心</title><link rel="stylesheet" th:href="@{/css/course/psych-style.css}" /></head><body class="th2-page"><div class="layout"><aside class="sidebar"><a class="brand" th:href="@{/psych/course/select_course}">諮由自在 Free Mind<small>THERAPIST STUDIO</small></a><nav class="nav"><a th:href="@{/psych/course/select_course}">課程管理</a><a th:href="@{/psych/course/add_course}">新增／編輯課程</a><a th:href="@{/psych/payout/selectPayout}">營運與成長</a><a class="active" th:href="@{/psych/course/psych_qa}">學員提問</a></nav></aside><div class="main"><header class="topbar"><p>課程商城／學員互動</p><span class="status warning">待回覆</span></header><main class="content"><div class="page-head"><div><h1>學員提問</h1><p>查看課程問題；每則提問只能回覆一次。</p></div><a class="btn ghost" th:href="@{/psych/course/select_course}">返回課程管理</a></div><div class="toolbar"><input class="field" placeholder="搜尋課程或會員……"><select class="field"><option>全部狀態</option><option>待回覆</option><option>已回覆</option></select><select class="field"><option>提問時間新至舊</option></select></div><div class="table-wrap"><table><thead><tr><th>課程／會員</th><th>提問時間</th><th>會員提問</th><th>回覆時間</th><th>心理師回覆</th><th>操作</th></tr></thead><tbody><tr th:if="${questions == null || questions.isEmpty()}"><td class="empty-state" colspan="6">目前沒有學員提問</td></tr><tr th:each="courseQa : ${questions}"><td><strong th:text="${courseQa.course.courseName}">課程</strong><br><span class="meta" th:text="${courseQa.member.name}">會員</span></td><td th:text="${courseQa.askedAt}">—</td><td th:text="${courseQa.courseQuestion}">問題</td><td th:text="${courseQa.answeredAt}">—</td><td th:text="${courseQa.courseAnswer == null ? '尚未回覆' : courseQa.courseAnswer}">—</td><td><form th:if="${courseQa.courseAnswer == null}" method="post" th:action="@{/psych/course/answer_qa}"><div class="form-group"><textarea class="field" name="courseAnswer" required></textarea></div><input type="hidden" name="questionId" th:value="${courseQa.questionId}"><button class="btn" type="submit">送出回覆</button></form><span class="status" th:if="${courseQa.courseAnswer != null}">已回覆</span></td></tr></tbody></table></div></main></div></div><script th:src="@{/js/course/psych-js.js}"></script></body></html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>學員提問｜心理師中心</title>
+  <link rel="stylesheet" th:href="@{/css/course/psych-style.css}" />
+</head>
+<body class="th2-page">
+  <div class="layout">
+    <aside class="sidebar">
+      <a class="brand" th:href="@{/psych/course/select_course}">
+        諮由自在 Free Mind
+        <small>THERAPIST STUDIO</small>
+      </a>
+      <nav class="nav">
+        <a th:href="@{/psych/course/select_course}">課程管理</a>
+        <a th:href="@{/psych/course/add_course}">新增／編輯課程</a>
+        <a th:href="@{/psych/payout/selectPayout}">營運與成長</a>
+        <a class="active" th:href="@{/psych/course/psych_qa}">學員提問</a>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <p>課程商城／學員互動</p>
+        <div class="topbar-actions">
+          <a class="profile-entry" th:href="@{/psych/profile}">
+            <span class="profile-entry-avatar" aria-hidden="true">心</span>
+            <span th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="page-head">
+          <div>
+            <h1>學員提問</h1>
+            <p>查看課程問題；每則提問只能回覆一次。</p>
+          </div>
+          <a class="btn ghost" th:href="@{/psych/course/select_course}">返回課程管理</a>
+        </div>
+
+        <form class="qa-search-form"
+              method="get"
+              th:action="@{/psych/course/psych_qa}"
+              data-qa-search-form>
+          <input class="field"
+                 type="search"
+                 name="keyword"
+                 th:value="${param.keyword != null ? param.keyword[0] : ''}"
+                 placeholder="搜尋課程或會員……">
+          <select class="field" name="orderBy">
+            <option value="courseIdDesc"
+                    th:selected="${param.orderBy == null or param.orderBy[0] == 'courseId' or param.orderBy[0] == 'courseIdDesc'}">
+              提問時間新至舊
+            </option>
+            <option value="courseIdAsc"
+                    th:selected="${param.orderBy != null and param.orderBy[0] == 'courseIdAsc'}">
+              提問時間舊至新
+            </option>
+          </select>
+          <input type="hidden" name="page" value="1">
+          <button class="btn secondary" type="submit">搜尋</button>
+        </form>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>課程／會員</th>
+                <th>提問時間</th>
+                <th>會員提問</th>
+                <th>回覆時間</th>
+                <th>心理師回覆</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${questions == null or questions.isEmpty()}">
+                <td class="empty-state" colspan="6">沒有符合搜尋條件的學員提問</td>
+              </tr>
+              <tr th:each="courseQa : ${questions != null ? questions.content : null}">
+                <td>
+                  <strong th:text="${courseQa.course.courseName}">課程</strong><br>
+                  <span class="meta" th:text="${courseQa.member.name}">會員</span>
+                </td>
+                <td th:text="${courseQa.askedAt}">—</td>
+                <td th:text="${courseQa.courseQuestion}">問題</td>
+                <td th:text="${courseQa.answeredAt}">—</td>
+                <td th:text="${courseQa.courseAnswer == null ? '尚未回覆' : courseQa.courseAnswer}">—</td>
+                <td>
+                  <form th:if="${courseQa.courseAnswer == null}"
+                        method="post"
+                        th:action="@{/psych/course/answer_qa}">
+                    <div class="form-group">
+                      <textarea class="field" name="courseAnswer" required></textarea>
+                    </div>
+                    <input type="hidden" name="questionId" th:value="${courseQa.questionId}">
+                    <button class="btn" type="submit">送出回覆</button>
+                  </form>
+                  <span class="status" th:if="${courseQa.courseAnswer != null}">已回覆</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div data-qa-search-pagination
+             th:if="${questions != null and questions.totalPages > 1}">
+          <div th:replace="~{fragments/pagination :: paginationWithOrder(
+            ${questions.number + 1},
+            ${questions.totalPages},
+            '/psych/course/psych_qa',
+            ${param.orderBy != null ? param.orderBy[0] : null}
+          )}"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script th:src="@{/js/course/psych-js.js}"></script>
+</body>
+</html>

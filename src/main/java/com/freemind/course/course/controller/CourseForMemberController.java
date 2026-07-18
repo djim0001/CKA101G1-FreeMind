@@ -86,13 +86,14 @@ public class CourseForMemberController {
 			@ModelAttribute("condition") CourseSpecification condition,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
-
+System.out.println("有成功進入");
 		Member member = (Member)model.getAttribute("member");
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 //		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
+System.out.println("即將開始確認member");
 		if(member!=null) {
 			for(Course course : courseList) {
 				course.setSaved(courseSvc
@@ -100,6 +101,7 @@ public class CourseForMemberController {
 			}
 			model.addAttribute("memberName", member.getName());
 		}
+System.out.println("確認member完畢");		
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseList", courseList);
 		model.addAttribute("totalPages", courseList.getTotalPages());

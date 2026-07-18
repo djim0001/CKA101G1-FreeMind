@@ -5,7 +5,6 @@
 <title>撰寫心得評論</title>
 <style>
     * { box-sizing: border-box; }
-
     body {
         font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
         background-color: #f5f5f5;
@@ -13,7 +12,6 @@
         padding: 40px 20px;
         color: #333;
     }
-
     .card {
         max-width: 560px;
         margin: 0 auto;
@@ -22,7 +20,6 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
         padding: 36px 40px;
     }
-
     h3 {
         font-size: 22px;
         color: #4a3e3e;
@@ -30,26 +27,13 @@
         padding-bottom: 14px;
         border-bottom: 2px solid #e8b4b4;
     }
+    .info-row { margin-bottom: 8px; font-size: 14px; }
+    .info-row .label { font-weight: 600; color: #7a6b6b; margin-right: 6px; }
 
-    .info-row {
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-    .info-row .label {
-        font-weight: 600;
-        color: #7a6b6b;
-        margin-right: 6px;
-    }
-
-    .field {
-        margin: 20px 0;
-    }
+    .field { margin: 20px 0; }
     .field > label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #7a6b6b;
-        margin-bottom: 8px;
+        display: block; font-size: 13px; font-weight: 600;
+        color: #7a6b6b; margin-bottom: 8px;
     }
 
     .star-rating {
@@ -57,15 +41,10 @@
         flex-direction: row-reverse;
         justify-content: flex-end;
     }
-    .star-rating input[type="radio"] {
-        display: none;
-    }
+    .star-rating input[type="radio"] { display: none; }
     .star-rating label {
-        font-size: 2rem;
-        line-height: 1;
-        color: #ddd;
-        cursor: pointer;
-        padding: 0 2px;
+        font-size: 2rem; line-height: 1; color: #ddd;
+        cursor: pointer; padding: 0 2px;
     }
     .star-rating input[type="radio"]:checked ~ label,
     .star-rating label:hover,
@@ -74,69 +53,59 @@
     }
 
     textarea {
-        width: 100%;
-        height: 120px;
-        resize: none;
-        padding: 10px;
-        border: 1px solid #e0d5d5;
-        border-radius: 6px;
-        font-family: inherit;
-        font-size: 14px;
+        width: 100%; height: 120px; resize: none;
+        padding: 10px; border: 1px solid #e0d5d5;
+        border-radius: 6px; font-family: inherit; font-size: 14px;
     }
-    textarea:focus {
-        outline: none;
-        border-color: #e8b4b4;
-    }
+    textarea:focus { outline: none; border-color: #e8b4b4; }
 
     input[type="submit"] {
-        display: block;
-        width: 100%;
-        margin-top: 8px;
-        padding: 12px 0;
-        background-color: #e8b4b4;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s;
+        display: block; width: 100%; margin-top: 8px;
+        padding: 12px 0; background-color: #e8b4b4; color: #fff;
+        border: none; border-radius: 6px; font-size: 15px;
+        font-weight: 600; cursor: pointer; transition: background-color 0.2s;
     }
-    input[type="submit"]:hover {
-        background-color: #d39393;
-    }
+    input[type="submit"]:hover { background-color: #d39393; }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>撰寫心得評論</h3>
+    <div class="card">
+        <h3>撰寫心得評論</h3>
 
-		<div class="info-row">
-			<span class="label">諮商時間：</span>
-			<span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm')}"></span>
-		</div>
+        <div class="info-row">
+            <span class="label">心理師：</span><span th:text="${orders.psychologist.name}"></span>
+        </div>
+        <div class="info-row">
+            <span class="label">諮商時間：</span>
+            <span th:text="${#temporals.format(orders.consStart, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
 
-		<form method="post" th:action="@{/member/orders/submitReview}">
-			<input type="hidden" name="orderId" th:value="${orders.orderId}">
+        <form method="post" th:action="@{/member/orders/submitReview}">
+            <input type="hidden" name="orderId" th:value="${orders.orderId}">
 
-			<div class="field">
-				<label>評分</label>
-				<div class="star-rating">
-					<input type="radio" id="star5" name="rating" value="5" checked><label for="star5">★</label>
-					<input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
-					<input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
-					<input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
-					<input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
-				</div>
-			</div>
+            <div class="field">
+                <label>評分</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5"
+                           th:checked="${orders.rating != null ? orders.rating == 5 : true}"><label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4"
+                           th:checked="${orders.rating != null and orders.rating == 4}"><label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="3"
+                           th:checked="${orders.rating != null and orders.rating == 3}"><label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2"
+                           th:checked="${orders.rating != null and orders.rating == 2}"><label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1"
+                           th:checked="${orders.rating != null and orders.rating == 1}"><label for="star1">★</label>
+                </div>
+            </div>
 
-			<div class="field">
-				<label>心得內容</label>
-				<textarea name="reviewContent"></textarea>
-			</div>
+            <div class="field">
+                <label>心得內容</label>
+                <textarea name="reviewContent" th:text="${orders.reviewContent}"></textarea>
+            </div>
 
-			<input type="submit" value="送出評論">
-		</form>
-	</div>
+            <input type="submit" value="送出評論">
+        </form>
+    </div>
 </body>
 </html>

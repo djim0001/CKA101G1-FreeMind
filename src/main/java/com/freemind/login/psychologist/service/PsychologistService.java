@@ -23,6 +23,7 @@ import com.freemind.consultation.orders.model.OrdersRepository;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsRepository;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.psychologist.dto.AvailableDateRes;
 import com.freemind.login.psychologist.dto.ConflictOrderRes;
 import com.freemind.login.psychologist.dto.ExpertiseRes;
@@ -57,6 +58,7 @@ public class PsychologistService {
 	private final PasswordEncoder passwordEncoder;
 	private final PersistentTokenRepository psychTokenRepository;
 	
+	private final NoticeService noticeService;
 	
 	private final int DAYS = 14;
 	
@@ -68,6 +70,7 @@ public class PsychologistService {
 			PsychologistRepository repository , SlotsRepository slotsRepository ,
 			OrdersRepository ordersRepository , PsychologistExpertiseRepository psychologistExpertiseRepository , ExpertiseRepository expertiseRepository,
 			PasswordEncoder passwordEncoder,
+			NoticeService noticeService,
 			@Qualifier("psychPersistentTokenRepository") PersistentTokenRepository psychTokenRepository) {
 			 
 		this.psychologistRepository = repository;
@@ -77,6 +80,7 @@ public class PsychologistService {
 		this.expertiseRepository = expertiseRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.psychTokenRepository = psychTokenRepository;
+		this.noticeService = noticeService;
 	}
 
 	
@@ -141,7 +145,8 @@ public class PsychologistService {
 			boolean wasConfirmed = o.getOrderStatus() == 1; // 取消前先記住,取消後就都是2了
 			cancelOrder(o); // 共用改時段那套:orderStatus=2、slot該小時2->0
 			if (wasConfirmed) {
-				// TODO(通知模組尚無API):對 o.getMember() 發「心理師無法提供服務,您的預約已取消」通知
+				noticeService.sendToMember(o.getMember().getMemberId(), null,"很抱歉,心理師目前無法提供服務,您 "
+						+ o.getConsStart().toLocalDate() + " 的預約已取消。", (byte) 0);
 			}
 		}
 	}
@@ -303,6 +308,10 @@ public class PsychologistService {
 				//把有改的時間的訂單到concelOrder
 				if(cancelIds.contains(o.getOrderId())) {
 					cancelOrder(o);
+					noticeService.sendToMember(o.getMember().getMemberId(), null, 
+							"很抱歉,心理師 " + p.getName() + " 因班表異動,您 "
+							+ o.getConsStart().toLocalDate() + " "
+							+ o.getConsStart().toLocalTime() + " 的預約已取消。", (byte) 0);
 				}
 			  }
 			}
@@ -336,7 +345,13 @@ public class PsychologistService {
 		ensureNextDaysSlots(p);
 		
 		if(locChanged) {
-			
+			List<Orders> future = ordersRepository.findByPsychologist_PsychIdAndOrderStatusInAndConsStartGreaterThanEqual(psychId , List.of(0,1) , LocalDateTime.now());
+		
+			for(Orders o : future) {
+				noticeService.sendToMember(o.getMember().getMemberId() , null , 
+						"心理師" + p.getName() + "的工作地點已更新為「" + req.getPsychLoc() + "」,您" + o.getConsStart().toLocalDate() + "的預約請留意" , (byte)0);
+				
+			}
 		}
 	
 		return List.of();
