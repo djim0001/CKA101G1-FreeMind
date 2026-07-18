@@ -1,134 +1,857 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>探索課程｜諮由自在</title>
-<link rel="stylesheet" th:href="@{/css/course/member-style.css}" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="諮由自在 Free Mind 心理課程商城" />
+	<title>探索課程｜諮由自在</title>
+	<style>
+		@font-face {
+			font-family: 'OpenHuninn';
+			src:
+				url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+				url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+			font-weight: 400;
+			font-style: normal;
+			font-display: swap;
+		}
+
+		:root {
+			--bg-warm: #FFFAEE;
+			--bg-soothing: #C2D9ED;
+			--blue-soft: #DCEAF5;
+			--orange: #F58E6B;
+			--orange-deep: #E5764F;
+			--pink: #FBD0BE;
+			--pink-soft: #FDE6DB;
+			--ink: #3A4B53;
+			--ink-soft: #6b7981;
+			--white: #FFFFFF;
+			--line: #ecdfce;
+			--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+			--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+			--radius-lg: 34px;
+			--radius-md: 22px;
+			--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+			--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+			--sans: "Noto Sans TC", system-ui, sans-serif;
+			--script: "Caveat", "OpenHuninn", cursive;
+			--display-en: "Baloo 2", sans-serif;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			min-width: 320px;
+			scroll-behavior: smooth;
+		}
+
+		body {
+			min-width: 320px;
+			min-height: 100vh;
+			margin: 0;
+			color: var(--ink);
+			background:
+				radial-gradient(circle at 5% 12%, rgba(251, 208, 190, .25), transparent 25rem),
+				radial-gradient(circle at 96% 38%, rgba(194, 217, 237, .28), transparent 27rem),
+				var(--bg-warm);
+			font-family: var(--sans);
+			line-height: 1.7;
+			-webkit-font-smoothing: antialiased;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		button,
+		input,
+		select {
+			font: inherit;
+		}
+
+		button {
+			border: 0;
+			cursor: pointer;
+		}
+
+		img,
+		svg,
+		video {
+			display: block;
+			max-width: 100%;
+		}
+
+		.course-market-main {
+			width: min(1160px, 92vw);
+			margin-inline: auto;
+			padding: clamp(2rem, 5vw, 4.5rem) 0 4.5rem;
+		}
+
+		.course-market-hero {
+			position: relative;
+			display: grid;
+			grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+			gap: clamp(2rem, 5vw, 4rem);
+			align-items: center;
+			min-height: 370px;
+			padding: clamp(2rem, 5vw, 4.25rem);
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-lg);
+			background: rgba(255, 255, 255, .84);
+			box-shadow: var(--shadow-md);
+		}
+
+		.course-market-hero::before {
+			position: absolute;
+			top: -9rem;
+			right: -7rem;
+			width: 25rem;
+			height: 25rem;
+			border-radius: 50%;
+			background: rgba(194, 217, 237, .64);
+			content: "";
+			pointer-events: none;
+		}
+
+		.course-market-hero::after {
+			position: absolute;
+			right: 27%;
+			bottom: -8rem;
+			width: 15rem;
+			height: 15rem;
+			border-radius: 50%;
+			background: rgba(251, 208, 190, .45);
+			content: "";
+			pointer-events: none;
+		}
+
+		.hero-copy,
+		.hero-study-card {
+			position: relative;
+			z-index: 1;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: .55rem;
+			margin: 0 0 .9rem;
+			color: var(--orange-deep);
+			font-size: .76rem;
+			font-weight: 700;
+			letter-spacing: .18em;
+			text-transform: uppercase;
+		}
+
+		.eyebrow::before {
+			width: 1.8rem;
+			height: 2px;
+			border-radius: 999px;
+			background: var(--orange);
+			content: "";
+		}
+
+		h1,
+		h2,
+		h3,
+		p {
+			overflow-wrap: anywhere;
+		}
+
+		.hero-copy h1 {
+			max-width: 10em;
+			margin: 0;
+			font-family: var(--serif);
+			font-size: clamp(2.2rem, 5vw, 4rem);
+			line-height: 1.18;
+			letter-spacing: -.035em;
+		}
+
+		.hero-copy h1 span {
+			position: relative;
+			display: inline-block;
+			color: var(--orange-deep);
+			z-index: 0;
+		}
+
+		.hero-copy h1 span::after {
+			position: absolute;
+			right: -.08em;
+			bottom: .05em;
+			left: -.08em;
+			z-index: -1;
+			height: .4em;
+			border-radius: .25em;
+			background: var(--pink);
+			content: "";
+			opacity: .75;
+		}
+
+		.hero-copy > p:last-child {
+			max-width: 36rem;
+			margin: 1.15rem 0 0;
+			color: var(--ink-soft);
+			font-size: 1rem;
+		}
+
+		.hero-study-card {
+			display: grid;
+			grid-template-columns: 72px minmax(0, 1fr);
+			gap: 1rem;
+			align-items: center;
+			padding: 1.35rem;
+			border: 1px solid rgba(255, 255, 255, .86);
+			border-radius: var(--radius-md);
+			background: rgba(255, 255, 255, .78);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.hero-study-icon {
+			display: grid;
+			place-items: center;
+			width: 72px;
+			height: 72px;
+			border-radius: 20px;
+			color: var(--orange-deep);
+			background: var(--pink-soft);
+		}
+
+		.hero-study-icon svg {
+			width: 34px;
+			height: 34px;
+			stroke: currentColor;
+		}
+
+		.hero-study-card strong {
+			display: block;
+			font-family: var(--serif);
+			font-size: 1rem;
+		}
+
+		.hero-study-card p {
+			margin: .3rem 0 0;
+			color: var(--ink-soft);
+			font-size: .82rem;
+		}
+
+		.course-account-tools {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			margin-top: 1.25rem;
+			padding: .85rem 1rem;
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			background: rgba(255, 255, 255, .82);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.course-account-tools > span {
+			color: var(--ink-soft);
+			font-size: .78rem;
+			font-weight: 700;
+			letter-spacing: .08em;
+		}
+
+		.course-tool-links {
+			display: flex;
+			align-items: center;
+			gap: .35rem;
+			flex-wrap: wrap;
+		}
+
+		.course-tool-links a {
+			display: inline-flex;
+			align-items: center;
+			gap: .38rem;
+			padding: .5rem .72rem;
+			border-radius: 999px;
+			color: var(--ink);
+			font-size: .8rem;
+			font-weight: 500;
+			transition: color .16s ease, background .16s ease;
+		}
+
+		.course-tool-links a:hover {
+			color: var(--orange-deep);
+			background: var(--pink-soft);
+		}
+
+		.course-tool-links svg {
+			width: 16px;
+			height: 16px;
+			stroke: currentColor;
+		}
+
+		.member-message {
+			margin-top: 1.25rem;
+			padding: .9rem 1rem;
+			border: 1px solid #BDD2C4;
+			border-left: 4px solid #7FA98B;
+			border-radius: 12px;
+			color: #3F6650;
+			background: #EFF7F1;
+			font-size: .88rem;
+		}
+
+		.course-controls {
+			margin-top: clamp(2.3rem, 5vw, 4rem);
+			padding: 1.25rem;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: rgba(255, 255, 255, .9);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.search-toolbar {
+			display: grid;
+			grid-template-columns: minmax(220px, 1fr) minmax(180px, .36fr) auto;
+			gap: .75rem;
+		}
+
+		.field {
+			width: 100%;
+			min-height: 48px;
+			padding: .72rem .9rem;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			color: var(--ink);
+			background: var(--white);
+			outline: 0;
+			transition: border-color .16s ease, box-shadow .16s ease;
+		}
+
+		.field:focus {
+			border-color: var(--orange);
+			box-shadow: 0 0 0 3px rgba(245, 142, 107, .16);
+		}
+
+		.field::placeholder {
+			color: #95A0A5;
+		}
+
+		.primary-button,
+		.card-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: .4rem;
+			min-height: 46px;
+			padding: .68rem 1rem;
+			border-radius: 12px;
+			font-weight: 700;
+			transition: transform .16s ease, background .16s ease, color .16s ease, border-color .16s ease;
+		}
+
+		.primary-button {
+			color: var(--white);
+			background: var(--orange);
+			box-shadow: 0 7px 18px rgba(245, 142, 107, .28);
+		}
+
+		.primary-button:hover {
+			background: var(--orange-deep);
+			transform: translateY(-1px);
+		}
+
+		.category-filter {
+			display: flex;
+			align-items: center;
+			gap: .45rem;
+			margin-top: 1rem;
+			padding-top: 1rem;
+			overflow-x: auto;
+			border-top: 1px solid var(--line);
+			scrollbar-width: thin;
+		}
+
+		.category-filter a,
+		.category-filter button {
+			flex: 0 0 auto;
+			min-height: 38px;
+			padding: .48rem .8rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			font-size: .8rem;
+			transition: color .16s ease, border-color .16s ease, background .16s ease;
+		}
+
+		.category-filter a:hover,
+		.category-filter button:hover,
+		.category-filter .active {
+			border-color: var(--bg-soothing);
+			color: var(--ink);
+			background: var(--blue-soft);
+		}
+
+		.section-head {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 2rem;
+			margin: clamp(2.8rem, 6vw, 4.8rem) 0 1.4rem;
+		}
+
+		.section-head h2 {
+			margin: .1rem 0 0;
+			font-family: var(--serif);
+			font-size: clamp(1.65rem, 3vw, 2.25rem);
+			line-height: 1.3;
+		}
+
+		.section-head > p {
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .88rem;
+			text-align: right;
+		}
+
+		.empty-state {
+			padding: 3rem 1.5rem;
+			border: 1px dashed #C9D7DC;
+			border-radius: var(--radius-md);
+			color: var(--ink-soft);
+			background: rgba(220, 234, 245, .45);
+			text-align: center;
+		}
+
+		.empty-state-icon {
+			display: grid;
+			place-items: center;
+			width: 58px;
+			height: 58px;
+			margin: 0 auto 1rem;
+			border-radius: 18px;
+			color: var(--ink);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+		}
+
+		.empty-state-icon svg {
+			width: 28px;
+			height: 28px;
+			stroke: currentColor;
+		}
+
+		.empty-state h3 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: 1.08rem;
+		}
+
+		.empty-state p {
+			margin: .35rem 0 0;
+			font-size: .85rem;
+		}
+
+		.course-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.course-card {
+			display: flex;
+			min-width: 0;
+			flex-direction: column;
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+		}
+
+		.course-card:hover {
+			border-color: rgba(245, 142, 107, .42);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-4px);
+		}
+
+		.course-cover {
+			position: relative;
+			display: block;
+			aspect-ratio: 16 / 9;
+			overflow: hidden;
+			background: var(--blue-soft);
+		}
+
+		.course-cover video {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.course-cover::after {
+			position: absolute;
+			inset: auto 0 0;
+			height: 42%;
+			background: linear-gradient(to top, rgba(58, 75, 83, .48), transparent);
+			content: "";
+			pointer-events: none;
+		}
+
+		.cover-category {
+			position: absolute;
+			right: .75rem;
+			bottom: .7rem;
+			z-index: 1;
+			padding: .32rem .62rem;
+			border-radius: 999px;
+			color: var(--white);
+			background: rgba(58, 75, 83, .78);
+			font-size: .7rem;
+			backdrop-filter: blur(6px);
+		}
+
+		.course-body {
+			display: flex;
+			flex: 1;
+			flex-direction: column;
+			padding: 1.15rem;
+		}
+
+		.course-tag {
+			align-self: flex-start;
+			padding: .28rem .58rem;
+			border-radius: 999px;
+			color: var(--orange-deep);
+			background: var(--pink-soft);
+			font-size: .68rem;
+			font-weight: 700;
+		}
+
+		.course-body h3 {
+			margin: .72rem 0 .4rem;
+			font-family: var(--serif);
+			font-size: 1.08rem;
+			line-height: 1.45;
+		}
+
+		.course-meta {
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .8rem;
+		}
+
+		.course-stats {
+			display: flex;
+			gap: .75rem;
+			margin-top: .8rem;
+			padding: .7rem 0;
+			border-top: 1px solid var(--line);
+			border-bottom: 1px solid var(--line);
+			color: var(--ink-soft);
+			font-size: .72rem;
+			flex-wrap: wrap;
+		}
+
+		.course-stats b {
+			color: var(--ink);
+			font-weight: 700;
+		}
+
+		.price-row {
+			margin-top: .9rem;
+		}
+
+		.course-price {
+			color: var(--orange-deep);
+			font-family: var(--display-en);
+			font-size: 1.22rem;
+			font-weight: 700;
+		}
+
+		.inline-actions {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: .55rem;
+			margin-top: auto;
+			padding-top: 1rem;
+		}
+
+		.inline-form {
+			margin: 0;
+		}
+
+		.card-action {
+			width: 100%;
+			min-height: 42px;
+			padding: .55rem .7rem;
+			border: 1px solid var(--orange);
+			color: var(--white);
+			background: var(--orange);
+			font-size: .78rem;
+		}
+
+		.card-action:hover {
+			border-color: var(--orange-deep);
+			background: var(--orange-deep);
+		}
+
+		.card-action.ghost {
+			border-color: var(--line);
+			color: var(--ink);
+			background: var(--white);
+		}
+
+		.card-action.ghost:hover,
+		.card-action.ghost.is-active {
+			border-color: var(--pink);
+			color: var(--orange-deep);
+			background: var(--pink-soft);
+		}
+
+		.favorite-heart {
+			font-size: 1rem;
+			line-height: 1;
+		}
+
+		.pagination-slot {
+			margin-top: 2rem;
+		}
+
+		.course-market-main :focus-visible {
+			outline: 3px solid var(--orange);
+			outline-offset: 3px;
+		}
+
+		@media (max-width: 920px) {
+			.course-market-hero {
+				grid-template-columns: 1fr;
+			}
+
+			.hero-study-card {
+				width: min(100%, 32rem);
+			}
+
+			.course-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+		}
+
+		@media (max-width: 700px) {
+			.course-market-main {
+				padding-top: 1.5rem;
+			}
+
+			.course-market-hero {
+				min-height: auto;
+				padding: 1.6rem;
+				border-radius: var(--radius-md);
+			}
+
+			.course-account-tools {
+				display: block;
+			}
+
+			.course-tool-links {
+				margin-top: .5rem;
+			}
+
+			.search-toolbar {
+				grid-template-columns: 1fr;
+			}
+
+			.section-head {
+				display: block;
+			}
+
+			.section-head > p {
+				margin-top: .5rem;
+				text-align: left;
+			}
+		}
+
+		@media (max-width: 540px) {
+			.hero-study-card {
+				grid-template-columns: 54px minmax(0, 1fr);
+			}
+
+			.hero-study-icon {
+				width: 54px;
+				height: 54px;
+				border-radius: 16px;
+			}
+
+			.course-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.course-tool-links a {
+				padding-inline: .58rem;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				scroll-behavior: auto !important;
+				transition: none !important;
+			}
+		}
+	</style>
 </head>
-<body class="thy2-member">
-	<header class="site-header">
-		<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>COURSE
-				MARKET</small></a>
-		<nav class="main-nav">
-			<a class="active" th:href="@{/member/course/select_course}">探索課程</a><a
-				th:href="@{/member/dashboard}">我的療癒足跡</a><a
-				th:href="@{/member/dashboard/myCollection}">我的收藏</a><a
-				th:href="@{/member/coupon/my_coupon}">我的優惠券</a><a
-				th:href="@{/member/course/my_course_order}">訂單紀錄</a>
-		</nav>
-		<div class="header-actions"><a class="cart-link" th:href="@{/member/course/shopping_cart}">購物車</a><a class="profile-entry" th:href="@{/member/profile}"><span th:text="${member==null?'會員':member.name}"></span></a></div>
-	</header>
-	<main class="container">
-		<section class="hero">
-			<div>
-				<p class="eyebrow">Course market</p>
-				<h1>找到適合此刻的心理課程</h1>
+<body>
+<!-- 	<header th:replace="~{member/memberHeader_new :: siteHeader('course')}"></header> -->
+<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
+	<main class="course-market-main">
+		<section class="course-market-hero" aria-labelledby="page-title">
+			<div class="hero-copy">
+				<p class="eyebrow">Course Market</p>
+				<h1 id="page-title">找到適合此刻的<span>心理課程</span></h1>
 				<p>用自己的速度學習，從理解情緒、關係與自我開始。</p>
 			</div>
-			<div class="hero-art" aria-hidden="true"></div>
+			<div class="hero-study-card" aria-hidden="true">
+				<span class="hero-study-icon">
+					<svg viewBox="0 0 24 24" fill="none">
+						<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22V5.5ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22V5.5Z" stroke-width="1.7" stroke-linejoin="round" />
+					</svg>
+				</span>
+				<span>
+					<strong>依自己的步調開始</strong>
+					<p>從課程分類與排序中，找到目前需要的學習內容。</p>
+				</span>
+			</div>
 		</section>
-		<div class="notice member-message" th:if="${cartMsg != null}"
-			th:text="${cartMsg}" style="margin-top: 22px"></div>
-		<form class="toolbar" method="get"
-			th:action="@{/member/course/select_course}">
-			<input class="field" type="search" name="keyword"
-				placeholder="搜尋課程名稱或心理師……" data-course-search><select
-				class="field" name="orderBy"><option value="listedAt"
-					th:selected="${orderBy == 'listedAt'}">最新上架</option>
-				<option value="popular" th:selected="${orderBy == 'popular'}">熱門課程</option>
-				<option value="priceAsc" th:selected="${orderBy == 'priceAsc'}">價格由低至高</option>
-				<option value="priceDesc" th:selected="${orderBy == 'priceDesc'}">價格由高至低</option></select>
-			<button class="btn" type="submit">搜尋課程</button>
-		</form>
-		<div class="course-filter-row">
-			<form class="tabs course-sort-tabs" method="get"
-				th:action="@{/member/course/select_course}" aria-label="課程排序">
-				<button type="submit" name="orderBy" value="popular"
-					th:classappend="${orderBy == 'popular'} ? 'active' : ''">熱門課程</button>
-				<button type="submit" name="orderBy" value="listedAt"
-					th:classappend="${orderBy == null or orderBy == '' or orderBy == 'listedAt'} ? 'active' : ''">最新課程</button>
+
+		<nav class="course-account-tools" aria-label="我的課程工具">
+			<span>我的課程工具</span>
+			<div class="course-tool-links">
+				<a th:href="@{/member/dashboard/myCollection}">
+					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path d="m12 20-1.4-1.3C5.4 14 2 10.9 2 7.1A4.1 4.1 0 0 1 6.2 3 4.6 4.6 0 0 1 12 6.2 4.6 4.6 0 0 1 17.8 3 4.1 4.1 0 0 1 22 7.1c0 3.8-3.4 6.9-8.6 11.6L12 20Z" stroke-width="1.7" stroke-linejoin="round" />
+					</svg>
+					我的收藏
+				</a>
+				<a th:href="@{/member/coupon/my_coupon}">
+					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path d="M4 5h16v4a3 3 0 0 0 0 6v4H4v-4a3 3 0 0 0 0-6V5Z" stroke-width="1.7" stroke-linejoin="round" />
+						<path d="M12 7v10" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="2 3" />
+					</svg>
+					我的優惠券
+				</a>
+				<a th:href="@{/member/course/my_course_order}">
+					<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z" stroke-width="1.7" stroke-linejoin="round" />
+						<path d="M9 8h6M9 12h6" stroke-width="1.7" stroke-linecap="round" />
+					</svg>
+					訂單紀錄
+				</a>
+			</div>
+		</nav>
+
+		<div class="member-message" th:if="${cartMsg != null}" th:text="${cartMsg}"></div>
+
+		<section class="course-controls" aria-label="搜尋與篩選課程">
+			<form class="search-toolbar" method="get" th:action="@{/member/course/select_course}">
+				<input class="field" type="search" name="keyword" placeholder="搜尋課程名稱或心理師……" data-course-search="true" />
+				<select class="field" name="orderBy" aria-label="課程排序方式">
+					<option value="listedAt" th:selected="${orderBy == 'listedAt'}">最新上架</option>
+					<option value="popular" th:selected="${orderBy == 'popular'}">熱門課程</option>
+					<option value="priceAsc" th:selected="${orderBy == 'priceAsc'}">價格由低至高</option>
+					<option value="priceDesc" th:selected="${orderBy == 'priceDesc'}">價格由高至低</option>
+				</select>
+				<button class="primary-button" type="submit">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+						<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+						<path d="m16 16 4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+					</svg>
+					搜尋課程
+				</button>
 			</form>
-			<form class="tabs course-category-tabs" method="get"
-				th:action="@{/member/course/select_course}" aria-label="課程分類">
-				<a th:href="@{/member/course/select_course}"
-					th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
+
+			<form class="category-filter" method="get" th:action="@{/member/course/select_course}" aria-label="課程分類">
+				<a th:href="@{/member/course/select_course}" th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
 				<button type="submit" name="courseCatId"
 					th:each="courseCategories : ${courseCategoriesListAll}"
 					th:value="${courseCategories.courseCatId}"
 					th:text="${courseCategories.courseCatName}"
 					th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
 			</form>
-		</div>
+		</section>
+
 		<div class="section-head">
 			<div>
-				<p class="eyebrow">Available courses</p>
+				<p class="eyebrow">Available Courses</p>
 				<h2>所有課程</h2>
 			</div>
 			<p>依你的步調，選一堂想開始的課。</p>
 		</div>
-		<div class="empty-state"
-			th:if="${courseList == null || courseList.isEmpty()}">
+
+		<div class="empty-state" th:if="${courseList == null || courseList.isEmpty()}">
+			<span class="empty-state-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24" fill="none">
+					<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22V5.5ZM20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22V5.5Z" stroke-width="1.7" stroke-linejoin="round" />
+				</svg>
+			</span>
 			<h3>目前沒有符合條件的課程</h3>
 			<p>請調整搜尋條件後再試一次。</p>
 		</div>
-		<section class="course-grid">
-			<article class="course-card" data-course-card
+
+		<section class="course-grid" aria-label="課程列表">
+			<article class="course-card" data-course-card="true"
 				th:each="course : ${courseList}"
 				th:attr="data-category=${course.courseCategories.courseCatId}">
-				<a class="course-cover course-video-cover course-cover-link"
-					th:href="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}"
+				<a class="course-cover" th:href="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}"
 					th:attr="aria-label=${'查看「' + course.courseName + '」課程詳情'}">
-					<video muted playsinline preload="metadata" data-course-thumbnail
+					<video muted="muted" playsinline="playsinline" preload="metadata" data-course-thumbnail="true"
 						th:src="${course.videoSrcPre != null and !#strings.isEmpty(course.videoSrcPre) ? course.videoSrcPre : course.videoSrc}"
 						th:attr="aria-label=${course.courseName + '影片預覽圖'}"></video>
-					<span th:text="${course.courseCategories.courseCatName}">課程分類</span>
+					<span class="cover-category" th:text="${course.courseCategories.courseCatName}">課程分類</span>
 				</a>
+
 				<div class="course-body">
-					<span class="tag"
-						th:text="${course.courseCategories.courseCatName}">分類</span>
+					<span class="course-tag" th:text="${course.courseCategories.courseCatName}">分類</span>
 					<h3 th:text="${course.courseName}">課程名稱</h3>
-					<p class="meta">
-						<span th:text="${course.psychologist.name}">心理師</span> 心理師
-					</p>
+					<p class="course-meta"><span th:text="${course.psychologist.name}">心理師</span> 心理師</p>
+
 					<div class="course-stats">
-						<span>收藏 <b th:text="${course.saveCount}">0</b></span><span>評價
-							<b th:text="${course.reviewCount}">0</b>
-						</span><span>提問 <b th:text="${course.commentCount}">0</b></span>
+						<span>收藏 <b th:text="${course.saveCount}">0</b></span>
+						<span>評價 <b th:text="${course.reviewCount}">0</b></span>
+						<span>提問 <b th:text="${course.commentCount}">0</b></span>
 					</div>
+
 					<div class="price-row">
-						<span class="price">NT$ <span th:text="${course.price}">0</span></span>
+						<span class="course-price">NT$ <span th:text="${course.price}">0</span></span>
 					</div>
+
 					<div class="inline-actions">
-						<form class="inline-form" method="post"
-							th:action="@{/member/course/add_cart}">
-							<input type="hidden" name="courseId"
-								th:value="${course.courseId}"><input type="hidden"
-								name="returnUrl">
-							<button class="btn" type="submit">加入購物車</button>
+						<form class="inline-form" method="post" th:action="@{/member/course/add_cart}">
+							<input type="hidden" name="courseId" th:value="${course.courseId}" />
+							<input type="hidden" name="returnUrl" />
+							<button class="card-action" type="submit">加入購物車</button>
 						</form>
-						<form class="inline-form" method="post"
-							th:action="@{/member/dashboard/favorite/toggle}">
-							<input type="hidden" name="courseId"
-								th:value="${course.courseId}"><input type="hidden"
-								name="currentPage" th:value="${currentPage}"><input
-								type="hidden" name="orderBy" th:value="${orderBy}"><input
-								type="hidden" name="returnUrl">
-							<button class="btn ghost" type="submit"
-								th:classappend="${course.saved} ? ' is-active' : ''">
-								<span class="favorite-heart" aria-hidden="true"
-									th:text="${course.saved} ? '♥' : '♡'">♡</span><span
-									th:text="${course.saved} ? '已收藏' : '收藏'">收藏</span>
+
+						<form class="inline-form" method="post" th:action="@{/member/dashboard/favorite/toggle}">
+							<input type="hidden" name="courseId" th:value="${course.courseId}" />
+							<input type="hidden" name="currentPage" th:value="${currentPage}" />
+							<input type="hidden" name="orderBy" th:value="${orderBy}" />
+							<input type="hidden" name="returnUrl" />
+							<button class="card-action ghost" type="submit" th:classappend="${course.saved} ? ' is-active' : ''">
+								<span class="favorite-heart" aria-hidden="true" th:text="${course.saved} ? '♥' : '♡'">♡</span>
+								<span th:text="${course.saved} ? '已收藏' : '收藏'">收藏</span>
 							</button>
 						</form>
 					</div>
 				</div>
 			</article>
 		</section>
-		<div
+
+		<div class="pagination-slot"
 			th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>
 	</main>
-	<footer class="site-footer">讓學習成為照顧自己的方式。</footer>
+
+	<footer th:replace="~{member/memberFooter_new :: siteFooter}"></footer>
+
 	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

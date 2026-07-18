@@ -62,7 +62,7 @@ public class CouponController {
 		model.addAttribute("couponListAllPages", couponListAllPages);
 		model.addAttribute("totalPages", couponListAllPages.getTotalPages());
 
-		return "back-end/course/coupon/selectCoupon";
+		return "back-end/course/course/selectCoupon";
 	}
 
 	@GetMapping("/add_coupon")
