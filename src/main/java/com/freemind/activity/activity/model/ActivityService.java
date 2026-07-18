@@ -40,7 +40,8 @@ public class ActivityService {
 		
 		activity.setActivityStatus(0);  // 活動狀態預設為「待審核」
 		activity.setRegisCount(0);      // 報名人數預設為0
-		activity.setCreatedAt(LocalDateTime.now());  // 系統自動帶入建立時間
+		activity.setWaitlistCount(0);   // 備取人數預設為0
+		activity.setCreatedAt(LocalDateTime.now());  
 		repository.save(activity);
 	}
 	
@@ -55,7 +56,7 @@ public class ActivityService {
 	    
 	    activity.setMember(existing.getMember());   // 找出原本的發起人，設定到即將要存檔的activity身上
 	    activity.setRegisCount(existing.getRegisCount()); // 補回目前報名人數，不讓使用者的表單洗掉這個值
-	    
+	    activity.setWaitlistCount(existing.getWaitlistCount());
 	    
 	    // 保留原始圖片
 	    if (activity.getPicture() == null) { 

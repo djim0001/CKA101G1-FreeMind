@@ -20,6 +20,11 @@ public class WebConfig implements WebMvcConfigurer {
 	@Value("${article.upload.url-path}")
     private String articleUrlPath;
 	
+	@Value("${activity.upload.dir}")
+	private String activityUploadDir;
+
+	@Value("${activity.upload.url-path}")
+	private String activityUrlPath;
 
 	@Value("${psych.upload.dir}")
 	private String psychUploadDir;
@@ -32,6 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
 	    registry.addResourceHandler(videoUrlPath).addResourceLocations("file:" + videoUploadDir);
 	    registry.addResourceHandler(articleUrlPath).addResourceLocations("file:" + articleUploadDir);
 	    registry.addResourceHandler(psychUrlPath).addResourceLocations("file:" + psychUploadDir);
+	    registry.addResourceHandler(activityUrlPath).addResourceLocations("file:" + activityUploadDir);
 	}
    
 	

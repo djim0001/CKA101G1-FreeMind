@@ -33,6 +33,11 @@ public interface RegistrationRepository extends JpaRepository<Registration, Inte
 	     + "ORDER BY r.reviewedAt DESC")
 	List<Registration> findReviewsByActivity(@Param("activity") Activity activity);
 	
+	// 5.計數：某一活動中，報名狀態為0,1,4的報名紀錄有幾筆
+	long countByActivityAndRegisStatusIn(Activity activity, List<Integer> statusList);
 	
 	
+	// 6.群組查詢各活動待審核人數
+	@Query("SELECT r.activity.activityId, COUNT(r) FROM Registration r WHERE r.regisStatus = 0 AND r.activity IN :activities GROUP BY r.activity.activityId")
+	List<Object[]> countPendingGroupByActivity(@Param("activities") List<Activity> activities);
 }

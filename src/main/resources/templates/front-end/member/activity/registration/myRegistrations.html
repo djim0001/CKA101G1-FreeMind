@@ -351,6 +351,7 @@
                     <th>活動名稱</th>
                     <th>活動時間</th>
                     <th>報名時間</th>
+                    <th>報名動機</th>
                     <th>報名狀態</th>
                     <th>活動狀態</th>
                     <th>我的評價</th>
@@ -359,12 +360,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="r : ${regisListData}">
-                    <td th:text="${r.activity.activityName}"></td>
-                    <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-                    <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
-                    <td th:text="${r.regisStatusText}"></td>
-                    <td th:text="${r.activity.memberViewStatusText}"></td>
+			  <tr th:each="r : ${regisListData}">
+			        <td th:text="${r.activity.activityName}"></td>
+			        <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+			        <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+			        <td th:text="${r.motivation}"></td>
+			        <td>
+			            <span th:text="${r.regisStatusText}"></span>
+			            <span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
+			                <br><small>（<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）</small>
+			            </span>
+			        </td>
+			        <td th:text="${r.activity.memberViewStatusText}"></td>
                     <td>
                         <span th:if="${r.reviewedAt != null}"
                               th:text="'★' + ${r.rating}"

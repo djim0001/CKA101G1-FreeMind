@@ -123,26 +123,26 @@ public class ActivityAdminController {
     }
     
     // 圖片
-    @GetMapping("activityImage")
-    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
-            throws IOException {
-        res.setContentType("image/jpeg");
-        Activity activity = activitySvc.getOneActivity(activityId);
-     
-
-        if (activity == null || activity.getPicture() == null) {
-            return;
-        }
-
-        String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
-        File imageFile = new File(uploadDir, activity.getPicture());
-
-        if (!imageFile.exists()) {
-            return;
-        }
-        res.setContentType("image/jpeg");
-        Files.copy(imageFile.toPath(), res.getOutputStream());
-    }
+//    @GetMapping("activityImage")
+//    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
+//            throws IOException {
+//        res.setContentType("image/jpeg");
+//        Activity activity = activitySvc.getOneActivity(activityId);
+//     
+//
+//        if (activity == null || activity.getPicture() == null) {
+//            return;
+//        }
+//
+//        String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+//        File imageFile = new File(uploadDir, activity.getPicture());
+//
+//        if (!imageFile.exists()) {
+//            return;
+//        }
+//        res.setContentType("image/jpeg");
+//        Files.copy(imageFile.toPath(), res.getOutputStream());
+//    }
     
     // 詳情
     @GetMapping("listOneActivity")

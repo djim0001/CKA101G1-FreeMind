@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -43,6 +44,11 @@ public class Registration implements Serializable{
 	@Column(name="regis_at", nullable=false)
 	private LocalDateTime regisAt;
 	
+	@Column(name="motivation", length=200)
+	@NotEmpty(message = "報名動機: 請勿空白")
+	@Size(max=200, message="報名動機: 長度不能超過{max}")
+	private String motivation;
+	
 	@Column(name="cancelled_at")
 	private LocalDateTime cancelledAt;
 	
@@ -54,6 +60,15 @@ public class Registration implements Serializable{
 	@Column(name="cancel_note", length=200)
 	@Size(max=200, message="取消補充說明：長度不能超過{max}")
 	private String cancelNote;
+	
+	@Min(value=0, message="拒絕原因：請選擇有效的選項")
+	@Max(value=2, message="拒絕原因：請選擇有效的選項")
+	@Column(name="reject_reason", columnDefinition="tinyint")
+	private Integer rejectReason;
+	
+	@Column(name="reject_note", length=200)
+	@Size(max=200, message="拒絕補充說明：長度不能超過{max}")
+	private String rejectNote;
 	
 	@Column(name="review_content", length=500)
 	@Size(max=500, message="活動心得：長度不能超過{max}")
@@ -106,6 +121,14 @@ public class Registration implements Serializable{
 	public void setRegisAt(LocalDateTime regisAt) {
 		this.regisAt = regisAt;
 	}
+	
+	public String getMotivation() {
+		return motivation;
+	}
+
+	public void setMotivation(String motivation) {
+		this.motivation = motivation;
+	}
 
 	public LocalDateTime getCancelledAt() {
 		return cancelledAt;
@@ -129,6 +152,22 @@ public class Registration implements Serializable{
 
 	public void setCancelNote(String cancelNote) {
 		this.cancelNote = cancelNote;
+	}
+
+	public Integer getRejectReason() {
+		return rejectReason;
+	}
+
+	public void setRejectReason(Integer rejectReason) {
+		this.rejectReason = rejectReason;
+	}
+
+	public String getRejectNote() {
+		return rejectNote;
+	}
+
+	public void setRejectNote(String rejectNote) {
+		this.rejectNote = rejectNote;
 	}
 
 	public String getReviewContent() {
@@ -159,9 +198,10 @@ public class Registration implements Serializable{
 		if (this.regisStatus == null) return "狀態待確認";
 		switch (this.regisStatus) {
 		case 0: return "待審核";
-		case 1: return "已報名成功";
+		case 1: return "已報名成功(正取)";
 		case 2: return "報名失敗";
 		case 3: return "已取消報名";
+		case 4: return "已報名成功(備取)";
 		default: return "狀態異常(待確認)";
 		}
 	}
@@ -176,8 +216,18 @@ public class Registration implements Serializable{
 		}
 	}
 	
+	public String getRejectReasonText() {
+		if (this.rejectReason == null) return "無";
+		switch (this.rejectReason) {
+		case 0: return "報名表單填寫不明確";
+		case 1: return "不符合活動資格條件";
+		case 2: return "其他";
+		default: return "未定義的拒絕原因";
+		}
+	}
+	
 	public boolean isCancellable() {
-	    if (this.regisStatus == null || (this.regisStatus != 0 && this.regisStatus != 1)) {
+	    if (this.regisStatus == null || (this.regisStatus != 0 && this.regisStatus != 1 && this.regisStatus != 4)) {
 	        return false;
 	    }
 	    
