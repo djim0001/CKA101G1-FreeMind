@@ -8,9 +8,12 @@
 		<div class="meta">
 			後台管理／<span th:text="${sectionTitle}">模組</span>
 		</div>
-		<div class="admin-id">
-			<span class="avatar" th:text="${admin != null and admin.name != null ? #strings.substring(admin.name,0,1) : '管'}">管</span>
-			<span th:text="${admin != null ? admin.name : '系統管理員'}">系統管理員</span>
+		<div class="admin-id"
+			th:with="adminUser=${(#authentication != null
+				and #authentication.principal instanceof T(com.freemind.login.security.adminsecurity.AdminUserDetails))
+				? #authentication.principal.admin : null}">
+			<span class="avatar" th:text="${adminUser != null and adminUser.name != null ? #strings.substring(adminUser.name,0,1) : '管'}">管</span>
+			<span th:text="${adminUser != null ? adminUser.name : '系統管理員'}">系統管理員</span>
 			<form class="inline-form" th:action="@{/back-end/logout}" method="post">
 				<button class="btn ghost" type="submit">登出</button>
 			</form>
