@@ -242,3 +242,16 @@ textarea.field { min-height: 110px; resize: vertical; }
 .thy2-member .pagination-ui [aria-current="page"],.thy2-member .pagination-ui .active>a,.thy2-member .pagination-ui a.active { color:#fff; background:var(--brand); border-color:var(--brand); box-shadow:0 6px 15px rgba(94,118,104,.24); pointer-events:none; }
 .thy2-member .pagination-ui [aria-disabled="true"],.thy2-member .pagination-ui .disabled>a { color:#a7aa9f; background:#eceadf; pointer-events:none; opacity:.72; }
 @media(max-width:640px){.thy2-member .pagination-ui{justify-content:flex-start;width:100%;margin-top:22px}.thy2-member .pagination-ui a,.thy2-member .pagination-ui button{min-width:37px;min-height:37px;padding:7px 10px}}
+
+/* 必填標記：label.required 前置紅色星號 */
+.thy2-member label.required::before { content: "* "; font-weight: 700; }
+
+/* 密碼顯示/隱藏切換（.pw-wrap 包住 input，.pw-toggle 為右側眼睛鈕；ui.js 綁定） */
+.thy2-member .pw-wrap { position: relative; }
+.thy2-member .pw-wrap .field { padding-right: 44px; }
+.thy2-member .pw-toggle { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; color: var(--muted); background: transparent; border: 0; border-radius: 8px; cursor: pointer; transition: color .16s ease, background .16s ease; }
+.thy2-member .pw-toggle:hover { color: var(--brand-dark); background: var(--mint); }
+.thy2-member .pw-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.thy2-member .pw-toggle .icon-eye-off { display: none; }
+.thy2-member .pw-toggle.showing .icon-eye { display: none; }
+.thy2-member .pw-toggle.showing .icon-eye-off { display: inline; }
