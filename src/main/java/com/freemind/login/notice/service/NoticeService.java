@@ -28,7 +28,7 @@ public class NoticeService {
 		
 		MemberNotice n = new MemberNotice();
 		n.setMemberId(memberId);
-		n.setAdminId(adminId == null ? 0 : adminId); 
+		n.setAdminId(adminId == null ? 1 : adminId); 
 		n.setNoticeContent(content);
 		n.setNoticeType(noticeType);
 		n.setCreatedAt(new Timestamp(System.currentTimeMillis()));

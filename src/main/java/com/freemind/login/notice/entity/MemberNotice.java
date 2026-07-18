@@ -49,7 +49,10 @@ public class MemberNotice implements java.io.Serializable {
 	@Column(name = "created_at" , nullable = false)
 	private Timestamp createdAt;
 	
-	@Column(name = "is_raed" , nullable = false)
+//	@Column(name = "is_raed" , nullable = false)
+//	private Boolean isRead = false;
+	
+	@Column(name = "is_read" , nullable = false)
 	private Boolean isRead = false;
 	
 	public String getNoticeTypeMsg() {
