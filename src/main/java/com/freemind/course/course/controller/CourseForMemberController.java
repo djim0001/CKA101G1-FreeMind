@@ -111,6 +111,7 @@ public class CourseForMemberController {
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 //		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		
 		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
 		if(member!=null) {
 			for(Course course : courseList) {
@@ -124,7 +125,6 @@ public class CourseForMemberController {
 		model.addAttribute("totalPages", courseList.getTotalPages());
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
-
 		return "front-end/member/course/selectCourse";
 	}
 	

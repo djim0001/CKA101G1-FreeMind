@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => notify(serverCartMessage.textContent.trim()), 80);
   }
 
+  const usesSharedNav = Boolean(document.querySelector('script[src="/js/nav.js"]'));
+  if (!usesSharedNav) {
   const popBindings = [
     ['bellBtn', 'bellPop'],
     ['avatarBtn', 'avatarPop']
@@ -142,6 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     updateBackToTop();
+  }
   }
 
   const enhancePagination = () => {
