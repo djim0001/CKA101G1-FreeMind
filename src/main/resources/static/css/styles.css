@@ -46,7 +46,7 @@ body {
 a { color: inherit; text-decoration: none; }
 img, svg { display: block; max-width: 100%; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
-.wrap { width: min(1160px, 92vw); margin-inline: auto; }
+.wrap { width: min(1040px, 90vw); margin-inline: auto; }
 .script { font-family: var(--script); color: var(--orange); }
 
 .btn {
