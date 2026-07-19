@@ -1,6 +1,7 @@
 services:
   app:
-    image: joshliu7106/freemind:0.0.1
+    build: .
+    image: freemind:local
     container_name: freemind-webapp
     depends_on:
       mysql:
