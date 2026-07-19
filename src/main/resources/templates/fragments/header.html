@@ -101,11 +101,18 @@
 					<div sec:authorize="isAuthenticated()">
 						<div class="pop-divider"></div>
 						<div class="pop-label">我的專區</div>
-						<a class="pop-item" th:href="@{/member/profile}" href="#" role="menuitem">
+
+						<!-- 個人檔案 / 專業檔案 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/profile}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
 								<circle cx="12" cy="8" r="3.2" />
 								<path d="M6 19c.6-3 3-4.5 6-4.5S17.4 16 18 19" /></svg>個人檔案</a>
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/profile}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<circle cx="12" cy="8" r="3.2" />
+								<path d="M6 19c.6-3 3-4.5 6-4.5S17.4 16 18 19" /></svg>專業檔案</a>
 
+						<!-- 我的通知 -->
 						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/notice}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
 								<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -115,17 +122,48 @@
 								<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
 								<path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>我的通知</a>
 
-						<a class="pop-item" th:href="@{/member/dashboard}" href="#" role="menuitem">
+						<!-- 會員：我的療癒足跡 / 心理師：預約管理 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/dashboard}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
 								<path d="M12 20c-1-3.5-5.5-4.5-5.5-9a5.5 5.5 0 0 1 11 0c0 4.5-4.5 5.5-5.5 9Z" /></svg>我的療癒足跡</a>
 						<a class="pop-item" th:href="@{/member/course/my_course_order}" href="#" role="menuitem">
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/orders/home}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<path d="M12 20c-1-3.5-5.5-4.5-5.5-9a5.5 5.5 0 0 1 11 0c0 4.5-4.5 5.5-5.5 9Z" /></svg>預約管理</a>
+
+						<!-- 會員：課程訂單紀錄 / 心理師：課程管理 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/course/my_course_order}" href="#" role="menuitem">
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/orders/home}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<path d="M12 20c-1-3.5-5.5-4.5-5.5-9a5.5 5.5 0 0 1 11 0c0 4.5-4.5 5.5-5.5 9Z" /></svg>預約管理</a>
+
+						<!-- 會員：課程訂單紀錄 / 心理師：課程管理 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/course/my_course_order}" href="#" role="menuitem">
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/orders/home}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<path d="M12 20c-1-3.5-5.5-4.5-5.5-9a5.5 5.5 0 0 1 11 0c0 4.5-4.5 5.5-5.5 9Z" /></svg>預約管理</a>
+
+						<!-- 會員：課程訂單紀錄 / 心理師：課程管理 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/course/my_course_order}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
 								<path d="M6 4h12l-1 4H7L6 4Z" />
 								<path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8Z" /></svg>課程訂單紀錄</a>
 						<a class="pop-item" th:href="@{/member/coupon/my_coupon}" href="#" role="menuitem">
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/course/select_course}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<path d="M6 4h12l-1 4H7L6 4Z" />
+								<path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8Z" /></svg>課程管理</a>
+
+						<!-- 會員：我的優惠券 / 心理師：文章管理 -->
+						<a class="pop-item" sec:authorize="hasRole('ROLE_MEMBER')" th:href="@{/member/coupon/my_coupon}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
 								<path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4Z" />
 								<path d="M14 6v12" stroke-dasharray="2 2" /></svg>我的優惠券</a>
+						<a class="pop-item" sec:authorize="hasRole('ROLE_PSYCH')" th:href="@{/psych/article/myArticles}" href="#" role="menuitem">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
+								<path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4Z" />
+								<path d="M14 6v12" stroke-dasharray="2 2" /></svg>文章管理</a>
+
 						<div class="pop-divider"></div>
 						<a class="pop-item" th:href="@{/support}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">

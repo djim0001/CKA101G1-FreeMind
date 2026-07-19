@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <footer class="ft" id="siteFooter" th:fragment="footer">
@@ -34,10 +35,18 @@
 			</div>
 			<div class="ft-col">
 				<h4>會員專區</h4>
-				<a th:href="@{/member/profile}" href="#">個人檔案</a>
-				<a th:href="@{/member/dashboard}" href="#">我的療癒足跡</a>
-				<a th:href="@{/member/course/orders}" href="#">課程訂單紀錄</a>
-				<a th:href="@{/member/coupon}" href="#">我的優惠券</a>
+				<th:block sec:authorize="!hasRole('ROLE_PSYCH')">
+					<a th:href="@{/member/profile}" href="#">個人檔案</a>
+					<a th:href="@{/member/dashboard}" href="#">我的療癒足跡</a>
+					<a th:href="@{/member/course/my_course_order}" href="#">課程訂單紀錄</a>
+					<a th:href="@{/member/coupon/my_coupon}" href="#">我的優惠券</a>
+				</th:block>
+				<th:block sec:authorize="hasRole('ROLE_PSYCH')">
+					<a th:href="@{/psych/profile}" href="#">專業檔案</a>
+					<a th:href="@{/psych/orders/home}" href="#">預約管理</a>
+					<a th:href="@{/psych/course/select_course}" href="#">課程管理</a>
+					<a th:href="@{/psych/article/myArticles}" href="#">文章管理</a>
+				</th:block>
 			</div>
 			<div class="ft-col">
 				<h4>帳號</h4>
