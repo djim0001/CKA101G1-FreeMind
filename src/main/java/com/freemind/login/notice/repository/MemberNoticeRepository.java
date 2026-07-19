@@ -22,5 +22,5 @@ public interface MemberNoticeRepository extends JpaRepository<MemberNotice, Inte
     @Query("UPDATE MemberNotice n SET n.isRead = true WHERE n.memberId = :memberId AND n.isRead = false")
     int markAllRead(@Param("memberId") Integer memberId);
     
-    
+    List<MemberNotice> findTop5ByMemberIdOrderByCreatedAtDesc(Integer memberId);
 }
