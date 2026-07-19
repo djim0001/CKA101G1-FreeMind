@@ -10,6 +10,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 	<style>
 
 		@font-face {
@@ -324,14 +325,22 @@
 			border: 1px solid transparent;
 			border-radius: 999px;
 			color: var(--ink-soft);
+			background: transparent;
+			box-shadow: none;
 			font-size: .84rem;
 			font-weight: 500;
 			white-space: nowrap;
-			transition: border-color .16s ease, color .16s ease, background .16s ease;
+			transition: color .16s ease;
 		}
 
-		body.admin-course-page .course-nav a:hover,
-		body.admin-course-page .course-nav a.active {
+		body.admin-course-page .course-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .course-nav a.active,
+		body.admin-course-page .course-nav a[aria-current="page"] {
 			border-color: rgba(194, 217, 237, .9);
 			color: var(--ink);
 			background: var(--blue-soft);
@@ -379,10 +388,34 @@
 
 		body.admin-course-page .page-head-actions {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
 			justify-content: flex-end;
 			gap: 1rem;
 			margin-left: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: .25rem;
+			width: max-content;
+			max-width: 100%;
+			margin-left: 0;
+			padding: 0;
+			overflow-x: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: .5rem .8rem;
+			font-size: .84rem;
+			line-height: 1.2;
 		}
 
 		body.admin-course-page .page-head-actions p {
@@ -1135,11 +1168,7 @@
 		}
 
 		body.admin-course-page .nav-inner > .header-course-nav {
-			flex: 1 1 auto;
-			min-width: 0;
-			min-height: 0;
-			padding: 0;
-			background: transparent;
+			display: none !important;
 		}
 
 		body.admin-course-page .site-footer {
@@ -1203,7 +1232,9 @@
 			}
 
 			body.admin-course-page .page-head-actions {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
 				margin-left: 0;
 			}
 
@@ -1257,67 +1288,136 @@
 			}
 		}
 
+		/* 所有課程後台頁面共用：固定功能導覽的尺寸、色調與位置。 */
+		body.admin-course-page .page-head-actions,
+		body.admin-course-page .page-head-actions .page-function-nav,
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			box-sizing: border-box;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			min-height: 48px;
+			border-color: transparent;
+			color: var(--ink-soft);
+			background: transparent;
+			font-size: .84rem;
+			font-weight: 500;
+			line-height: 1.2;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a.active,
+		body.admin-course-page .page-head-actions .page-function-nav a[aria-current="page"] {
+			border-color: var(--bg-soothing);
+			color: var(--ink);
+			background: var(--blue-soft);
+		}
+
+		@media (min-width: 1281px) {
+			body.admin-course-page .page-head {
+				display: grid;
+				grid-template-columns: minmax(16rem, 1fr) 55rem;
+				align-items: end;
+				gap: 1.5rem;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: 44rem 10rem;
+				align-items: center;
+				justify-content: end;
+				gap: 1rem;
+				width: 55rem;
+				margin-left: 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: .25rem;
+				width: 44rem;
+				max-width: none;
+				margin: 0;
+				overflow: visible;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 1280px) {
+			body.admin-course-page .page-head {
+				display: block;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 10rem;
+				width: 100%;
+				align-items: center;
+				gap: 1rem;
+				margin: 1rem 0 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(8.25rem, 1fr));
+				gap: .25rem;
+				width: 100%;
+				max-width: none;
+				margin: 0;
+				overflow-x: auto;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				align-self: center;
+				justify-self: end;
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 760px) {
+			body.admin-course-page .page-head-actions {
+				grid-template-columns: minmax(0, 1fr);
+				gap: .75rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				justify-self: stretch;
+				width: 100%;
+				min-width: 0;
+				max-width: none;
+			}
+		}
+
 	</style>
 </head>
 <body class="thy2-page admin-course-page">
-	<a class="skip-link" href="#main-content">跳至主要內容</a>
-	<header class="nav site-header">
-		<div class="wrap nav-inner">
-			<a class="brand" href="/admin/home" th:href="@{/admin/home}" aria-label="諮由自在後台管理首頁">
-				<span class="logo-mind" aria-hidden="true">
-					<span class="word">
-						<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-					</span>
-					<span class="faces">
-						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-					</span>
-				</span>
-				<span class="brand-text">
-					<span class="logo">諮由自在</span>
-					<span class="en">Free&nbsp;Mind</span>
-				</span>
-			</a>
-			<nav class="course-nav header-course-nav" aria-label="課程商城管理">
-				<a th:href="@{/admin/course/select_course}">課程發布管理</a>
-				<a th:href="@{/admin/course/select_course_order}">訂單與退款</a>
-				<a th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
-				<a class="active" aria-current="page" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
-				<a th:href="@{/admin/course/select_course_categories}">課程分類</a>
-			</nav>
-			<div class="nav-actions">
-				<a class="profile-entry" th:href="@{/admin/select_page}" aria-label="前往管理員檔案">
-					<span class="profile-photo" aria-hidden="true">
-						<img
-							th:if="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
-							th:src="${admin.profilePic}"
-							alt="" />
-						<svg
-							th:unless="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
-							viewBox="0 0 24 24"
-							fill="none">
-							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8" stroke-linecap="round" />
-							<circle cx="12" cy="7" r="4" stroke-width="1.8" />
-						</svg>
-					</span>
-					<span class="profile-copy">
-						<small th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
-						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
-					</span>
-				</a>
-				<form class="logout-form" th:action="@{/back-end/logout}" method="post">
-					<button class="logout-button" type="submit" aria-label="登出後台">
-						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-							<path d="M14 8l4 4-4 4M18 12H8M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-						<span>登出</span>
-					</button>
-				</form>
-			</div>
-		</div>
-	</header>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 	<main id="main-content" class="admin-main">
 		<div class="wrap">
 <div class="page-head">
@@ -1326,24 +1426,30 @@
 						<h1>全站課程優惠券管理</h1>
 					</div>
 					<div class="page-head-actions">
-						<p>設定折扣、折抵上限、消費門檻與發放後有效天數。</p>
+						<nav class="course-nav page-function-nav" aria-label="課程商城管理" data-admin-course-nav>
+							<a data-admin-nav="courses" th:href="@{/admin/course/select_course}">課程發布管理</a>
+							<a data-admin-nav="orders" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
+							<a data-admin-nav="payout" th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
+							<a data-admin-nav="coupon" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+							<a data-admin-nav="categories" th:href="@{/admin/course/select_course_categories}">課程分類</a>
+						</nav>
 						<a class="btn" href="#coupon-spec" data-new-coupon>＋ 新增優惠券</a>
 					</div>
 				</div><div class="notice">所有優惠券皆適用全站已上架課程，不使用優惠碼，也不綁定指定課程。</div>
 <div class="grid-2 coupon-management-grid"><section class="panel" id="coupon-spec"><h2>優惠券規格</h2><p class="meta">建立新的全站課程優惠券規格；標示 <span class="required">＊</span> 的欄位為必填。</p><p class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></p><form class="form-grid" th:if="${coupon != null}" th:action="@{/admin/coupon/insert_coupon}" method="post" th:object="${coupon}" style="margin-top:18px" data-coupon-spec-form><div class="form-group"><label for="couponName">優惠券名稱 <span class="required">＊</span></label><input id="couponName" class="field" type="text" th:field="*{couponName}" required autocomplete="off"><span class="error" th:if="${#fields.hasErrors('couponName')}" th:errors="*{couponName}"></span></div><div class="form-group"><label for="discount">折扣倍率 <span class="required">＊</span></label><input id="discount" class="field" type="number" min="0.1" max="0.95" step="0.05" th:field="*{discount}" required data-admin-discount><span class="form-note">例如九五折填 0.95，八折填 0.8。</span><span class="error" th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}"></span></div><div class="form-group"><label for="discountLimit">最高折抵金額（NT$）</label><input id="discountLimit" class="field" type="number" min="0" step="1" th:field="*{discountLimit}" data-admin-limit><span class="error" th:if="${#fields.hasErrors('discountLimit')}" th:errors="*{discountLimit}"></span></div><div class="form-group"><label for="triggerThreshold">消費觸發門檻（NT$）</label><input id="triggerThreshold" class="field" type="number" min="0" step="1" th:field="*{triggerThreshold}" data-admin-threshold><span class="error" th:if="${#fields.hasErrors('triggerThreshold')}" th:errors="*{triggerThreshold}"></span></div><div class="form-group"><label for="discountDuration">發放後有效天數 <span class="required">＊</span></label><input id="discountDuration" class="field" type="number" min="1" step="1" th:field="*{discountDuration}" required><span class="error" th:if="${#fields.hasErrors('discountDuration')}" th:errors="*{discountDuration}"></span></div><div class="form-group" style="align-self:end"><button class="btn" type="submit">儲存優惠券規格</button></div></form>
 
 <div class="notice" style="margin-top:16px" data-discount-example></div></section>
-<section class="panel"><h2>發放會員優惠券</h2><form th:action="@{/admin/coupon/publish}" method="post"><div class="form-group"><label for="coupon-template">選擇優惠券</label><select id="coupon-template" class="field" name="couponId" required data-coupon-template><option value="">請選擇</option><option th:each="coupon : ${couponListAll}" th:value="${coupon.couponId}" th:text="${coupon.couponName}" th:attr="data-coupon-name=${coupon.couponName},data-discount=${coupon.discount},data-discount-limit=${coupon.discountLimit},data-trigger-threshold=${coupon.triggerThreshold},data-discount-duration=${coupon.discountDuration}"></option></select></div><div class="form-group" style="margin-top:14px"><label for="stock">發放數量</label><input id="stock" class="field" type="number" name="stock" min="1" required></div><div class="form-group" style="margin-top:14px"><label for="ttlHours">發布後可領取時數</label><input id="ttlHours" class="field" type="number" name="ttlHours" min="1" required></div><div class="form-group" style="margin-top:14px"><label for="audience">發放對象</label><select id="audience" class="field" name="audience" data-audience-select><option value="all">所有會員</option><option value="new">新會員</option><option value="spending">消費達金額的會員</option></select></div><div class="form-group" style="margin-top:14px" data-audience-threshold hidden><label for="audience-threshold">會員累積消費門檻（NT$）</label><input id="audience-threshold" class="field" type="number" name="audienceThreshold" min="1" data-audience-threshold-input></div><button class="btn" type="submit" style="margin-top:18px">確認發放</button></form></section></div>
-<section class="panel" style="margin-top:20px"><div class="panel-heading"><div><h2>現有優惠券規格</h2><p class="meta" th:if="${session.couponPageQty > 0}">目前頁數：<b th:text="|${currentPage}/${session.couponPageQty}|">1/1</b></p></div></div><div class="table-wrap"><table><thead><tr><th>優惠券編號／名稱</th><th>折扣</th><th>最高折抵</th><th>消費門檻</th><th>有效天數</th></tr></thead><tbody><tr th:each="coupon : ${couponListAllPages}"><td><strong><span th:text="${coupon.couponId}">#</span>　<span th:text="${coupon.couponName}">名稱</span></strong><br><span class="meta">全站已上架課程</span></td><td th:text="${coupon.discount}">—</td><td>NT$ <span th:text="${coupon.discountLimit != null ? coupon.discountLimit : 0}">0</span></td><td>NT$ <span th:text="${coupon.triggerThreshold != null ? coupon.triggerThreshold : 0}">0</span></td><td><span th:text="${coupon.discountDuration}">0</span> 天</td></tr></tbody></table></div><div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/coupon/select_coupon')}"></div></section>
+<section class="panel"><h2>發放會員優惠券</h2><form th:action="@{/admin/coupon/publish}" method="post"><div class="form-group"><label for="coupon-template">選擇優惠券</label><select id="coupon-template" class="field" name="couponId" required data-coupon-template><option value="">請選擇</option><option th:each="coupon : ${couponListAll}" th:value="${coupon.couponId}" th:text="${coupon.couponName}" th:attr="data-coupon-name=${coupon.couponName},data-discount=${coupon.discount},data-discount-limit=${coupon.discountLimit},data-trigger-threshold=${coupon.triggerThreshold},data-discount-duration=${coupon.discountDuration}"></option></select></div><div class="form-group" style="margin-top:14px"><label for="stock">發放數量</label><input id="stock" class="field" type="number" name="stock" min="1" required></div><div class="form-group" style="margin-top:14px"><label for="ttlHours">發布後可領取時數</label><input id="ttlHours" class="field" type="number" name="ttlHours" min="1" required></div><button class="btn" type="submit" style="margin-top:18px">確認發放</button></form></section></div>
+<section class="panel" style="margin-top:20px"><div class="panel-heading"><div><h2>現有優惠券規格</h2><p class="meta" th:if="${session.couponPageQty > 0}">目前頁數：<b th:text="|${currentPage}/${session.couponPageQty}|">1/1</b></p></div></div><div class="table-wrap"><table><thead><tr><th>優惠券編號／名稱</th><th>折扣</th><th>最高折抵</th><th>消費門檻</th><th>有效天數</th></tr></thead><tbody><tr th:each="coupon : ${couponListAllPages}"><td><strong><span th:text="${coupon.couponId}">#</span>　<span th:text="${coupon.couponName}">名稱</span></strong><br><span class="meta">全站已上架課程</span></td><td th:text="${coupon.discount}">—</td><td>NT$ <span th:text="${coupon.discountLimit != null ? coupon.discountLimit : 0}">0</span></td><td>NT$ <span th:text="${coupon.triggerThreshold != null ? coupon.triggerThreshold : 0}">0</span></td><td><span th:text="${coupon.discountDuration}">0</span> 天</td></tr></tbody></table></div><div th:replace="~{fragments/pagination :: pagination(
+    ${currentPage},
+    ${totalPages},
+    '/admin/coupon/select_coupon',
+    ''
+)}"></div></section>
 		</div>
 	</main>
 	<div class="coupon-modal modal-shell" th:if="${couponMsg != null}"><div class="coupon-modal-content"><h2>發布結果</h2><p th:text="${couponMsg}"></p><button class="btn" type="button" data-close-modal>確定</button></div></div>
-	<footer class="site-footer">
-		<div class="wrap footer-inner">
-			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span>
-			<span>請妥善保管管理員帳號資訊</span>
-		</div>
-	</footer>
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>
 </html>

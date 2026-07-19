@@ -10,6 +10,7 @@
 <link
 	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 	rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/css/styles.css}" />
 <style>
 @font-face {
 	font-family: 'OpenHuninn';
@@ -848,8 +849,9 @@ body.thy2-member .ft-bottom {
 }
 body.thy2-member #backToTop {
 	position: fixed;
+	top: 170px;
 	right: 24px;
-	bottom: 24px;
+	bottom: auto;
 	z-index: 90;
 	display: grid;
 	place-items: center;
@@ -930,8 +932,9 @@ body.thy2-member :focus-visible {
 }
 @media (max-width: 560px) {
 	body.thy2-member #backToTop {
+		top: 148px;
 		right: 16px;
-		bottom: 16px;
+		bottom: auto;
 		width: 42px;
 		height: 42px;
 	}
@@ -1275,166 +1278,11 @@ body.thy2-member .profile-entry-avatar {
 /* ========== End shared member-course shell ========== */
 </style>
 </head>
-<body class="thy2-member">
-	<header class="nav site-header" th:fragment="header">
-	<div class="wrap nav-inner">
-		<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
-			<span class="logo-mind" aria-hidden="true">
-				<span class="word">
-					<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-				</span>
-				<span class="faces">
-					<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-					<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-					<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-					<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-				</span>
-			</span>
-			<span class="brand-text">
-				<span class="logo">諮由自在</span>
-				<span class="en">Free&nbsp;Mind</span>
-			</span>
-		</a>
-		<nav class="main-nav" aria-label="課程會員功能">
-			<a th:href="@{/member/course/select_course}" href="#">探索課程</a>
-			<a th:href="@{/member/dashboard/myLearning}" href="#">我的學習空間</a>
-			<a th:href="@{/member/dashboard/myCollection/course}" href="#">收藏課程</a>
-			<a th:href="@{/member/coupon/my_coupon}" href="#">我的優惠券</a>
-			<a th:href="@{/member/course/my_course_order}" href="#">訂單紀錄</a>
-		</nav>
-		<div class="nav-right">
-			<a class="icon-btn cart-icon-btn"
-				th:href="@{/member/course/shopping_cart}" href="#"
-				aria-label="購物車">
-				<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-					stroke-linecap="round" stroke-linejoin="round"
-					aria-hidden="true">
-					<circle cx="9" cy="20" r="1"/>
-					<circle cx="18" cy="20" r="1"/>
-					<path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L21 8H6"/>
-				</svg>
-				<span class="header-count-badge"
-					th:if="${countMemberCartCount != null and countMemberCartCount > 0}"
-					th:text="${countMemberCartCount}"
-					aria-label="購物車課程數量">0</span>
-			</a>
-			<div class="pop-holder">
-				<button class="icon-btn notification-btn" id="bellBtn" type="button"
-					aria-label="會員通知" aria-haspopup="true"
-					aria-expanded="false" aria-controls="bellPop">
-					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-						stroke-linecap="round" stroke-linejoin="round"
-						aria-hidden="true">
-						<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
-						<path d="M13.7 21a2 2 0 0 1-3.4 0"/>
-					</svg>
-					<span class="dot"
-						th:if="${countMemberUnread != null and countMemberUnread > 0}"
-						aria-hidden="true"></span>
-					<span class="sr-only"
-						th:if="${countMemberUnread != null and countMemberUnread > 0}"
-						th:text="${'未讀通知 ' + countMemberUnread + ' 則'}">有未讀通知</span>
-				</button>
-				<div class="pop" id="bellPop" role="menu"
-					aria-label="會員通知選單">
-					<div class="pop-head">
-						<b>通知</b>
-						<p th:if="${countMemberUnread != null and countMemberUnread > 0}"
-							th:text="${'你有 ' + countMemberUnread + ' 則未讀通知'}">你有未讀通知</p>
-						<p th:unless="${countMemberUnread != null and countMemberUnread > 0}">目前沒有未讀通知</p>
-					</div>
-					<div class="pop-divider"></div>
-					<a class="pop-item" th:href="@{/member/notice}" href="#"
-						role="menuitem"
-						style="justify-content: center; color: var(--orange); font-weight: 500;">查看全部通知</a>
-				</div>
-			</div>
-			<div class="auth" sec:authorize="hasRole('MEMBER')">
-				<div class="pop-holder">
-					<button class="avatar-btn" id="avatarBtn" type="button"
-						aria-label="會員選單" aria-haspopup="true"
-						aria-expanded="false" aria-controls="avatarPop">
-						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-							<circle cx="12" cy="9" r="3.4" fill="#3A4B53"/>
-							<path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19"
-								stroke="#3A4B53" stroke-width="1.8"
-								stroke-linecap="round"/>
-						</svg>
-						<span class="sr-only"
-							sec:authentication="principal.member.name">會員</span>
-					</button>
-					<div class="pop" id="avatarPop" role="menu"
-						aria-label="會員功能選單">
-						<div class="pop-head">
-							<b>歡迎回來</b>
-							<p><span sec:authentication="principal.member.name">會員</span>，這是你的會員專區</p>
-						</div>
-						<div class="pop-divider"></div>
-						<div class="pop-label">我的專區</div>
-						<a class="pop-item" th:href="@{/member/profile}" role="menuitem">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-								aria-hidden="true">
-								<circle cx="12" cy="8" r="3.2"/>
-								<path d="M6 19c.6-3 3-4.5 6-4.5S17.4 16 18 19"/>
-							</svg>
-							個人檔案
-						</a>
-						<a class="pop-item"
-							th:href="@{/member/dashboard}" role="menuitem">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-								aria-hidden="true">
-								<path d="M12 20c-1-3.5-5.5-4.5-5.5-9a5.5 5.5 0 0 1 11 0c0 4.5-4.5 5.5-5.5 9Z"/>
-							</svg>
-							我的療癒足跡
-						</a>
-						<a class="pop-item"
-							th:href="@{/member/course/orders}" role="menuitem">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-								aria-hidden="true">
-								<path d="M6 4h12l-1 4H7L6 4Z"/>
-								<path d="M5 8h14v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8Z"/>
-							</svg>
-							課程訂單紀錄
-						</a>
-						<a class="pop-item"
-							th:href="@{/member/coupon}" role="menuitem">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-								aria-hidden="true">
-								<path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4Z"/>
-								<path d="M14 6v12" stroke-dasharray="2 2"/>
-							</svg>
-							我的優惠券
-						</a>
-						<a class="pop-item"
-							th:href="@{/support}" role="menuitem">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
-								aria-hidden="true">
-								<path d="M21 12a9 9 0 1 0-3.6 7.2L21 20l-.8-3.4A8.9 8.9 0 0 0 21 12Z"/>
-							</svg>
-							聯繫客服
-						</a>
-					</div>
-				</div>
-			</div>
-			<button class="hamburger" id="memberHambBtn" type="button"
-				aria-label="開啟選單" aria-controls="memberMobileMenu"
-				aria-expanded="false">
-				<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"
-					stroke-linecap="round" aria-hidden="true">
-					<path d="M4 7h16M4 12h16M4 17h16"/>
-				</svg>
-			</button>
-		</div>
-	</div>
-	<nav class="mobile-menu" id="memberMobileMenu" aria-label="行動選單">
-		<a th:href="@{/member/course/select_course}" href="#">探索課程</a>
-		<a th:href="@{/member/dashboard/myLearning}" href="#">我的學習空間</a>
-		<a th:href="@{/member/dashboard/myCollection/course}" href="#">收藏課程</a>
-		<a th:href="@{/member/coupon/my_coupon}" href="#">我的優惠券</a>
-		<a th:href="@{/member/course/my_course_order}" href="#">訂單紀錄</a>
-	</nav>
-</header>
-	<main class="container">
+<body class="thy2-member"
+	th:attr="data-member-unread-count=${countMemberUnread != null ? countMemberUnread : ''}">
+	<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="container">
 		<div class="section-head">
 			<div>
 				<p class="eyebrow">Shopping cart</p>
@@ -1496,61 +1344,10 @@ body.thy2-member .profile-entry-avatar {
 			</aside>
 		</div>
 	</main>
-	<footer class="ft" id="siteFooter" th:fragment="footer">
-	<div class="wrap">
-		<div class="ft-grid">
-			<div>
-				<a class="brand" th:href="@{/}" href="/">
-					<span class="logo-mind" aria-hidden="true">
-						<span class="word">
-							<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-						</span>
-						<span class="faces">
-							<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-							<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-							<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-							<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-						</span>
-					</span>
-					<span class="brand-text">
-						<span class="logo">諮由自在</span>
-						<span class="en">Free&nbsp;Mind</span>
-					</span>
-				</a>
-				<p class="ft-about">一個把心理諮商、課程、專欄與陪伴社群整合在一起的地方。願你在這裡，能慢慢地、安心地，成為更自在的自己。</p>
-			</div>
-			<div class="ft-col">
-				<h4>探索</h4>
-				<a th:href="@{/consultation}" href="#">諮商預約</a>
-				<a th:href="@{/member/course/select_course}" href="#">課程商城</a>
-				<a th:href="@{/article}" href="#">專欄文章</a>
-				<a th:href="@{/member/activity/activityIndex}" href="#">揪團活動</a>
-			</div>
-			<div class="ft-col">
-				<h4>會員專區</h4>
-				<a th:href="@{/member/profile}" href="#">個人檔案</a>
-				<a th:href="@{/member/dashboard/myLearning}" href="#">我的學習空間</a>
-				<a th:href="@{/member/course/my_course_order}" href="#">課程訂單紀錄</a>
-				<a th:href="@{/member/coupon/my_coupon}" href="#">我的優惠券</a>
-			</div>
-			<div class="ft-col">
-				<h4>帳號</h4>
-				<a th:href="@{/front-end/login}" href="#">會員登入</a>
-				<a th:href="@{/psych/psychologistLogin}" href="#">心理師登入</a>
-				<a th:href="@{/support}" href="#">聯繫客服</a>
-			</div>
-		</div>
-		<div class="ft-bottom">
-			<span>© 2026 諮由自在 FreeMind｜CKA101G1</span>
-			<span>本平台不提供緊急危機處理，若有立即危險請撥打 1925 安心專線。</span>
-		</div>
-	</div>
-</footer>
-<button id="backToTop" type="button" aria-label="回到頂部" th:fragment="backToTop">
-	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-		<path d="M12 19V5M5 12l7-7 7 7"/>
-	</svg>
-</button>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+	<script th:src="@{/js/nav.js}"></script>
 	<script th:src="@{/js/course/member-js.js}"></script>
 </body>
 </html>

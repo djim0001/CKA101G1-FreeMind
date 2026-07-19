@@ -9,7 +9,8 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 		rel="stylesheet" />
-<style>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+	<style>
 	@font-face {
 		font-family: 'OpenHuninn';
 		src:
@@ -166,32 +167,6 @@
 	}
 	.avatar-btn:hover { transform: translateY(-2px); }
 	.avatar-btn svg { width: 26px; height: 26px; }
-	.profile-trigger {
-		display: flex;
-		align-items: center;
-		gap: .65rem;
-		min-height: 44px;
-		padding: 0 .85rem 0 0;
-		border-radius: 999px;
-		background: #fff;
-		box-shadow: var(--shadow-sm);
-		text-align: left;
-		transition: transform .2s;
-	}
-	.profile-trigger:hover { transform: translateY(-2px); }
-	.profile-trigger .avatar-btn { flex: 0 0 auto; box-shadow: none; }
-	.profile-trigger:hover .avatar-btn { transform: none; }
-	.profile-copy { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
-	.profile-copy small { color: var(--ink-soft); font-size: .7rem; }
-	.profile-copy strong {
-		overflow: hidden;
-		max-width: 88px;
-		font-family: var(--serif);
-		font-size: .88rem;
-		font-weight: 700;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
 	.dot {
 		position: absolute;
 		top: 9px;
@@ -274,10 +249,10 @@
 	/* 課程管理內容。 */
 	.page-main { padding: 2.6rem 0 4.5rem; }
 	.page-intro {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 2rem;
+		display: grid;
+		grid-template-columns: minmax(13rem, .72fr) minmax(0, 1.28fr);
+		align-items: end;
+		gap: .75rem 2rem;
 		margin-bottom: 1.6rem;
 		padding: 0 .3rem 1.5rem;
 		border-bottom: 1px solid var(--line);
@@ -291,15 +266,18 @@
 		color: var(--orange);
 	}
 	.page-intro h1 {
+		overflow: hidden;
 		margin: 0;
 		font-family: var(--serif);
-		font-size: clamp(2rem, 4vw, 3.1rem);
+		font-size: clamp(1.75rem, 3vw, 2.6rem);
 		line-height: 1.2;
-		letter-spacing: .02em;
+		letter-spacing: 0;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.page-intro p {
-		max-width: 42rem;
-		margin: .55rem 0 0;
+		max-width: none;
+		margin: 0 0 .15rem;
 		color: var(--ink-soft);
 		font-size: 1rem;
 	}
@@ -880,12 +858,116 @@
 		.ft-grid { grid-template-columns: 1fr; }
 		#backToTop { right: 16px; bottom: 16px; width: 42px; height: 42px; }
 		.pop { position: fixed; top: 82px; right: 4vw; left: 4vw; width: auto; }
-		.profile-trigger { padding: 0; background: transparent; box-shadow: none; }
-		.profile-copy { display: none; }
 		.preview-tabs { overflow-x: auto; }
 	}
 	@media (prefers-reduced-motion: reduce) {
 		* { scroll-behavior: auto !important; transition: none !important; }
+	}
+
+	/* 心理師課程系列頁面共用：第一列標題與說明，第二列功能導覽。 */
+	.page-intro-heading {
+		min-width: 0;
+	}
+	.page-intro-description {
+		align-self: end;
+		justify-self: end;
+		width: 100%;
+		text-align: right;
+	}
+	.page-route-panel {
+		display: grid;
+		grid-column: 1 / -1;
+		width: min(48rem, 66.666%);
+		max-width: 66.666%;
+		gap: .8rem;
+		justify-items: stretch;
+		margin: .2rem auto 0;
+	}
+	.page-route-nav {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: .45rem;
+		width: 100%;
+	}
+	.page-route-nav a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 0;
+		min-height: 48px;
+		padding: .65rem .55rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		color: var(--ink-soft);
+		background: transparent;
+		font-size: .9rem;
+		font-weight: 500;
+		line-height: 1.2;
+		text-align: center;
+		white-space: nowrap;
+		transition: border-color .18s, background .18s, color .18s;
+	}
+	.page-route-nav a:hover {
+		border-color: var(--line);
+		color: var(--ink);
+		background: var(--white);
+	}
+	.page-route-nav a.active,
+	.page-route-nav a[aria-current="page"] {
+		border-color: var(--bg-soothing);
+		color: var(--ink);
+		background: var(--blue-soft);
+	}
+	.page-specific-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: .65rem;
+		width: 100%;
+	}
+	@media (max-width: 1080px) {
+		.page-route-panel {
+			width: 66.666%;
+			max-width: 66.666%;
+			justify-items: stretch;
+		}
+		.page-route-nav {
+			width: 100%;
+		}
+		.page-specific-actions {
+			width: 100%;
+			justify-content: flex-end;
+		}
+	}
+	@media (max-width: 700px) {
+		.page-intro {
+			grid-template-columns: 1fr;
+		}
+		.page-intro-description {
+			margin: 0;
+		}
+		.page-route-panel {
+			width: 100%;
+			max-width: 100%;
+			margin: .2rem 0 0;
+		}
+		.page-route-nav {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.page-route-nav a {
+			white-space: normal;
+		}
+		.page-specific-actions {
+			align-items: stretch;
+			flex-direction: column;
+		}
+		.page-specific-actions > *,
+		.page-specific-actions .btn {
+			width: 100%;
+		}
 	}
 	</style>
 </head>
@@ -909,22 +991,6 @@
 					<span class="en">Free&nbsp;Mind</span>
 				</span>
 			</a>
-
-			<nav class="nav-menu" aria-label="心理師主選單">
-				<a class="active" th:class="${activePage == null or activePage == 'courses'} ? 'active' : null"
-					th:href="@{/psych/course/select_course}" href="/psych/course/select_course"
-					aria-current="page"
-					th:attr="aria-current=${activePage == null or activePage == 'courses'} ? 'page' : null">課程管理</a>
-				<a th:class="${activePage == 'editor'} ? 'active' : null"
-					th:href="@{/psych/course/add_course}" href="/psych/course/add_course"
-					th:attr="aria-current=${activePage == 'editor'} ? 'page' : null">新增／編輯課程</a>
-				<a th:class="${activePage == 'payout'} ? 'active' : null"
-					th:href="@{/psych/payout/selectPayout}" href="/psych/payout/selectPayout"
-					th:attr="aria-current=${activePage == 'payout'} ? 'page' : null">營運與成長</a>
-				<a th:class="${activePage == 'qa'} ? 'active' : null"
-					th:href="@{/psych/course/psych_qa}" href="/psych/course/psych_qa"
-					th:attr="aria-current=${activePage == 'qa'} ? 'page' : null">學員提問</a>
-			</nav>
 
 			<div class="nav-right">
 				<div class="pop-holder">
@@ -956,24 +1022,18 @@
 				</div>
 
 				<div class="pop-holder">
-					<button class="profile-trigger" id="avatarBtn" type="button" aria-label="心理師選單"
+					<button class="avatar-btn" id="avatarBtn" type="button" aria-label="心理師功能選單"
 						aria-haspopup="true" aria-expanded="false" aria-controls="avatarPop">
-						<span class="avatar-btn" aria-hidden="true">
-							<svg viewBox="0 0 24 24" fill="none">
-								<circle cx="12" cy="9" r="3.4" fill="#3A4B53" />
-								<path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19"
-									stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" />
-							</svg>
-						</span>
-						<span class="profile-copy">
-							<small>心理師</small>
-							<strong th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</strong>
-						</span>
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+							<circle cx="12" cy="9" r="3.4" fill="#3A4B53" />
+							<path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19"
+								stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" />
+						</svg>
 					</button>
 					<div class="pop" id="avatarPop" role="menu">
 						<div class="pop-head">
 							<b th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</b>
-							<p>歡迎回來，管理你的預約、課程與個人資料。</p>
+							<p>心理師專區・管理預約、課程與個人資料。</p>
 						</div>
 						<div class="pop-divider"></div>
 						<div class="pop-label">功能選單</div>
@@ -1038,16 +1098,27 @@
 	<main class="page-main">
 		<div class="wrap">
 			<section class="page-intro" aria-labelledby="pageTitle">
-				<div>
+				<div class="page-intro-heading">
 					<span class="eyebrow">心理師中心</span>
 					<h1 id="pageTitle">新增／編輯課程</h1>
-					<p>完成課程資料、純文字內容大綱、兩種影片與定價後，再送出審核。</p>
 				</div>
-				<div class="page-actions">
-					<span class="status" th:text="${course.courseStatusText}">草稿</span>
-					<a class="btn btn-secondary" th:href="@{/psych/course/select_course}"
-						href="/psych/course/select_course">返回課程管理</a>
-				</div>
+				<p class="page-intro-description">完成課程資料、純文字內容大綱、兩種影片與定價後，再送出審核。</p>
+				<aside class="page-route-panel" aria-label="心理師課程功能">
+					<nav class="page-route-nav" aria-label="心理師課程功能導覽">
+						<a th:classappend="${activePage == 'courses'} ? ' active' : ''"
+							th:href="@{/psych/course/select_course}" href="/psych/course/select_course"
+							th:attr="aria-current=${activePage == 'courses'} ? 'page' : null">課程管理</a>
+						<a th:classappend="${activePage == 'editor'} ? ' active' : ''"
+							th:href="@{/psych/course/add_course}" href="/psych/course/add_course"
+							th:attr="aria-current=${activePage == 'editor'} ? 'page' : null">新增／編輯課程</a>
+						<a th:classappend="${activePage == 'payout'} ? ' active' : ''"
+							th:href="@{/psych/payout/selectPayout}" href="/psych/payout/selectPayout"
+							th:attr="aria-current=${activePage == 'payout'} ? 'page' : null">營運與成長</a>
+						<a th:classappend="${activePage == 'qa'} ? ' active' : ''"
+							th:href="@{/psych/course/psych_qa}" href="/psych/course/psych_qa"
+							th:attr="aria-current=${activePage == 'qa'} ? 'page' : null">學員提問</a>
+					</nav>
+				</aside>
 			</section>
 
 			<section class="workspace" aria-label="課程內容編輯工作區">
