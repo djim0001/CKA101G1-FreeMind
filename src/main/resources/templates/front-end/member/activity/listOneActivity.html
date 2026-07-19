@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <title>查看單一活動詳情</title>
     
-    <style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />  
+<style>
     
 .status-badge {
     display: inline-block;
@@ -24,8 +25,44 @@
     border-color: #2e7d32;
     background-color: #e8f5e9;
 }
+
+/* ---------- 分享彈窗 ---------- */
+.share-modal-overlay {
+	display: none; position: fixed; inset: 0;
+	background: rgba(255,255,255,.55); backdrop-filter: blur(6px);
+	z-index: 500; align-items: center; justify-content: center;
+	opacity: 0; transition: opacity .2s;
+}
+.share-modal-overlay.show { display: flex; opacity: 1; }
+.share-modal-panel {
+	background: #fff; border-radius: 12px;
+	box-shadow: 0 8px 24px rgba(0,0,0,.12); width: 90%; max-width: 400px; padding: 1.6rem;
+	transform: translateY(10px); transition: transform .2s;
+	font-family: 'Noto Sans TC', sans-serif;
+}
+.share-modal-overlay.show .share-modal-panel { transform: translateY(0); }
+.share-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3rem; }
+.share-modal-header span { font-size: 1.05rem; font-weight: 700; color: #333; }
+.share-modal-close { background: none; border: none; font-size: 22px; color: #888; cursor: pointer; line-height: 1; }
+.share-modal-close:hover { color: #333; }
+.share-modal-options { display: flex; justify-content: space-between; gap: .5rem; }
+.share-option { display: flex; flex-direction: column; align-items: center; gap: .5rem; border: none; background: none; cursor: pointer; font-family: inherit; flex: 1; }
+.share-icon {
+	width: 52px; height: 52px; border-radius: 50%;
+	display: flex; align-items: center; justify-content: center;
+	font-size: 22px; color: #fff; transition: transform .15s;
+}
+.share-option:hover .share-icon { transform: scale(1.1); }
+.share-label { font-size: .74rem; color: #888; }
+.copy-icon      { background: #555; }
+.line-icon      { background: #06C755; }
+.instagram-icon { background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.facebook-icon  { background: #1877F2; }
+.threads-icon   { background: #000; }
+.share-toast { margin-top: 1rem; text-align: center; font-size: .78rem; color: #888; min-height: 16px; }
+ 
     
-    </style>
+</style>
 </head>
 <body>
     <h1 th:text="${activity.activityName}"></h1>
@@ -108,6 +145,10 @@
 	    <button type="button">♡ 關注</button>
 	</a>
 	
+	<button type="button" onclick="openShareModal()">
+	    <i class="fa-regular fa-share-from-square"></i> 分享
+	</button>
+	
 	<br>
 	<h3>活動評價</h3>
 		<div th:each="rv : ${reviewListData}">
@@ -130,6 +171,39 @@
      th:data-waitlist-capacity="${activity.waitlistCapacity}"
      style="display:none;"></div>
 
+
+<!-- 分享連結 -->
+<div class="share-modal-overlay" id="shareModal" onclick="closeShareModalOutside(event)">
+	<div class="share-modal-panel">
+		<div class="share-modal-header">
+			<span>分享活動</span>
+			<button type="button" class="share-modal-close" onclick="closeShareModal()">&times;</button>
+		</div>
+		<div class="share-modal-options">
+			<button type="button" class="share-option" onclick="copyLink()">
+				<span class="share-icon copy-icon"><i class="fa-regular fa-copy"></i></span>
+				<span class="share-label">複製連結</span>
+			</button>
+			<button type="button" class="share-option" onclick="shareToLine()">
+				<span class="share-icon line-icon"><i class="fa-brands fa-line"></i></span>
+				<span class="share-label">LINE</span>
+			</button>
+			<button type="button" class="share-option" onclick="shareToInstagram()">
+				<span class="share-icon instagram-icon"><i class="fa-brands fa-instagram"></i></span>
+				<span class="share-label">Instagram</span>
+			</button>
+			<button type="button" class="share-option" onclick="shareToFacebook()">
+				<span class="share-icon facebook-icon"><i class="fa-brands fa-facebook"></i></span>
+				<span class="share-label">Facebook</span>
+			</button>
+			<button type="button" class="share-option" onclick="shareToThreads()">
+				<span class="share-icon threads-icon"><i class="fa-brands fa-at"></i></span>
+				<span class="share-label">Threads</span>
+			</button>
+		</div>
+		<div class="share-toast" id="shareToast"></div>
+	</div>
+</div>
 <script>
 (function() {
     var activityId = document.getElementById('activityData').getAttribute('data-activity-id');
@@ -153,6 +227,41 @@
         console.log('WebSocket錯誤:', e);
     };
 })();
+</script>
+
+<script>
+function openShareModal() {
+	document.getElementById('shareToast').textContent = '';
+	document.getElementById('shareModal').classList.add('show');
+}
+function closeShareModal() { document.getElementById('shareModal').classList.remove('show'); }
+function closeShareModalOutside(e) { if (e.target.id === 'shareModal') closeShareModal(); }
+
+function copyLink() {
+	navigator.clipboard.writeText(location.href).then(function() {
+		document.getElementById('shareToast').textContent = '連結已複製！';
+	}).catch(function() {
+		document.getElementById('shareToast').textContent = '複製失敗，請手動複製網址';
+	});
+}
+function openSharePopup(url) {
+	var w=600,h=500,l=(screen.width-w)/2,t=(screen.height-h)/2;
+	window.open(url,'_blank','width='+w+',height='+h+',left='+l+',top='+t+',noopener,noreferrer');
+}
+function shareToLine() {
+	openSharePopup('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title));
+}
+function shareToInstagram() {
+	navigator.clipboard.writeText(location.href).then(function() {
+		document.getElementById('shareToast').textContent = 'Instagram 不支援直接分享，已複製連結，請至 Instagram App 貼上。';
+	});
+}
+function shareToFacebook() {
+	openSharePopup('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href));
+}
+function shareToThreads() {
+	openSharePopup('https://www.threads.net/intent/post?text='+encodeURIComponent(document.title+' '+location.href));
+}
 </script>
 </body>
 </html>

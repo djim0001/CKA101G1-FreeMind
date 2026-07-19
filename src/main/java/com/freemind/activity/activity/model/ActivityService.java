@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.freemind.activity.activity.util.HibernateUtil_CompositeQuery_Activity;
 import com.freemind.activity.registration.model.Registration;
@@ -262,5 +263,44 @@ public class ActivityService {
 	    
 	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
 	    	    "您發起的活動「" + existing.getActivityName() + "」審核未通過，請查看退回原因並修改。", (byte) 2);
+	}
+	
+	// 排程發布:檢查所有已審核且排程時間已到的活動
+	@Transactional
+	public void publishScheduledActivities() {
+	    List<Activity> readyList = repository.findByActivityStatusAndScheduledPublishAtLessThanEqual(1, LocalDateTime.now());
+	    for (Activity activity : readyList) {
+	        activity.setActivityStatus(2);
+	        activity.setPublishedAt(LocalDateTime.now());
+	        activity.setUpdatedAt(LocalDateTime.now());
+
+	        noticeService.sendToMember(activity.getMember().getMemberId(), null,
+	            "您發起的活動「" + activity.getActivityName() + "」已依排程正式發布。", (byte) 2);
+	    }
+	    if (!readyList.isEmpty()) {
+	        System.out.println("排程發布完成,共發布 " + readyList.size() + " 筆活動");
+	    }
+	}
+	
+	// 排程設定:設定預定發布時間,活動維持已審核狀態,等排程器發布
+	@Transactional
+	public void schedulePublishActivity(Integer activityId, LocalDateTime scheduledAt) {
+	    Activity existing = repository.findById(activityId).orElseThrow(() -> new IllegalArgumentException("活動不存在"));
+
+	    if (existing.getActivityStatus() != 1) {
+	        throw new IllegalStateException("此活動非為已審核狀態，無法設定排程發布");
+	    }
+
+	    if (!scheduledAt.isAfter(LocalDateTime.now())) {
+	        throw new IllegalArgumentException("排程發布時間必須晚於現在時間");
+	    }
+
+	    existing.setScheduledPublishAt(scheduledAt);
+	    existing.setUpdatedAt(LocalDateTime.now());
+	    repository.save(existing);
+
+	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
+	        "您發起的活動「" + existing.getActivityName() + "」已通過審核，將於 "
+	        + scheduledAt.toLocalDate() + " " + scheduledAt.toLocalTime() + " 正式發布。", (byte) 2);
 	}
 }

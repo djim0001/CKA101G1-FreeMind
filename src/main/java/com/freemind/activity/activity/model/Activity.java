@@ -130,6 +130,9 @@ public class Activity implements Serializable{
 	@Column(name = "postpone_note", length = 200)
 	private String postponeNote;
 
+	@Column(name = "scheduled_publish_at")
+	private LocalDateTime scheduledPublishAt; 
+	
 	@Column(name = "published_at")
 	private LocalDateTime publishedAt;
 
@@ -339,6 +342,14 @@ public class Activity implements Serializable{
 
 	public void setPostponeNote(String postponeNote) {
 	    this.postponeNote = postponeNote;
+	}
+		
+	public LocalDateTime getScheduledPublishAt() {
+		return scheduledPublishAt;
+	}
+
+	public void setScheduledPublishAt(LocalDateTime scheduledPublishAt) {
+		this.scheduledPublishAt = scheduledPublishAt;
 	}
 
 	public LocalDateTime getPublishedAt() {
