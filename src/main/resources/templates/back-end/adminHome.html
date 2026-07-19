@@ -5,6 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="description" content="諮由自在 Free Mind 後台管理功能導覽頁面" />
 	<title>諮由自在｜後台管理</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+		rel="stylesheet" />
 	<style>
 		@font-face {
 			font-family: 'OpenHuninn';
@@ -273,6 +278,12 @@
 			stroke: currentColor;
 		}
 
+		.profile-photo img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
 		.profile-copy {
 			display: flex;
 			min-width: 0;
@@ -330,7 +341,7 @@
 		main {
 			width: 100%;
 			flex: 1;
-			padding: clamp(2rem, 4vw, 3.5rem) 0 4rem;
+			padding: clamp(1.25rem, 2vw, 1.75rem) 0 4rem;
 		}
 
 		.page-header {
@@ -426,13 +437,11 @@
 			border-right: 0;
 		}
 
-		.function-card:nth-last-child(-n + 1) {
+		.function-card:nth-last-child(-n + 2) {
 			border-bottom: 0;
 		}
 
 		.function-card:last-child {
-			grid-column: 1 / -1;
-			min-height: 142px;
 			border-right: 0;
 		}
 
@@ -578,7 +587,7 @@
 			}
 
 			main {
-				padding-top: 1.6rem;
+				padding-top: 1.25rem;
 			}
 
 			.page-header {
@@ -655,43 +664,38 @@
 						<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
 					</span>
 					<span class="faces">
-						<svg class="fm" viewBox="0 0 24 11" fill="none">
-							<path d="M6 3.5c1.3 0 2.3-1 2.3-2.2M15.7 1.3c0 1.2 1 2.2 2.3 2.2M7 6.2c1.5 2.4 3.2 3.3 5 3.3s3.5-.9 5-3.3" stroke="#D99B3F" stroke-width="1.5" stroke-linecap="round" />
-						</svg>
-						<svg class="fi" viewBox="0 0 9 11" fill="none">
-							<circle cx="4.5" cy="6.2" r="2.15" stroke="#C87392" stroke-width="1.5" />
-						</svg>
-						<svg class="fn" viewBox="0 0 17 11" fill="none">
-							<path d="M4 6.5h9" stroke="#6D97B4" stroke-width="1.5" stroke-linecap="round" />
-						</svg>
-						<svg class="fd" viewBox="0 0 17 11" fill="none">
-							<path d="M2.2 7c1.3-2.6 3.4-2.6 4.7 0 1.3 2.6 3.4 2.6 4.7 0 1-2 2.4-2.4 3.2-1.2" stroke="#739D70" stroke-width="1.5" stroke-linecap="round" />
-						</svg>
+						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
 					</span>
 				</span>
 				<span class="brand-text">
 					<span class="logo">諮由自在</span>
-					<span class="en">Free Mind</span>
+					<span class="en">Free&nbsp;Mind</span>
 				</span>
 			</a>
 
 			<span class="admin-badge">系統管理後台</span>
 
 			<div class="nav-actions">
-				<!--
-					管理員照片與姓名待後端欄位確認後串接。
-					目前不預設任何未確認的 Thymeleaf Model 屬性。
-				-->
 				<a class="profile-entry" th:href="@{/admin/select_page}" aria-label="前往管理員檔案">
 					<span class="profile-photo" aria-hidden="true">
-						<svg viewBox="0 0 24 24" fill="none">
+						<img
+							th:if="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
+							th:src="${admin.profilePic}"
+							alt="" />
+						<svg
+							th:unless="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
+							viewBox="0 0 24 24"
+							fill="none">
 							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8" stroke-linecap="round" />
 							<circle cx="12" cy="7" r="4" stroke-width="1.8" />
 						</svg>
 					</span>
 					<span class="profile-copy">
-						<small>管理員帳號</small>
-						<strong>姓名資料待串接</strong>
+						<small th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
+						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
 					</span>
 				</a>
 
@@ -834,13 +838,31 @@
 					<a class="function-card" th:href="@{/admin/notice/listAllNoticeTemplate}">
 						<span class="card-icon" aria-hidden="true">
 							<svg viewBox="0 0 24 24" fill="none">
-								<rect x="3" y="5" width="18" height="14" rx="2" stroke-width="1.8" />
-								<path d="m5 8 7 5 7-5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M5 4h14v16H5z" stroke-width="1.8" stroke-linejoin="round" />
+								<path d="M8 8h8M8 12h8M8 16h5" stroke-width="1.8" stroke-linecap="round" />
 							</svg>
 						</span>
 						<span class="card-copy">
 							<h3>通知範本</h3>
 							<p>管理系統通知訊息範本，維持平台通知內容一致。</p>
+						</span>
+						<span class="card-arrow" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none">
+								<path d="m9 6 6 6-6 6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+							</svg>
+						</span>
+					</a>
+
+					<a class="function-card" th:href="@{/admin/notice}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none">
+								<path d="M18 8a6 6 0 0 0-12 0c0 5.5-2 6.8-3 8h18c-1-1.2-3-2.5-3-8Z" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+								<path d="M9.5 20h5" stroke-width="1.8" stroke-linecap="round" />
+							</svg>
+						</span>
+						<span class="card-copy">
+							<h3>通知管理</h3>
+							<p>前往通知管理頁面，進行後台提供的通知相關操作。</p>
 						</span>
 						<span class="card-arrow" aria-hidden="true">
 							<svg viewBox="0 0 24 24" fill="none">
