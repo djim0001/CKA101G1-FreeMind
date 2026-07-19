@@ -3,7 +3,7 @@ package com.freemind.article.service;
 
 import org.springframework.data.domain.Page;
 
-import com.freemind.article.dto.ArticleInteractionStatsDTO;
+import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 
 public interface ArticleInteractionService {
@@ -18,7 +18,7 @@ public interface ArticleInteractionService {
 	
 	long getBookmarkCount(Integer articleId);
 	
-	ArticleInteractionStatsDTO getArticleStatistics(Article article);
+	ArticleWithStatsDTO getArticleStatistics(Article article);
 	
 	boolean isLikedByMember(Integer articleId, Integer memberId);
 	

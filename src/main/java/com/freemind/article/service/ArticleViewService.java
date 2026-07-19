@@ -12,6 +12,4 @@ public interface ArticleViewService {
 	
 	void adjustHotScore(Integer articleId, double delta);
 	
-//	void rebuildHotScoreFromDb();
-
 }

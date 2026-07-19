@@ -1,86 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!-- 一般分頁：給不需要 orderBy 的頁面使用 -->
-<nav th:fragment="pagination(currentPage, totalPages, baseUrl)"
-     th:if="${totalPages != null and totalPages > 1}">
+<!--
+  共用分頁元件
+  用法：
+  <div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/article}, ${queryString})}"></div>
 
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=1)}">至第一頁</a>&nbsp;
-    </span>
+  參數：
+    currentPage : 目前頁碼（從 1 開始）
+    totalPages  : 總頁數
+    baseUrl     : 基底網址，例如 @{/article}
+    queryString : 除了 page 以外的查詢字串，例如 "keyword=焦慮&catId=3"，沒有就傳 null 或 ''
+-->
 
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=${currentPage - 1})}">上一頁</a>&nbsp;
-    </span>
+<nav class="pager" th:fragment="pagination(currentPage, totalPages, baseUrl, queryString)"
+     th:if="${totalPages != null and totalPages > 1}" aria-label="分頁導覽"
+     th:with="qs=${(queryString == null or #strings.isEmpty(queryString)) ? '' : '&amp;' + queryString},
+              start=${currentPage - 2 < 1 ? 1 : (currentPage + 2 > totalPages ? (totalPages - 4 < 1 ? 1 : totalPages - 4) : currentPage - 2)},
+              end=${start + 4 > totalPages ? totalPages : start + 4}">
 
-    <span>
-        第 <span th:text="${currentPage}"></span> /
-        <span th:text="${totalPages}"></span> 頁&nbsp;
-    </span>
+	<!-- 上一頁 -->
+	<a class="pg-btn pg-arrow" rel="prev"
+	   th:if="${currentPage > 1}"
+	   th:href="${baseUrl + '?page=' + (currentPage - 1) + qs}" aria-label="上一頁">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+			 stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+	</a>
+	<span class="pg-btn pg-arrow is-disabled" th:unless="${currentPage > 1}" aria-hidden="true">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+			 stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+	</span>
 
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${currentPage + 1})}">下一頁</a>&nbsp;
-    </span>
+	<!-- 第一頁 + 省略號 -->
+	<a class="pg-btn" th:if="${start > 1}" th:href="${baseUrl + '?page=1' + qs}">1</a>
+	<span class="pg-dots" th:if="${start > 2}">…</span>
 
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${totalPages})}">至最後一頁</a>&nbsp;
-    </span>
+	<!-- 頁碼 -->
+	<th:block th:each="i : ${#numbers.sequence(start, end)}">
+		<a class="pg-btn" th:classappend="${i == currentPage} ? ' is-current' : ''"
+		   th:href="${baseUrl + '?page=' + i + qs}"
+		   th:text="${i}"
+		   th:attr="aria-current=${i == currentPage} ? 'page' : null">1</a>
+	</th:block>
 
+	<!-- 省略號 + 最後一頁 -->
+	<span class="pg-dots" th:if="${end < totalPages - 1}">…</span>
+	<a class="pg-btn" th:if="${end < totalPages}"
+	   th:href="${baseUrl + '?page=' + totalPages + qs}" th:text="${totalPages}">9</a>
+
+	<!-- 下一頁 -->
+	<a class="pg-btn pg-arrow" rel="next"
+	   th:if="${currentPage < totalPages}"
+	   th:href="${baseUrl + '?page=' + (currentPage + 1) + qs}" aria-label="下一頁">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+			 stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+	</a>
+	<span class="pg-btn pg-arrow is-disabled" th:unless="${currentPage < totalPages}" aria-hidden="true">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+			 stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+	</span>
 </nav>
 
-
-<!-- 排序分頁：給需要 orderBy 的頁面使用 -->
-<nav th:fragment="paginationWithOrder(currentPage, totalPages, baseUrl, orderBy)"
-     th:if="${totalPages != null and totalPages > 1}">
-
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=1, orderBy=${orderBy})}">至第一頁</a>&nbsp;
-    </span>
-
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=${currentPage - 1}, orderBy=${orderBy})}">上一頁</a>&nbsp;
-    </span>
-
-    <span>
-        第 <span th:text="${currentPage}"></span> /
-        <span th:text="${totalPages}"></span> 頁&nbsp;
-    </span>
-
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${currentPage + 1}, orderBy=${orderBy})}">下一頁</a>&nbsp;
-    </span>
-
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${totalPages}, orderBy=${orderBy})}">至最後一頁</a>&nbsp;
-    </span>
-
-</nav>
-
-<nav th:fragment="paginationWithkeyword(currentPage, totalPages, baseUrl, keyword)"
-     th:if="${totalPages != null and totalPages > 1}">
-
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=1, keyword=${keyword})}">至第一頁</a>&nbsp;
-    </span>
-
-    <span th:if="${currentPage > 1}">
-        <a th:href="@{${baseUrl}(page=${currentPage - 1}, keyword=${keyword})}">上一頁</a>&nbsp;
-    </span>
-
-    <span>
-        第 <span th:text="${currentPage}"></span> /
-        <span th:text="${totalPages}"></span> 頁&nbsp;
-    </span>
-
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${currentPage + 1}, keyword=${keyword})}">下一頁</a>&nbsp;
-    </span>
-
-    <span th:if="${currentPage < totalPages}">
-        <a th:href="@{${baseUrl}(page=${totalPages}, keyword=${keyword})}">至最後一頁</a>&nbsp;
-    </span>
-
-</nav>
 </body>
 </html>

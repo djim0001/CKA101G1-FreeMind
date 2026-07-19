@@ -18,4 +18,8 @@ public interface ArticleCatRepository extends JpaRepository<ArticleCat, Integer>
 
 	@Query("SELECT COUNT(c) > 0 FROM ArticleCat c WHERE LOWER(TRIM(c.articleCatName)) = LOWER(TRIM(:catName))")
 	boolean existsCatName(@Param("catName") String catName);
+
+	@Query("SELECT c FROM ArticleCat c WHERE LOWER(TRIM(c.articleCatName)) LIKE LOWER(CONCAT('%', TRIM(:keyword), '%'))")
+	List<ArticleCat> findCatsByName(@Param("keyword") String keyword);
+
 }

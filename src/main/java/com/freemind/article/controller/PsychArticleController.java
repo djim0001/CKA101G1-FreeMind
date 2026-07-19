@@ -2,7 +2,6 @@ package com.freemind.article.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.dto.ArticleCreateForm;
-import com.freemind.article.dto.ArticleInteractionStatsDTO;
-import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.dto.StatsSummaryDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
@@ -75,22 +72,8 @@ public class PsychArticleController {
 
 		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
-		
-		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
-		for (Article article : articlePage.getContent()) {
-			ArticleInteractionStatsDTO stats = null;
-			
-			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
-				stats = articleInteractionService.getArticleStatistics(article);
-			}
-			
-			ArticleWithStatsDTO dto = new ArticleWithStatsDTO(article, stats);
-			articleList.add(dto);
-		}
-		
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("articleList", articleList);
 		return "front-end/psych/article/myArticles";
 	}
 	
@@ -113,17 +96,14 @@ public class PsychArticleController {
 			switch (status) {
 			case 2:
 				totalPublishedCount += 1;
+				totalViewCount += article.getViewCount();
+				totalLikeCount += articleInteractionService.getLikeCount(article.getArticleId());
+				totalBookmarkCount += articleInteractionService.getBookmarkCount(article.getArticleId());
+				totalShareCount += article.getShareCount();
 				break;
 			case 4:
-				totalPublishedCount += 1;
+				totalUnPublishedCount += 1;
 				break;
-			}
-			
-			if (status == 2 || status == 4) {
-				totalViewCount += article.getViewCount();
-				totalLikeCount += article.getLikeBaseCount() + articleInteractionService.getLikeCount(article.getArticleId());
-				totalBookmarkCount += article.getBookmarkBaseCount() + articleInteractionService.getBookmarkCount(article.getArticleId());
-				totalShareCount += article.getShareCount();
 			}
 		}
 		

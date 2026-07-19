@@ -3,7 +3,6 @@ package com.freemind.article.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +35,11 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 				.orElseThrow(() -> new IllegalArgumentException("查無此文章分類"));
 		
 		return articleCat;
+	}
+	
+	@Override
+	public List<ArticleCat> getCatsByName(String keyword) {
+		return articleCatRepository.findCatsByName(keyword);
 	}
 	
 	@Override

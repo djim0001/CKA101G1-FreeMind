@@ -1,530 +1,468 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>專欄文章</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>專欄文章｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<!-- ============================================================
+     本頁專屬樣式（非共用）
+     ============================================================ -->
 <style>
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+/* ---------- 頁首標題區 ---------- */
+.art-head { background: var(--bg-warm); padding: 2.6rem 0 1.6rem; }
+.art-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.art-head .crumb a:hover { color: var(--orange); }
+.art-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.art-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.art-head h1 em { font-style: normal; color: var(--orange); }
+.art-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
+
+/* ---------- 版面 ---------- */
+.art-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
+.art-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2.2rem; align-items: start; }
+@media (min-width: 1041px) {
+	.art-side { position: sticky; top: 92px; }
 }
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.6;
+/* ---------- 側欄卡片 ---------- */
+.side-card {
+	background: #fff; border: 1px solid var(--line);
+	border-radius: var(--radius-md); padding: 1.5rem 1.4rem;
+	box-shadow: var(--shadow-sm); margin-bottom: 1.4rem;
+}
+.side-card h3 {
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem;
+	margin: 0 0 1rem; display: flex; align-items: center; gap: .5rem;
+}
+.side-card h3::before {
+	content: ""; width: 8px; height: 8px; border-radius: 50%;
+	background: var(--orange); flex: 0 0 auto;
 }
 
-.container {
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 30px 20px;
+/* 關鍵字搜尋（底色與日期欄相同） */
+.side-search { position: relative; }
+.side-search input {
+	width: 100%; height: 48px; padding: 0 3rem 0 1.2rem;
+	border-radius: 999px; border: 1px solid var(--line); background: #f6f1e8;
+	font-family: inherit; font-size: .95rem; color: var(--ink);
+	transition: border-color .2s, background .2s;
+}
+.side-search input:focus { outline: none; border-color: var(--orange); background: #fff; }
+.side-search button {
+	position: absolute; right: 6px; top: 6px; width: 36px; height: 36px;
+	border-radius: 50%; background: var(--orange); display: grid; place-items: center;
+	transition: background .2s;
+}
+.side-search button:hover { background: var(--orange-deep); }
+.side-search button svg { width: 17px; height: 17px; stroke: #fff; }
+
+/* 進階篩選表單 */
+.filter-field { margin-bottom: 1rem; min-width: 0; }
+.filter-field > label {
+	display: block; font-size: .8rem; font-weight: 500; letter-spacing: .1em;
+	color: var(--ink-soft); margin-bottom: .4rem;
+}
+.filter-field select,
+.filter-field input[type="date"] {
+	width: 100%; min-width: 0; max-width: 100%;
+	height: 42px; padding: 0 .7rem;
+	border: 1px solid var(--line); border-radius: 12px; background: #f6f1e8;
+	font-family: inherit; font-size: .86rem; color: var(--ink);
+}
+.filter-field select:disabled,
+.filter-field input:disabled { color: var(--ink-soft); cursor: not-allowed; }
+.filter-field select:focus, .filter-field input:focus { outline: none; border-color: var(--orange); background: #fff; }
+.filter-dates { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .5rem; }
+.filter-actions { display: flex; gap: .6rem; margin-top: 1.1rem; }
+.filter-actions .btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: .68rem .6rem; font-size: .9rem; }
+.filter-note { font-size: .76rem; color: var(--ink-soft); margin: .2rem 0 0; line-height: 1.6; }
+
+/* 分類清單 */
+.cat-list { list-style: none; margin: 0; padding: 0; }
+.cat-list li + li { border-top: 1px solid var(--line); }
+.cat-list a {
+	display: flex; align-items: center; justify-content: space-between;
+	padding: .7rem .2rem; font-size: .95rem; color: var(--ink-soft);
+	transition: color .18s, padding .18s;
+}
+.cat-list a:hover { color: var(--orange); padding-left: .5rem; }
+.cat-list a.is-active { color: var(--orange-deep); font-weight: 500; }
+.cat-list a.is-active::after { content: "●"; font-size: .5rem; color: var(--orange); }
+
+/* 熱門文章 */
+.hot-list { list-style: none; margin: 0; padding: 0; }
+.hot-item { display: flex; gap: .85rem; padding: .8rem 0; border-top: 1px solid var(--line); }
+.hot-item:first-child { border-top: none; padding-top: 0; }
+.hot-item .rank {
+	font-family: var(--display-en); font-size: 1.5rem; font-weight: 700;
+	line-height: 1.1; color: var(--pink); flex: 0 0 auto; width: 1.4rem;
+}
+.hot-item:nth-child(1) .rank { color: var(--orange); }
+.hot-item .hot-body { min-width: 0; }
+.hot-item b {
+	display: block; font-size: .94rem; font-weight: 500; line-height: 1.55;
+	color: var(--ink); transition: color .18s;
+}
+.hot-item a:hover b { color: var(--orange); }
+.hot-item small { font-size: .76rem; color: var(--ink-soft); letter-spacing: .04em; }
+.hot-msg { font-size: .88rem; color: var(--ink-soft); margin: .4rem 0 0; }
+
+/* 側欄 CTA */
+.side-cta { background: var(--bg-soothing); border: none; text-align: center; padding: 1.8rem 1.4rem; }
+.side-cta .script { font-size: 1.25rem; }
+.side-cta p { font-size: .9rem; color: var(--ink); margin: .3rem 0 1.1rem; }
+
+/* ---------- 結果列 ---------- */
+.result-bar {
+	display: flex; align-items: center; justify-content: space-between;
+	flex-wrap: wrap; gap: .8rem; margin-bottom: 1.4rem;
+}
+.result-bar .count { font-size: .92rem; color: var(--ink-soft); }
+.result-bar .count b { color: var(--ink); font-weight: 700; }
+.result-bar .sort { display: flex; align-items: center; gap: .5rem; }
+.result-bar .sort label { font-size: .85rem; color: var(--ink-soft); }
+.result-bar .sort select {
+	height: 40px; padding: 0 .9rem; border: 1px solid var(--line);
+	border-radius: 12px; background: #f6f1e8; font-family: inherit;
+	font-size: .88rem; color: var(--ink-soft);
 }
 
-.page-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 28px;
-	padding-bottom: 16px;
-	border-bottom: 2px solid #e8b4b4;
+/* ---------- 精選文章（橫式長方形） ---------- */
+.featured-card {
+	display: grid; grid-template-columns: minmax(0,1.02fr) minmax(0,1fr);
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 1.6rem;
+	transition: transform .25s, box-shadow .25s;
 }
-
-.page-header h1 {
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
+.featured-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.featured-cover { position: relative; min-height: 236px; }
+.featured-cover img { width: 100%; height: 100%; object-fit: cover; }
+/* 移除精選封面的虛線內框 */
+.featured-cover::after { content: none; }
+.featured-body { padding: 1.7rem 1.9rem; display: flex; flex-direction: column; justify-content: center; }
+.featured-badge {
+	align-self: flex-start; background: var(--pink-soft); color: var(--orange-deep);
+	font-size: .74rem; font-weight: 500; letter-spacing: .1em;
+	padding: .28rem .8rem; border-radius: 999px; margin-bottom: .7rem;
 }
-
-.page-header a {
-	display: inline-block;
-	padding: 8px 20px;
-	background-color: #e8b4b4;
-	color: #fff;
-	text-decoration: none;
-	border-radius: 6px;
-	font-size: 14px;
-	transition: background-color 0.2s;
+.featured-meta-top { font-size: .76rem; letter-spacing: .1em; color: var(--orange); font-weight: 500; }
+.featured-body h2 {
+	font-family: var(--serif); font-weight: 700; font-size: clamp(1.2rem,1.7vw,1.5rem);
+	line-height: 1.5; margin: .4rem 0 .6rem;
 }
-
-.page-header a:hover {
-	background-color: #d39393;
+.featured-body p { font-size: .9rem; color: var(--ink-soft); margin: 0 0 1rem; line-height: 1.8; }
+.featured-foot {
+	display: flex; align-items: center; justify-content: space-between; gap: .8rem;
+	font-size: .8rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: .8rem;
 }
+.featured-foot .go { color: var(--orange); font-weight: 500; }
 
-.search-bar {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	margin-bottom: 20px;
-	padding: 18px 22px;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+/* ---------- 文章卡片 ---------- */
+.art-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.6rem; }
+.art-list .art-card {
+	background: #fff; border-radius: var(--radius-md); overflow: hidden;
+	box-shadow: var(--shadow-sm); border: 1px solid var(--line);
+	transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column;
 }
-
-.search-bar input {
-	flex: 1;
-	padding: 10px 16px;
-	border: 1px solid #e8d5d5;
-	border-radius: 20px;
-	font-size: 14px;
-	outline: none;
-	color: #333;
+.art-list .art-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+.art-list .art-cover { height: 190px; position: relative; }
+.art-list .art-cover img { width: 100%; height: 100%; object-fit: cover; }
+/* 移除卡片封面的虛線內框 */
+.art-cover::after { content: none; }
+.art-list .art-body { padding: 1.3rem 1.4rem 1.5rem; flex: 1; display: flex; flex-direction: column; }
+.art-list .art-meta-top {
+	font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
+	color: var(--orange); font-weight: 500;
 }
-
-.search-bar input:focus {
-	border-color: #e8b4b4;
+.art-list .art-body h3 {
+	font-family: var(--serif); font-weight: 700; font-size: 1.15rem;
+	margin: .45rem 0 .5rem; line-height: 1.5;
 }
+.art-list .art-body p { font-size: .88rem; color: var(--ink-soft); margin: 0 0 1rem; flex: 1; }
+.art-list .art-meta { font-size: .8rem; color: var(--ink-soft); display: flex; justify-content: space-between; gap: .6rem; }
 
-.search-bar select {
-	padding: 10px 16px;
-	border: 1px solid #e8d5d5;
-	border-radius: 20px;
-	font-size: 14px;
-	outline: none;
-	color: #7a6b6b;
-	background-color: #fff;
-	cursor: pointer;
-	white-space: nowrap;
-}
+/* ---------- 底部分頁 ---------- */
+.art-bottom { border-top: 1px solid var(--line); margin-top: 2.6rem; padding-top: .6rem; }
+.art-bottom .pager { margin-top: 1.6rem; }
 
-.search-bar select:focus {
-	border-color: #e8b4b4;
-}
-
-.search-bar button {
-	padding: 10px 24px;
-	background-color: #e8b4b4;
-	color: #fff;
-	border: none;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 500;
-	cursor: pointer;
-	transition: background-color 0.2s;
-	white-space: nowrap;
-}
-
-.search-bar button:hover {
-	background-color: #d39393;
-}
-
-.search-bar .clear-search {
-	font-size: 13px;
-	color: #999;
-	text-decoration: none;
-	white-space: nowrap;
-}
-
-.search-bar .clear-search:hover {
-	color: #d39393;
-	text-decoration: underline;
-}
-
-/* RWD */
-@media ( max-width : 640px) {
-	.search-bar {
-		flex-wrap: wrap;
-	}
-	.search-bar input {
-		flex-basis: 100%;
-	}
-	.search-bar select {
-		flex-basis: 100%;
-	}
-}
-
-.category-filter {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	margin-bottom: 28px;
-	padding: 18px 22px;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-
-.category-filter a {
-	display: inline-block;
-	padding: 6px 18px;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	text-decoration: none;
-	border-radius: 20px;
-	font-size: 14px;
-	font-weight: 500;
-	transition: all 0.2s;
-}
-
-.category-filter a:hover, .category-filter a.active {
-	background-color: #e8b4b4;
-	color: #fff;
-}
-
-.hot-section {
-	margin-bottom: 28px;
-	padding: 20px 22px;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-}
-
-.hot-list {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 16px;
-}
-
-.hot-card {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	background: #fbf2f2;
-	border-radius: 10px;
-	overflow: hidden;
-	text-decoration: none;
-	color: inherit;
-	transition: box-shadow 0.2s, transform 0.15s;
-}
-
-.hot-card:hover {
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-	transform: translateY(-2px);
-}
-
-.hot-rank {
-	position: absolute;
-	top: 8px;
-	left: 8px;
-	width: 26px;
-	height: 26px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: #e8b4b4;
-	color: #fff;
-	font-size: 13px;
-	font-weight: 700;
-	border-radius: 50%;
-	z-index: 1;
-}
-
-.hot-cover {
-	width: 100%;
-	height: 200px;  
-	overflow: hidden;
-	background-color: #f2dddd;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.hot-cover img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.hot-cover .no-image {
-	color: #ccbaba;
-	font-size: 13px;
-}
-
-.hot-info {
-	padding: 12px 14px;
-}
-
-.hot-info h4 {
-	font-size: 15px;
-	font-weight: 600;
-	color: #4a3e3e;
-	margin-bottom: 6px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-.hot-cat {
-	display: inline-block;
-	padding: 2px 10px;
-	background-color: #fff;
-	color: #7a6b6b;
-	border-radius: 12px;
-	font-size: 11px;
-	font-weight: 500;
-}
-
-/* RWD */
-@media ( max-width : 640px) {
-	.hot-list {
-		grid-template-columns: 1fr;
-	}
-	.hot-cover {
-		height: 160px;
-	}
-}
-
-.article-list {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-	margin-bottom: 32px;
-}
-
-.article-card {
-	display: flex;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-	overflow: hidden;
-	transition: box-shadow 0.2s, transform 0.15s;
-}
-
-.article-card:hover {
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-	transform: translateY(-2px);
-}
-
-.article-cover {
-	flex-shrink: 0;
-	width: 200px;
-	height: 150px;
-	overflow: hidden;
-	background-color: #fbf2f2;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.article-cover img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.article-cover .no-image {
-	color: #ccbaba;
-	font-size: 13px;
-}
-
-.article-info {
-	flex: 1;
-	padding: 20px 24px;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-}
-
-.article-info h2 {
-	font-size: 20px;
-	font-weight: 600;
-	color: #4a3e3e;
-	margin-bottom: 10px;
-}
-
-.article-meta {
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	margin-bottom: 14px;
-	font-size: 13px;
-	color: #888;
-}
-
-.article-meta .cat-tag {
-	display: inline-block;
-	padding: 2px 12px;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border-radius: 12px;
-	font-size: 12px;
-	font-weight: 500;
-}
-
-.article-action a {
-	display: inline-block;
-	padding: 7px 22px;
-	background-color: #e8b4b4;
-	color: #fff;
-	text-decoration: none;
-	border-radius: 6px;
-	font-size: 14px;
-	transition: background-color 0.2s;
-}
-
-.article-action a:hover {
-	background-color: #d39393;
-}
-
+/* 找不到結果 */
 .empty-state {
-	text-align: center;
-	padding: 60px 20px;
-	background: #fff;
-	border-radius: 10px;
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-	color: #999;
-	font-size: 16px;
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
 }
+.empty-state svg { width: 46px; height: 46px; stroke: var(--orange); margin: 0 auto 1rem; fill: none; }
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; margin-bottom: .3rem; }
+.empty-state p { color: var(--ink-soft); font-size: .92rem; margin: 0 0 1.4rem; }
 
-.pagination {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	flex-wrap: wrap;
+/* ---------- RWD ---------- */
+@media (max-width: 1040px) {
+	.art-layout { grid-template-columns: 1fr; }
+	.art-side { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; align-items: start; }
+	.art-side .side-cta { grid-column: 1 / -1; }
+	.featured-card { grid-template-columns: 1fr; }
+	.featured-cover { min-height: 180px; }
 }
-
-.pagination a, .pagination span {
-	display: inline-block;
-	padding: 8px 14px;
-	font-size: 14px;
-	font-weight: 500;
-	border-radius: 6px;
-	text-decoration: none;
-	border: 1px solid #f2dddd;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	transition: all 0.2s;
-}
-
-.pagination a:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-.pagination .active {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-	pointer-events: none;
-}
-
-.pagination .disabled {
-	opacity: 0.4;
-	pointer-events: none;
-}
-
-.pagination .page-info {
-	font-size: 14px;
-	color: #666;
-	background: #fff;
-	border: 1px solid #e0e0e0;
-}
-
-/* RWD */
-@media ( max-width : 640px) {
-	.article-card {
-		flex-direction: column;
-	}
-	.article-cover {
-		width: 100%;
-		height: 180px;
-	}
+@media (max-width: 720px) {
+	.art-side { grid-template-columns: 1fr; }
+	.art-list { grid-template-columns: 1fr; }
 }
 </style>
 </head>
+
 <body>
-	<div class="container">
 
-		<div class="page-header">
-			<h1>專欄文章</h1>
-			<a th:href="@{/}">回首頁</a>
-		</div>
-		
-		<form class="search-bar" th:action="@{/article}" method="get">
-			<input type="text" name="keyword" placeholder="搜尋文章標題或作者..." th:value="${keyword}" />
-			<select name="sort">
-				<option value="">發布日期新至舊</option>
-				<option value="asc">發布日期舊至新</option>
-			</select>
-			<button type="submit">搜尋</button>
-			<a th:if="${keyword != null && !keyword.isEmpty()}" th:href="@{/article}" class="clear-search">清除搜尋</a>
-		</form>
+<!--
+  Model 屬性（ArticleController 未更動）
+    articleCats / articlePage / currentPage / selectedCatId / keyword / hotArticles
+  ★ ArticleCat getter：articleCatId / articleCatName（共 4 處）
+  ★ 精選 = 第 1 頁第一篇；下方格線用 th:unless 跳過不重複
+-->
+<th:block th:with="
+	kw           = ${keyword == null ? '' : keyword},
+	qs           = ${(selectedCatId == null ? '' : 'catId=' + selectedCatId)
+	                 + ((keyword == null or #strings.isEmpty(keyword)) ? ''
+	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))},
+	showFeatured = ${articlePage != null and articlePage.hasContent() and currentPage != null and currentPage == 1}">
 
-		<div class="category-filter">
-			<a th:href="@{/article(keyword=${keyword})}"
-				th:classappend="${selectedCatId == null} ? 'active' : ''">全部</a>
-			<a th:each="cat : ${articleCats}"
-				th:href="@{/article(catId=${cat.articleCatId}, keyword=${keyword})}"
-				th:text="${cat.articleCatName}"
-				th:classappend="${selectedCatId != null && selectedCatId == cat.articleCatId} ? 'active' : ''"></a>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<!-- ================= 頁首標題 ================= -->
+	<section class="art-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span><span style="opacity:1;color:var(--ink)">專欄文章</span>
+			</div>
+			<span class="script" style="font-size:1.3rem;">慢慢讀，慢慢懂自己</span>
+			<h1>專欄文章，陪你<em>把心事讀懂</em>。</h1>
+			<p>由專業心理師撰寫的身心健康文章。也許今天需要的，就在其中一篇裡。</p>
 		</div>
-		
-		<div class="hot-section" th:if="${hotArticles != null && !hotArticles.isEmpty()}">
-<!-- 		<h3 class="hot-title">熱門文章</h3> -->
-			<div class="hot-list">
-				<a class="hot-card" th:each="hot, iterStat : ${hotArticles}"
-				   th:href="@{/article/{id}(id=${hot.articleId})}">
-					<span class="hot-rank" th:text="${iterStat.index + 1}"></span>
-					<div class="hot-cover">
-						<img th:if="${hot.coverImage != null}"
-							th:src="@{/article/{id}/cover(id=${hot.articleId})}" />
-						<span class="no-image" th:if="${hot.coverImage == null}">無封面</span>
+	</section>
+
+	<!-- ================= 主體 ================= -->
+	<section class="art-page">
+		<div class="wrap">
+			<div class="art-layout">
+
+				<!-- ---------- 左側欄 ---------- -->
+				<aside class="art-side">
+
+					<!-- 關鍵字搜尋 -->
+					<div class="side-card">
+						<form class="side-search" th:action="@{/article}" method="get" role="search" autocomplete="off">
+							<input type="search" name="keyword" placeholder="搜尋文章關鍵字…"
+								   th:value="${kw}" aria-label="搜尋文章" autocomplete="off" />
+							<input type="hidden" name="catId" th:if="${selectedCatId != null}" th:value="${selectedCatId}" />
+							<button type="submit" aria-label="搜尋">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+									<circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></svg>
+							</button>
+						</form>
 					</div>
-					<div class="hot-info">
-						<h4 th:text="${hot.title}"></h4>
-						<span class="hot-cat" th:text="${hot.articleCat != null ? hot.articleCat.articleCatName : '未分類'}"></span>
+
+					<!-- 文章分類 -->
+					<div class="side-card">
+						<h3>文章分類</h3>
+						<ul class="cat-list">
+							<li>
+								<a th:href="@{/article(keyword=${kw == '' ? null : kw})}" href="#"
+								   th:classappend="${selectedCatId == null} ? ' is-active' : ''">全部文章</a>
+							</li>
+							<li th:each="cat : ${articleCats}">
+								<a th:href="@{/article(catId=${cat.articleCatId}, keyword=${kw == '' ? null : kw})}" href="#"
+								   th:text="${cat.articleCatName}"
+								   th:classappend="${selectedCatId != null and selectedCatId == cat.articleCatId} ? ' is-active' : ''">情緒照顧</a>
+							</li>
+						</ul>
 					</div>
-				</a>
+
+					<!-- 熱門文章 -->
+					<div class="side-card">
+						<h3>熱門文章</h3>
+						<ul class="hot-list" th:if="${hotArticles != null and !hotArticles.isEmpty()}">
+							<li class="hot-item" th:each="hot, st : ${hotArticles}">
+								<span class="rank" th:text="${st.count}">1</span>
+								<a class="hot-body" th:href="@{'/article/' + ${hot.articleId}}" href="#">
+									<b th:text="${hot.title}">「我沒事」的背後，其實藏了很多事</b>
+									<small th:text="${#numbers.formatInteger(hot.viewCount, 1, 'COMMA')} + ' 次閱讀'">1,024 次閱讀</small>
+								</a>
+							</li>
+						</ul>
+						<p class="hot-msg" th:if="${hotArticles == null or hotArticles.isEmpty()}">
+							目前還沒有熱門文章，之後再來看看。</p>
+					</div>
+
+					<!-- 進階篩選 -->
+					<div class="side-card">
+						<h3>進階篩選</h3>
+						<form th:action="@{/article}" method="get" autocomplete="off">
+							<input type="hidden" name="keyword" th:value="${kw}" />
+							<input type="hidden" name="catId" th:if="${selectedCatId != null}" th:value="${selectedCatId}" />
+
+							<div class="filter-field">
+								<label for="psychId">作者心理師</label>
+								<select name="psychId" id="psychId" disabled>
+									<option value="">不限作者</option>
+								</select>
+							</div>
+
+							<div class="filter-field">
+								<label>發布日期</label>
+								<div class="filter-dates">
+									<input type="date" name="dateFrom" aria-label="開始日期" disabled />
+									<input type="date" name="dateTo" aria-label="結束日期" disabled />
+								</div>
+							</div>
+
+							<p class="filter-note">此區開發中，後端接上參數後把 disabled 拿掉即可。</p>
+
+							<div class="filter-actions">
+								<button type="submit" class="btn btn-primary" disabled>套用條件</button>
+								<a class="btn btn-outline" th:href="@{/article}" href="#">清除</a>
+							</div>
+						</form>
+					</div>
+
+					<!-- 側欄 CTA -->
+					<div class="side-card side-cta">
+						<span class="script">讀完之後，也可以找人聊聊</span>
+						<p>如果有些事讀著讀著就浮上來了，讓心理師陪你一起看看。</p>
+						<a class="btn btn-primary" th:href="@{/consultation}" href="#">預約諮商</a>
+					</div>
+				</aside>
+
+				<!-- ---------- 右側文章列表 ---------- -->
+				<main>
+					<div class="result-bar">
+						<div class="count">
+							共 <b th:text="${articlePage != null ? articlePage.totalElements : 0}">36</b> 篇文章
+							<span th:if="${!#strings.isEmpty(kw)}">・關鍵字「<span th:text="${kw}">焦慮</span>」</span>
+						</div>
+						<div class="sort">
+							<label for="sortTop">排序</label>
+							<select id="sortTop" disabled><option>最新發布</option></select>
+						</div>
+					</div>
+
+					<!-- 精選文章：第 1 頁第一篇，th:with 在此把 plain 算好 -->
+					<a class="featured-card" th:if="${showFeatured}"
+					   th:with="top=${articlePage.content[0]},
+					            plain=${top.content == null ? '' :
+					                    top.content.replaceAll('\x3C[^\x3E]*\x3E',' ')
+					                               .replaceAll('&[a-zA-Z#0-9]+;',' ')
+					                               .replaceAll('\s+',' ').trim()}"
+					   th:href="@{'/article/' + ${top.articleId}(page=${currentPage}, catId=${selectedCatId})}" href="#">
+
+						<div class="photo-slot featured-cover">
+							<img th:if="${top.coverImage != null and top.coverImage.length > 0}"
+								 th:src="@{'/article/' + ${top.articleId} + '/cover'}"
+								 th:alt="${top.title}" />
+							<div class="ps-inner" th:if="${top.coverImage == null or top.coverImage.length == 0}">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+									 stroke-linecap="round" stroke-linejoin="round">
+									<rect x="3" y="6" width="18" height="14" rx="3" />
+									<circle cx="12" cy="13" r="3.2" /></svg>
+								<small>封面照片預留</small>
+							</div>
+						</div>
+
+						<div class="featured-body">
+							<span class="featured-badge">精選文章</span>
+							<span class="featured-meta-top">
+								<span th:if="${top.articleCat != null}" th:text="${top.articleCat.articleCatName}">情緒照顧</span>
+								<span th:if="${top.publishedAt != null}"
+									  th:text="'・' + ${#temporals.format(top.publishedAt, 'yyyy.MM.dd')}">・2026.07.19</span>
+							</span>
+							<h2 th:text="${top.title}">「我沒事」的背後，其實藏了很多事</h2>
+							<p th:text="${#strings.length(plain) > 90 ? #strings.substring(plain,0,90) + '…' : plain}"></p>
+							<div class="featured-foot">
+								<span th:if="${top.psychologist != null}"
+									  th:text="${top.psychologist.name} + ' 心理師'">陳語安 心理師</span>
+								<span class="go">閱讀全文 →</span>
+							</div>
+						</div>
+					</a>
+
+					<!-- 文章卡片列表（第 1 頁跳過第一篇） -->
+					<div class="art-list" th:if="${articlePage != null and articlePage.hasContent()}">
+						<th:block th:each="art, st : ${articlePage.content}">
+							<a class="art-card" th:unless="${showFeatured and st.index == 0}"
+							   th:href="@{'/article/' + ${art.articleId}(page=${currentPage}, catId=${selectedCatId})}" href="#"
+							   th:with="plain=${art.content == null ? '' :
+							                   art.content.replaceAll('\x3C[^\x3E]*\x3E',' ')
+							                              .replaceAll('&[a-zA-Z#0-9]+;',' ')
+							                              .replaceAll('\s+',' ').trim()}">
+
+								<div class="photo-slot art-cover">
+									<img th:if="${art.coverImage != null and art.coverImage.length > 0}"
+										 th:src="@{'/article/' + ${art.articleId} + '/cover'}"
+										 th:alt="${art.title}" loading="lazy" />
+									<div class="ps-inner" th:if="${art.coverImage == null or art.coverImage.length == 0}">
+										<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+											 stroke-linecap="round" stroke-linejoin="round">
+											<rect x="3" y="6" width="18" height="14" rx="3" />
+											<circle cx="12" cy="13" r="3.2" /></svg>
+										<small>封面照片預留</small>
+									</div>
+								</div>
+
+								<div class="art-body">
+									<span class="art-meta-top">
+										<span th:if="${art.articleCat != null}" th:text="${art.articleCat.articleCatName}">情緒照顧</span>
+										<span th:if="${art.publishedAt != null}"
+											  th:text="'・' + ${#temporals.format(art.publishedAt, 'yyyy.MM.dd')}">・2026.07.19</span>
+									</span>
+									<h3 th:text="${art.title}">「我沒事」的背後，其實藏了很多事</h3>
+									<p th:text="${#strings.length(plain) > 60 ? #strings.substring(plain,0,60) + '…' : plain}"></p>
+									<div class="art-meta">
+										<span th:if="${art.psychologist != null}"
+											  th:text="${art.psychologist.name} + ' 心理師'">陳語安 心理師</span>
+										<span th:text="${#numbers.formatInteger(art.viewCount, 1, 'COMMA')} + ' 次閱讀'">1,024 次閱讀</span>
+									</div>
+								</div>
+							</a>
+						</th:block>
+					</div>
+
+					<!-- 查無結果 -->
+					<div class="empty-state" th:if="${articlePage == null or !articlePage.hasContent()}">
+						<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+							<circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></svg>
+						<b>沒有符合條件的文章</b>
+						<p>換個關鍵字，或選別的分類，再找找看。</p>
+						<a class="btn btn-primary" th:href="@{/article}" href="#">看全部文章</a>
+					</div>
+				</main>
+			</div>
+
+			<!-- 分頁 -->
+			<div class="art-bottom" th:if="${articlePage != null}">
+				<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, @{/article}, ${qs})}"></div>
 			</div>
 		</div>
+	</section>
 
-		<div class="article-list"
-			th:if="${articlePage.content != null && !articlePage.content.isEmpty()}">
-			<div class="article-card" th:each="article : ${articlePage.content}">
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
 
-				<div class="article-cover">
-					<img th:if="${article.coverImage != null}"
-						th:src="@{/article/{id}/cover(id=${article.articleId})}" /> <span
-						class="no-image" th:if="${article.coverImage == null}">無封面</span>
-				</div>
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
 
-				<div class="article-info">
-					<h2 th:text="${article.title}"></h2>
-					<div class="article-meta">
-						<span class="cat-tag"
-							th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
-						<span th:text="${article.publishedAt}"></span>
-					</div>
-					<div class="article-action">
-					    <a th:if="${selectedCatId != null}"
-					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage}, catId=${selectedCatId})}">查看詳情</a>
-					    <a th:unless="${selectedCatId != null}"
-					       th:href="@{/article/{id}(id=${article.articleId}, page=${currentPage})}">查看詳情</a>
-					</div>
-				</div>
+</th:block>
 
-			</div>
-		</div>
-
-		<div class="empty-state"
-			th:if="${articlePage.content == null || articlePage.content.isEmpty()}">
-			目前沒有文章</div>
-
-		<div class="pagination" th:if="${articlePage.totalPages > 1}">
-			<!-- 上一頁 -->
-			<a th:if="${currentPage > 1}"
-			   th:href="@{/article(page=${currentPage - 1}, catId=${selectedCatId}, keyword=${keyword})}">上一頁</a>
-			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span>
-			
-			<!-- 頁碼 -->
-			<th:block th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
-			    <a th:if="${i != currentPage}"
-			       th:href="@{/article(page=${i}, catId=${selectedCatId}, keyword=${keyword})}"
-			       th:text="${i}"></a>
-			    <span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
-			</th:block>
-			
-			<!-- 下一頁 -->
-			<a th:if="${currentPage < articlePage.totalPages}"
-			   th:href="@{/article(page=${currentPage + 1}, catId=${selectedCatId}, keyword=${keyword})}">下一頁</a>
-			<span th:if="${currentPage >= articlePage.totalPages}" class="disabled">下一頁</span>
-		</div>
-	</div>
+<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
+<script></script>
 </body>
 </html>

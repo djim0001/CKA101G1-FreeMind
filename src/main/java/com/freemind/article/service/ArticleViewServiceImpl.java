@@ -100,24 +100,4 @@ public class ArticleViewServiceImpl implements ArticleViewService{
 		redisTemplate.opsForZSet().incrementScore(HOT_KEY, articleId.toString(), delta); // ZINCRBY
 	}
 	
-	/*
-	@Override
-	@Transactional(readOnly = true)
-	public void rebuildHotScoreFromDb() {
-		List<Article> articles = articleRepository.findByStatus(2);
-		
-		for (Article article : articles) {
-			Integer articleId = article.getArticleId();
-			
-			double baseScore = article.getLikeBaseCount() * weightLike + article.getBookmarkBaseCount() * weightBookmark;
-			
-			if (baseScore > 0) {
-	            redisTemplate.opsForZSet().incrementScore(HOT_KEY, articleId.toString(), baseScore);
-	        }
-		}
-		
-		log.info("Rebuilt hot score for {} articles.", articles.size());
-	}
-	*/
-
 }

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.freemind.article.dto.ArticleInteractionStatsDTO;
 import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
@@ -76,15 +75,14 @@ public class AdminArticleController {
 		Page<Article> articlePage = articleService.getReviewedArticles(status, page);
 		
 		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
-		for(Article article : articlePage.getContent()) {
-			ArticleInteractionStatsDTO stats = null;
+		for (Article article : articlePage.getContent()) {
+			ArticleWithStatsDTO stats = null;
 			
 			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
 				stats = articleInteractionService.getArticleStatistics(article);
 			}
 			
-			ArticleWithStatsDTO dto = new ArticleWithStatsDTO(article, stats);
-			articleList.add(dto);
+			articleList.add(stats);
 		}
 		
 		model.addAttribute("articlePage", articlePage);
@@ -113,10 +111,16 @@ public class AdminArticleController {
     @GetMapping("/categories")
     public String getCatSearch(Model model,
     		@RequestParam(name = "catId", required = false) Integer catId,
+    		@RequestParam(name = "keyword", required = false) String keyword,
     		@RequestParam(name = "page", defaultValue = "1") Integer page) {
-		List<ArticleCat> cats = articleCatService.getAllCats();
-		List<Map<String, Object>> catList = new ArrayList<>();
+		List<ArticleCat> cats;
+		if (keyword != null && !keyword.isBlank()) {
+			cats = articleCatService.getCatsByName(keyword);
+		} else {
+			cats = articleCatService.getAllCats();
+		}
 		
+		List<Map<String, Object>> catList = new ArrayList<>();
 		for (ArticleCat cat : cats) {
 			Map<String, Object> map = new HashMap<>();
 			map.put("articleCatId", cat.getArticleCatId());

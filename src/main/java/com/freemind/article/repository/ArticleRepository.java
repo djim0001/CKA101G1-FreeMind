@@ -51,5 +51,14 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count WHERE a.articleId = :articleId")
 	void incrementViewCount(@Param("articleId")Integer articleId, long count);
 
-
+	@Query("SELECT a FROM Article a WHERE a.articleCat IN :cats " +
+	       "AND a.articleStatus = 2 AND a.articleId NOT IN :articleIds " +
+		   "ORDER BY a.viewCount DESC LIMIT 3")
+	List<Article> getPopularFromCats(@Param("cats")List<ArticleCat> cats, @Param("articleIds")List<Integer> viewedArticleIds);
+	
+	@Query("SELECT a.articleCat FROM Article a " +
+	       "WHERE a.articleStatus = 2 AND a.articleCat.articleCatStatus = TRUE " +
+		   "GROUP BY a.articleCat ORDER BY COUNT(a) DESC LIMIT :number")
+	List<ArticleCat> getPopularCats(@Param("number") int number);
+	
 }

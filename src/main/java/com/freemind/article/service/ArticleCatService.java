@@ -12,6 +12,8 @@ public interface ArticleCatService {
 	List<ArticleCat> getActiveCats();
 	
 	ArticleCat getCatById(Integer catId);
+	
+	List<ArticleCat> getCatsByName(String keyword);
 
 	ArticleCat createCat(String catName);
 	

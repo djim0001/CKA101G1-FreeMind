@@ -60,7 +60,6 @@ public class MemberDashboardController {
 	    return "redirect:/member/activity/registration/myRegistrations";
 	}
 
-	
 	@GetMapping("/myCollection")
     public String getMyCollection() {
         return "front-end/member/memberpage/myCollection";
