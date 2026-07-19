@@ -11,6 +11,88 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-toast]').forEach(element => element.addEventListener('click', () => notify(element.dataset.toast)));
 
+  const takeDownDialog = document.querySelector('[data-take-down-dialog]');
+  const takeDownCourseName = takeDownDialog?.querySelector('[data-take-down-course]');
+  const takeDownCourseId = takeDownDialog?.querySelector('[data-take-down-course-id]');
+  const takeDownReason = takeDownDialog?.querySelector('[data-take-down-reason]');
+
+  document.querySelectorAll('[data-open-take-down]').forEach(button => {
+    button.addEventListener('click', () => {
+      if (!takeDownDialog) return;
+      if (takeDownCourseName) takeDownCourseName.textContent = button.dataset.courseName || '';
+      if (takeDownCourseId) takeDownCourseId.value = button.dataset.courseId || '';
+      if (takeDownReason) takeDownReason.value = '';
+      takeDownDialog.showModal();
+      takeDownReason?.focus();
+    });
+  });
+
+  document.querySelectorAll('[data-close-take-down]').forEach(button => {
+    button.addEventListener('click', () => takeDownDialog?.close());
+  });
+
+  takeDownDialog?.addEventListener('click', event => {
+    if (event.target === takeDownDialog) takeDownDialog.close();
+  });
+
+  const revenueRows = [...document.querySelectorAll('[data-revenue-row]')];
+  const revenueValues = revenueRows.map(row => Number(row.dataset.revenueValue) || 0);
+  const highestRevenue = Math.max(0, ...revenueValues);
+  revenueRows.forEach((row, index) => {
+    const value = revenueValues[index];
+    const bar = row.querySelector('[data-revenue-bar]');
+    if (!bar) return;
+    bar.style.width = `${highestRevenue > 0 ? (value / highestRevenue) * 100 : 0}%`;
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', String(highestRevenue));
+    bar.setAttribute('aria-valuenow', String(value));
+  });
+
+  const couponSpecForm = document.querySelector('[data-coupon-spec-form]');
+  const couponDiscount = couponSpecForm?.querySelector('[data-admin-discount]');
+  const couponLimit = couponSpecForm?.querySelector('[data-admin-limit]');
+  const couponThreshold = couponSpecForm?.querySelector('[data-admin-threshold]');
+  const couponExample = document.querySelector('[data-discount-example]');
+
+  const updateCouponExample = () => {
+    if (!couponExample) return;
+    const discount = Number(couponDiscount?.value);
+    const limit = Number(couponLimit?.value);
+    const threshold = Number(couponThreshold?.value);
+    if (!Number.isFinite(discount) || discount <= 0 || discount >= 1) {
+      couponExample.textContent = '填寫折扣倍率後，這裡會顯示規格摘要。';
+      return;
+    }
+    const percentage = Math.round(discount * 100);
+    const details = [`折扣為原價的 ${percentage}%`];
+    if (Number.isFinite(limit) && limit > 0) details.push(`最高折抵 NT$ ${limit.toLocaleString('zh-TW')}`);
+    if (Number.isFinite(threshold) && threshold > 0) details.push(`消費滿 NT$ ${threshold.toLocaleString('zh-TW')} 可使用`);
+    couponExample.textContent = details.join('；') + '。';
+  };
+
+  [couponDiscount, couponLimit, couponThreshold].forEach(input => {
+    input?.addEventListener('input', updateCouponExample);
+  });
+  updateCouponExample();
+
+  const audienceSelect = document.querySelector('[data-audience-select]');
+  const audienceThreshold = document.querySelector('[data-audience-threshold]');
+  const audienceThresholdInput = document.querySelector('[data-audience-threshold-input]');
+  const updateAudienceThreshold = () => {
+    if (!audienceThreshold) return;
+    const needsThreshold = audienceSelect?.value === 'spending';
+    audienceThreshold.hidden = !needsThreshold;
+    if (audienceThresholdInput) audienceThresholdInput.required = needsThreshold;
+  };
+  audienceSelect?.addEventListener('change', updateAudienceThreshold);
+  updateAudienceThreshold();
+
+  document.querySelectorAll('[data-new-coupon]').forEach(link => {
+    link.addEventListener('click', () => {
+      window.setTimeout(() => document.getElementById('couponName')?.focus(), 0);
+    });
+  });
+
   const enhancePagination = () => {
     const roots = new Set();
     document.querySelectorAll('main a[href*="page="], main a[href*="currentPage="]').forEach(link => {

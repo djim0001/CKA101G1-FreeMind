@@ -32,9 +32,11 @@ import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.course.util.CourseSpecification;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -44,23 +46,29 @@ public class CourseForMemberController {
 
 	private final CourseService courseSvc;
 	private final MemberService memberSvc;
+	private final NoticeService noticeSvc;
 	private final OrderDetailService orderDetailSvc;
 	private final CourseOrderService courseOrderSvc;
+	private final ShoppingCartRedisService shoppingCartSvc;
 	private final CourseQaCommentService commentService;
 	private final CourseCategoriesService courseCategoriesSvc;
 	
 	public CourseForMemberController(
 			CourseService courseSvc, 
 			MemberService memberSvc,
+			NoticeService noticeSvc,
 			CourseOrderService courseOrderSvc,
 			OrderDetailService orderDetailSvc,
+			ShoppingCartRedisService shoppingCartSvc,
 			CourseQaCommentService commentService,
 			CourseCategoriesService courseCategoriesSvc) {
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
+		this.noticeSvc = noticeSvc;
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
 		this.commentService = commentService;
+		this.shoppingCartSvc = shoppingCartSvc;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
@@ -72,6 +80,18 @@ public class CourseForMemberController {
         }
         return memberSvc.findByAccount(authentication.getName());
     }
+	@ModelAttribute("countMemberUnread")
+	public Long memberNotice(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? noticeSvc.countMemberUnread(member.getMemberId()) : null);
+	}
+	
+	@ModelAttribute("countMemberCartCount")
+	public Long memberShoppingCartCount(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
+	}
+	
     @ModelAttribute("courseCategoriesListAll")
 	public List<CourseCategories> courseCategoriesListAll(){
 		List<CourseCategories> courseCategoriesListAll = courseCategoriesSvc.getAllCourseCategories();
@@ -86,14 +106,12 @@ public class CourseForMemberController {
 			@ModelAttribute("condition") CourseSpecification condition,
 			@RequestParam(name = "orderBy", required = false) String orderBy,
 			ModelMap model, HttpSession session) {
-System.out.println("有成功進入");
 		Member member = (Member)model.getAttribute("member");
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 //		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
 		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
-System.out.println("即將開始確認member");
 		if(member!=null) {
 			for(Course course : courseList) {
 				course.setSaved(courseSvc
@@ -101,7 +119,6 @@ System.out.println("即將開始確認member");
 			}
 			model.addAttribute("memberName", member.getName());
 		}
-System.out.println("確認member完畢");		
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("courseList", courseList);
 		model.addAttribute("totalPages", courseList.getTotalPages());

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>通知歷史</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5; color: #333; line-height: 1.6; padding: 40px 20px;
+}
+h1 {
+	max-width: 760px; margin: 0 auto 8px; font-size: 26px; font-weight: 700;
+	color: #4a3e3e; padding-bottom: 14px; border-bottom: 2px solid #e8b4b4;
+	display: flex; align-items: center; justify-content: space-between;
+}
+h1 a {
+	padding: 8px 20px; background-color: #e8b4b4; color: #fff;
+	text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500;
+}
+h1 a:hover { background-color: #d39393; }
+.person-line { max-width: 760px; margin: 0 auto 20px; font-size: 14px; color: #7a6b6b; }
+
+.toolbar { max-width: 760px; margin: 0 auto 16px; display: flex; gap: 8px; flex-wrap: wrap; }
+.toolbar a {
+	padding: 6px 16px; border-radius: 999px; font-size: 14px; text-decoration: none;
+	background: #fbf2f2; color: #7a6b6b; border: 1px solid #f2dddd;
+}
+.toolbar a.active, .toolbar a:hover { background: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+
+.notice-list { max-width: 760px; margin: 0 auto; }
+.notice-card {
+	background: #fff; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.notice-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+.type-badge {
+	padding: 2px 10px; border-radius: 999px; font-size: 12px;
+	background: #fbf2f2; color: #b96f6f;
+}
+.sender { font-size: 12px; color: #999; }
+.read-tag { font-size: 12px; padding: 1px 8px; border-radius: 999px; }
+.read-tag.yes { background: #eaf6ec; color: #2e7d43; }
+.read-tag.no { background: #fdf3e7; color: #b26a00; }
+.time { font-size: 12px; color: #aaa; margin-left: auto; }
+.content { font-size: 14px; color: #444; white-space: pre-wrap; word-break: break-all; }
+.empty-hint { text-align: center; color: #999; padding: 36px 0; }
+</style>
+</head>
+<body>
+	<h1>
+		<span>通知歷史</span>
+		<a th:href="@{/admin/notice(role=${role})}">返回查詢</a>
+	</h1>
+	<p class="person-line"
+		th:text="'對象:' + ${person.name} + '(' + ${person.account} + ',編號 ' + ${person.id} + ')'">
+		對象:王小明(psych01,編號 1)</p>
+
+	<!-- 種類篩選(字典依身分不同) -->
+	<div class="toolbar">
+		<a th:classappend="${type == null} ? 'active'"
+			th:href="@{/admin/notice/history(role=${role}, id=${person.id})}">全部</a>
+		<th:block th:if="${role == 'psych'}">
+			<a th:classappend="${type != null && type == 0} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=0)}">文章審核</a>
+			<a th:classappend="${type != null && type == 1} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=1)}">預約</a>
+			<a th:classappend="${type != null && type == 2} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=2)}">課程</a>
+		</th:block>
+		<th:block th:if="${role == 'member'}">
+			<a th:classappend="${type != null && type == 0} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=0)}">預約</a>
+			<a th:classappend="${type != null && type == 1} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=1)}">課程</a>
+			<a th:classappend="${type != null && type == 2} ? 'active'"
+				th:href="@{/admin/notice/history(role=${role}, id=${person.id}, type=2)}">活動</a>
+		</th:block>
+	</div>
+
+	<!-- 心理師的通知 -->
+	<div class="notice-list" th:if="${role == 'psych'}">
+		<div class="notice-card" th:each="n : ${psychNotices}">
+			<div class="notice-head">
+				<span class="type-badge" th:text="${n.noticeTypeMsg}">預約通知</span>
+				<span class="sender"
+					th:text="${n.adminId == 0 ? '發送者:系統' : '發送者:管理員(編號' + n.adminId + ')'}">發送者:系統</span>
+				<span class="read-tag yes" th:if="${n.isRead}">已讀</span>
+				<span class="read-tag no" th:unless="${n.isRead}">未讀</span>
+				<span class="time" th:text="${#dates.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-17 10:00</span>
+			</div>
+			<p class="content" th:text="${n.noticeContent}">內容</p>
+		</div>
+		<p class="empty-hint" th:if="${#lists.isEmpty(psychNotices)}">此對象沒有符合的通知</p>
+	</div>
+
+	<!-- 會員的通知 -->
+	<div class="notice-list" th:if="${role == 'member'}">
+		<div class="notice-card" th:each="n : ${memberNotices}">
+			<div class="notice-head">
+				<span class="type-badge" th:text="${n.noticeTypeMsg}">預約通知</span>
+				<span class="sender"
+					th:text="${n.adminId == 0 ? '發送者:系統' : '發送者:管理員(編號' + n.adminId + ')'}">發送者:系統</span>
+				<span class="read-tag yes" th:if="${n.isRead}">已讀</span>
+				<span class="read-tag no" th:unless="${n.isRead}">未讀</span>
+				<span class="time" th:text="${#dates.format(n.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-17 10:00</span>
+			</div>
+			<p class="content" th:text="${n.noticeContent}">內容</p>
+		</div>
+		<p class="empty-hint" th:if="${#lists.isEmpty(memberNotices)}">此對象沒有符合的通知</p>
+	</div>
+</body>
+</html>
