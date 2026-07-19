@@ -4,6 +4,7 @@ import java.beans.PropertyEditorSupport;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -19,6 +20,7 @@ import com.freemind.consultation.reports.model.Reports;
 import com.freemind.consultation.reports.model.ReportsService;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
 import jakarta.validation.Valid;
 
@@ -158,18 +160,21 @@ public class ReportsController {
 
 	@PostMapping("reply")
 	public String reply(@RequestParam("reportId") String reportId,
-			@RequestParam(value = "adminId", required = false) String adminId,
 			@RequestParam("reportStatus") String reportStatus,
-			@RequestParam(value = "reportNote", required = false) String reportNote, ModelMap model) {
+			@RequestParam(value = "reportNote", required = false) String reportNote,
+			@AuthenticationPrincipal AdminUserDetails prinAdmin, ModelMap model) {
+
 		Reports reports = reportsSvc.getOneReports(Integer.valueOf(reportId));
-		if (adminId != null && !adminId.isBlank()) {
-			Admin admin = new Admin();
-			admin.setAdminId(Integer.valueOf(adminId));
-			reports.setAdmin(admin);
+
+		// 記錄處理這筆回報的管理員（用登入身分）
+		if (prinAdmin != null) {
+			reports.setAdmin(prinAdmin.getAdmin());
 		}
+
 		reports.setReportStatus(Integer.valueOf(reportStatus));
 		reports.setReportNote(reportNote);
 		reportsSvc.updateReports(reports);
+
 		model.addAttribute("success", "-(回覆成功)");
 		Reports updatedReports = reportsSvc.getOneReports(reports.getReportId());
 		model.addAttribute("reports", updatedReports);

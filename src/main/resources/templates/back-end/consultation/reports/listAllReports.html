@@ -72,11 +72,12 @@
                         <th>問題描述</th>
                         <th>回報日期</th>
                         <th>處理狀態</th>
+                        <th>處理人員</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="report : ${reportsListData}" th:if="${report.reportStatus != 2}">
+                     <tr th:each="report : ${reportsListData}" th:if="${report.reportStatus != 2}">
                         <td th:text="${report.reportId}"></td>
                         <td th:text="${report.member.memberId}"></td>
                         <td class="nowrap" th:text="${report.member.name}"></td>
@@ -88,6 +89,7 @@
                             <span th:case="0" class="status-pending">待處理</span>
                             <span th:case="1" class="status-processing">處理中</span>
                         </td>
+                        <td th:text="${report.admin != null ? report.admin.adminId : '尚未指派'}"></td>
                         <td class="nowrap">
                             <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
                                 <input type="hidden" name="reportId" th:value="${report.reportId}">
@@ -114,6 +116,7 @@
                         <th>回報日期</th>
                         <th>處理備註</th>
                         <th>狀態</th>
+                        <th>處理人員</th>
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -128,6 +131,7 @@
                         <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
                         <td class="desc" th:text="${report.reportNote != null ? report.reportNote : '-'}"></td>
                         <td><span class="status-resolved">已解決</span></td>
+                        <td th:text="${report.admin != null ? report.admin.adminId : '尚未指派'}"></td>
                         <td class="nowrap">
                             <form method="post" th:action="@{/admin/reports/getOne_For_Reply}">
                                 <input type="hidden" name="reportId" th:value="${report.reportId}">
