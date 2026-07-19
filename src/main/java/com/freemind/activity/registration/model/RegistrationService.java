@@ -10,13 +10,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.freemind.activity.activity.model.Activity;
+import com.freemind.activity.websocket.ActivityWebSocketHandler;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.notice.service.NoticeService;
 
 @Service
 public class RegistrationService {
 	
 	@Autowired
 	private RegistrationRepository regisRepo;
+	
+	@Autowired
+	private NoticeService noticeService;
+	
+	@Autowired
+	private ActivityWebSocketHandler activityWebSocketHandler;
 	
 	@Transactional
 	public Registration register(Member member, Activity activity,  String motivation) {
@@ -51,9 +59,13 @@ public class RegistrationService {
 		regis.setRegisAt(LocalDateTime.now()); 
 		regis.setMotivation(motivation);
 		
-	    // 5. 存:save 進資料庫
-		return regisRepo.save(regis);
-	    // TODO: 通知團主有新報名待審核(等組員的通知模組)
+		// 通知團主有新報名待審核
+		noticeService.sendToMember(activity.getMember().getMemberId(), null,
+			    "您的活動「" + activity.getActivityName() + "」有新的報名申請待審核。", (byte) 2);
+		
+		Registration saved = regisRepo.save(regis);
+		activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
+		return saved;
 	}
 	
 	@Transactional
@@ -74,14 +86,23 @@ public class RegistrationService {
 	    if (activity.getRegisCount() < activity.getCapacity()) {
 	        regis.setRegisStatus(1);
 	        activity.setRegisCount(activity.getRegisCount() + 1);
-	        // TODO: 通知會員報名成功(正取)
+	        // 通知會員報名成功(正取)
+	        noticeService.sendToMember(regis.getMember().getMemberId(), null,
+	                "您報名的活動「" + activity.getActivityName() + "」已審核通過（正取）。", (byte) 2);
+	        activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 	    } else if (activity.getWaitlistCount() < activity.getWaitlistCapacity()) {
 	        regis.setRegisStatus(4);
 	        activity.setWaitlistCount(activity.getWaitlistCount() + 1);
-	        // TODO: 通知會員候補成功(備取)
+	        // 通知會員候補成功(備取)
+	        noticeService.sendToMember(regis.getMember().getMemberId(), null,
+	                "您報名的活動「" + activity.getActivityName() + "」目前為候補狀態。", (byte) 2);
+	        activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 	    } else {
 	        regis.setRegisStatus(2);
-	        // TODO: 通知會員報名失敗(名額不足)
+	        // 通知會員報名失敗
+	        noticeService.sendToMember(regis.getMember().getMemberId(), null,
+	                "很抱歉，您報名的活動「" + activity.getActivityName() + "」名額不足，報名失敗。", (byte) 2);
+	        activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 	    }
 		return regis;
 	}
@@ -105,7 +126,10 @@ public class RegistrationService {
 	    regis.setRegisStatus(2);
 	    regis.setRejectReason(rejectReason);
 	    regis.setRejectNote(rejectNote);
-	    // TODO: 通知會員報名遭拒絕
+	    // 通知會員報名遭拒絕
+	    noticeService.sendToMember(regis.getMember().getMemberId(), null,
+	    	    "很抱歉，您報名的活動「" + activity.getActivityName() + "」未通過審核。", (byte) 2);
+	    activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 	    return regis;
 	}
 	
@@ -135,8 +159,12 @@ public class RegistrationService {
 	    Activity activity = regis.getActivity();
 	    if (regis.getRegisStatus() == 1) {
 	        activity.setRegisCount(activity.getRegisCount() - 1);
+	        noticeService.sendToMember(activity.getMember().getMemberId(), null,
+	            "您的活動「" + activity.getActivityName() + "」有一位正取成員取消了報名，名額已釋出。", (byte) 2);
 	    } else if (regis.getRegisStatus() == 4) {
 	        activity.setWaitlistCount(activity.getWaitlistCount() - 1);
+	        noticeService.sendToMember(activity.getMember().getMemberId(), null,
+	            "您的活動「" + activity.getActivityName() + "」有一位候補成員取消了報名。", (byte) 2);
 	    }
 
 		
@@ -144,6 +172,7 @@ public class RegistrationService {
 		regis.setCancelledAt(LocalDateTime.now()); 
 		regis.setCancelReason(cancelReason);
 		regis.setCancelNote(cancelNote);
+		activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 		return regis;
 	}
 	
@@ -235,8 +264,18 @@ public class RegistrationService {
 	    regis.setRegisStatus(1);
 	    activity.setRegisCount(activity.getRegisCount() + 1);
 	    activity.setWaitlistCount(activity.getWaitlistCount() - 1);
-	    // TODO: 通知會員已從候補遞補為正取
-
+	    // 通知會員已從候補遞補為正取
+	    noticeService.sendToMember(regis.getMember().getMemberId(), null,
+	    	    "您候補的活動「" + activity.getActivityName() + "」已遞補為正取。", (byte) 2);
+	    activityWebSocketHandler.broadcastSlotUpdate(activity.getActivityId(), buildSlotJson(activity));
 	    return regis;
+	}
+	
+	// 組出目前活動的正取/備取/未審核人數,給WebSocket廣播用
+	private String buildSlotJson(Activity activity) {
+	    long pendingCount = regisRepo.countByActivityAndRegisStatusIn(activity, List.of(0));
+	    return "{\"正取\":" + activity.getRegisCount()
+	         + ",\"備取\":" + activity.getWaitlistCount()
+	         + ",\"未審核\":" + pendingCount + "}";
 	}
 }

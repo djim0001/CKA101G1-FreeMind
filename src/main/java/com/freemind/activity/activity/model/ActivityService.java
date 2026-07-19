@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.freemind.activity.activity.util.HibernateUtil_CompositeQuery_Activity;
-import com.freemind.activity.follow.model.ActivityFollowId;
-import com.freemind.activity.follow.model.ActivityFollowRepository;
+import com.freemind.activity.registration.model.Registration;
+import com.freemind.activity.registration.model.RegistrationRepository;
+import com.freemind.login.notice.service.NoticeService;
 
 @Service
 public class ActivityService {
@@ -20,7 +21,13 @@ public class ActivityService {
 	private ActivityRepository repository;
 	
 	@Autowired
+	private RegistrationRepository regisRepo;
+	
+	@Autowired
 	private  SessionFactory sessionFactory;
+	
+	@Autowired
+	private NoticeService noticeService;
 	
 	public void addActivity(Activity activity) {
 	    LocalDateTime now = LocalDateTime.now();
@@ -38,6 +45,13 @@ public class ActivityService {
 	        throw new RuntimeException("活動結束時間，必須晚於活動開始時間");
 	    }
 		
+	    if (activity.getCapacity() == null || activity.getCapacity() < 1) {
+	        throw new RuntimeException("正取名額不能小於1");
+	    }
+	    if (activity.getWaitlistCapacity() == null || activity.getWaitlistCapacity() < 1) {
+	        throw new RuntimeException("備取名額不能小於1");
+	    }
+	    
 		activity.setActivityStatus(0);  // 活動狀態預設為「待審核」
 		activity.setRegisCount(0);      // 報名人數預設為0
 		activity.setWaitlistCount(0);   // 備取人數預設為0
@@ -124,6 +138,12 @@ public class ActivityService {
 	    existing.setCancelNote(cancelNote);  // 記錄取消原因
 	    existing.setUpdatedAt(LocalDateTime.now());
 	    repository.save(existing);
+	    
+	    List<Registration> confirmedRegis = regisRepo.findByActivityAndRegisStatusIn(existing, List.of(0, 1, 4));
+	    for (Registration r : confirmedRegis) {
+	        noticeService.sendToMember(r.getMember().getMemberId(), null,
+	            "很抱歉，您報名的活動「" + existing.getActivityName() + "」已被發起人取消。", (byte) 2);
+	    }
 	}
 	
 	// 發起者延期已發布的活動
@@ -142,6 +162,13 @@ public class ActivityService {
 	    existing.setPostponeNote(postponeNote);
 	    existing.setUpdatedAt(LocalDateTime.now());
 	    repository.save(existing);
+	    
+	
+	    List<Registration> confirmedRegis = regisRepo.findByActivityAndRegisStatusIn(existing, List.of(0, 1, 4));
+	    for (Registration r : confirmedRegis) {
+	        noticeService.sendToMember(r.getMember().getMemberId(), null,
+	            "很抱歉，您報名的活動「" + existing.getActivityName() + "」已延期，請留意新的活動時間。", (byte) 2);
+	    }
 	}
 	
 	// 發起者變更需延期活動的時間
@@ -166,6 +193,13 @@ public class ActivityService {
 		existing.setActivityStatus(2);
 		existing.setUpdatedAt(LocalDateTime.now());
 		repository.save(existing);
+		
+		List<Registration> confirmedRegis = regisRepo.findByActivityAndRegisStatusIn(existing, List.of(0, 1, 4));
+		for (Registration r : confirmedRegis) {
+		    noticeService.sendToMember(r.getMember().getMemberId(), null,
+		        "您報名的活動「" + existing.getActivityName() + "」新時間已確定為 "
+		        + existing.getActivityStart().toLocalDate() + " " + existing.getActivityStart().toLocalTime() + "，請留意。", (byte) 2);
+		}
 	}
 	
 	// 後台員工手動發布活動
@@ -180,6 +214,9 @@ public class ActivityService {
 	    existing.setPublishedAt(LocalDateTime.now());  // 發布時間，自動寫入當下
 	    existing.setUpdatedAt(LocalDateTime.now());
 	    repository.save(existing);
+	    
+	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
+	    	    "您發起的活動「" + existing.getActivityName() + "」已正式發布。", (byte) 2);
 	}
 	
 	// 後台員工查看活動列表
@@ -203,6 +240,9 @@ public class ActivityService {
 	    existing.setReviewedAt(LocalDateTime.now());
 	    existing.setUpdatedAt(LocalDateTime.now());
 	    repository.save(existing);
+	    
+	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
+	    	    "您發起的活動「" + existing.getActivityName() + "」已通過審核。", (byte) 2);
 	}
 	
 	// 後台員工退回活動
@@ -219,5 +259,8 @@ public class ActivityService {
 	    existing.setReviewedAt(LocalDateTime.now());
 	    existing.setUpdatedAt(LocalDateTime.now());
 	    repository.save(existing);
+	    
+	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
+	    	    "您發起的活動「" + existing.getActivityName() + "」審核未通過，請查看退回原因並修改。", (byte) 2);
 	}
 }

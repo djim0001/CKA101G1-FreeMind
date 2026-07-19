@@ -40,4 +40,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Inte
 	// 6.群組查詢各活動待審核人數
 	@Query("SELECT r.activity.activityId, COUNT(r) FROM Registration r WHERE r.regisStatus = 0 AND r.activity IN :activities GROUP BY r.activity.activityId")
 	List<Object[]> countPendingGroupByActivity(@Param("activities") List<Activity> activities);
+	
+	// 7.回傳報名狀態清單
+	List<Registration> findByActivityAndRegisStatusIn(Activity activity, List<Integer> statusList);
 }

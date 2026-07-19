@@ -31,8 +31,9 @@
         <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
         <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
     </p>
-    <p>正取名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
-	<p>備取名額：<span th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
+    <p>正取名額：<span id="confirmedCount" th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	<p>備取名額：<span id="waitlistCount" th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
+	<p>已報名人數：<span id="totalRegisteredCount" th:text="${activity.regisCount + activity.waitlistCount + pendingCount} + ' / ' + ${activity.capacity + activity.waitlistCapacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 	<div class="admin-actions">
         <div class="action-block" th:if="${activity.activityStatus == 0}" >
@@ -71,11 +72,39 @@
 	
     <a th:href="@{/admin/activity/listAllActivity}">返回活動列表</a>
 
+<div id="activityData" 
+     th:data-activity-id="${activity.activityId}"
+     th:data-capacity="${activity.capacity}"
+     th:data-waitlist-capacity="${activity.waitlistCapacity}"
+     style="display:none;"></div>
 <script>
 function toggleRejectForm() {
     const form = document.getElementById('rejectForm');
     form.style.display = (form.style.display === 'none') ? 'block' : 'none';
 }
+
+(function() {
+    var activityId = document.getElementById('activityData').getAttribute('data-activity-id');
+    var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+    var socket = new WebSocket(wsUrl);
+
+    socket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        var confirmedCap = document.getElementById('activityData').getAttribute('data-capacity');
+        var waitlistCap = document.getElementById('activityData').getAttribute('data-waitlist-capacity');
+
+        document.getElementById('confirmedCount').innerText = data['正取'] + ' / ' + confirmedCap;
+        document.getElementById('waitlistCount').innerText = data['備取'] + ' / ' + waitlistCap;
+
+        var total = data['正取'] + data['備取'] + data['未審核'];
+        var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+        document.getElementById('totalRegisteredCount').innerText = total + ' / ' + totalCap;
+    };
+
+    socket.onerror = function(e) {
+        console.log('WebSocket錯誤:', e);
+    };
+})();
 </script>
 </body>
 </html>

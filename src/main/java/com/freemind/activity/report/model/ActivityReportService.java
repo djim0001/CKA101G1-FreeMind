@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +13,7 @@ import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.registration.model.RegistrationRepository;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.notice.service.NoticeService;
 
 @Service
 public class ActivityReportService {
@@ -23,6 +23,9 @@ public class ActivityReportService {
 	
 	@Autowired
 	private RegistrationRepository regisRepo;
+	
+	@Autowired
+	private NoticeService noticeService;
 
 
 	// 會員送出回報
@@ -101,6 +104,10 @@ public class ActivityReportService {
 		report.setReplyContent(replyContent.trim());
 		report.setReportStatus(2);
 		report.setRepliedAt(LocalDateTime.now());
+		
+		noticeService.sendToMember(report.getMember().getMemberId(), null,
+		        "您回報的問題「" + report.getActivity().getActivityName() + "」已獲得回覆，請查看詳情。", (byte) 2);
+		
 		return report;
 	}
 	// 後台查全部問題回報
