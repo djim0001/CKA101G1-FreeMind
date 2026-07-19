@@ -1,5 +1,6 @@
 package com.freemind.activity.activity.controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,6 +157,23 @@ public class ActivityAdminController {
         
         model.addAttribute("activity", activity);
         return "back-end/activity/activity/listOneActivity";   
+    }
+    
+    // 排程發布
+    @PostMapping("schedulePublish")
+    public String schedulePublish(@RequestParam("activityId") Integer activityId,
+                                   @RequestParam("scheduledPublishAt") String scheduledPublishAt,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            LocalDateTime scheduledAt = LocalDateTime.parse(scheduledPublishAt);
+            activitySvc.schedulePublishActivity(activityId, scheduledAt);
+            redirectAttributes.addFlashAttribute("successMessage", "已設定排程發布");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "排程時間格式有誤");
+        }
+        return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
     
 }

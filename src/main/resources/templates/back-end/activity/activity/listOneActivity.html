@@ -62,12 +62,28 @@
 	    </div>
 	    
 	    <div class="action-block" th:if="${activity.activityStatus == 1}">
-	        <form th:action="@{/admin/activity/publish}" method="post"
-	              onsubmit="return confirm('確定要發布這個活動嗎？')">
-	            <input type="hidden" name="activityId" th:value="${activity.activityId}">
-	            <button type="submit">發布</button>
-	        </form>
-	    </div>
+		    <form th:action="@{/admin/activity/publish}" method="post"
+		          onsubmit="return confirm('確定要立即發布這個活動嗎？')" style="display:inline;">
+		        <input type="hidden" name="activityId" th:value="${activity.activityId}">
+		        <button type="submit">立即發布</button>
+		    </form>
+		
+		    <button type="button" onclick="toggleScheduleForm()">排程發布</button>
+		
+		    <div class="action-block" id="scheduleForm" style="display:none;">
+		        <form th:action="@{/admin/activity/schedulePublish}" method="post"
+		              onsubmit="return confirm('確定要設定排程發布嗎？')">
+		            <input type="hidden" name="activityId" th:value="${activity.activityId}">
+		            <label>預定發布時間：</label>
+		            <input type="datetime-local" name="scheduledPublishAt" required>
+		            <button type="submit">確認排程</button>
+		        </form>
+		    </div>
+		
+		    <p th:if="${activity.scheduledPublishAt != null}" style="color:blue;">
+		        已排程於 <span th:text="${#temporals.format(activity.scheduledPublishAt, 'yyyy/MM/dd HH:mm')}"></span> 自動發布
+		    </p>
+		</div>
 	</div>
 	
     <a th:href="@{/admin/activity/listAllActivity}">返回活動列表</a>
@@ -80,6 +96,11 @@
 <script>
 function toggleRejectForm() {
     const form = document.getElementById('rejectForm');
+    form.style.display = (form.style.display === 'none') ? 'block' : 'none';
+}
+
+function toggleScheduleForm() {
+    const form = document.getElementById('scheduleForm');
     form.style.display = (form.style.display === 'none') ? 'block' : 'none';
 }
 
