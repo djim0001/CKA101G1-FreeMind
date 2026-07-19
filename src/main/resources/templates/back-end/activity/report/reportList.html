@@ -26,6 +26,19 @@
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
     <p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
 
+	<!-- 分頁籤 -->
+	<div>
+	    <a th:href="@{/admin/activity/report/list(tab='pending')}">
+	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold;' : ''">待處理</button>
+	    </a>
+	    <a th:href="@{/admin/activity/report/list(tab='processing')}">
+	        <button type="button" th:style="${currentTab == 'processing'} ? 'font-weight:bold;' : ''">處理中</button>
+	    </a>
+	    <a th:href="@{/admin/activity/report/list(tab='done')}">
+	        <button type="button" th:style="${currentTab == 'done'} ? 'font-weight:bold;' : ''">已處理</button>
+	    </a>
+	</div>
+
     <table border="1" style="table-layout: fixed; width: 100%;">
         <tr>
             <th>回報人</th>
@@ -88,7 +101,7 @@
 
 	<div th:if="${totalPages > 1}">
 	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/admin/activity/report/list(currentPage=${i})}"
+	       th:href="@{/admin/activity/report/list(tab=${currentTab}, currentPage=${i})}"
 	       th:text="${i}"
 	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
 	    </a>

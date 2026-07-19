@@ -257,9 +257,15 @@ tbody tr:hover td {
 				<div class="search-grid">
 					<span class="search-field">訂單編號：<input type="text"
 						name="orderId"></span> <span class="search-field">會員編號：<input
-						type="text" name="memberId"></span> <span class="search-field">心理師編號：<input
-						type="text" name="psychId"></span> <span class="search-field">
-						訂單狀態： <select name="orderStatus">
+						type="text" name="memberId"></span> <span class="search-field">
+						心理師： <select name="psychId">
+							<option value="">全部</option>
+							<option th:each="p : ${psychologistsList}"
+								th:value="${p.psychId}"
+								th:text="${p.psychId} + ' - ' + ${p.name}"></option>
+					</select>
+					</span> <span class="search-field"> 訂單狀態： <select
+						name="orderStatus">
 							<option value="">全部</option>
 							<option value="0">待確認</option>
 							<option value="1">已確認</option>

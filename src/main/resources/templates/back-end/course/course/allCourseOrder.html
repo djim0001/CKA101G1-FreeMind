@@ -1402,7 +1402,7 @@
 						th:data-payment-status="${condition != null ? condition.paymentStatus : ''}"
 						th:data-ordered-date="${condition != null ? condition.orderedDate : ''}">
 						<div
-							th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/order_search', ${orderBy})}"></div>
+				th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/course/order_search', ${orderBy})}"></div>
 					</div>
 				</section>
 				<section class="tab-panel" data-panel="refunds" hidden>

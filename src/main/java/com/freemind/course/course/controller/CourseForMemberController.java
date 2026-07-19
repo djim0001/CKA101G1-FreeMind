@@ -89,6 +89,7 @@ public class CourseForMemberController {
 	@ModelAttribute("countMemberCartCount")
 	public Long memberShoppingCartCount(ModelMap model) {
 		Member member = (Member)model.getAttribute("member");
+System.out.println((member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null));
 		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
 	}
 	
@@ -111,6 +112,7 @@ public class CourseForMemberController {
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 //		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
+		
 		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
 		if(member!=null) {
 			for(Course course : courseList) {
@@ -124,7 +126,6 @@ public class CourseForMemberController {
 		model.addAttribute("totalPages", courseList.getTotalPages());
 		if(orderBy != null)
 			model.addAttribute("orderBy", orderBy);
-
 		return "front-end/member/course/selectCourse";
 	}
 	

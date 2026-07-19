@@ -1,8 +1,6 @@
 package com.freemind.activity.activity.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +16,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
+import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.activity.util.PageUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/admin/activity")
@@ -29,6 +27,9 @@ public class ActivityAdminController {
 
     @Autowired
     ActivityService activitySvc;
+    
+    @Autowired
+    private RegistrationService regisSvc;
     
     private static final int PAGE_SIZE = 3;
 
@@ -40,6 +41,7 @@ public class ActivityAdminController {
 
         List<Activity> list = activitySvc.getAllForAdmin(emptyMap, currentPage);
         model.addAttribute("activityListData", list);
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForAdmin(emptyMap);
@@ -59,6 +61,7 @@ public class ActivityAdminController {
         Map<String, String[]> map = req.getParameterMap();
         List<Activity> list = activitySvc.getAllForAdmin(map, currentPage);
         model.addAttribute("activityListData", list);
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForAdmin(map);
@@ -148,8 +151,29 @@ public class ActivityAdminController {
     @GetMapping("listOneActivity")
     public String listOneActivity(@RequestParam("activityId") Integer activityId, ModelMap model) {
         Activity activity = activitySvc.getOneActivity(activityId);
+        
+        long pendingCount = regisSvc.countPendingByActivity(activity);
+        model.addAttribute("pendingCount", pendingCount);
+        
         model.addAttribute("activity", activity);
         return "back-end/activity/activity/listOneActivity";   
+    }
+    
+    // 排程發布
+    @PostMapping("schedulePublish")
+    public String schedulePublish(@RequestParam("activityId") Integer activityId,
+                                   @RequestParam("scheduledPublishAt") String scheduledPublishAt,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            LocalDateTime scheduledAt = LocalDateTime.parse(scheduledPublishAt);
+            activitySvc.schedulePublishActivity(activityId, scheduledAt);
+            redirectAttributes.addFlashAttribute("successMessage", "已設定排程發布");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "排程時間格式有誤");
+        }
+        return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
     
 }

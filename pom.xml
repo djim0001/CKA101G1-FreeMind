@@ -129,6 +129,12 @@
 			<!-- <version>2.2.0</version> -->
 			<scope>provided</scope>                  <!-- ※provided只提供編譯，jar檔不匯出 -->
 		</dependency>
+		
+		<!-- websocket (Spring) -->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
 
 		<!-- javax.json -->                          <!-- spring-boot 未內建依賴 -->
 		<dependency>

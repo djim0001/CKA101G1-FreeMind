@@ -317,6 +317,23 @@
 	    color: #fff;
 	    border-color: #e8b4b4;
 	}
+	
+	.activity-link {
+    color: #333;
+    text-decoration: none;
+	}
+	.activity-link:hover {
+	    color: #e8b4b4;
+	    text-decoration: underline;
+	}
+	
+	.text-left {
+    text-align: left;
+	}
+	
+	.no-wrap {
+    white-space: nowrap;
+	}
     </style>
 </head>
 <body>
@@ -361,11 +378,13 @@
             </thead>
             <tbody>
 			  <tr th:each="r : ${regisListData}">
-			        <td th:text="${r.activity.activityName}"></td>
+			        <td>
+					    <a class="activity-link" th:href="@{/member/activity/listOneActivity(activityId=${r.activity.activityId})}" th:text="${r.activity.activityName}"></a>
+					</td>
 			        <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
 			        <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
-			        <td th:text="${r.motivation}"></td>
-			        <td>
+			        <td class="text-left" th:text="${r.motivation}"></td>
+			        <td class="no-wrap">
 			            <span th:text="${r.regisStatusText}"></span>
 			            <span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
 			                <br><small>（<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）</small>

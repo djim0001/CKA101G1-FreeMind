@@ -22,6 +22,19 @@
     <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
 	
+	<!-- 分頁籤 -->
+	<div>
+	    <a th:href="@{/member/activity/report/myReports(tab='pending')}">
+	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold;' : ''">待處理</button>
+	    </a>
+	    <a th:href="@{/member/activity/report/myReports(tab='processing')}">
+	        <button type="button" th:style="${currentTab == 'processing'} ? 'font-weight:bold;' : ''">處理中</button>
+	    </a>
+	    <a th:href="@{/member/activity/report/myReports(tab='done')}">
+	        <button type="button" th:style="${currentTab == 'done'} ? 'font-weight:bold;' : ''">已處理</button>
+	    </a>
+	</div>
+	
 	<table border="1" style="table-layout: fixed; width: 100%;">
         <tr>
             <th>活動名稱</th>

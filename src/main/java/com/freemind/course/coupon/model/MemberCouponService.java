@@ -266,5 +266,14 @@ public class MemberCouponService {
             throw e;
         }
     }
+    
+    public boolean couponExistsByMember(Integer memberId, Integer couponId) {
+    	
+    return memberCouponRepository
+    	.existsByMemberMemberIdAndCouponCouponId(
+    			memberId,
+    			couponId
+    			);
+    }
 
 }

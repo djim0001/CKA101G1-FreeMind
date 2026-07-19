@@ -130,7 +130,7 @@ public class OrdersMemberController {
 	}
 
 	@PostMapping("bookSubmit")
-	public String bookSubmit(@RequestParam("timeslotId") String timeslotId, @RequestParam("hour") String hourStr,
+	public String bookSubmit(@RequestParam("timeslotId") String timeslotId, @RequestParam(value = "hour", required = false) String hourStr,
 			@RequestParam("psychId") String psychId,
 			@RequestParam("psychLoc") String psychLoc, @RequestParam("psychFee") String psychFee,
 			@RequestParam("visitPurpose") String visitPurpose,
@@ -143,6 +143,16 @@ public class OrdersMemberController {
 			return "redirect:/front-end/login";
 		}
 		Integer memberId = prinUserDetails.getMember().getMemberId();
+		
+		if (hourStr == null || hourStr.isBlank()) {
+			Slots slot0 = slotsSvc.getOneSlots(Integer.valueOf(timeslotId));
+			Psychologist psy0 = psychologistRepository.findById(Integer.valueOf(psychId)).orElse(null);
+			model.addAttribute("slots", slot0);
+			model.addAttribute("availableHours", computeAvailableHours(slot0, slot0.getSlotDate()));
+			model.addAttribute("psychologist", psy0);
+			model.addAttribute("errorMessage", "請先選擇可預約時段再送出。");
+			return "front-end/member/consultation/orders/bookInput";
+		}
 
 		int hour = Integer.parseInt(hourStr);
 		Integer tid = Integer.valueOf(timeslotId);

@@ -17,6 +17,109 @@ document.addEventListener('DOMContentLoaded', () => {
     window.setTimeout(() => notify(serverCartMessage.textContent.trim()), 80);
   }
 
+  const syncMemberUnreadCount = () => {
+    const rawCount = document.body.dataset.memberUnreadCount?.trim();
+    if (rawCount === undefined || rawCount === '') return;
+
+    const unreadCount = Number.parseInt(rawCount, 10);
+    if (!Number.isFinite(unreadCount) || unreadCount < 0) return;
+
+    const bellButton = document.getElementById('bellBtn');
+    if (!bellButton) return;
+
+    let unreadDot = bellButton.querySelector('.dot');
+    if (unreadCount > 0 && !unreadDot) {
+      unreadDot = document.createElement('span');
+      unreadDot.className = 'dot';
+      unreadDot.setAttribute('aria-hidden', 'true');
+      bellButton.appendChild(unreadDot);
+    } else if (unreadCount === 0) {
+      unreadDot?.remove();
+    }
+
+    const unreadLabel = unreadCount > 0
+      ? `你有 ${unreadCount} 則未讀訊息`
+      : '目前沒有未讀訊息';
+    const unreadCopy = document.querySelector('#bellPop .pop-head p');
+    if (unreadCopy) unreadCopy.textContent = unreadLabel;
+    bellButton.setAttribute('aria-label', `會員通知，${unreadLabel}`);
+  };
+  syncMemberUnreadCount();
+
+  const updateCartCount = rawCount => {
+    const cartCount = Number.parseInt(String(rawCount).trim(), 10);
+    if (!Number.isFinite(cartCount) || cartCount < 0) return false;
+
+    const countLabel = cartCount > 0
+      ? `購物車內有 ${cartCount} 門課程`
+      : '購物車目前沒有課程';
+
+    document.querySelectorAll('[data-cart-count]').forEach(badge => {
+      badge.textContent = String(cartCount);
+      badge.hidden = cartCount <= 0;
+      badge.setAttribute('aria-label', countLabel);
+    });
+
+    document.querySelectorAll('.floating-cart').forEach(cartLink => {
+      cartLink.setAttribute('aria-label', `前往購物車，${countLabel}`);
+      cartLink.setAttribute('title', countLabel);
+    });
+
+    return true;
+  };
+
+  document.querySelectorAll('form[action$="/member/course/add_cart"]').forEach(form => {
+    form.addEventListener('submit', async event => {
+      if (!window.fetch || form.dataset.cartSubmitting === 'true') return;
+
+      event.preventDefault();
+      form.dataset.cartSubmitting = 'true';
+      const submitButton = form.querySelector('[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          credentials: 'same-origin'
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const responseHtml = await response.text();
+        const responseDocument = new DOMParser().parseFromString(responseHtml, 'text/html');
+        const responseCartCount = responseDocument.querySelector('[data-cart-count]');
+        const responseMessage = responseDocument.querySelector('[data-cart-message]')?.textContent.trim();
+        const resolvedCartCount = responseCartCount?.dataset.cartCountValue?.trim();
+        const hasResolvedCartCount = resolvedCartCount !== undefined && resolvedCartCount !== '';
+        let countUpdated = false;
+
+        if (hasResolvedCartCount) {
+          countUpdated = updateCartCount(resolvedCartCount);
+        }
+
+        if (!countUpdated) {
+          if (response.redirected && /login/i.test(response.url)) {
+            window.location.assign(response.url);
+          } else {
+            window.location.reload();
+          }
+          return;
+        }
+
+        if (responseMessage) notify(responseMessage);
+      } catch (error) {
+        console.error('更新購物車數量失敗', error);
+        window.location.reload();
+      } finally {
+        delete form.dataset.cartSubmitting;
+        if (submitButton) submitButton.disabled = false;
+      }
+    });
+  });
+
+  const usesSharedNav = Boolean(document.querySelector('script[src="/js/nav.js"]'));
+  if (!usesSharedNav) {
   const popBindings = [
     ['bellBtn', 'bellPop'],
     ['avatarBtn', 'avatarPop']
@@ -125,10 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const backToTopButton = document.getElementById('backToTop');
   const siteFooter = document.getElementById('siteFooter');
+  const floatingCart = document.querySelector('.floating-cart');
   if (backToTopButton) {
     const updateBackToTop = () => {
       backToTopButton.classList.toggle('show', window.scrollY > 480);
 
+      if (floatingCart) {
+        backToTopButton.style.transform = '';
+        return;
+      }
       if (!siteFooter) return;
       const footerOverlap = window.innerHeight - siteFooter.getBoundingClientRect().top;
       backToTopButton.style.transform = footerOverlap > 0
@@ -142,6 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     updateBackToTop();
+  }
   }
 
   const enhancePagination = () => {

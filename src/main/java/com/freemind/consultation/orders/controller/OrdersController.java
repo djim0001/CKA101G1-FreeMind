@@ -20,6 +20,9 @@ public class OrdersController {
 	@Autowired
 	private OrdersService ordersSvc;
 
+	@Autowired
+	private com.freemind.login.psychologist.repository.PsychologistRepository psychologistRepository;
+
 	@GetMapping("home")
 	public String consultationManagementHome(ModelMap model) {
 		return "back-end/consultation/consultationManagementHome";
@@ -29,6 +32,7 @@ public class OrdersController {
 	public String listAllOrders(ModelMap model) {
 		List<Orders> list = ordersSvc.getAll();
 		model.addAttribute("ordersListData", list);
+		model.addAttribute("psychologistsList", psychologistRepository.findAll());
 		return "back-end/consultation/orders/listAllOrders";
 	}
 
@@ -47,6 +51,9 @@ public class OrdersController {
 			@RequestParam(value = "govSubsidy", required = false) String govSubsidy,
 			@RequestParam(value = "sessionType", required = false) String sessionType,
 			@RequestParam(value = "slotDate", required = false) String slotDate, ModelMap model) {
+
+		// 心理師下拉清單（查詢後畫面也要有）
+		model.addAttribute("psychologistsList", psychologistRepository.findAll());
 
 		// 有填訂單編號 → 直接查那一筆
 		if (orderId != null && !orderId.isBlank()) {

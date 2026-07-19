@@ -1367,7 +1367,7 @@
 					</table>
 				</div>
 				<div
-					th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/goto_delisted', ${orderBy})}"></div>
+				th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/course/goto_delisted', ${orderBy})}"></div>
 		</div>
 	</main>
 	<dialog class="admin-dialog" data-take-down-dialog>
