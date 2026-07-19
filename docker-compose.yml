@@ -1,0 +1,58 @@
+services:
+  app:
+    image: joshliu7106/freemind:0.0.1
+    container_name: freemind-webapp
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: dbtest
+      DB_USER: root
+      DB_PASSWORD: "123456"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      TZ: Asia/Taipei
+     
+    volumes:
+      # 上傳檔持久化：對應 app 相對路徑 ./uploads（Tomcat 工作目錄 /usr/local/tomcat）
+      - ./uploads:/usr/local/tomcat/uploads
+    ports:
+      - "8080:8080"
+
+  mysql:
+    image: mysql:8.4
+    container_name: freemind-mysql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: dbtest
+      TZ: Asia/Taipei
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:5.0.14
+    container_name: freemind-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  mysql-data:
+  redis-data:
