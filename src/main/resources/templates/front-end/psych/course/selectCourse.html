@@ -9,6 +9,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 	<style>
 	@font-face {
 		font-family: 'OpenHuninn';
@@ -248,10 +249,10 @@
 	/* 課程管理內容。 */
 	.page-main { padding: 2.6rem 0 4.5rem; }
 	.page-intro {
-		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 2rem;
+		display: grid;
+		grid-template-columns: minmax(13rem, .72fr) minmax(0, 1.28fr);
+		align-items: end;
+		gap: .75rem 2rem;
 		margin-bottom: 1.6rem;
 		padding: 0 .3rem 1.5rem;
 		border-bottom: 1px solid var(--line);
@@ -265,15 +266,18 @@
 		color: var(--orange);
 	}
 	.page-intro h1 {
+		overflow: hidden;
 		margin: 0;
 		font-family: var(--serif);
-		font-size: clamp(2rem, 4vw, 3.1rem);
+		font-size: clamp(1.75rem, 3vw, 2.6rem);
 		line-height: 1.2;
-		letter-spacing: .02em;
+		letter-spacing: 0;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.page-intro p {
-		max-width: 42rem;
-		margin: .55rem 0 0;
+		max-width: none;
+		margin: 0 0 .15rem;
 		color: var(--ink-soft);
 		font-size: 1rem;
 	}
@@ -859,6 +863,112 @@
 	@media (prefers-reduced-motion: reduce) {
 		* { scroll-behavior: auto !important; transition: none !important; }
 	}
+
+	/* 心理師課程系列頁面共用：第一列標題與說明，第二列功能導覽。 */
+	.page-intro-heading {
+		min-width: 0;
+	}
+	.page-intro-description {
+		align-self: end;
+		justify-self: end;
+		width: 100%;
+		text-align: right;
+	}
+	.page-route-panel {
+		display: grid;
+		grid-column: 1 / -1;
+		width: min(48rem, 66.666%);
+		max-width: 66.666%;
+		gap: .8rem;
+		justify-items: stretch;
+		margin: .2rem auto 0;
+	}
+	.page-route-nav {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: .45rem;
+		width: 100%;
+	}
+	.page-route-nav a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 100%;
+		min-width: 0;
+		min-height: 48px;
+		padding: .65rem .55rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		color: var(--ink-soft);
+		background: transparent;
+		font-size: .9rem;
+		font-weight: 500;
+		line-height: 1.2;
+		text-align: center;
+		white-space: nowrap;
+		transition: border-color .18s, background .18s, color .18s;
+	}
+	.page-route-nav a:hover {
+		border-color: var(--line);
+		color: var(--ink);
+		background: var(--white);
+	}
+	.page-route-nav a.active,
+	.page-route-nav a[aria-current="page"] {
+		border-color: var(--bg-soothing);
+		color: var(--ink);
+		background: var(--blue-soft);
+	}
+	.page-specific-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: .65rem;
+		width: 100%;
+	}
+	@media (max-width: 1080px) {
+		.page-route-panel {
+			width: 66.666%;
+			max-width: 66.666%;
+			justify-items: stretch;
+		}
+		.page-route-nav {
+			width: 100%;
+		}
+		.page-specific-actions {
+			width: 100%;
+			justify-content: flex-end;
+		}
+	}
+	@media (max-width: 700px) {
+		.page-intro {
+			grid-template-columns: 1fr;
+		}
+		.page-intro-description {
+			margin: 0;
+		}
+		.page-route-panel {
+			width: 100%;
+			max-width: 100%;
+			margin: .2rem 0 0;
+		}
+		.page-route-nav {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.page-route-nav a {
+			white-space: normal;
+		}
+		.page-specific-actions {
+			align-items: stretch;
+			flex-direction: column;
+		}
+		.page-specific-actions > *,
+		.page-specific-actions .btn {
+			width: 100%;
+		}
+	}
 	</style>
 </head>
 <body th:with="activePage='courses'">
@@ -881,22 +991,6 @@
 					<span class="en">Free&nbsp;Mind</span>
 				</span>
 			</a>
-
-			<nav class="nav-menu" aria-label="心理師主選單">
-				<a class="active" th:class="${activePage == null or activePage == 'courses'} ? 'active' : null"
-					th:href="@{/psych/course/select_course}" href="/psych/course/select_course"
-					aria-current="page"
-					th:attr="aria-current=${activePage == null or activePage == 'courses'} ? 'page' : null">課程管理</a>
-				<a th:class="${activePage == 'editor'} ? 'active' : null"
-					th:href="@{/psych/course/add_course}" href="/psych/course/add_course"
-					th:attr="aria-current=${activePage == 'editor'} ? 'page' : null">新增／編輯課程</a>
-				<a th:class="${activePage == 'payout'} ? 'active' : null"
-					th:href="@{/psych/payout/selectPayout}" href="/psych/payout/selectPayout"
-					th:attr="aria-current=${activePage == 'payout'} ? 'page' : null">營運與成長</a>
-				<a th:class="${activePage == 'qa'} ? 'active' : null"
-					th:href="@{/psych/course/psych_qa}" href="/psych/course/psych_qa"
-					th:attr="aria-current=${activePage == 'qa'} ? 'page' : null">學員提問</a>
-			</nav>
 
 			<div class="nav-right">
 				<div class="pop-holder">
@@ -1004,14 +1098,27 @@
 	<main class="page-main">
 		<div class="wrap">
 			<section class="page-intro" aria-labelledby="pageTitle">
-				<div>
+				<div class="page-intro-heading">
 					<span class="eyebrow">心理師中心</span>
 					<h1 id="pageTitle">課程管理</h1>
-					<p>查看課程狀態、設定上架後折扣與管理學員互動；課程下架由管理員執行。</p>
 				</div>
-				<a class="btn btn-primary" th:href="@{/psych/course/add_course}" href="/psych/course/add_course">
-					<span aria-hidden="true">＋</span>建立新課程
-				</a>
+				<p class="page-intro-description">查看課程狀態、設定上架後折扣與管理學員互動；課程下架由管理員執行。</p>
+				<aside class="page-route-panel" aria-label="心理師課程功能">
+					<nav class="page-route-nav" aria-label="心理師課程功能導覽">
+						<a th:classappend="${activePage == 'courses'} ? ' active' : ''"
+							th:href="@{/psych/course/select_course}" href="/psych/course/select_course"
+							th:attr="aria-current=${activePage == 'courses'} ? 'page' : null">課程管理</a>
+						<a th:classappend="${activePage == 'editor'} ? ' active' : ''"
+							th:href="@{/psych/course/add_course}" href="/psych/course/add_course"
+							th:attr="aria-current=${activePage == 'editor'} ? 'page' : null">新增／編輯課程</a>
+						<a th:classappend="${activePage == 'payout'} ? ' active' : ''"
+							th:href="@{/psych/payout/selectPayout}" href="/psych/payout/selectPayout"
+							th:attr="aria-current=${activePage == 'payout'} ? 'page' : null">營運與成長</a>
+						<a th:classappend="${activePage == 'qa'} ? ' active' : ''"
+							th:href="@{/psych/course/psych_qa}" href="/psych/course/psych_qa"
+							th:attr="aria-current=${activePage == 'qa'} ? 'page' : null">學員提問</a>
+					</nav>
+				</aside>
 			</section>
 
 			<section class="stats" aria-label="課程統計">

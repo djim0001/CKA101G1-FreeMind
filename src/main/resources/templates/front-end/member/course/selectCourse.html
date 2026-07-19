@@ -1269,9 +1269,9 @@ body.thy2-member :focus-visible {
 					th:action="@{/member/course/select_course}" aria-label="課程分類">
 					<a th:href="@{/member/course/select_course}"
 						th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
-					<button type="submit" name="courseCatId"
+					<button type="submit" name="keyword"
 						th:each="courseCategories : ${courseCategoriesListAll}"
-						th:value="${courseCategories.courseCatId}"
+						th:value="${courseCategories.courseCatName}"
 						th:text="${courseCategories.courseCatName}"
 						th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
 				</form>

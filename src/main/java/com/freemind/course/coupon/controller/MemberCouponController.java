@@ -3,6 +3,7 @@ package com.freemind.course.coupon.controller;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,6 +23,7 @@ import com.freemind.course.dto.CouponClaimResult;
 import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,23 +34,61 @@ public class MemberCouponController {
 private final MemberCouponService memCouponSvc;
 private final CouponService couponSvc;
 private final MemberService memberSvc;
+private final NoticeService noticeSvc;
 private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	
 	public MemberCouponController(
 			ShoppingCartRedisService ShoppingCartRedisSvc,
 			MemberService memberSvc,
 			CouponService couponSvc,
+			NoticeService noticeSvc,
 			MemberCouponService memCouponSvc) {
 		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
 		this.memCouponSvc = memCouponSvc;
 		this.memberSvc = memberSvc;
 		this.couponSvc = couponSvc;
+		this.noticeSvc = noticeSvc;
 	}
 
-	@ModelAttribute("member")
-    public Member currentMember(Authentication authentication) {
-        return memberSvc.findByAccount(authentication.getName());
-    }
+	@ModelAttribute
+	public void addMemberAttributes(
+	        Authentication authentication,
+	        ModelMap model) {
+
+	    // 訪客的預設資料
+	    model.addAttribute("member", null);
+	    model.addAttribute("countMemberUnread", 0L);
+	    model.addAttribute("countMemberCartCount", 0L);
+
+	    // 未登入或匿名使用者
+	    if (authentication == null
+	            || authentication instanceof AnonymousAuthenticationToken
+	            || !authentication.isAuthenticated()) {
+	        return;
+	    }
+	    Member member =
+	            memberSvc.findByAccount(authentication.getName());
+	    if (member == null) {
+	        System.out.println("找不到對應會員資料");
+	        return;
+	    }
+	    Long unreadCount =
+	            noticeSvc.countMemberUnread(member.getMemberId());
+	    Long cartCount =
+	    		ShoppingCartRedisSvc.getCourseCount(member.getMemberId());
+	    model.addAttribute("member", member);
+	    model.addAttribute(
+	            "countMemberUnread",
+	            unreadCount != null ? unreadCount : 0L
+	    );
+	    model.addAttribute(
+	            "countMemberCartCount",
+	            cartCount != null ? cartCount : 0L
+	    );
+
+//	    System.out.println("會員名稱：" + member.getName());
+//	    System.out.println("購物車數量：" + cartCount);
+	}
 	
 	@GetMapping("/my_coupon")
 	public String myCoupon(

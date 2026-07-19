@@ -72,25 +72,66 @@ public class CourseForMemberController {
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
 	
-	@ModelAttribute("member")
-    public Member currentMember(Authentication authentication) {
-        // 訪客（未登入或匿名）時不放 member 進 model
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return null;
-        }
-        return memberSvc.findByAccount(authentication.getName());
-    }
-	@ModelAttribute("countMemberUnread")
-	public Long memberNotice(ModelMap model) {
-		Member member = (Member)model.getAttribute("member");
-		return (member != null ? noticeSvc.countMemberUnread(member.getMemberId()) : null);
-	}
+//	@ModelAttribute("member")
+//    public Member currentMember(Authentication authentication) {
+//        // 訪客（未登入或匿名）時不放 member 進 model
+//        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+//            return null;
+//        }
+//        return memberSvc.findByAccount(authentication.getName());
+//    }
+//	@ModelAttribute("countMemberUnread")
+//	public Long memberNotice(ModelMap model) {
+//		Member member = (Member)model.getAttribute("member");
+//		return (member != null ? noticeSvc.countMemberUnread(member.getMemberId()) : null);
+//	}
+//	
+//	@ModelAttribute("countMemberCartCount")
+//	public Long memberShoppingCartCount(ModelMap model) {
+//		Member member = (Member)model.getAttribute("member");
+//System.out.println(member.getName());
+//System.out.println((member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null));
+//		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
+//	}
 	
-	@ModelAttribute("countMemberCartCount")
-	public Long memberShoppingCartCount(ModelMap model) {
-		Member member = (Member)model.getAttribute("member");
-System.out.println((member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null));
-		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
+	@ModelAttribute
+	public void addMemberAttributes(
+	        Authentication authentication,
+	        ModelMap model) {
+
+	    // 訪客的預設資料
+	    model.addAttribute("member", null);
+	    model.addAttribute("countMemberUnread", 0L);
+	    model.addAttribute("countMemberCartCount", 0L);
+
+	    // 未登入或匿名使用者
+	    if (authentication == null
+	            || authentication instanceof AnonymousAuthenticationToken
+	            || !authentication.isAuthenticated()) {
+	        return;
+	    }
+	    Member member =
+	            memberSvc.findByAccount(authentication.getName());
+	    if (member == null) {
+	        System.out.println("找不到對應會員資料");
+	        return;
+	    }
+	    Long unreadCount =
+	            noticeSvc.countMemberUnread(member.getMemberId());
+	    Long cartCount =
+	            shoppingCartSvc.getCourseCount(member.getMemberId());
+	    model.addAttribute("member", member);
+	    model.addAttribute(
+	            "countMemberUnread",
+	            unreadCount != null ? unreadCount : 0L
+	    );
+	    model.addAttribute(
+	            "countMemberCartCount",
+	            cartCount != null ? cartCount : 0L
+	    );
+
+//	    System.out.println("會員名稱：" + member.getName());
+//	    System.out.println("購物車數量：" + cartCount);
 	}
 	
     @ModelAttribute("courseCategoriesListAll")
@@ -112,7 +153,6 @@ System.out.println((member != null ? shoppingCartSvc.getCourseCount(member.getMe
 		Integer currentPage = page;
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 //		Page<Course> courseList = courseSvc.findCourseByCourseStstus((byte)4, currentPage - 1, sortField);
-		
 		Page<Course> courseList = courseSvc.searchListedCourses(keyword, currentPage-1, sortField);
 		if(member!=null) {
 			for(Course course : courseList) {
