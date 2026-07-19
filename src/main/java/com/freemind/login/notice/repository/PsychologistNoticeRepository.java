@@ -22,4 +22,6 @@ public interface PsychologistNoticeRepository extends JpaRepository<Psychologist
     @Modifying
     @Query("UPDATE PsychologistNotice n SET n.isRead = true WHERE n.psychId = :psychId AND n.isRead = false")
     int markAllRead(@Param("psychId") Integer psychId);
+
+    List<PsychologistNotice> findTop5ByPsychIdOrderByCreatedAtDesc(Integer psychId);
 }

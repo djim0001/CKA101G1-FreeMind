@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -27,9 +28,11 @@ import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
 import jakarta.validation.Valid;
 
@@ -49,10 +52,26 @@ public class CourseOrderController {
 	private OrderDetailService orderDetailSvc;
 	@Autowired
 	private CourseQaCommentService commentService;
+	@Autowired
+	NoticeService noticeSvc;
+	@Autowired
+	ShoppingCartRedisService shoppingCartSvc;
 
 	@ModelAttribute("member")
 	public Member currentMember(Authentication authentication) {
 		return memberSvc.findByAccount(authentication.getName());
+	}
+	
+	@ModelAttribute("countMemberUnread")
+	public Long memberNotice(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? noticeSvc.countMemberUnread(member.getMemberId()) : null);
+	}
+	
+	@ModelAttribute("countMemberCartCount")
+	public Long memberShoppingCartCount(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
 	}
 
 //	@GetMapping("acb")

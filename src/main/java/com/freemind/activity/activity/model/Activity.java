@@ -93,12 +93,20 @@ public class Activity implements Serializable{
 	private LocalDateTime activityEnd;
 
 	@Column(name="capacity", nullable=false)
-	@NotNull(message = "活動名額: 請勿空白")
-	@Min(value = 1, message = "活動名額: 不能小於{value}")
+	@NotNull(message = "正取名額: 請勿空白")
+	@Min(value = 1, message = "正取名額: 不能小於{value}")
 	private Integer capacity;
 
 	@Column(name = "regis_count", nullable = false)
 	private Integer regisCount;
+	
+	@Column(name="waitlist_capacity", nullable=false)
+	@NotNull(message = "備取名額: 請勿空白")
+	@Min(value = 1, message = "備取名額: 不能小於{value}")
+	private Integer waitlistCapacity;
+
+	@Column(name = "waitlist_count", nullable = false)
+	private Integer waitlistCount;
 
 
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -259,6 +267,22 @@ public class Activity implements Serializable{
 	public void setRegisCount(Integer regisCount) {
 		this.regisCount = regisCount;
 	}
+	
+	public Integer getWaitlistCapacity() {
+		return waitlistCapacity;
+	}
+
+	public void setWaitlistCapacity(Integer waitlistCapacity) {
+		this.waitlistCapacity = waitlistCapacity;
+	}
+
+	public Integer getWaitlistCount() {
+		return waitlistCount;
+	}
+
+	public void setWaitlistCount(Integer waitlistCount) {
+		this.waitlistCount = waitlistCount;
+	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
@@ -366,7 +390,13 @@ public class Activity implements Serializable{
 	    if (now.isBefore(this.regisStart)) {
 	        return "尚未開放報名";
 	    } else if (!now.isAfter(this.regisEnd)) {
-	    		return isFull() ? "已額滿" : "可報名中";
+		    	if (isFull()) {
+		    	    return "已額滿";
+		    	} else if (this.regisCount != null && this.capacity != null && this.regisCount >= this.capacity) {
+		    	    return "候補中";
+		    	} else {
+		    	    return "可報名中";
+		    	}
 	    } else if (now.isBefore(this.activityEnd)) {
 	        return "已截止報名";
 	    } else {
@@ -383,9 +413,10 @@ public class Activity implements Serializable{
 	}
 	
 	public boolean isFull() {
-	    return this.regisCount != null && this.capacity != null
-	            && this.regisCount >= this.capacity;
-	}	
+	    boolean regisFull = this.regisCount != null && this.capacity != null && this.regisCount >= this.capacity;
+	    boolean waitlistFull = this.waitlistCount != null && this.waitlistCapacity != null && this.waitlistCount >= this.waitlistCapacity;
+	    return regisFull && waitlistFull;
+	}
 	
 	public boolean isRegistrable() {
 	    if (this.activityStatus == null || this.activityStatus != 2) {

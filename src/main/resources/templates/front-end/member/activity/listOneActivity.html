@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>查看單一活動詳情</title>
@@ -33,7 +34,7 @@
 	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
 
     <img th:if="${activity.picture != null}" 
-         th:src="@{/member/activity/activityImage(activityId=${activity.activityId})}" 
+         th:src="@{'/activity-images/' + ${activity.picture}}" 
          style="max-width: 400px;">
     <img th:unless="${activity.picture != null}" 
          th:src="@{/images/no-image.jpg}" 
@@ -53,23 +54,41 @@
         <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
         <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
     </p>
-    <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+    <p>正取名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	<p>備取名額：<span th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
+    <p>已報名人數：<span th:text="${activity.regisCount + activity.waitlistCount + pendingCount} + ' / ' + ${activity.capacity + activity.waitlistCapacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 
 	<span th:if="${myRegisMap.get(activity.activityId) == 0}" class="status-badge status-pending">審核中</span>
 	<span th:if="${myRegisMap.get(activity.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
+	<span th:if="${myRegisMap.get(activity.activityId) == 4}" class="status-badge status-confirmed">已候補</span>
+						
 	
+	<!-- 報名功能 -->
 	<th:block th:if="${myRegisMap.get(activity.activityId) == null}">
-		<form th:if="${activity.registrable && (#authentication.principal == 'anonymousUser' || activity.member.memberId != #authentication.principal.member.memberId)}"
-		      th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-		    <input type="hidden" name="activityId" th:value="${activity.activityId}">
-		    <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listOneActivity(activityId=${activity.activityId})}">
-		    <button type="submit">報名</button>
-		</form>
-	</th:block>
-	<!-- (登入版)關注功能 -->
-	<div th:if="${isFollowing != null}" style="display:inline;">
+	    <!-- 已登入會員：顯示報名表單 -->
+	    <form th:if="${activity.registrable}" sec:authorize="hasRole('MEMBER')"
+	          th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
+	        <th:block th:if="${activity.member.memberId != #authentication.principal.member.memberId}">
+	            <input type="hidden" name="activityId" th:value="${activity.activityId}">
+	            <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listOneActivity(activityId=${activity.activityId})}">
+	            <br>
+	            <label>報名動機：</label><br>
+	            <textarea name="motivation" required maxlength="200" placeholder="簡單說說你想參加這個活動的原因" style="width:300px; height:60px;"></textarea><br>
+	            <button type="submit">報名</button>
+	        </th:block>
+	    </form>
 	
+	    <!-- 未登入：導去登入頁 -->
+	    <a th:if="${activity.registrable}" sec:authorize="isAnonymous()"
+	       th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
+	        <button type="button">報名</button>
+	    </a>
+	</th:block>
+	
+	<!-- 關注功能 -->
+	<!-- 已登入會員：關注功能 -->
+	<div sec:authorize="hasRole('MEMBER')" style="display:inline;">
 	    <form th:if="${!isFollowing}"
 	          th:action="@{/member/activity/follow/follow}" method="post" style="display:inline;">
 	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
@@ -82,8 +101,9 @@
 	        <button type="submit">♥ 已關注</button>
 	    </form>
 	</div>
-	<!-- 關注按鈕(訪客版):點選跳轉至登入,登入後返回此活動頁 -->
-	<a th:if="${isFollowing == null}"
+	
+	<!-- 未登入：導去登入頁 -->
+	<a sec:authorize="isAnonymous()"
 	   th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
 	    <button type="button">♡ 關注</button>
 	</a>

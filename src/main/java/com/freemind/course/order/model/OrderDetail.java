@@ -47,10 +47,10 @@ public class OrderDetail {
 	private String reviewContent;
 	@Column(name = "reviewed_at")
 	private LocalDateTime reviewedAt;
-	@Column(name = "course_progress")
-	private BigDecimal courseProgress;
-	@Column(name = "playback_position")
-	private LocalTime playbackPosition;
+	@Column(name = "course_progress", precision = 3, scale = 2)
+	private BigDecimal courseProgress = BigDecimal.ZERO;
+	@Column(name = "playback_position", nullable = false)
+	private LocalTime playbackPosition = LocalTime.MIDNIGHT;
 
 	public CompositeOrderDetail getCompositeOrderDetail() {
 		return compositeOrderDetail;

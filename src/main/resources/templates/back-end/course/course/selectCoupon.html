@@ -3,8 +3,8 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta name="description" content="課程下架管理後台管理頁面" />
-	<title>課程下架管理｜管理後台</title>
+	<meta name="description" content="優惠券管理後台管理頁面" />
+	<title>優惠券管理｜管理後台</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link
@@ -1281,10 +1281,10 @@
 				</span>
 			</a>
 			<nav class="course-nav header-course-nav" aria-label="課程商城管理">
-				<a class="active" aria-current="page" th:href="@{/admin/course/select_course}">課程發布管理</a>
+				<a th:href="@{/admin/course/select_course}">課程發布管理</a>
 				<a th:href="@{/admin/course/select_course_order}">訂單與退款</a>
 				<a th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
-				<a th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+				<a class="active" aria-current="page" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
 				<a th:href="@{/admin/course/select_course_categories}">課程分類</a>
 			</nav>
 			<div class="nav-actions">
@@ -1323,79 +1323,21 @@
 <div class="page-head">
 					<div>
 						<span class="page-kicker">後台管理</span>
-						<h1>課程下架管理</h1>
+						<h1>全站課程優惠券管理</h1>
 					</div>
 					<div class="page-head-actions">
-						<p>由管理員選擇要下架的課程並記錄原因。</p>
-						<a class="btn ghost" th:href="@{/admin/course/select_course}">返回發布管理</a>
+						<p>設定折扣、折抵上限、消費門檻與發放後有效天數。</p>
+						<a class="btn" href="#coupon-spec" data-new-coupon>＋ 新增優惠券</a>
 					</div>
-				</div>
-				<div class="notice">下架後停止新會員購買，但須保留已購買會員的觀看權益與學習紀錄。</div>
-				<div class="table-wrap" style="margin-top: 18px">
-					<table class="compact-table">
-						<thead>
-							<tr>
-								<th>課程／心理師</th>
-								<th>分類</th>
-								<th>狀態</th>
-								<th>收藏／評價／提問</th>
-								<th>定價</th>
-								<th>審核員工</th>
-								<th>操作</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="course : ${courseList}">
-								<td><div class="course-summary">
-										<strong th:text="${course.courseName}">課程名稱</strong><span
-											class="meta" th:text="${course.psychologist.name}">心理師</span>
-									</div></td>
-								<td th:text="${course.courseCategories.courseCatName}">分類</td>
-								<td><span class="status"
-									th:text="${course.courseStatusText}">狀態</span></td>
-								<td><span th:text="${course.saveCount}">0</span>／<span
-									th:text="${course.reviewCount}">0</span>／<span
-									th:text="${course.commentCount}">0</span></td>
-								<td>NT$ <span th:text="${course.price}">0</span></td>
-								<td
-									th:text="${course.admin != null ? course.admin.name : '尚未指定管理員'}">—</td>
-								<td><button class="btn danger" type="button"
-										data-open-take-down th:data-course-id="${course.courseId}"
-										th:data-course-name="${course.courseName}">下架課程</button></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div
-					th:replace="~{fragments/pagination :: paginationWithOrder(${currentPage}, ${totalPages}, '/admin/course/goto_delisted', ${orderBy})}"></div>
+				</div><div class="notice">所有優惠券皆適用全站已上架課程，不使用優惠碼，也不綁定指定課程。</div>
+<div class="grid-2 coupon-management-grid"><section class="panel" id="coupon-spec"><h2>優惠券規格</h2><p class="meta">建立新的全站課程優惠券規格；標示 <span class="required">＊</span> 的欄位為必填。</p><p class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></p><form class="form-grid" th:if="${coupon != null}" th:action="@{/admin/coupon/insert_coupon}" method="post" th:object="${coupon}" style="margin-top:18px" data-coupon-spec-form><div class="form-group"><label for="couponName">優惠券名稱 <span class="required">＊</span></label><input id="couponName" class="field" type="text" th:field="*{couponName}" required autocomplete="off"><span class="error" th:if="${#fields.hasErrors('couponName')}" th:errors="*{couponName}"></span></div><div class="form-group"><label for="discount">折扣倍率 <span class="required">＊</span></label><input id="discount" class="field" type="number" min="0.1" max="0.95" step="0.05" th:field="*{discount}" required data-admin-discount><span class="form-note">例如九五折填 0.95，八折填 0.8。</span><span class="error" th:if="${#fields.hasErrors('discount')}" th:errors="*{discount}"></span></div><div class="form-group"><label for="discountLimit">最高折抵金額（NT$）</label><input id="discountLimit" class="field" type="number" min="0" step="1" th:field="*{discountLimit}" data-admin-limit><span class="error" th:if="${#fields.hasErrors('discountLimit')}" th:errors="*{discountLimit}"></span></div><div class="form-group"><label for="triggerThreshold">消費觸發門檻（NT$）</label><input id="triggerThreshold" class="field" type="number" min="0" step="1" th:field="*{triggerThreshold}" data-admin-threshold><span class="error" th:if="${#fields.hasErrors('triggerThreshold')}" th:errors="*{triggerThreshold}"></span></div><div class="form-group"><label for="discountDuration">發放後有效天數 <span class="required">＊</span></label><input id="discountDuration" class="field" type="number" min="1" step="1" th:field="*{discountDuration}" required><span class="error" th:if="${#fields.hasErrors('discountDuration')}" th:errors="*{discountDuration}"></span></div><div class="form-group" style="align-self:end"><button class="btn" type="submit">儲存優惠券規格</button></div></form>
+
+<div class="notice" style="margin-top:16px" data-discount-example></div></section>
+<section class="panel"><h2>發放會員優惠券</h2><form th:action="@{/admin/coupon/publish}" method="post"><div class="form-group"><label for="coupon-template">選擇優惠券</label><select id="coupon-template" class="field" name="couponId" required data-coupon-template><option value="">請選擇</option><option th:each="coupon : ${couponListAll}" th:value="${coupon.couponId}" th:text="${coupon.couponName}" th:attr="data-coupon-name=${coupon.couponName},data-discount=${coupon.discount},data-discount-limit=${coupon.discountLimit},data-trigger-threshold=${coupon.triggerThreshold},data-discount-duration=${coupon.discountDuration}"></option></select></div><div class="form-group" style="margin-top:14px"><label for="stock">發放數量</label><input id="stock" class="field" type="number" name="stock" min="1" required></div><div class="form-group" style="margin-top:14px"><label for="ttlHours">發布後可領取時數</label><input id="ttlHours" class="field" type="number" name="ttlHours" min="1" required></div><div class="form-group" style="margin-top:14px"><label for="audience">發放對象</label><select id="audience" class="field" name="audience" data-audience-select><option value="all">所有會員</option><option value="new">新會員</option><option value="spending">消費達金額的會員</option></select></div><div class="form-group" style="margin-top:14px" data-audience-threshold hidden><label for="audience-threshold">會員累積消費門檻（NT$）</label><input id="audience-threshold" class="field" type="number" name="audienceThreshold" min="1" data-audience-threshold-input></div><button class="btn" type="submit" style="margin-top:18px">確認發放</button></form></section></div>
+<section class="panel" style="margin-top:20px"><div class="panel-heading"><div><h2>現有優惠券規格</h2><p class="meta" th:if="${session.couponPageQty > 0}">目前頁數：<b th:text="|${currentPage}/${session.couponPageQty}|">1/1</b></p></div></div><div class="table-wrap"><table><thead><tr><th>優惠券編號／名稱</th><th>折扣</th><th>最高折抵</th><th>消費門檻</th><th>有效天數</th></tr></thead><tbody><tr th:each="coupon : ${couponListAllPages}"><td><strong><span th:text="${coupon.couponId}">#</span>　<span th:text="${coupon.couponName}">名稱</span></strong><br><span class="meta">全站已上架課程</span></td><td th:text="${coupon.discount}">—</td><td>NT$ <span th:text="${coupon.discountLimit != null ? coupon.discountLimit : 0}">0</span></td><td>NT$ <span th:text="${coupon.triggerThreshold != null ? coupon.triggerThreshold : 0}">0</span></td><td><span th:text="${coupon.discountDuration}">0</span> 天</td></tr></tbody></table></div><div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/admin/coupon/select_coupon')}"></div></section>
 		</div>
 	</main>
-	<dialog class="admin-dialog" data-take-down-dialog>
-	<form method="post" th:action="@{delisted_course}">
-		<div class="dialog-head">
-			<div>
-				<span class="dialog-kicker">管理員操作</span>
-				<h2>確認下架課程</h2>
-			</div>
-			<button class="dialog-close" type="button" data-close-take-down>×</button>
-		</div>
-		<p>
-			即將下架：<strong data-take-down-course></strong>
-		</p>
-		<input type="hidden" name="courseId" data-take-down-course-id>
-		<div class="form-group">
-			<label for="delistReason">下架原因</label><select id="delistReason"
-				class="field" name="delistReason" required data-take-down-reason><option
-					value="">請選擇</option>
-				<option th:each="reason : ${delistReasons}" th:value="${reason}"
-					th:text="${reason.label}"></option></select>
-		</div>
-		<div class="dialog-actions">
-			<button class="btn ghost" type="button" data-close-take-down>取消</button>
-			<button class="btn danger" type="submit">確認下架</button>
-		</div>
-	</form>
-	</dialog>
+	<div class="coupon-modal modal-shell" th:if="${couponMsg != null}"><div class="coupon-modal-content"><h2>發布結果</h2><p th:text="${couponMsg}"></p><button class="btn" type="button" data-close-modal>確定</button></div></div>
 	<footer class="site-footer">
 		<div class="wrap footer-inner">
 			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span>

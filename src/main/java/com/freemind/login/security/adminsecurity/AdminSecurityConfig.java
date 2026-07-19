@@ -38,16 +38,22 @@ public class AdminSecurityConfig {
                 // 登入頁面允許所有人訪問
                 .requestMatchers("/","/back-end/login","/admin/home").permitAll()
                 
-                //課程管理
-                .requestMatchers("/admin/adminPayout","/admin/refund").hasAnyRole("super_admin","courses")
-                
-                //超級管理員
-             // 改前
-              //超級管理員
-              .requestMatchers("/admin/select_page").hasRole("super_admin")
+                // ===== 模組權限控管（super_admin 一律放行）=====
+                // 課程：有 courses 權限才能操作
+                .requestMatchers("/admin/course/**","/admin/coupon/**","/admin/refund/**","/admin/adminPayout/**")
+                    .hasAnyRole("super_admin","courses")
+                // 諮商（含心理師管理）：有 consultation 權限才能操作
+                .requestMatchers("/admin/orders/**","/admin/slots/**","/admin/reports/**","/admin/psych/**")
+                    .hasAnyRole("super_admin","consultation")
+                // 文章：有 articles 權限才能操作
+                .requestMatchers("/admin/article/**")
+                    .hasAnyRole("super_admin","articles")
+                // 活動：有 activities 權限才能操作
+                .requestMatchers("/admin/activity/**","/admin/activityCat/**")
+                    .hasAnyRole("super_admin","activities")
 
-              // 改後
-              // 超級管理員專區：管理員帳號 CRUD ＋ 權限 CRUD
+
+              // 超級管理員才能進入：管理員帳號 CRUD ＋ 權限 CRUD
               .requestMatchers(
                       // 管理員查詢頁（AdminIdController）
                       "/admin/select_page",

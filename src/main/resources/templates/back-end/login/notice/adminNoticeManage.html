@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>通知管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5; color: #333; line-height: 1.6; padding: 40px 20px;
+}
+h1 {
+	max-width: 860px; margin: 0 auto 28px; font-size: 28px; font-weight: 700;
+	color: #4a3e3e; padding-bottom: 16px; border-bottom: 2px solid #e8b4b4;
+	display: flex; align-items: center; justify-content: space-between;
+}
+h1 a {
+	padding: 8px 20px; background-color: #e8b4b4; color: #fff;
+	text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500;
+}
+h1 a:hover { background-color: #d39393; }
+
+.alert {
+	max-width: 860px; margin: 0 auto 16px; padding: 12px 16px;
+	background-color: #eaf6ec; color: #2e7d43; border: 1px solid #cdead4;
+	border-radius: 6px; font-size: 14px;
+}
+
+.card {
+	max-width: 860px; margin: 0 auto 20px; background: #fff; border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07); padding: 24px;
+}
+
+.filter-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.filter-form select, .filter-form input[type="text"] {
+	padding: 8px 12px; border: 1px solid #f2dddd; border-radius: 6px;
+	font-size: 14px; color: #444; outline: none;
+}
+.filter-form input[type="text"] { flex: 1; min-width: 180px; }
+.filter-form select:focus, .filter-form input:focus {
+	border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
+}
+.filter-form button {
+	padding: 8px 20px; background-color: #e8b4b4; color: #fff;
+	border: none; border-radius: 6px; font-size: 14px; cursor: pointer;
+}
+.filter-form button:hover { background-color: #d39393; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f2dddd; }
+th { color: #7a6b6b; font-weight: 600; background: #fbf2f2; }
+tr:hover td { background: #fdf7f7; }
+a.history-link {
+	display: inline-block; padding: 5px 14px; background-color: #fbf2f2;
+	color: #7a6b6b; border: 1px solid #f2dddd; text-decoration: none;
+	border-radius: 6px; font-size: 13px;
+}
+a.history-link:hover { background-color: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+.empty-hint { color: #999; text-align: center; padding: 24px 0; }
+</style>
+</head>
+<body>
+	<h1>
+		<span>通知管理</span>
+		<a th:href="@{/admin/notice/send}">發送通知</a>
+	</h1>
+
+	<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
+
+	<!-- 查人:身分 + 帳號/姓名關鍵字 -->
+	<div class="card">
+		<form th:action="@{/admin/notice}" method="get" class="filter-form">
+			<select name="role">
+				<option value="member" th:selected="${role == 'member'}">會員</option>
+				<option value="psych" th:selected="${role == 'psych'}">心理師</option>
+			</select>
+			<input type="text" name="keyword" placeholder="帳號或姓名(空白=列出全部)"
+				th:value="${keyword}" />
+			<button type="submit">查詢</button>
+		</form>
+	</div>
+
+	<!-- 人員清單:點「查看通知」進該人的通知歷史 -->
+	<div class="card">
+		<table>
+			<thead>
+				<tr>
+					<th>編號</th>
+					<th>帳號</th>
+					<th>姓名</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="p : ${people}">
+					<td th:text="${p.id}">1</td>
+					<td th:text="${p.account}">account01</td>
+					<td th:text="${p.name}">王小明</td>
+					<td>
+						<a class="history-link"
+							th:href="@{/admin/notice/history(role=${role}, id=${p.id})}">查看通知</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<p class="empty-hint" th:if="${#lists.isEmpty(people)}">查無符合的人員</p>
+	</div>
+</body>
+</html>

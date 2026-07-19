@@ -4,12 +4,145 @@ document.addEventListener('DOMContentLoaded', () => {
   const notify = message => {
     if (!message) return;
     toast.textContent = message;
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
     toast.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
   };
 
   document.querySelectorAll('[data-toast]').forEach(element => element.addEventListener('click', () => notify(element.dataset.toast)));
+  const serverCartMessage = document.querySelector('[data-cart-message]');
+  if (serverCartMessage?.textContent.trim()) {
+    window.setTimeout(() => notify(serverCartMessage.textContent.trim()), 80);
+  }
+
+  const popBindings = [
+    ['bellBtn', 'bellPop'],
+    ['avatarBtn', 'avatarPop']
+  ].map(([buttonId, popId]) => ({
+    button: document.getElementById(buttonId),
+    pop: document.getElementById(popId)
+  })).filter(binding => binding.button && binding.pop);
+
+  const setPopState = (binding, isOpen) => {
+    binding.pop.classList.toggle('open', isOpen);
+    binding.button.setAttribute('aria-expanded', String(isOpen));
+  };
+  const closePops = exceptPop => {
+    popBindings.forEach(binding => {
+      if (binding.pop !== exceptPop) setPopState(binding, false);
+    });
+  };
+
+  popBindings.forEach(binding => {
+    binding.button.addEventListener('click', event => {
+      event.stopPropagation();
+      const shouldOpen = !binding.pop.classList.contains('open');
+      closePops(binding.pop);
+      setPopState(binding, shouldOpen);
+    });
+    binding.pop.addEventListener('click', event => event.stopPropagation());
+  });
+
+  const profileMenuButtons = [...document.querySelectorAll('[data-toggle-menu]')];
+  const setProfileMenuState = (button, menu, isOpen) => {
+    menu.classList.toggle('open', isOpen);
+    button.setAttribute('aria-expanded', String(isOpen));
+  };
+  const closeProfileMenus = exceptMenu => {
+    profileMenuButtons.forEach(button => {
+      const menu = document.getElementById(button.dataset.toggleMenu);
+      if (!menu || menu === exceptMenu) return;
+      setProfileMenuState(button, menu, false);
+    });
+  };
+
+  profileMenuButtons.forEach(button => {
+    const menu = document.getElementById(button.dataset.toggleMenu);
+    if (!menu) return;
+
+    button.addEventListener('click', event => {
+      event.stopPropagation();
+      const shouldOpen = !menu.classList.contains('open');
+      closeProfileMenus(menu);
+      setProfileMenuState(button, menu, shouldOpen);
+    });
+
+    const wrapper = button.closest('.profile-wrapper');
+    if (wrapper) {
+      wrapper.addEventListener('mouseenter', () => {
+        closeProfileMenus(menu);
+        setProfileMenuState(button, menu, true);
+      });
+      wrapper.addEventListener('mouseleave', () => {
+        setProfileMenuState(button, menu, false);
+      });
+    }
+
+    menu.addEventListener('click', event => event.stopPropagation());
+  });
+
+  document.addEventListener('click', () => {
+    closePops();
+    closeProfileMenus();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const activePop = popBindings.find(binding => binding.button.getAttribute('aria-expanded') === 'true');
+    closePops();
+    const activeButton = profileMenuButtons.find(button => button.getAttribute('aria-expanded') === 'true');
+    closeProfileMenus();
+    activePop?.button.focus();
+    activeButton?.focus();
+  });
+
+  const hamburgerButton = document.getElementById('memberHambBtn');
+  const mobileMenu = document.getElementById('memberMobileMenu');
+  if (hamburgerButton && mobileMenu) {
+    const setMobileMenuState = isOpen => {
+      mobileMenu.classList.toggle('open', isOpen);
+      hamburgerButton.setAttribute('aria-expanded', String(isOpen));
+      hamburgerButton.setAttribute('aria-label', isOpen ? '關閉選單' : '開啟選單');
+    };
+
+    hamburgerButton.addEventListener('click', event => {
+      event.stopPropagation();
+      setMobileMenuState(!mobileMenu.classList.contains('open'));
+    });
+    mobileMenu.addEventListener('click', event => event.stopPropagation());
+    document.addEventListener('click', () => setMobileMenuState(false));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        setMobileMenuState(false);
+        hamburgerButton.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 940) setMobileMenuState(false);
+    });
+  }
+
+  const backToTopButton = document.getElementById('backToTop');
+  const siteFooter = document.getElementById('siteFooter');
+  if (backToTopButton) {
+    const updateBackToTop = () => {
+      backToTopButton.classList.toggle('show', window.scrollY > 480);
+
+      if (!siteFooter) return;
+      const footerOverlap = window.innerHeight - siteFooter.getBoundingClientRect().top;
+      backToTopButton.style.transform = footerOverlap > 0
+        ? `translateY(-${footerOverlap + 16}px)`
+        : '';
+    };
+
+    window.addEventListener('scroll', updateBackToTop, { passive: true });
+    window.addEventListener('resize', updateBackToTop);
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    updateBackToTop();
+  }
 
   const enhancePagination = () => {
     const roots = new Set();
@@ -25,9 +158,18 @@ document.addEventListener('DOMContentLoaded', () => {
       root.classList.add('pagination-ui');
       root.setAttribute('role', 'navigation');
       root.setAttribute('aria-label', '分頁導覽');
+      [...root.childNodes]
+        .filter(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim())
+        .forEach(node => {
+          const summary = document.createElement('span');
+          summary.className = 'pagination-summary';
+          summary.textContent = node.textContent.trim();
+          node.replaceWith(summary);
+        });
       root.querySelectorAll('a').forEach(link => {
         const label = link.textContent.trim();
-        const page = new URL(link.href, window.location.href).searchParams.get('page');
+        const params = new URL(link.href, window.location.href).searchParams;
+        const page = params.get('page') || params.get('currentPage');
         if (/最前|第一/.test(label)) link.setAttribute('aria-label', '前往第一頁');
         else if (/上一/.test(label)) link.setAttribute('aria-label', '前往上一頁');
         else if (/下一/.test(label)) link.setAttribute('aria-label', '前往下一頁');
@@ -78,17 +220,61 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.confirm(form.dataset.confirmForm)) event.preventDefault();
   }));
 
-  document.querySelectorAll('[data-close-modal]').forEach(button => button.addEventListener('click', () => {
-    const modal = button.closest('.modal-shell');
-    if (modal) modal.hidden = true;
-  }));
+  const modals = [...document.querySelectorAll('.modal-shell')];
+  const modalTriggers = new WeakMap();
+  const isModalOpen = modal => !modal.hidden && modal.style.display !== 'none';
+  const setModalState = (modal, isOpen, trigger = null) => {
+    if (!modal) return;
 
-  document.querySelectorAll('.modal-shell').forEach(modal => modal.addEventListener('click', event => {
-    if (event.target === modal) modal.hidden = true;
-  }));
+    if (isOpen) {
+      if (trigger) modalTriggers.set(modal, trigger);
+      modal.hidden = false;
+      modal.style.removeProperty('display');
+      modal.setAttribute('aria-hidden', 'false');
+      window.requestAnimationFrame(() => {
+        modal.querySelector('[data-close-modal], input, select, textarea, button, a[href]')?.focus();
+      });
+      return;
+    }
+
+    modal.hidden = true;
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    const opener = modalTriggers.get(modal);
+    if (opener?.isConnected) opener.focus();
+  };
+
+  modals.forEach(modal => {
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    if (modal.hidden) {
+      setModalState(modal, false);
+    } else {
+      setModalState(modal, true);
+    }
+
+    modal.addEventListener('click', event => {
+      if (event.target === modal) setModalState(modal, false);
+    });
+  });
+
+  document.querySelectorAll('[data-close-modal]').forEach(button => {
+    button.addEventListener('click', event => {
+      event.preventDefault();
+      setModalState(button.closest('.modal-shell'), false);
+    });
+  });
 
   document.querySelectorAll('.modal-shell[data-open-on-load="true"]').forEach(modal => {
-    modal.hidden = false;
+    setModalState(modal, true);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const activeModal = [...modals].reverse().find(isModalOpen);
+    if (!activeModal) return;
+    event.preventDefault();
+    setModalState(activeModal, false);
   });
 
   const search = document.querySelector('[data-course-search]');
@@ -119,6 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-toggle-target]').forEach(button => button.addEventListener('click', () => {
     const target = document.querySelector(button.dataset.toggleTarget);
     if (!target) return;
+
+    if (target.matches('.modal-shell')) {
+      setModalState(target, !isModalOpen(target), button);
+      return;
+    }
+
     target.hidden = !target.hidden;
     if (!target.hidden) target.querySelector('input,select,textarea')?.focus();
   }));

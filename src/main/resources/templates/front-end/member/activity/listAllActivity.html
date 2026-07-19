@@ -139,16 +139,16 @@
     /* =================================================================== */
     /* 分配寬度比例 (100%) */
     /* =================================================================== */
-    th:nth-child(1) { width: 10%; }  /* 圖片 */
+    th:nth-child(1) { width: 9%; }  /* 圖片 */
     th:nth-child(2) { width: 4%; }  /* 編號 */
-    th:nth-child(3) { width: 19%; } /* 活動名稱 */
+    th:nth-child(3) { width: 17%; } /* 活動名稱 */
     th:nth-child(4) { width: 6%; } /* 縣市 */
     th:nth-child(5) { width: 6%; } /* 區域 */
-    th:nth-child(6) { width: 14%; } /* 活動時間 */
-    th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
-    th:nth-child(8) { width: 14%; } /* 報名時間 */
-    th:nth-child(9) { width: 10%; }  /* 報名狀態 */
-    th:nth-child(10) { width: 10%; } /* 操作按鈕 */
+    th:nth-child(6) { width: 13%; } /* 活動時間 */
+    th:nth-child(7) { width: 12%; }  /* 已報名/名額 */
+    th:nth-child(8) { width: 13%; } /* 報名時間 */
+    th:nth-child(9) { width: 9%; }  /* 報名狀態 */
+    th:nth-child(10) { width: 11%; } /* 操作按鈕 */
 
     thead th {
         background-color: #fbf2f2;
@@ -179,8 +179,15 @@
     }
 
 	td:nth-child(6),
+	td:nth-child(7),
 	td:nth-child(8) {
 	    text-align: left;
+	}
+	
+	.capacity-info {
+    text-align: left;
+    line-height: 1.6;
+    font-size: 13px;
 	}
 
     /* 詳情/報名按鈕 */
@@ -358,10 +365,10 @@
 	            </tr>
 	        </thead>
 	        <tbody>
-	            <tr th:each="a : ${activityListData}" th:style="${a.ended} ? 'color:gray;' : ''">
+	            <tr th:each="a : ${activityListData}">
 	                <td>
 	                    <img th:if="${a.picture != null}"
-	                         th:src="@{/member/activity/activityImage(activityId=${a.activityId})}">
+	                         th:src="@{'/activity-images/' + ${a.picture}}">
 	                    <img th:unless="${a.picture != null}"
 	                         th:src="@{/images/no-image.jpg}">
 	                </td>
@@ -370,7 +377,11 @@
 	                <td th:text="${a.activityCity}"></td>
 	                <td th:text="${a.activityDist}"></td>
 	                <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-	                <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+	                <td class="capacity-info">
+					    正取 <span th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+					    備取 <span th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
+					    已報名 <span th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
+					</td>
 	                <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
 	                <td th:text="${a.registrationStatusText}"></td>
 	                <td>
@@ -382,28 +393,28 @@
 	                    <!-- 已報名:審核中(status=0) -->
 	                    <span th:if="${myRegisMap.get(a.activityId) == 0}" class="status-badge status-pending">審核中</span>
 	
-	                    <!-- 已報名:已報名成功(status=1) -->
+	                    <!-- 已報名:已報名成功(正取)(status=1) -->
 	                    <span th:if="${myRegisMap.get(a.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
 	
+						<!-- 已候補:已報名成功(備取)(status=4) -->
+						<span th:if="${myRegisMap.get(a.activityId) == 4}" class="status-badge status-confirmed">已候補</span>
+						
+						<!-- 報名按鈕 -->
 	                    <th:block th:if="${myRegisMap.get(a.activityId) == null}">
-	                        <!-- 情況 1：未登入 -->
-	                        <form th:if="${a.registrable}" sec:authorize="isAnonymous()"
-	                              th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-	                            <input type="hidden" name="activityId" th:value="${a.activityId}">
-	                            <button type="submit" class="btn-primary">報名</button>
-	                        </form>
-	
-	                        <!-- 情況 2：已登入會員-->
-	                        <form th:if="${a.registrable}" sec:authorize="hasRole('MEMBER')"
-	                              th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-	                            <!-- 只有當活動發起人不是自己時，才顯示報名按鈕 -->
-	                            <th:block th:if="${a.member.memberId != #authentication.principal.member.memberId}">
-	                                <input type="hidden" name="activityId" th:value="${a.activityId}">
-	                                <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listAllActivity}">
-	                                <button type="submit" class="btn-primary">報名</button>
-	                            </th:block>
-	                        </form>
-	                    </th:block>
+						    <form th:if="${a.registrable}" sec:authorize="hasRole('MEMBER')"
+						          th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
+						        <th:block th:if="${a.member.memberId != #authentication.principal.member.memberId}">
+						            <input type="hidden" name="activityId" th:value="${a.activityId}">
+						            <button type="submit" class="btn-primary">報名</button>
+						        </th:block>
+						    </form>
+						
+						    <form th:if="${a.registrable}" sec:authorize="isAnonymous()"
+						          th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
+						        <input type="hidden" name="activityId" th:value="${a.activityId}">
+						        <button type="submit" class="btn-primary">報名</button>
+						    </form>
+						</th:block>
 	                </td>
 	            </tr>
 	        </tbody>

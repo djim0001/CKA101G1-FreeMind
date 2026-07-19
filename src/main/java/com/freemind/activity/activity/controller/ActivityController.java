@@ -69,6 +69,7 @@ public class ActivityController {
 
         List<Activity> list = activitySvc.getAllForMember(emptyMap, currentPage);
         model.addAttribute("activityListData", list);
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         model.addAttribute("currentPage", currentPage);
 
         long total = activitySvc.getTotalCountForMember(emptyMap);
@@ -90,6 +91,7 @@ public class ActivityController {
     		Map<String, String[]> map = req.getParameterMap();
         List<Activity> list = activitySvc.getAllForMember(map, currentPage);
         model.addAttribute("activityListData", list);
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         model.addAttribute("currentPage", currentPage);
         
         long total = activitySvc.getTotalCountForMember(map);
@@ -360,25 +362,25 @@ public class ActivityController {
     		return "redirect:/member/activity/ownedActivities";
     }
     
-    @GetMapping("activityImage")
-    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
-            throws IOException {
-     Activity activity = activitySvc.getOneActivity(activityId);
-
-     if (activity == null || activity.getPicture() == null) {
-         return;   // 沒有活動或沒有圖片，什麼都不寫，回應空白
-     }  
-
-     // 組出圖片在磁碟上的實際路徑
-     String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
-     File imageFile = new File(uploadDir, activity.getPicture());
-
-     if (!imageFile.exists()) {
-         return;   // 檔名有記錄，但實體檔案不存在（例如被誤刪），一樣回應空白
-     }
-     res.setContentType("image/jpeg");
-     Files.copy(imageFile.toPath(), res.getOutputStream()); // 讀取這個檔案 → 把讀到的內容寫進 response
-    }
+//    @GetMapping("activityImage")
+//    public void activityImage(@RequestParam("activityId") Integer activityId, HttpServletResponse res)
+//            throws IOException {
+//     Activity activity = activitySvc.getOneActivity(activityId);
+//
+//     if (activity == null || activity.getPicture() == null) {
+//         return;   // 沒有活動或沒有圖片，什麼都不寫，回應空白
+//     }  
+//
+//     // 組出圖片在磁碟上的實際路徑
+//     String uploadDir = System.getProperty("user.dir") + "/uploads/activity-images/";
+//     File imageFile = new File(uploadDir, activity.getPicture());
+//
+//     if (!imageFile.exists()) {
+//         return;   // 檔名有記錄，但實體檔案不存在（例如被誤刪），一樣回應空白
+//     }
+//     res.setContentType("image/jpeg");
+//     Files.copy(imageFile.toPath(), res.getOutputStream()); // 讀取這個檔案 → 把讀到的內容寫進 response
+//    }
     
     @GetMapping("listOneActivity")
     public String listOneActivity(@RequestParam("activityId") Integer activityId,
@@ -391,6 +393,9 @@ public class ActivityController {
             model.addAttribute("isFollowing",
                 followSvc.isFollowing(userDetails.getMember().getMemberId(), activityId));
         }
+        
+        long pendingCount = regisSvc.countPendingByActivity(activity);
+        model.addAttribute("pendingCount", pendingCount);
         
         model.addAttribute("activity", activity);
         model.addAttribute("reviewListData", regisSvc.getReviewsByActivity(activity));
@@ -420,7 +425,7 @@ public class ActivityController {
         List<Registration> myRegis = regisSvc.getMyRegistrations(userDetails.getMember());
         for (Registration r : myRegis) {
             Integer status = r.getRegisStatus();
-            if (status == 0 || status == 1) {   // 只留下待審核和已報名成功
+            if (status == 0 || status == 1 || status == 4) {   // 待審核、已報名成功(正取)、已報名成功(備取)
                 map.put(r.getActivity().getActivityId(), status);
             }
         }

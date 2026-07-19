@@ -25,6 +25,8 @@ import com.freemind.activity.util.PageUtils;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
+import jakarta.validation.ConstraintViolationException;
+
 @Controller
 @RequestMapping("/member/activity/registration")
 public class RegistrationController {
@@ -46,7 +48,10 @@ public class RegistrationController {
     								@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage, 
     								@AuthenticationPrincipal MemberUserDetails userDetails,
                                   ModelMap model) {
-      
+        if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    		
     		Member member = userDetails.getMember();
     		List<Registration> allList = regisSvc.getMyRegistrations(member);
     		
@@ -66,7 +71,7 @@ public class RegistrationController {
 	    	    	for (Registration r : allList) {
 	    	    	    int status = r.getRegisStatus();
 	    	    	    boolean isRejectedOrCancelled = (status == 2 || status == 3);
-	    	    	    boolean isEndedOrCancelledActivity = (status == 1 && (r.getActivity().isEnded() || r.getActivity().getActivityStatus() == 4));
+	    	    	    boolean isEndedOrCancelledActivity = ((status == 1 || status == 4) && (r.getActivity().isEnded() || r.getActivity().getActivityStatus() == 4));
 	    	    	    
 	    	    	    if (isRejectedOrCancelled || isEndedOrCancelledActivity) {
 	    	    	        filtered.add(r);
@@ -74,12 +79,13 @@ public class RegistrationController {
 	    	    	}
     	     // 即將參加
     	    } else {
-	    	    	filtered = new ArrayList<>();
-	    	    	for (Registration r : allList) {
-	    	    	    if (r.getRegisStatus() == 1 && !r.getActivity().isEnded() && r.getActivity().getActivityStatus() != 4) {
-	    	    	        filtered.add(r);
-	    	    	    }
-	    	    	}
+    	        filtered = new ArrayList<>();
+    	        for (Registration r : allList) {
+    	            int status = r.getRegisStatus();
+    	            if ((status == 1 || status == 4) && !r.getActivity().isEnded() && r.getActivity().getActivityStatus() != 4) {
+    	                filtered.add(r);
+    	            }
+    	        }
     	    
     	    	// 篩完之後才排序:用 Collections.sort + 自訂比較規則
 	    	    			// 排序filtered這個list, 排序規則(比較器)
@@ -121,9 +127,15 @@ public class RegistrationController {
     // 二、送出報名
     @PostMapping("register")
     public String register(@RequestParam("activityId") Integer activityId,
+    							@RequestParam("motivation") String motivation,
     							@RequestParam(value = "redirectUrl", defaultValue = "/member/activity/listAllActivity") String redirectUrl,
     							@AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+    	
     		Member member = userDetails.getMember();
     		
     		 // 防護:只接受站內路徑,擋掉被竄改成外部網址的情況
@@ -138,12 +150,15 @@ public class RegistrationController {
     		}
     		
     		try {
-    			regisSvc.register(member, activity);
-    			redirectAttributes.addFlashAttribute("successMessage", "報名成功,等待審核");
-    			return "redirect:/member/activity/registration/myRegistrations";
+    		    regisSvc.register(member, activity, motivation);
+    		    redirectAttributes.addFlashAttribute("successMessage", "報名成功,等待審核");
+    		    return "redirect:/member/activity/registration/myRegistrations";
     		} catch (IllegalArgumentException | IllegalStateException e) {
-    			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-    			return "redirect:" + redirectUrl;     
+    		    redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+    		    return "redirect:" + redirectUrl;
+    		} catch (ConstraintViolationException e) {
+    		    redirectAttributes.addFlashAttribute("errorMessage", "報名資料格式有誤,請確認填寫內容");
+    		    return "redirect:" + redirectUrl;
     		}
     }
     
@@ -154,6 +169,11 @@ public class RegistrationController {
                          @RequestParam("cancelNote") String cancelNote,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+    	
     		try {
     			regisSvc.cancel(regisId, cancelReason, cancelNote, userDetails.getMember());
     			redirectAttributes.addFlashAttribute("successMessage", "已取消報名");
@@ -166,13 +186,40 @@ public class RegistrationController {
     // 四、活動報名名單(給發起人檢視)
     @GetMapping("activityRegistrations")
     public String activityRegistrations(@RequestParam("activityId") Integer activityId,
-    									   @RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
-                                        @AuthenticationPrincipal MemberUserDetails userDetails,
-                                        ModelMap model) {
-    		Activity activity = activitySvc.getOneActivity(activityId);
-    		List<Registration> list = regisSvc.getRegistrationsByActivity(activity, userDetails.getMember());
+    										@RequestParam(value = "tab", defaultValue = "pending") String tab,
+    										@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+                                         @AuthenticationPrincipal MemberUserDetails userDetails,
+                                         ModelMap model,
+                                         RedirectAttributes redirectAttributes) {
+    		if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
+    	    Activity activity = activitySvc.getOneActivity(activityId);
+    	    List<Registration> allList;
+    	    try {
+    	        allList = regisSvc.getRegistrationsByActivity(activity, userDetails.getMember());
+    	    } catch (IllegalArgumentException | IllegalStateException e) {
+    	        redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+    	        return "redirect:/member/activity/ownedActivities";
+    	    }
     		
-    		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+    	    List<Registration> filtered = new ArrayList<>();
+    	    for (Registration r : allList) {
+    	        int status = r.getRegisStatus();
+    	        if ("pending".equals(tab) && status == 0) {
+    	            filtered.add(r);
+    	        } else if ("confirmed".equals(tab) && status == 1) {
+    	            filtered.add(r);
+    	        } else if ("waitlist".equals(tab) && status == 4) {
+    	            filtered.add(r);
+    	        } else if ("closed".equals(tab) && (status == 2 || status == 3)) {
+    	            filtered.add(r);
+    	        }
+    	    }
+
+    		
+    		int totalPages = PageUtils.calculateTotalPages(filtered.size(), PAGE_SIZE);
     	    if (currentPage < 1) {
     	        currentPage = 1;
     	    } else if (currentPage > totalPages) {
@@ -180,15 +227,16 @@ public class RegistrationController {
     	    }
 
     	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
-    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, filtered.size());
     	    List<Registration> pageData = fromIndex < toIndex 
-    	            ? list.subList(fromIndex, toIndex) 
+    	            ? filtered.subList(fromIndex, toIndex) 
     	            : new ArrayList<>();
     		
     	    model.addAttribute("regisListData", pageData);
     	    model.addAttribute("activity", activity);
     	    model.addAttribute("currentPage", currentPage);
     	    model.addAttribute("totalPages", totalPages);
+    	    model.addAttribute("currentTab", tab);
     		
         return "front-end/member/activity/registration/activityRegistrations";
     }
@@ -199,7 +247,11 @@ public class RegistrationController {
     						  @RequestParam("activityId") Integer activityId, 
                           @AuthenticationPrincipal MemberUserDetails userDetails,
                           RedirectAttributes redirectAttributes) {
-   
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }    	
+    	
 		try {
 			regisSvc.approve(regisId, userDetails.getMember());
 			redirectAttributes.addFlashAttribute("successMessage", "審核完成");
@@ -209,13 +261,61 @@ public class RegistrationController {
 		return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
     }
     
-    // 六、填寫評論
+    // 六、拒絕活動報名(發起人)
+    @PostMapping("reject")
+    public String reject(@RequestParam("regisId") Integer regisId,
+                          @RequestParam("activityId") Integer activityId,
+                          @RequestParam("rejectReason") Integer rejectReason,
+                          @RequestParam("rejectNote") String rejectNote,
+                          @AuthenticationPrincipal MemberUserDetails userDetails,
+                          RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+
+        try {
+            regisSvc.reject(regisId, rejectReason, rejectNote, userDetails.getMember());
+            redirectAttributes.addFlashAttribute("successMessage", "已拒絕此報名申請");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
+    }
+    
+    // 七、備取遞補為正取(發起人)
+    @PostMapping("promote")
+    public String promote(@RequestParam("regisId") Integer regisId,
+                           @RequestParam("activityId") Integer activityId,
+                           @AuthenticationPrincipal MemberUserDetails userDetails,
+                           RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+
+        try {
+            regisSvc.promoteToConfirmed(regisId, userDetails.getMember());
+            redirectAttributes.addFlashAttribute("successMessage", "已將此筆報名遞補為正取");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
+    }
+    
+    
+    // 八、填寫評論
     @PostMapping("review")
     public String review(@RequestParam("regisId") Integer regisId,
                          @RequestParam("rating") Integer rating,
                          @RequestParam("reviewContent") String reviewContent,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          RedirectAttributes redirectAttributes) {
+    		if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+    	
     		try {
     			regisSvc.review(regisId, rating, reviewContent, userDetails.getMember());
     			redirectAttributes.addFlashAttribute("successMessage", "已送出評論");

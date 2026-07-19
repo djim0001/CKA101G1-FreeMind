@@ -51,13 +51,13 @@ public class NoticeService {
 
 	//管理員 大量發送
 	@Transactional
-	public void seneToMembers(List<Integer> memberIds , Integer adminId , String content , byte noticeType) {
+	public void sendToMembers(List<Integer> memberIds , Integer adminId , String content , byte noticeType) {
 		for(Integer id : memberIds) {
 			sendToMember(id , adminId , content , noticeType);
 		}
 	}
 	@Transactional
-	public void seneToPsychs(List<Integer> psychIds , Integer adminId , String content , byte noticeType) {
+	public void sendToPsychs(List<Integer> psychIds , Integer adminId , String content , byte noticeType) {
 		for(Integer id : psychIds) {
 			sendToMember(id , adminId , content , noticeType);
 		}

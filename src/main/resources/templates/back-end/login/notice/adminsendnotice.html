@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>發送通知</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
+	background-color: #f5f5f5; color: #333; line-height: 1.6; padding: 40px 20px;
+}
+h1 {
+	max-width: 720px; margin: 0 auto 28px; font-size: 28px; font-weight: 700;
+	color: #4a3e3e; padding-bottom: 16px; border-bottom: 2px solid #e8b4b4;
+}
+.alert {
+	max-width: 720px; margin: 0 auto 16px; padding: 12px 16px;
+	background-color: #eaf6ec; color: #2e7d43; border: 1px solid #cdead4;
+	border-radius: 6px; font-size: 14px;
+}
+form {
+	max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07); padding: 40px;
+}
+form > div { margin-bottom: 24px; }
+label.field-label {
+	display: block; margin-bottom: 8px; font-size: 15px; font-weight: 600; color: #7a6b6b;
+}
+.role-choices, .inline { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.role-choices label, .all-row label {
+	display: inline-flex; gap: 6px; align-items: center; font-size: 15px; cursor: pointer;
+}
+select, textarea {
+	width: 100%; padding: 10px 14px; border: 1px solid #f2dddd; border-radius: 6px;
+	font-size: 15px; color: #444; outline: none;
+}
+select:focus, textarea:focus {
+	border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
+}
+textarea { resize: vertical; min-height: 120px; }
+.people-box {
+	max-height: 220px; overflow-y: auto; border: 1px solid #f2dddd;
+	border-radius: 8px; padding: 12px 14px; margin-top: 10px;
+	display: flex; flex-wrap: wrap; gap: 8px;
+}
+.people-box label {
+	display: inline-flex; gap: 5px; align-items: center; padding: 5px 12px;
+	background: #fbf2f2; border: 1px solid #f2dddd; border-radius: 999px;
+	font-size: 14px; color: #7a6b6b; cursor: pointer;
+}
+.people-box label:has(input:checked) { background: #e8b4b4; color: #fff; border-color: #e8b4b4; }
+.hint { font-size: 13px; color: #999; margin-top: 6px; }
+button[type="submit"] {
+	padding: 10px 28px; font-size: 15px; border: none; border-radius: 6px;
+	cursor: pointer; background-color: #e8b4b4; color: #fff;
+}
+button[type="submit"]:hover { background-color: #d39393; }
+.panel[hidden] { display: none; }
+</style>
+</head>
+<body>
+	<h1>發送通知</h1>
+
+	<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
+
+	<form th:action="@{/admin/notice/send}" method="post" id="sendForm">
+
+		<!-- 1. 收件身分 -->
+		<div>
+			<label class="field-label">收件身分</label>
+			<div class="role-choices">
+				<label><input type="radio" name="targetRole" value="member" checked /> 會員</label>
+				<label><input type="radio" name="targetRole" value="psych" /> 心理師</label>
+			</div>
+		</div>
+
+		<!-- 2. 收件對象:全選 or 勾特定人(依身分切換面板) -->
+		<div>
+			<label class="field-label">收件對象</label>
+			<div class="all-row">
+				<label><input type="checkbox" name="sendAll" value="true" id="sendAll" /> 全部發送(勾了就不用選特定對象)</label>
+			</div>
+
+			<div class="panel" id="memberPanel">
+				<div class="people-box">
+					<!-- TODO: 顯示欄位依你們 Member entity 的 getter 調整(這裡用帳號) -->
+					<label th:each="m : ${memberOptions}">
+						<input type="checkbox" name="targetIds" th:value="${m.memberId}" />
+						<span th:text="${m.memberAccount}">member01</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="panel" id="psychPanel" hidden>
+				<div class="people-box">
+					<label th:each="p : ${psychOptions}">
+						<input type="checkbox" name="targetIds" th:value="${p.psychId}" />
+						<span th:text="${p.name} + '(' + ${p.psychAccount} + ')'">王小明(psych01)</span>
+					</label>
+				</div>
+			</div>
+			<p class="hint">切換身分會清空已勾選的對象,避免把會員的勾選誤送成心理師編號</p>
+		</div>
+
+		<!-- 3. 通知種類(兩種身分的字典不同,跟著切換) -->
+		<div>
+			<label class="field-label">通知種類</label>
+			<select name="noticeType" id="typeSelect"></select>
+		</div>
+
+		<!-- 4. 內容 -->
+		<div>
+			<label class="field-label">通知內容</label>
+			<textarea name="content" maxlength="1000" placeholder="最多1000字"></textarea>
+		</div>
+
+		<div>
+			<button type="submit">發送</button>
+		</div>
+	</form>
+
+	<script th:inline="none">
+	// 兩張表的種類字典不同:會員 0預約/1課程/2活動;心理師 0文章審核/1預約/2課程
+	const TYPE_OPTIONS = {
+		member: [[0, '預約通知'], [1, '課程通知'], [2, '活動通知']],
+		psych:  [[0, '文章審核通知'], [1, '預約通知'], [2, '課程通知']]
+	};
+
+	const memberPanel = document.getElementById('memberPanel');
+	const psychPanel = document.getElementById('psychPanel');
+	const typeSelect = document.getElementById('typeSelect');
+
+	function switchRole(role) {
+		memberPanel.hidden = (role !== 'member');
+		psychPanel.hidden = (role !== 'psych');
+
+		// 清掉另一個身分面板的勾選:兩個面板的checkbox都叫targetIds,
+		// 不清的話會員的勾選會被當成心理師編號送出去
+		document.querySelectorAll('.panel input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+		// 種類選項換字典
+		typeSelect.innerHTML = '';
+		TYPE_OPTIONS[role].forEach(([v, label]) => {
+			const opt = document.createElement('option');
+			opt.value = v;
+			opt.textContent = label;
+			typeSelect.appendChild(opt);
+		});
+	}
+
+	document.querySelectorAll('input[name="targetRole"]').forEach(r =>
+		r.addEventListener('change', e => switchRole(e.target.value)));
+
+	switchRole('member'); // 初始
+	</script>
+</body>
+</html>

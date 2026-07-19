@@ -11,7 +11,7 @@
 	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
 
     <img th:if="${activity.picture != null}" 
-         th:src="@{/admin/activity/activityImage(activityId=${activity.activityId})}" 
+         th:src="@{'/activity-images/' + ${activity.picture}}"
          style="max-width: 400px;">
     <img th:unless="${activity.picture != null}" 
          th:src="@{/images/no-image.jpg}" 
@@ -31,7 +31,8 @@
         <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
         <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
     </p>
-    <p>名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+    <p>正取名額：<span th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
+	<p>備取名額：<span th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
     <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
 	<div class="admin-actions">
         <div class="action-block" th:if="${activity.activityStatus == 0}" >

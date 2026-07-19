@@ -32,6 +32,8 @@ import com.freemind.course.course.model.CourseQaCommentService;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.dto.CourseQaSearchCondition;
 import com.freemind.course.dto.PsychDiscountFormDTO;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.psychologist.dto.PsychologistSelfRes;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
@@ -47,6 +49,7 @@ public class CourseForPsychController {
 	private final CourseCategoriesService courseCategoriesSvc;
 	private final PsychologistService psychologistService;
 	private final CourseQaCommentService courseQaCommentSvc;
+	private final NoticeService noticeSvc;
 
 //    @Value("${course.video.upload-path}")
 //    private String videoUploadPath;
@@ -56,17 +59,32 @@ public class CourseForPsychController {
 	private String videoUrlPath;
 
 	public CourseForPsychController(CourseService courseSvc, CourseCategoriesService courseCategoriesSvc,
-			PsychologistService psychologistService, CourseQaCommentService courseQaCommentSvc) {
+			PsychologistService psychologistService, NoticeService noticeSvc, CourseQaCommentService courseQaCommentSvc) {
 
 		this.courseSvc = courseSvc;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 		this.psychologistService = psychologistService;
 		this.courseQaCommentSvc = courseQaCommentSvc;
+		this.noticeSvc = noticeSvc;
 	}
 
 	@ModelAttribute("courseCategoriesListAll")
 	public List<CourseCategories> courseCategoriesListAll() {
 		return courseCategoriesSvc.getAllCourseCategories();
+	}
+	
+	@ModelAttribute("psychologist")
+	public void psychologist(ModelMap model,
+			@ModelAttribute("psych") PsychologistSelfRes psych) {
+		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
+		model.addAttribute("psychologist", psychologist);
+	}
+	
+	@ModelAttribute("countPsychUnread")
+	public Long psychNotice(
+			ModelMap model,
+			@ModelAttribute("psych") PsychologistSelfRes psych) {
+		return (psych != null ? noticeSvc.countPsychUnread(psych.getPsychId()) : null);
 	}
 
 	@GetMapping("/select_course")

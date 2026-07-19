@@ -31,6 +31,11 @@ public class ActivityFollowController {
     public String follow(@RequestParam("activityId") Integer activityId,
                            @AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+    	    		
     		Integer memberId = userDetails.getMember().getMemberId();
     		try {
     			followSvc.follow(memberId, activityId);
@@ -45,6 +50,11 @@ public class ActivityFollowController {
     public String unfollow(@RequestParam("activityId") Integer activityId,
                            @AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
+        if (userDetails == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+            return "redirect:/front-end/login";
+        }
+    	
     		Integer memberId = userDetails.getMember().getMemberId();
     		try {
     			followSvc.unfollow(memberId, activityId);
@@ -61,6 +71,10 @@ public class ActivityFollowController {
     public String myFollows(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
     							@AuthenticationPrincipal MemberUserDetails userDetails,
     							ModelMap model) {
+        if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+    	
     		Integer memberId = userDetails.getMember().getMemberId();
     		List<Activity> list = followSvc.myFollows(memberId);
     		

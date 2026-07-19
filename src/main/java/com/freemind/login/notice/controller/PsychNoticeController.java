@@ -35,13 +35,13 @@ public class PsychNoticeController {
 	@PostMapping("/{noticeId}/read")
 	public String markRead(@PathVariable Integer noticeId ,@RequestParam(name ="type" , required = false) Byte type, @SessionAttribute("psychId") Integer psychId){
 		noticeService.markPsychNoticeRead(noticeId,psychId);
-		return "redirect:/psych/notice/notice" + (type != null ? "?type=" + type : "");
+		return "redirect:/psych/notice" + (type != null ? "?type=" + type : "");
 	}
 	
 	@PostMapping("/readAll")
 	public String markAllRead(@RequestParam(name = "type" , required = false)Byte type,@SessionAttribute("psychId") Integer psychId) {
 		noticeService.markAllPsychRead(psychId);
-		return "redirect:/psych/notice/notice" + (type != null ? "?type=" + type : "" );
+		return "redirect:/psych/notice" + (type != null ? "?type=" + type : "" );
 	}
 	
 }

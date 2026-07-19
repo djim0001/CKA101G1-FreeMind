@@ -57,8 +57,6 @@ public class AdminPayoutController {
 			long totalSales = orderDetailService.getMonthlySales(psych.getPsychId(), YearMonth.now());
 			model.addAttribute("psychologistNo" + (i + 1), psych);
 			model.addAttribute("totalSales" + (i + 1), totalSales);
-			System.out.println(psych);
-			System.out.println(totalSales);
 		}
 
 		int UnpaidPayouts = payoutService.countUnpaidPayouts();

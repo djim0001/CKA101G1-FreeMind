@@ -38,6 +38,10 @@ public class ActivityReportController {
 	public String myReports(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
 							@AuthenticationPrincipal MemberUserDetails userDetails,
 	                        ModelMap model) {
+	    if (userDetails == null) {
+	        return "redirect:/front-end/login";
+	    }
+		
 		Member member = userDetails.getMember();
 		List<ActivityReport> list = reportSvc.getMyReports(member);
 		
@@ -66,6 +70,11 @@ public class ActivityReportController {
 	                     @RequestParam("reportContent") String reportContent,
 	                     @AuthenticationPrincipal MemberUserDetails userDetails,
 	                     RedirectAttributes redirectAttributes) {
+	    if (userDetails == null) {
+	        redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
+	        return "redirect:/front-end/login";
+	    }
+		
 		Member member = userDetails.getMember();
 		Activity activity = activitySvc.getOneActivity(activityId);
 		

@@ -62,14 +62,14 @@ public class CouponController {
 		model.addAttribute("couponListAllPages", couponListAllPages);
 		model.addAttribute("totalPages", couponListAllPages.getTotalPages());
 
-		return "back-end/course/coupon/selectCoupon";
+		return "back-end/course/course/selectCoupon";
 	}
 
 	@GetMapping("/add_coupon")
 	public String addCoupon(ModelMap model) {
 		Coupon coupon = new Coupon();
 		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/addCoupon";
+		return "back-end/course/course/addCoupon";
 	}
 
 	@PostMapping("/select_one_coupon")
@@ -78,19 +78,18 @@ public class CouponController {
 			ModelMap model) {
 		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
 		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/listOneCoupon";
+		return "back-end/course/course/listOneCoupon";
 	}
 
 	@PostMapping("/insert_coupon")
 	public String insertCoupon(@Valid Coupon coupon, BindingResult result, ModelMap model) {
 
 		if (result.hasErrors()) {
-			return "back-end/course/coupon/addCoupon";
+			return "back-end/course/course/selectCourse";
 		}
 
 		couponSvc.addCoupon(coupon);
-		model.addAttribute("coupon", coupon);
-		return "back-end/course/coupon/selectCoupon";
+		return "redirect:/admin/coupon/select_coupon";
 	}
 
 	@PostMapping("/publish")

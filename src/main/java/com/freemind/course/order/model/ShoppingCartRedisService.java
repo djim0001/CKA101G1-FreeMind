@@ -100,5 +100,18 @@ public class ShoppingCartRedisService {
 		String key = "shoppingCart:member:" + memberId;
 		stringRedisTemplate.delete(key);
 	}
+	
+	public Long getCourseCount(Integer memberId) {
+	    if (memberId == null) {
+	        throw new IllegalArgumentException("會員編號不能為空");
+	    }
+
+	    String key = "shoppingCart:member:" + memberId;
+
+	    Long count = stringRedisTemplate.opsForSet().size(key);
+
+	    return count != null ? count : 0L;
+	}
+	
 
 }
