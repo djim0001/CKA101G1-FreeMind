@@ -10,13 +10,14 @@
         font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif;
         background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 60px 20px;
     }
-    .wrap { max-width: 900px; margin: 0 auto; }
+    .wrap { max-width: 720px; margin: 0 auto; }
 
     .head { text-align: center; margin-bottom: 40px; }
     .head h1 { font-size: 30px; font-weight: 700; }
     .head p { color: #a99a95; font-size: 15px; margin-top: 6px; }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    /* 固定兩欄 */
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
     .tile {
         display: block; text-decoration: none; color: inherit;
         background: #fff; border-radius: 16px; padding: 30px 26px;
@@ -32,6 +33,11 @@
     }
     .tile h3 { font-size: 18px; margin-bottom: 6px; }
     .tile p { font-size: 13px; color: #a99a95; }
+
+    /* 手機時改單欄 */
+    @media (max-width: 560px) {
+        .grid { grid-template-columns: 1fr; }
+    }
 </style>
 </head>
 <body>
@@ -56,11 +62,6 @@
                 <div class="icon">📖</div>
                 <h3>歷史諮商紀錄</h3>
                 <p>查詢已完成、未出席、已取消的諮商紀錄</p>
-            </a>
-            <a class="tile" th:href="@{/psych/orders/psychCancelledForm}">
-                <div class="icon">🚫</div>
-                <h3>取消紀錄</h3>
-                <p>檢視所有已取消的預約</p>
             </a>
             <a class="tile" th:href="@{/psych/orders/psychReviews}">
                 <div class="icon">⭐</div>

@@ -136,17 +136,34 @@ public class OrdersPsychController {
 		Integer psychId = prinUserDetails.getPsychologist().getPsychId();
 		List<Orders> list = ordersSvc.getPendingAndConfirmedByPsychId(psychId);
 
-		// 已確認、且「諮商結束+3天」已過的訂單 → 標記逾期
 		java.time.LocalDateTime now = java.time.LocalDateTime.now();
 		java.util.Set<Integer> overdueOrders = new java.util.HashSet<>();
+
+		// 統計每個時段有幾筆「待確認」訂單
+		java.util.Map<java.time.LocalDateTime, Long> slotCount = new java.util.HashMap<>();
 		for (Orders o : list) {
 			if (o.getOrderStatus() != null && o.getOrderStatus() == 1
 					&& o.getConsEnd() != null && now.isAfter(o.getConsEnd().plusDays(3))) {
 				overdueOrders.add(o.getOrderId());
 			}
+			if (o.getOrderStatus() != null && o.getOrderStatus() == 0 && o.getConsStart() != null) {
+				slotCount.merge(o.getConsStart(), 1L, Long::sum);
+			}
+		}
+
+		// 同一時段 >1 筆待確認 → 標記為競爭，記下人數
+		java.util.Map<Integer, Long> competitionMap = new java.util.HashMap<>();
+		for (Orders o : list) {
+			if (o.getOrderStatus() != null && o.getOrderStatus() == 0 && o.getConsStart() != null) {
+				Long c = slotCount.get(o.getConsStart());
+				if (c != null && c > 1) {
+					competitionMap.put(o.getOrderId(), c);
+				}
+			}
 		}
 
 		model.addAttribute("overdueOrders", overdueOrders);
+		model.addAttribute("competitionMap", competitionMap);
 		model.addAttribute("ordersListData", list);
 		model.addAttribute("psychId", psychId);
 		return "front-end/psych/consultation/orders/psychOrdersForm";
