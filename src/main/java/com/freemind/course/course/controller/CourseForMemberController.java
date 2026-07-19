@@ -89,6 +89,7 @@ public class CourseForMemberController {
 	@ModelAttribute("countMemberCartCount")
 	public Long memberShoppingCartCount(ModelMap model) {
 		Member member = (Member)model.getAttribute("member");
+System.out.println((member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null));
 		return (member != null ? shoppingCartSvc.getCourseCount(member.getMemberId()) : null);
 	}
 	

@@ -1090,10 +1090,37 @@ body.thy2-member .ft-bottom {
 	color: var(--ink-soft);
 	font-size: .82rem;
 }
+body.thy2-member .floating-cart {
+	position: fixed; top: 94px; right: 24px; bottom: auto; z-index: 91;
+	width: 58px; height: 58px; border-radius: 50%;
+	display: grid; place-items: center; color: var(--white);
+	background: var(--orange); box-shadow: var(--shadow-md);
+	transition: transform .2s, background .2s, box-shadow .2s;
+}
+body.thy2-member .floating-cart:hover {
+	background: var(--orange-deep); transform: translateY(-3px);
+	box-shadow: 0 18px 38px rgba(229, 118, 79, .34);
+}
+body.thy2-member .floating-cart svg { width: 27px; height: 27px; }
+body.thy2-member .floating-cart-count {
+	position: absolute; top: -5px; right: -5px;
+	min-width: 24px; height: 24px; padding: 0 6px;
+	display: grid; place-items: center; border-radius: 999px;
+	color: var(--white); background: var(--ink);
+	border: 3px solid var(--bg-warm); font-size: .74rem; font-weight: 700;
+}
+body.thy2-member .floating-cart-count[hidden] { display: none; }
+@media (max-width: 560px) {
+	body.thy2-member .floating-cart {
+		top: 82px; right: 16px; bottom: auto; width: 50px; height: 50px;
+	}
+	body.thy2-member .floating-cart svg { width: 24px; height: 24px; }
+}
 body.thy2-member #backToTop {
 	position: fixed;
+	top: 170px;
 	right: 24px;
-	bottom: 24px;
+	bottom: auto;
 	z-index: 90;
 	display: grid;
 	place-items: center;
@@ -1180,8 +1207,9 @@ body.thy2-member :focus-visible {
 	body.thy2-member .pagination-summary { width: 100%; text-align: center; }
 	body.thy2-member .pagination-ui a { flex: 1 1 auto; }
 	body.thy2-member #backToTop {
+		top: 148px;
 		right: 16px;
-		bottom: 16px;
+		bottom: auto;
 		width: 42px;
 		height: 42px;
 	}
@@ -1198,7 +1226,8 @@ body.thy2-member :focus-visible {
 }
 </style>
 </head>
-<body class="thy2-member">
+<body class="thy2-member"
+	th:attr="data-member-unread-count=${countMemberUnread != null ? countMemberUnread : ''}">
 	<div th:replace="~{fragments/header :: header}"></div>
 
 <main class="container">
@@ -1317,6 +1346,21 @@ body.thy2-member :focus-visible {
 				th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/course/select_course', ${orderBy})}"></div>
 	</main>
 
+	<a class="floating-cart" th:href="@{/member/course/shopping_cart}"
+		aria-label="前往購物車" title="前往購物車">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+			aria-hidden="true">
+			<circle cx="9" cy="20" r="1"></circle>
+			<circle cx="18" cy="20" r="1"></circle>
+			<path d="M3 4h2l2.4 10.2a2 2 0 0 0 2 1.5h7.8a2 2 0 0 0 1.9-1.4L21 8H6"></path>
+		</svg>
+		<span class="floating-cart-count" data-cart-count
+			th:text="${countMemberCartCount != null ? countMemberCartCount : 0}"
+			th:hidden="${countMemberCartCount == null or countMemberCartCount <= 0}"
+			th:attr="data-cart-count-value=${countMemberCartCount != null ? countMemberCartCount : ''},aria-label=${countMemberCartCount != null and countMemberCartCount > 0 ? '購物車內有 ' + countMemberCartCount + ' 門課程' : '購物車目前沒有課程'}"
+			aria-live="polite" aria-atomic="true">0</span>
+	</a>
 	<div th:replace="~{fragments/footer :: footer}"></div>
 	<div th:replace="~{fragments/footer :: backToTop}"></div>
 	<script th:src="@{/js/nav.js}"></script>
