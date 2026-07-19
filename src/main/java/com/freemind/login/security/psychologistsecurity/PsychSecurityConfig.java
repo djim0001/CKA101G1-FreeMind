@@ -56,7 +56,7 @@ public class PsychSecurityConfig {
 
 					// 有被攔截前想去的頁面就送回去,否則去個人頁
 					SavedRequest saved = requestCache.getRequest(request, response);
-					response.sendRedirect(saved != null ? saved.getRedirectUrl() : "/psych/profile");
+					response.sendRedirect(saved != null ? saved.getRedirectUrl() : "/");
 				})
 				.failureUrl("/psych/psychologistLogin?error=true")
 				.permitAll()
