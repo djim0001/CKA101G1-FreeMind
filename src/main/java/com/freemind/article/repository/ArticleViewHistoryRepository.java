@@ -1,5 +1,6 @@
 package com.freemind.article.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +13,9 @@ import com.freemind.article.entity.ArticleViewHistory;
 import com.freemind.article.entity.ArticleViewHistoryId;
 
 public interface ArticleViewHistoryRepository extends JpaRepository<ArticleViewHistory, ArticleViewHistoryId>{
+	
+	@Query("SELECT a FROM ArticleViewHistory a WHERE a.member.memberId = :memberId")
+	List<ArticleViewHistory> findByMemberId(@Param("memberId")Integer memberId);
 
 	@Query("SELECT a FROM ArticleViewHistory a WHERE a.member.memberId = :memberId")
 	Page<ArticleViewHistory> findByMemberId(@Param("memberId")Integer memberId, Pageable pageable);

@@ -116,6 +116,11 @@ public class ArticleServiceImpl implements ArticleService{
 		article.setSubmittedAt(LocalDateTime.now());
 		return articleRepository.save(article);
 	}
+	
+	@Override
+	public List<Article> getMyArticles(Integer psychId) {
+		return articleRepository.findArticlesByPsychId(psychId);
+	}
 
 	@Override
 	public Page<Article> getMyArticles(Integer psychId, Integer page) {

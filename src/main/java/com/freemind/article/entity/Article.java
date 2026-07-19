@@ -92,12 +92,6 @@ public class Article implements Serializable {
 	@Column(name = "view_count", nullable = false)
 	private Integer viewCount = 0;
 	
-	@Column(name = "like_base_count", nullable = false)
-	private Integer likeBaseCount = 0;
-	
-	@Column(name = "bookmark_base_count", nullable = false)
-	private Integer bookmarkBaseCount = 0;
-	
 	@Column(name = "share_count", nullable = false)
 	private Integer shareCount = 0;
 }

@@ -2,7 +2,6 @@ package com.freemind.article.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.dto.ArticleCreateForm;
-import com.freemind.article.dto.ArticleInteractionStatsDTO;
-import com.freemind.article.dto.ArticleWithStatsDTO;
+import com.freemind.article.dto.StatsSummaryDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.exception.ArticleValidationException;
@@ -74,23 +72,52 @@ public class PsychArticleController {
 
 		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
-		
-		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
-		for (Article article : articlePage.getContent()) {
-			ArticleInteractionStatsDTO stats = null;
-			
-			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
-				stats = articleInteractionService.getArticleStatistics(article);
-			}
-			
-			ArticleWithStatsDTO dto = new ArticleWithStatsDTO(article, stats);
-			articleList.add(dto);
-		}
-		
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
-		model.addAttribute("articleList", articleList);
 		return "front-end/psych/article/myArticles";
+	}
+	
+	
+	@GetMapping("/myArticles/statsDashboard")
+	public String statsDashboard(Model model,
+								 @AuthenticationPrincipal PsychUserDetails prinPsychUser) {
+		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
+		List<Article> articles = articleService.getMyArticles(psychId);
+		long totalPublishedCount = 0L;
+		long totalUnPublishedCount = 0L;
+		long totalViewCount = 0L;
+		long totalLikeCount = 0L;
+		long totalBookmarkCount = 0L;
+		long totalShareCount = 0L;
+		
+		for (Article article : articles) {
+			int status = article.getArticleStatus();
+			
+			switch (status) {
+			case 2:
+				totalPublishedCount += 1;
+				totalViewCount += article.getViewCount();
+				totalLikeCount += articleInteractionService.getLikeCount(article.getArticleId());
+				totalBookmarkCount += articleInteractionService.getBookmarkCount(article.getArticleId());
+				totalShareCount += article.getShareCount();
+				break;
+			case 4:
+				totalUnPublishedCount += 1;
+				break;
+			}
+		}
+		
+		StatsSummaryDTO summary = StatsSummaryDTO.builder()
+										 .totalPublishedCount(totalPublishedCount)
+										 .totalUnPublishedCount(totalUnPublishedCount)
+										 .totalLikeCount(totalLikeCount)
+										 .totalBookmarkCount(totalBookmarkCount)
+										 .totalViewCount(totalViewCount)
+										 .totalShareCount(totalShareCount)
+										 .build();
+		
+		model.addAttribute("summary", summary);
+		return "front-end/psych/article/statsDashboard";
 	}
 	
 	@GetMapping("/create")
@@ -226,7 +253,7 @@ public class PsychArticleController {
 		}
 
 	}
-
+	
 	@PostMapping("/{articleId}/edit")
 	public String updateArticle(Model model, 
 			@ModelAttribute ArticleCreateForm form,

@@ -3,7 +3,6 @@ package com.freemind.article.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -39,12 +38,17 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 	}
 	
 	@Override
+	public List<ArticleCat> getCatsByName(String keyword) {
+		return articleCatRepository.findCatsByName(keyword);
+	}
+	
+	@Override
 	public ArticleCat createCat(String catName) {
 		if (catName == null || catName.isBlank()) {
 			throw new IllegalArgumentException("請輸入分類名稱");
 		}
 		
-		if (articleCatRepository.existsSimilarName(catName.trim())) {
+		if (articleCatRepository.existsCatName(catName.trim())) {
 			throw new IllegalArgumentException("此分類已存在");
 		}
 		

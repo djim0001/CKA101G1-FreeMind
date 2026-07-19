@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.freemind.article.dto.ArticleInteractionStatsDTO;
+import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleBookmark;
 import com.freemind.article.entity.ArticleBookmarkId;
@@ -130,13 +130,13 @@ public class ArticleInteractionServiceImpl implements ArticleInteractionService{
 	
 	@Override
 	@Transactional(readOnly = true)
-	public ArticleInteractionStatsDTO getArticleStatistics(Article article) {
-		return ArticleInteractionStatsDTO.builder()
-				.articleId(article.getArticleId())
+	public ArticleWithStatsDTO getArticleStatistics(Article article) {
+		return ArticleWithStatsDTO.builder()
+				.article(article)
 				.viewCount(article.getViewCount())
-				.likeCount(article.getLikeBaseCount() + getLikeCount(article.getArticleId()))
-				.bookmarkCount(article.getBookmarkBaseCount() + getBookmarkCount(article.getArticleId()))
-				.shareCount( article.getShareCount())
+				.likeCount(getLikeCount(article.getArticleId()))
+				.bookmarkCount(getBookmarkCount(article.getArticleId()))
+				.shareCount(article.getShareCount())
 				.build();
 	}
 

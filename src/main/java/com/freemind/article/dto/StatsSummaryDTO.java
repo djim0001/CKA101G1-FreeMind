@@ -11,10 +11,11 @@ import lombok.Setter;
 @Builder
 @Setter
 @Getter
-public class ArticleInteractionStatsDTO {
-	private Integer articleId;
-	private long viewCount;
-	private long likeCount;
-	private long bookmarkCount;
-	private long shareCount;
+public class StatsSummaryDTO {
+	private long totalPublishedCount;
+	private long totalUnPublishedCount;
+	private long totalViewCount;
+	private long totalLikeCount;
+	private long totalBookmarkCount;
+	private long totalShareCount;
 }

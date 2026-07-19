@@ -29,18 +29,5 @@
 <h3><a th:href="@{/article}">專欄文章</a>｜<a th:href="@{/member/dashboard/myCollection/article}">我的收藏</a>｜<a th:href="@{/psych/article/myArticles}">我的文章</a>｜<a th:href="@{/admin/article}">文章管理</a></h3>
 <h3><a th:href="@{/member/activity/activityIndex}">揪團活動</a>｜<a th:href="@{/member/activity/ownedActivities}">我發起的活動</a>｜<a th:href="@{/admin/activity/activityAdminIndex}">活動管理</a></h3>
 
-<script>
-function getCookieValue(name) {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-const userSession = getCookieValue("visitorId");
-if (!userSession) {
-	document.cookie = "visitorId=" + crypto.randomUUID();
-}
-</script>
-
 </body>
 </html>

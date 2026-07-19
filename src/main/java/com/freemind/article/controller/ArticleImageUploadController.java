@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.freemind.article.entity.Article;
 import com.freemind.article.service.ArticleService;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
 import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 @RestController
@@ -27,8 +28,10 @@ public class ArticleImageUploadController {
 	    if (authentication != null && authentication.getPrincipal() instanceof PsychUserDetails psychUser) {
 	        Integer psychId = psychUser.getPsychologist().getPsychId();
 	        article = articleService.getArticle(articleId, psychId);
-	    } else {
-	        article = articleService.getArticleForAdmin(articleId);
+	    } else if (authentication != null && authentication.getPrincipal() instanceof AdminUserDetails) {
+	    	article = articleService.getArticleForAdmin(articleId);
+		} else {
+			article = articleService.getArticle(articleId, null);
 	    }
 	    
 	    // 根據檔案開頭的位元組(Hex Signature)判斷圖片類型

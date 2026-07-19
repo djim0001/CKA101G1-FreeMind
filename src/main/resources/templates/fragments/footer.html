@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer class="ft" id="siteFooter" th:fragment="footer">
+	<div class="wrap">
+		<div class="ft-grid">
+			<div>
+				<a class="brand" th:href="@{/}" href="/">
+					<span class="logo-mind" aria-hidden="true">
+						<span class="word">
+							<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
+						</span>
+						<span class="faces">
+							<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+							<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+							<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+							<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
+						</span>
+					</span>
+					<span class="brand-text">
+						<span class="logo">諮由自在</span>
+						<span class="en">Free&nbsp;Mind</span>
+					</span>
+				</a>
+				<p class="ft-about">一個把心理諮商、課程、專欄與陪伴社群整合在一起的地方。願你在這裡，能慢慢地、安心地，成為更自在的自己。</p>
+			</div>
+			<div class="ft-col">
+				<h4>探索</h4>
+				<a th:href="@{/consultation}" href="#">諮商預約</a>
+				<a th:href="@{/member/course/select_course}" href="#">課程商城</a>
+				<a th:href="@{/article}" href="#">專欄文章</a>
+				<a th:href="@{/member/activity/activityIndex}" href="#">揪團活動</a>
+			</div>
+			<div class="ft-col">
+				<h4>會員專區</h4>
+				<a th:href="@{/member/profile}" href="#">個人檔案</a>
+				<a th:href="@{/member/dashboard}" href="#">我的療癒足跡</a>
+				<a th:href="@{/member/course/orders}" href="#">課程訂單紀錄</a>
+				<a th:href="@{/member/coupon}" href="#">我的優惠券</a>
+			</div>
+			<div class="ft-col">
+				<h4>帳號</h4>
+				<a th:href="@{/front-end/login}" href="#">會員登入</a>
+				<a th:href="@{/psych/psychologistLogin}" href="#">心理師登入</a>
+				<a th:href="@{/support}" href="#">聯繫客服</a>
+			</div>
+		</div>
+		<div class="ft-bottom">
+			<span>© 2026 諮由自在 FreeMind｜CKA101G1</span>
+			<span>本平台不提供緊急危機處理，若有立即危險請撥打 1995 安心專線。</span>
+		</div>
+	</div>
+</footer>
+
+<button id="backToTop" aria-label="回到頂部" th:fragment="backToTop">
+	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+		<path d="M12 19V5M5 12l7-7 7 7"/>
+	</svg>
+</button>
+
+</body>
+</html>

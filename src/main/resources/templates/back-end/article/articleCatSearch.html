@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>文章分類｜管理後台</title>
-<link rel="stylesheet" th:href="@{/css/course/style.css}" />
-<link rel="stylesheet" th:href="@{/css/course/admin.css}" />
+<link rel="stylesheet" th:href="@{/css/course/admin-style.css}" />
 <style>
 .search-container {
 	position: relative;
@@ -117,7 +116,7 @@
 		const searchInput = document.getElementById('searchInput');
 		const dropdown = document.getElementById('dropdown');
 
-		searchInput.addEventListener('input', function() {
+		searchInput.addEventListener('input', function () {
 			const keyword = this.value.trim();
 			dropdown.innerHTML = '';
 
@@ -140,7 +139,7 @@
 				const item = document.createElement('div');
 				item.className = 'dropdown-item';
 				item.textContent = cat.articleCatId + ' - ' + cat.articleCatName;
-				item.addEventListener('click', function() {
+				item.addEventListener('click', function () {
 					window.location.href = '/admin/article/categories/' + cat.articleCatId;
 				});
 				dropdown.appendChild(item);
@@ -149,7 +148,7 @@
 			dropdown.style.display = 'block';
 		});
 
-		document.addEventListener('click', function(e) {
+		document.addEventListener('click', function (e) {
 			if (!e.target.closest('.search-container')) {
 				dropdown.style.display = 'none';
 			}

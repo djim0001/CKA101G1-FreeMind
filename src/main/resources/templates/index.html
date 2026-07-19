@@ -1,228 +1,387 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>諮由自在｜線上心理諮商平台</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-        --green: #769382;
-        --green-dark: #5e7668;
-        --green-light: #efe5d3;
-        --ink: #333d37;
-        --gray: #6f7a72;
-    }
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        color: var(--ink);
-        background: #fff;
-        line-height: 1.7;
-    }
-    a { text-decoration: none; color: inherit; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>諮由自在 Free Mind｜整合性諮商平台</title>
 
-    .nav {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 40px;
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        z-index: 10;
-    }
-    .nav .logo { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: 2px; }
-    .nav .auth { display: flex; gap: 10px; }
-    .btn {
-        padding: 9px 22px;
-        border-radius: 999px;
-        font-size: 14px;
-        transition: all 0.2s;
-        cursor: pointer;
-        border: none;
-    }
-    .btn-outline { border: 1.5px solid #fff; color: #fff; background: transparent; }
-    .btn-outline:hover { background: rgba(255,255,255,0.18); }
-    .btn-solid { background: #fff; color: var(--green-dark); font-weight: 600; }
-    .btn-solid:hover { background: var(--green-light); }
-
-    .hero {
-        background: linear-gradient(135deg, #769382 0%, #5e7668 100%);
-        color: #fff;
-        text-align: center;
-        padding: 130px 40px 90px;
-    }
-    .hero .tag { font-size: 15px; font-weight: 600; opacity: 0.9; margin-bottom: 14px; letter-spacing: 2px; }
-    .hero h1 { font-size: 42px; line-height: 1.35; margin-bottom: 20px; }
-    .hero p { font-size: 17px; opacity: 0.92; margin-bottom: 32px; }
-    .hero .cta { background: #fff; color: var(--green-dark); padding: 14px 42px; font-size: 16px; font-weight: 600; border-radius: 999px; display: inline-block; transition: background 0.2s; }
-    .hero .cta:hover { background: var(--green-light); }
-
-    .section { max-width: 1080px; margin: 0 auto; padding: 70px 40px; }
-    .section-head { text-align: center; margin-bottom: 44px; }
-    .section-head .sub { color: var(--green); font-weight: 600; margin-bottom: 8px; }
-    .section-head h2 { font-size: 30px; }
-
-    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 22px; }
-    .card {
-        border: 1px solid #eee;
-        border-radius: 16px;
-        padding: 34px 26px;
-        text-align: center;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(74,157,127,0.15); }
-    .card .icon {
-        width: 66px; height: 66px; margin: 0 auto 18px;
-        background: var(--green-light); border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 30px;
-    }
-    .card h3 { font-size: 20px; margin-bottom: 10px; }
-    .card p { font-size: 14px; color: var(--gray); margin-bottom: 18px; }
-    .card .go { color: var(--green); font-weight: 600; font-size: 14px; }
-
-    footer { background: var(--ink); color: #cdd8d3; text-align: center; padding: 30px; font-size: 13px; }
-
-    /* 系統公告區塊 */
-    .notice-section { background: var(--green-light); }
-    .notice-wrap { max-width: 1080px; margin: 0 auto; padding: 40px; }
-    .notice-wrap h2 {
-        font-size: 22px; color: var(--green-dark);
-        display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
-    }
-    .notice-list { display: flex; flex-direction: column; gap: 12px; }
-    .notice-item {
-        background: #fff; border-radius: 12px; padding: 16px 20px;
-        display: flex; align-items: flex-start; gap: 14px;
-        box-shadow: 0 2px 8px rgba(47,62,57,0.06);
-    }
-    .notice-item .date { color: var(--green); font-size: 13px; font-weight: 600; white-space: nowrap; padding-top: 2px; }
-    .notice-item .content { color: var(--ink); font-size: 15px; white-space: pre-line; }
-
-    /* 會員登入後的頭像下拉菜單 */
-    .profile-wrapper { position: relative; }
-    .profile-entry {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 9px 20px; border-radius: 999px;
-        background: #fff; color: var(--green-dark); font-weight: 600;
-        border: none; font-size: 14px; cursor: pointer;
-        font-family: inherit; transition: background 0.2s;
-    }
-    .profile-entry::before {
-        content: "👤"; font-size: 15px; line-height: 1;
-    }
-    .profile-entry:hover { background: var(--green-light); }
-    .profile-menu {
-        position: absolute; top: 100%; right: 0; margin-top: 10px;
-        min-width: 170px; background: #fff; border-radius: 14px;
-        box-shadow: 0 12px 32px rgba(47,62,57,0.18);
-        overflow: hidden; display: none; z-index: 20;
-    }
-    .profile-menu[data-open] { display: block; }
-    .menu-item {
-        display: block; width: 100%; padding: 12px 18px;
-        text-align: left; color: var(--ink); font-size: 14px;
-        background: none; border: none; cursor: pointer;
-        font-family: inherit; transition: background 0.15s;
-    }
-    .menu-item:hover { background: var(--green-light); color: var(--green-dark); }
-    .menu-item-form { margin: 0; }
-    .logout-btn { color: #c0554e; border-top: 1px solid #f0f0f0; }
-    .logout-btn:hover { background: #c0554e; color: #fff; }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" href="/css/index.css" />
 </head>
+
 <body>
 
-    <div class="nav">
-        <a class="logo" th:href="@{/}">諮由自在</a>
-        <div class="auth" sec:authorize="!hasRole('MEMBER')">
-            <a class="btn btn-outline" th:href="@{/front-end/login}">會員登入</a>
-            <a class="btn btn-solid" th:href="@{/psych/psychologistLogin}">心理師登入</a>
-        </div>
-        <div class="auth" sec:authorize="hasRole('MEMBER')">
-            <div class="profile-wrapper">
-                <button class="profile-entry" type="button" data-toggle-menu="index-profile-dropdown">
-                    <span sec:authentication="principal.member.name">會員</span>
-                </button>
-                <div class="profile-menu" id="index-profile-dropdown">
-                    <a class="menu-item" th:href="@{/member/notice}">會員通知</a>
-                    <a class="menu-item" th:href="@{/member/profile}">會員資料</a>
-                    <a class="menu-item" th:href="@{/member/dashboard}">我的療癒足跡</a>
-                    <form class="menu-item-form" th:action="@{/front-end/logout}" method="post">
-                        <button class="menu-item logout-btn" type="submit">登出</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="hero">
-        <div class="tag">讓心理健康成為日常</div>
-        <h1>線上預約心理師<br>讓心理照護不中斷</h1>
-        <p>專業、安全且重視隱私的心理諮商平台，陪你安放每一種情緒。</p>
-        <a class="cta" th:href="@{/search}">開始預約</a>
-    </div>
+	<!-- ================= Hero ================= -->
+	<section class="hero">
+		<div class="wrap hero-grid">
+			<!-- 照片預留區（拱形） -->
+			<div class="hero-photo-wrap">
+				<div class="hero-photo">
+					<img src="/images/hero-main.webp" alt="why not now?" />
+				</div>
+			</div>
 
-    <div class="notice-section" th:if="${notifications != null and !notifications.isEmpty()}">
-        <div class="notice-wrap">
-            <h2>📢 系統公告</h2>
-            <div class="notice-list">
-                <div class="notice-item" th:each="notice : ${notifications}">
-                    <span class="date" th:text="${#dates.format(notice.createdAt, 'yyyy-MM-dd')}"></span>
-                    <span class="content" th:text="${notice.systemContent}"></span>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="hero-copy">
+				<span class="script" style="font-size: 1.4rem;">給心一個綻放的機會</span>
+				<h1>
+					通往內心平靜的路，<br />可以 <em>溫柔一點</em>。
+				</h1>
+				<p class="lead">諮由自在把心理諮商、課程、專欄與陪伴社群整合在同一個平台。不必勉強自己一夜好起來，我們陪你，一步一步慢慢來。</p>
+				<div class="hero-cta">
+					<a class="btn btn-primary" th:href="@{/consultation}" href="#">預約你的第一次談話
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+							stroke="#fff" stroke-width="2" stroke-linecap="round"
+							stroke-linejoin="round">
+							<path d="M5 12h14M13 6l6 6-6 6" /></svg>
+					</a> 
+					<a class="btn btn-ghost" href="#see_more">先逛逛</a>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <div class="section">
-        <div class="section-head">
-            <div class="sub">諮由自在服務</div>
-            <h2>探索我們的服務</h2>
-        </div>
-        <div class="cards">
-            <a class="card" th:href="@{/search}">
-                <div class="icon">🗓️</div>
-                <h3>預約諮商</h3>
-                <p>搜尋合適的心理師，選擇方便的時段，線上快速完成預約。</p>
-                <span class="go">立即預約 →</span>
-            </a>
-            <a class="card" th:href="@{/member/course/select_course}">
-                <div class="icon">📚</div>
-                <h3>課程商城</h3>
-                <p>豐富的線上心理健康課程，隨時隨地照顧自己的內在。</p>
-                <span class="go">瀏覽課程 →</span>
-            </a>
-            <a class="card" th:href="@{/article}">
-                <div class="icon">📰</div>
-                <h3>專欄文章</h3>
-                <p>由專業心理師撰寫的身心健康文章，陪你認識自己。</p>
-                <span class="go">閱讀文章 →</span>
-            </a>
-            <a class="card" th:href="@{/member/activity/activityIndex}">
-                <div class="icon">🤝</div>
-                <h3>揪團活動</h3>
-                <p>參加或發起心理健康相關活動，在連結中獲得支持。</p>
-                <span class="go">探索活動 →</span>
-            </a>
-            <a class="card" th:href="@{/member/dashboard}">
-                <div class="icon">🌿</div>
-                <h3>我的療癒足跡</h3>
-                <p>查看你的預約、學習、活動與收藏，管理專屬的療癒歷程。</p>
-                <span class="go">前往查看 →</span>
-            </a>
-            <a class="card" th:href="@{/member/profile}">
-                <div class="icon">👤</div>
-                <h3>會員個人檔案</h3>
-                <p>檢視與編輯你的個人資料，維護帳號資訊。</p>
-                <span class="go">前往管理 →</span>
-            </a>
-        </div>
-    </div>
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none"
+		aria-hidden="true">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z"
+			fill="#FFFFFF" /></svg>
 
-    <footer>© 2026 諮由自在 FreeMind｜CKA101G1</footer>
+	<!-- ================= 我們的陪伴方式 ================= -->
+	<section class="services">	
+		<div class="services-head">
+			<svg class="sprig" viewBox="0 0 40 56" fill="none" stroke="#8C7E71" stroke-width="2" stroke-linecap="round">
+				<path d="M20 54 C20 36 20 24 20 12"/>
+				<path d="M20 16 C12 12 6 6 8 2 C14 4 19 9 20 16 Z"/>
+				<path d="M20 16 C28 12 34 6 32 2 C26 4 21 9 20 16 Z"/>
+				<path d="M20 30 C13 27 9 23 10 20 C15 22 19 25 20 30 Z"/>
+				<path d="M20 30 C27 27 31 23 30 20 C25 22 21 25 20 30 Z"/>
+			</svg>
+			<span class="script" style="font-size:1.3rem;">雙向流動的療癒</span>
+			<h2 class="t">我們的陪伴方式</h2>
+		</div>
 
-    <script th:src="@{/js/login/common/ui.js}"></script>
+		<div class="cards">
+			<a class="card" th:href="@{/consultation}" href="#">
+				<span class="icon">
+					<svg viewBox="0 0 58 58" fill="none">
+						<path d="M29 54 C29 42 29 34 29 26" stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+						<path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#EFB65E"/>
+						<path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#B8813A" stroke-width="1.4" stroke-linecap="round"/>
+						<path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#B8813A" stroke-width="1.4" stroke-linecap="round"/>
+					</svg>
+				</span>
+				<h3>諮商預約</h3>
+				<p>與合適的心理師，一對一好好談，選擇方便的時段線上快速完成預約。</p>
+				<span class="go">立即預約 →</span>
+			</a>
+
+			<a class="card" th:href="@{/member/course/select_course}" href="#">
+				<span class="icon">
+					<svg viewBox="0 0 58 58" fill="none">
+						<path d="M29 54 C29 42 29 34 29 26" stroke="#A85974" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+						<path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#DB93A9" stroke="#A85974" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#DB93A9" stroke="#A85974" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#E29276"/>
+						<path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#A85974" stroke-width="1.4" stroke-linecap="round"/>
+						<path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#A85974" stroke-width="1.4" stroke-linecap="round"/>
+					</svg>
+				</span>
+				<h3>課程商城</h3>
+				<p>心理師設計的線上心理健康課程，隨時上、慢慢練，照顧自己的內在。</p>
+				<span class="go">瀏覽課程 →</span>
+			</a>
+
+			<a class="card" th:href="@{/article}" href="#">
+				<span class="icon">
+					<svg viewBox="0 0 58 58" fill="none">
+						<path d="M29 54 C29 42 29 34 29 26" stroke="#4F7B96" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+						<path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#8FB2C9" stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#8FB2C9" stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#8FB2C9"/>
+						<path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#4F7B96" stroke-width="1.4" stroke-linecap="round"/>
+						<path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#4F7B96" stroke-width="1.4" stroke-linecap="round"/>
+					</svg>
+				</span>
+				<h3>專欄文章</h3>
+				<p>由專業心理師撰寫的身心健康文章，慢慢讀，慢慢懂自己一點。</p>
+				<span class="go">閱讀文章 →</span>
+			</a>
+
+			<a class="card" th:href="@{/member/activity/activityIndex}" href="#">
+				<span class="icon">
+					<svg viewBox="0 0 58 58" fill="none">
+						<path d="M29 54 C29 42 29 34 29 26" stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+						<path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						<path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#93b094"/>
+						<path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#547055" stroke-width="1.4" stroke-linecap="round"/>
+						<path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#547055" stroke-width="1.4" stroke-linecap="round"/>
+					</svg>
+				</span>
+				<h3>揪團活動</h3>
+				<p>在懂你的人之間練習不孤單，參加或發起心理健康相關活動，獲得支持。</p>
+				<span class="go">探索活動 →</span>
+			</a>
+		</div>
+	</section>
+
+	<!-- ================= 我們相信，慢慢來也可以 ================= -->
+	<section class="approach" id="see_more">
+		<div class="wrap">
+			<div class="approach-head">
+				<div class="t">我們相信，慢慢來也可以</div>
+			</div>
+			<div class="approach-body">
+				<div>
+					<p>傾聽與陪伴是一群相信 <mark class="hl o"> 你值得被好好接住</mark> 的人。比起急著把問題解決，我們更在意你在過程裡，有沒有感覺到安全。</p>
+					<p>所以這裡把 <mark class="hl b">諮商、課程、專欄與社群</mark> 放在一起，讓你用自己的步調，選擇現在最需要的方式。</p>
+				</div>
+				<div class="approach-photo">
+					<img src="/images/approach-photo.webp" alt="tulip-pic" />
+				</div>
+				<div>
+					<p>有人需要 <mark class="hl b">一對一的深談</mark>，有人想先從課程慢慢暖身，也有人在一群同行的人之間，才慢慢長回力氣。</p>
+					<p>無論你在哪個階段，我們都想 <mark class="hl o">陪你一起</mark>，找到剛剛好的那條路。</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 認識心理師 ================= -->
+	<section class="meet">
+		<div class="wrap meet-grid">
+			<div class="photo-slot blue meet-photo">
+				<div class="ps-inner">
+					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+						stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="6" width="18" height="14" rx="3" />
+						<circle cx="12" cy="13" r="3.2" />
+						<path d="M8 6l1.2-2h5.6L16 6" /></svg>
+					<b>心理師照片預留區</b> <small>建議正方形，柔和自然的人物照</small>
+				</div>
+			</div>
+
+			<div class="meet-copy">
+				<span class="eyebrow">Psychologist ・ 心理師團隊</span>
+				<h2>
+					陪你談話的，是一群<br /> <em>溫柔又專業</em> 的人。
+				</h2>
+				<p>我們的每一位心理師都領有國家證照，擅長領域涵蓋焦慮、關係、職涯、失落與自我探索。預約前，你可以先讀讀他們的自我介紹與風格，找到那個「感覺對了」的人再開始。</p>
+				<p style="font-weight: 500;">因為好的關係，本來就該從你放心開始。</p>
+				<div class="meet-stats">
+					<div>
+						<b>40+</b><span>合作心理師</span>
+					</div>
+					<div>
+						<b>12</b><span>專長領域</span>
+					</div>
+					<div>
+						<b>4.9</b><span>平均滿意度</span>
+					</div>
+				</div>
+				<a class="btn btn-primary" th:href="@{/consultation}" href="#">瀏覽心理師並預約</a>
+			</div>
+		</div>
+	</section>
+
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none"
+		aria-hidden="true" style="margin-top: -1px;">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v-30H0Z"
+			fill="#C2D9ED" /></svg>
+
+	<!-- ================= 課程商城 ================= -->
+	<section class="courses">
+		<div class="wrap">
+			<div class="courses-head">
+				<div>
+					<span class="script" style="font-size: 1.35rem;">用自己的步調，慢慢練習</span>
+					<h2>課程商城</h2>
+				</div>
+				<a class="btn btn-outline" th:href="@{/member/course/select_course}" href="#">看更多課程</a>
+			</div>
+
+			<div class="course-row">
+				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
+					<div class="photo-slot pink course-cover">
+						<span class="course-price">NT$1,280</span>
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>課程封面預留</small>
+						</div>
+					</div>
+					<div class="course-body">
+						<span class="course-tag">情緒調節</span>
+						<h3>與焦慮共處：8 堂日常練習課</h3>
+						<p>從呼吸、覺察到自我對話，帶你建立一套屬於自己的安定節奏。</p>
+						<div class="course-meta">
+							<span>共 8 堂 ・ 陳語安 心理師</span>
+							<span class="stars">★ 4.8</span>
+						</div>
+					</div>
+				</a>
+
+				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
+					<div class="photo-slot blue course-cover">
+						<span class="course-price">NT$980</span>
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>課程封面預留</small>
+						</div>
+					</div>
+					<div class="course-body">
+						<span class="course-tag">關係修復</span>
+						<h3>愛裡也有界線：親密關係練習課</h3>
+						<p>學會表達需求、設立界線，讓親密關係裡的兩個人都能好好呼吸。</p>
+						<div class="course-meta">
+							<span>共 6 堂 ・ 林之默 心理師</span>
+							<span class="stars">★ 4.9</span>
+						</div>
+					</div>
+				</a>
+
+				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
+					<div class="photo-slot course-cover">
+						<span class="course-price">NT$690</span>
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>課程封面預留</small>
+						</div>
+					</div>
+					<div class="course-body">
+						<span class="course-tag">正念紓壓</span>
+						<h3>3 分鐘正念呼吸：忙碌生活的暫停鍵</h3>
+						<p>不需要冥想經驗，跟著引導練習，隨時把自己重新接住。</p>
+						<div class="course-meta">
+							<span>共 5 堂 ・ 諮由自在編輯室</span>
+							<span class="stars">★ 4.7</span>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 精選專欄 ================= -->
+	<section class="articles">
+		<div class="wrap">
+			<div class="articles-head">
+				<div>
+					<span class="script" style="font-size: 1.35rem;">慢慢讀，慢慢懂自己</span>
+					<h2>精選專欄</h2>
+				</div>
+				<a class="btn btn-outline" th:href="@{/article}" href="#">看更多文章</a>
+			</div>
+
+			<div class="art-row">
+				<a class="art-card" th:href="@{/article}" href="#">
+					<div class="photo-slot pink art-cover">
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>封面照片預留</small>
+						</div>
+					</div>
+					<div class="art-body">
+						<span class="art-tag">情緒照顧</span>
+						<h3>「我沒事」的背後，其實藏了很多事</h3>
+						<p>當我們習慣說沒事，情緒就默默累積。用三個練習，重新聽見自己的聲音。</p>
+						<span class="art-meta">6 分鐘閱讀 ・ 陳語安 心理師</span>
+					</div>
+				</a>
+				<a class="art-card" th:href="@{/article}" href="#">
+					<div class="photo-slot blue art-cover">
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>封面照片預留</small>
+						</div>
+					</div>
+					<div class="art-body">
+						<span class="art-tag">關係練習</span>
+						<h3>親密不是黏在一起，而是各自完整</h3>
+						<p>在關係裡失去自己，是很多人的隱痛。談談界線，如何讓愛更自在。</p>
+						<span class="art-meta">8 分鐘閱讀 ・ 林之默 心理師</span>
+					</div>
+				</a>
+				<a class="art-card" th:href="@{/article}" href="#">
+					<div class="photo-slot art-cover">
+						<div class="ps-inner">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+								stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="6" width="18" height="14" rx="3" />
+								<circle cx="12" cy="13" r="3.2" /></svg>
+							<small>封面照片預留</small>
+						</div>
+					</div>
+					<div class="art-body">
+						<span class="art-tag">日常正念</span>
+						<h3>給焦慮的你：3 分鐘就能做的呼吸法</h3>
+						<p>心跳很快、腦袋停不下來時，一組簡單的呼吸節奏，就能把自己輕輕接住。</p>
+						<span class="art-meta">4 分鐘閱讀 ・ 諮由自在編輯室</span>
+					</div>
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= 揪團活動 ================= -->
+	<section class="cta-band">
+		<div class="wrap">
+			<div class="cta-box">
+				<div class="txt">
+					<span class="script" style="font-size: 1.4rem;">你不需要一個人撐著</span>
+					<h2>
+						加入揪團活動，<br />在懂你的人之間，<em>慢慢長回力氣</em>。
+					</h2>
+					<p>正念健走、手作療癒、主題支持團體……和一群同行的人，把「照顧自己」變成一件溫暖又不孤單的事。</p>
+					<a class="btn btn-primary"
+						th:href="@{/member/activity/activityIndex}" href="#">查看近期活動 <svg
+							width="16" height="16" viewBox="0 0 24 24" fill="none"
+							stroke="#fff" stroke-width="2" stroke-linecap="round"
+							stroke-linejoin="round">
+							<path d="M5 12h14M13 6l6 6-6 6" /></svg>
+					</a>
+				</div>
+				<div class="photo-slot pink cta-photo">
+					<div class="ps-inner">
+						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+							stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="6" width="18" height="14" rx="3" />
+							<circle cx="12" cy="13" r="3.2" />
+							<path d="M8 6l1.2-2h5.6L16 6" /></svg>
+						<b>活動照片預留區</b> <small>建議橫式 4:3</small>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script src="/js/nav.js"></script>
 </body>
 </html>

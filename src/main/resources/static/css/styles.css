@@ -7,6 +7,7 @@
 	font-style: normal;
 	font-display: swap;
 }
+
 :root {
 	--bg-warm: #FFFAEE;
 	--bg-soothing: #C2D9ED;
@@ -23,12 +24,14 @@
 	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
 	--radius-lg: 34px;
 	--radius-md: 22px;
+
 	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
 	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
 	--sans: "Noto Sans TC", system-ui, sans-serif;
 	--script: "Caveat", "OpenHuninn", cursive;
 	--display-en: "Baloo 2", sans-serif;
 }
+
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
@@ -45,6 +48,7 @@ img, svg { display: block; max-width: 100%; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 .wrap { width: min(1160px, 92vw); margin-inline: auto; }
 .script { font-family: var(--script); color: var(--orange); }
+
 .btn {
 	display: inline-flex; align-items: center; gap: .5rem;
 	padding: .85rem 1.8rem; border-radius: 999px;
@@ -57,10 +61,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 .btn-ghost:hover { transform: translateY(-2px); }
 .btn-outline { border: 1.6px solid var(--ink); color: var(--ink); background: transparent; }
 .btn-outline:hover { background: var(--ink); color: #fff; }
+
 .eyebrow {
 	display: inline-block; font-size: .8rem; font-weight: 500;
 	letter-spacing: .22em; text-transform: uppercase; color: var(--orange);
 }
+
 /* 重點字標記 */
 mark.hl { background: transparent; color: inherit; padding: 0 .1em; font-weight: 500; position: relative; }
 mark.hl::after {
@@ -70,6 +76,7 @@ mark.hl::after {
 mark.hl.o { color: #F589A3; }
 mark.hl.o::after { background: var(--pink); }
 mark.hl.b::after { background: var(--bg-soothing); }
+
 /* 照片預留區 */
 .photo-slot { position: relative; background: var(--blue-soft); display: grid; place-items: center; overflow: hidden; }
 .photo-slot.pink { background: var(--pink-soft); }
@@ -82,9 +89,10 @@ mark.hl.b::after { background: var(--bg-soothing); }
 .ps-inner svg { width: 40px; height: 40px; margin: 0 auto .55rem; stroke: var(--ink); }
 .ps-inner b { display: block; font-size: .92rem; font-weight: 500; letter-spacing: .04em; }
 .ps-inner small { font-size: .74rem; }
+
 /* ============================================================
-     導覽列
-     ============================================================ */
+      導覽列
+      ============================================================ */
 header.nav {
 	position: sticky; top: 0; z-index: 100;
 	background: rgba(253, 246, 237, .85); backdrop-filter: blur(12px);
@@ -92,6 +100,7 @@ header.nav {
 }
 .nav-inner { display: flex; align-items: center; gap: 1.4rem; height: 74px; }
 .brand { display: flex; align-items: center; gap: .8rem; }
+
 .logo-mind { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; user-select: none; flex: 0 0 auto; }
 .logo-mind .word { display: flex; align-items: flex-end; }
 .logo-mind .word span {
@@ -108,6 +117,7 @@ header.nav {
 .logo-mind .faces .fi { width: 9px;  height: 11px; }
 .logo-mind .faces .fn { width: 17px; height: 11px; }
 .logo-mind .faces .fd { width: 17px; height: 11px; }
+
 .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-text .logo {
 	font-family: var(--zen-maru); font-weight: 700; font-size: 1.18rem;
@@ -117,9 +127,11 @@ header.nav {
 	font-family: var(--display-en); font-size: .85rem; font-weight: 700;
 	color: var(--ink-soft); letter-spacing: .24em; text-transform: uppercase; margin-top: .15em;
 }
+
 .nav-menu { display: flex; gap: .25rem; margin-left: .5rem; }
 .nav-menu a { padding: .5rem .95rem; border-radius: 999px; font-size: .96rem; font-weight: 500; color: var(--ink-soft); transition: background .2s, color .2s; }
 .nav-menu a:hover { background: rgba(194, 217, 237, .4); color: var(--ink); }
+
 .nav-right { margin-left: auto; display: flex; align-items: center; gap: .55rem; }
 .icon-btn {
 	position: relative; width: 44px; height: 44px; border-radius: 50%;
@@ -127,6 +139,7 @@ header.nav {
 }
 .icon-btn:hover { transform: translateY(-2px); }
 .icon-btn svg { width: 20px; height: 20px; stroke: var(--ink); }
+
 .avatar-btn {
 	width: 44px; height: 44px; border-radius: 50%;
 	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
@@ -135,7 +148,9 @@ header.nav {
 }
 .avatar-btn:hover { transform: translateY(-2px); }
 .avatar-btn svg { width: 26px; height: 26px; }
+
 .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid #fff; }
+
 .pop-holder { position: relative; }
 .pop {
 	position: absolute; right: 0; top: calc(100% + 12px); width: 266px; background: #fff;
@@ -162,16 +177,19 @@ header.nav {
 .noti-item b { font-size: .9rem; display: block; }
 .noti-item time { font-size: .76rem; color: var(--ink-soft); }
 .noti-item p { margin: .1rem 0 0; font-size: .84rem; color: var(--ink-soft); }
+
 .hamburger { display: none; }
 .mobile-menu { display: none; flex-direction: column; gap: .2rem; padding: .6rem 4vw 1.2rem; background: var(--bg-warm); border-bottom: 1px solid var(--line); }
 .mobile-menu.open { display: flex; }
 .mobile-menu a { padding: .7rem .4rem; font-weight: 500; color: var(--ink); border-radius: 10px; }
 .mobile-menu a:hover { background: rgba(194, 217, 237, .4); }
-/* 波浪（多個頁面都會用到的分隔裝飾） */
+
+/* 波浪（背景分隔裝飾） */
 .wave { display: block; width: 100%; height: 64px; }
+
 /* ============================================================
-     Footer
-     ============================================================ */
+      Footer
+      ============================================================ */
 footer.ft { background: var(--white); border-top: 1px solid var(--line); padding: 3.2rem 0 2rem; }
 .ft-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 2rem; }
 .ft .brand { margin-bottom: 1rem; }
@@ -188,6 +206,7 @@ footer.ft { background: var(--white); border-top: 1px solid var(--line); padding
 	display: flex; justify-content: space-between; flex-wrap: wrap; gap: .6rem;
 	font-size: .82rem; color: var(--ink-soft);
 }
+
 /* 回到頂部按鈕 */
 #backToTop {
 	position: fixed; right: 24px; bottom: 24px; width: 48px; height: 48px;
@@ -202,6 +221,35 @@ footer.ft { background: var(--white); border-top: 1px solid var(--line); padding
 @media (max-width: 560px) {
 	#backToTop { right: 16px; bottom: 16px; width: 42px; height: 42px; }
 }
+
+/* ============================================================
+      分頁 Pagination
+      ============================================================ */
+.pager {
+	display: flex; align-items: center; justify-content: center;
+	gap: .5rem; flex-wrap: wrap; margin: 2.8rem 0 .5rem;
+}
+.pager .pg-btn {
+	min-width: 42px; height: 42px; padding: 0 .7rem;
+	display: inline-flex; align-items: center; justify-content: center;
+	background: #fff; border: 1px solid var(--line); border-radius: 14px;
+	font-size: .95rem; font-weight: 500; color: var(--ink);
+	box-shadow: var(--shadow-sm);
+	transition: transform .18s, background .18s, color .18s, border-color .18s;
+}
+.pager .pg-btn:hover { transform: translateY(-2px); border-color: var(--orange); color: var(--orange); }
+.pager .pg-btn.is-current {
+	background: var(--orange); border-color: var(--orange); color: #fff;
+	box-shadow: 0 8px 20px rgba(245, 142, 107, .4);
+}
+.pager .pg-btn.is-current:hover { color: #fff; }
+.pager .pg-arrow svg { width: 18px; height: 18px; }
+.pager .pg-btn.is-disabled {
+	opacity: .38; box-shadow: none; cursor: default; pointer-events: none;
+}
+.pager .pg-dots { color: var(--ink-soft); padding: 0 .1rem; letter-spacing: .1em; }
+
+
 /* ============================================================ RWD ============================================================ */
 @media (max-width: 940px) {
 	.ft-grid { grid-template-columns: 1fr 1fr; }
@@ -211,8 +259,13 @@ footer.ft { background: var(--white); border-top: 1px solid var(--line); padding
 @media (max-width: 520px) {
 	.ft-grid { grid-template-columns: 1fr; }
 }
+
 :focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
 @media (prefers-reduced-motion: reduce) {
 	* { transition: none !important; scroll-behavior: auto; }
 }
 
+@media (max-width: 520px) {
+	.pager { gap: .35rem; }
+	.pager .pg-btn { min-width: 36px; height: 36px; border-radius: 11px; font-size: .88rem; }
+}

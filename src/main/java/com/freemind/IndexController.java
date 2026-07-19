@@ -9,7 +9,7 @@ import com.freemind.login.notice.service.NotificationService;
 
 @Controller
 public class IndexController {
-
+	
     @Autowired
     private NotificationService notificationSvc;
 
