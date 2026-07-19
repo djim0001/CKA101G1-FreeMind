@@ -26,6 +26,7 @@ import com.freemind.course.order.model.OrderDetailService;
 import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -39,18 +40,21 @@ public class ShoppingCartController {
 	private final CourseOrderService courseOrderSvc;
 	private final OrderDetailService orderDetailSvc;
 	private final MemberCouponService memberCouponSvc;
+	private final NoticeService noticeSvc;
 	
 	public ShoppingCartController(
 			ShoppingCartRedisService ShoppingCartRedisSvc, 
 			MemberCouponService memberCouponSvc,
 			CourseOrderService courseOrderSvc,
 			OrderDetailService orderDetailSvc,
+			NoticeService noticeSvc,
 			CourseService courseSvc,
 			MemberService memberSvc) {
 		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
 		this.memberCouponSvc = memberCouponSvc;
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
+		this.noticeSvc = noticeSvc;
 		this.courseSvc = courseSvc;
 		this.memberSvc = memberSvc;
 	}
@@ -60,6 +64,17 @@ public class ShoppingCartController {
         return memberSvc.findByAccount(authentication.getName());
     }
 	
+	@ModelAttribute("countMemberUnread")
+	public Long memberNotice(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? noticeSvc.countMemberUnread(member.getMemberId()) : null);
+	}
+	
+	@ModelAttribute("countMemberCartCount")
+	public Long memberShoppingCartCount(ModelMap model) {
+		Member member = (Member)model.getAttribute("member");
+		return (member != null ? ShoppingCartRedisSvc.getCourseCount(member.getMemberId()) : null);
+	}
 	
 	@GetMapping("/shopping_cart")
 	public String shoppingCart(ModelMap model, 
