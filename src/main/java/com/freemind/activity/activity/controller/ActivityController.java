@@ -256,6 +256,7 @@ public class ActivityController {
         
         long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
         model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         return "front-end/member/activity/ownedActivities";
     }
  
@@ -282,6 +283,7 @@ public class ActivityController {
         
         long total = activitySvc.getTotalCountForOwner(map, memberId);
         model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
+        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));  
         
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");

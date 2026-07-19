@@ -108,10 +108,16 @@
         </p>
 
         <p>
-            活動名額：
-            <input type="number" th:field="*{capacity}">
-            <span th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" style="color:red;"></span>
-        </p>
+		    正取名額：
+		    <input type="number" th:field="*{capacity}">
+		    <span th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}" style="color:red;"></span>
+		</p>
+		
+		<p>
+		    備取名額：
+		    <input type="number" th:field="*{waitlistCapacity}">
+		    <span th:if="${#fields.hasErrors('waitlistCapacity')}" th:errors="*{waitlistCapacity}" style="color:red;"></span>
+		</p>
 
 		<p>
 		    活動圖片：

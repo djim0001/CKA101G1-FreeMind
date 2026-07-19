@@ -59,10 +59,7 @@
             <th>縣市</th>
             <th>區域</th>
 		    <th>活動時間</th>
-		    <td>
-			    正取 <span th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
-			    備取 <span th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span>
-			</td>
+		    <th>名額</th>
 		    <th>報名時間</th>
 		    <th>報名狀態</th>
 		    <th>活動狀態</th>
@@ -83,7 +80,11 @@
 		    <td th:text="${a.activityCity}"></td>
 		    <td th:text="${a.activityDist}"></td>
 		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+		    <td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
+			    正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+			    備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
+			    已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
+			</td>
 		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
 		    <td th:text="${a.registrationStatusText}"></td>
 		    	<td th:text="${a.activityStatusText}"></td>
@@ -110,5 +111,33 @@
 	<br>
 	<a th:href="@{/admin/activity/activityAdminIndex}">回後台活動導覽頁</a>
 
+<script>
+(function() {
+    var rows = document.querySelectorAll('[data-activity-id]');
+    rows.forEach(function(row) {
+        var activityId = row.getAttribute('data-activity-id');
+        var confirmedCap = row.getAttribute('data-capacity');
+        var waitlistCap = row.getAttribute('data-waitlist-capacity');
+
+        var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+        var socket = new WebSocket(wsUrl);
+
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+
+            document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
+            document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+
+            var total = data['正取'] + data['備取'] + data['未審核'];
+            var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+            document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
+        };
+
+        socket.onerror = function(e) {
+            console.log('WebSocket錯誤(活動' + activityId + '):', e);
+        };
+    });
+})();
+</script>
 </body>
 </html>

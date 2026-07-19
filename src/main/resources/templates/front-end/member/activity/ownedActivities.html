@@ -8,16 +8,16 @@
   /* =================================================================== */
   /* 分配寬度比例 (100%) */
   /* =================================================================== */
-  th:nth-child(1) { width: 10%; }  /* 活動圖片 */
+  th:nth-child(1) { width: 9%; }  /* 活動圖片 */
   th:nth-child(2) { width: 4%; }  /* 編號 */
-  th:nth-child(3) { width: 20%; } /* 活動名稱 */
-  th:nth-child(4) { width: 8%; } /* 活動狀態 */
-  th:nth-child(5) { width: 13%; } /* 活動時間 */
-  th:nth-child(6) { width: 7%; }  /* 已報名/名額 */
-  th:nth-child(7) { width: 13%; } /* 報名時間 */
+  th:nth-child(3) { width: 17%; } /* 活動名稱 */
+  th:nth-child(4) { width: 7%; } /* 活動狀態 */
+  th:nth-child(5) { width: 12%; } /* 活動時間 */
+  th:nth-child(6) { width: 11%; }  /* 已報名/名額 */
+  th:nth-child(7) { width: 12%; } /* 報名時間 */
   th:nth-child(8) { width: 6%; }  /* 報名狀態狀態 */
   th:nth-child(9) { width: 9%; } /* 查看詳情按鈕欄位 */	
-  th:nth-child(10) { width: 10%; } /* 其他操作按鈕欄位 */	
+  th:nth-child(10) { width: 9%; } /* 其他操作按鈕欄位 */	
   
   td:nth-child(9) {
     white-space: nowrap; 
@@ -28,6 +28,7 @@
   .action-block {
     display: inline-block;
   }
+  
     </style>
 </head>
 <body>
@@ -81,7 +82,11 @@
 		    <td th:text="${a.activityName}"></td>
 		    <td th:text="${a.activityStatusText}"></td>
 		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:text="${a.regisCount} + ' / ' + ${a.capacity}"></td>
+		    <td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
+			    正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+			    備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
+			    已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
+			</td>
 		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
 		    <td th:text="${a.registrationStatusText}"></td>
 		    <td>
@@ -205,6 +210,35 @@ function toggleScheduleForm(activityId) {
         button.style.color = '';
     }
 }
+
+
+
+(function() {
+    var rows = document.querySelectorAll('[data-activity-id]');
+    rows.forEach(function(row) {
+        var activityId = row.getAttribute('data-activity-id');
+        var confirmedCap = row.getAttribute('data-capacity');
+        var waitlistCap = row.getAttribute('data-waitlist-capacity');
+
+        var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+        var socket = new WebSocket(wsUrl);
+
+        socket.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+
+            document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
+            document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+
+            var total = data['正取'] + data['備取'] + data['未審核'];
+            var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+            document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
+        };
+
+        socket.onerror = function(e) {
+            console.log('WebSocket錯誤(活動' + activityId + '):', e);
+        };
+    });
+})();
 </script>
 </body>
 </html>

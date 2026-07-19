@@ -29,10 +29,22 @@ public class ActivityReportAdminController {
 
 	// 回報列表
 	@GetMapping("list")
-	public String list(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+	public String list(@RequestParam(value = "tab", defaultValue = "pending") String tab,
+						@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
 						@AuthenticationPrincipal AdminUserDetails userDetails,
 						ModelMap model) {
-		List<ActivityReport> allList = reportSvc.getAllReports();
+		Integer status;
+	    if ("processing".equals(tab)) {
+	        status = 1;
+	    } else if ("done".equals(tab)) {
+	        status = 2;
+	    } else {
+	        tab = "pending";
+	        status = 0;
+	    }
+
+	    List<ActivityReport> allList = reportSvc.getReportsByStatus(status);
+
 		
 		int totalPages = PageUtils.calculateTotalPages(allList.size(), PAGE_SIZE);
 		if (currentPage < 1) {
@@ -50,6 +62,7 @@ public class ActivityReportAdminController {
 		model.addAttribute("reportListData", pageData);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", totalPages);
+		model.addAttribute("currentTab", tab);
 		model.addAttribute("currentAdminId", userDetails.getAdmin().getAdminId());
 		return "back-end/activity/report/reportList";
 	}

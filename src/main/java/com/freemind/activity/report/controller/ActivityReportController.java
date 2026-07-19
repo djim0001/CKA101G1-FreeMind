@@ -35,7 +35,8 @@ public class ActivityReportController {
 
 	// 我的回報紀錄
 	@GetMapping("myReports")
-	public String myReports(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+	public String myReports(@RequestParam(value = "tab", defaultValue = "pending") String tab,
+							@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
 							@AuthenticationPrincipal MemberUserDetails userDetails,
 	                        ModelMap model) {
 	    if (userDetails == null) {
@@ -43,9 +44,26 @@ public class ActivityReportController {
 	    }
 		
 		Member member = userDetails.getMember();
-		List<ActivityReport> list = reportSvc.getMyReports(member);
 		
-		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+		Integer status;
+		  if ("processing".equals(tab)) {
+		      status = 1;
+		  } else if ("done".equals(tab)) {
+		      status = 2;
+		  } else {
+		      tab = "pending";
+		      status = 0;
+		  }
+		
+		List<ActivityReport> allList = reportSvc.getMyReports(member);
+		List<ActivityReport> filtered = new ArrayList<>();
+		   for (ActivityReport r : allList) {
+		       if (r.getReportStatus().equals(status)) {
+		           filtered.add(r);
+		       }
+		   }
+		
+		int totalPages = PageUtils.calculateTotalPages(filtered.size(), PAGE_SIZE);
 	    if (currentPage < 1) {
 	        currentPage = 1;
 	    } else if (currentPage > totalPages) {
@@ -53,14 +71,15 @@ public class ActivityReportController {
 	    }
 
 	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
-	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+	    int toIndex = Math.min(fromIndex + PAGE_SIZE, filtered.size());
 	    List<ActivityReport> pageData = fromIndex < toIndex 
-	            ? list.subList(fromIndex, toIndex) 
+	            ? filtered.subList(fromIndex, toIndex) 
 	            : new ArrayList<>();
 		
 	    model.addAttribute("reportListData", pageData);
 	    model.addAttribute("currentPage", currentPage);
 	    model.addAttribute("totalPages", totalPages);
+	    model.addAttribute("currentTab", tab);
 		return "front-end/member/activity/report/myReports";
 	}
 
