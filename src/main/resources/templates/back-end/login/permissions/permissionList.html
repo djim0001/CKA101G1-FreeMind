@@ -1,62 +1,84 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>權限清單｜諮由自在後台</title>
-<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
-<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
 </head>
-<body class="thy2-page thy2-profile">
-	<div class="layout">
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
 		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('permission-list')}"></aside>
-		<div class="main">
-			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>權限清單</h1>
-						<p>維護系統可指派給管理員的權限項目。</p>
-					</div>
-					<div class="page-actions">
-						<a class="btn" th:href="@{/admin/permissions/add}">新增權限</a>
-					</div>
-				</div>
 
-				<div class="table-wrap" th:if="${!permissions.isEmpty()}">
-					<table class="compact-table">
-						<thead>
-							<tr>
-								<th>權限ID</th>
-								<th>權限名稱</th>
-								<th>權限說明</th>
-								<th>操作</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="perm : ${permissions}">
-								<td th:text="${perm.permId}"></td>
-								<td th:text="${perm.permName}"></td>
-								<td th:text="${perm.permDetail}"></td>
-								<td>
-									<div class="actions">
-										<a class="btn ghost" th:href="@{/admin/permissions/edit(permId=${perm.permId})}">編輯</a>
-										<a class="btn danger" th:href="@{/admin/permissions/delete(permId=${perm.permId})}"
-											onclick="return confirm('確定要刪除此權限嗎？')">刪除</a>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
 
-				<div class="empty-state" th:if="${permissions.isEmpty()}">
-					<h3>尚無權限資訊</h3>
-					<p>點擊右上角「新增權限」建立第一筆權限。</p>
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<span class="current">權限清單</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>權限<em>清單</em></h1>
+					<p>維護系統可指派給管理員的權限項目。</p>
 				</div>
-			</main>
-		</div>
+				<div class="page-actions">
+					<a class="btn btn-primary" th:href="@{/admin/permissions/add}" href="#">新增權限</a>
+				</div>
+			</div>
+
+			<div class="table-wrap" th:if="${!permissions.isEmpty()}">
+				<table>
+					<thead>
+						<tr>
+							<th>權限ID</th>
+							<th>權限名稱</th>
+							<th>權限說明</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="perm : ${permissions}">
+							<td th:text="${perm.permId}"></td>
+							<td th:text="${perm.permName}"></td>
+							<td th:text="${perm.permDetail}"></td>
+							<td>
+								<div class="actions">
+									<a class="btn btn-ghost btn-sm" th:href="@{/admin/permissions/edit(permId=${perm.permId})}" href="#">編輯</a>
+									<a class="btn btn-danger btn-sm" th:href="@{/admin/permissions/delete(permId=${perm.permId})}" href="#"
+										onclick="return confirm('確定要刪除此權限嗎？')">刪除</a>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="empty-state" th:if="${permissions.isEmpty()}">
+				<h3>尚無權限資訊</h3>
+				<p>點擊右上角「新增權限」建立第一筆權限。</p>
+			</div>
+
+		</main>
 	</div>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 </body>
 </html>

@@ -1,91 +1,126 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>修改管理員｜諮由自在後台</title>
-<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
-<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
 </head>
-<body class="thy2-page thy2-profile">
-	<div class="layout">
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
 		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('admin-list')}"></aside>
-		<div class="main">
-			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>修改管理員</h1>
-						<p>編號 <span th:text="${adminVO.adminId}"></span>：更新帳號資料與照片。</p>
-					</div>
-					<div class="page-actions">
-						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
-					</div>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<a th:href="@{/admin/listAllAdmin}" href="#">管理員列表</a><span>/</span>
+				<span class="current">修改管理員</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>修改<em>管理員</em></h1>
+					<p>編號 <span th:text="${adminVO.adminId}"></span>：更新帳號資料與照片。</p>
 				</div>
-
-				<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
-
-				<div class="panel">
-					<form class="form-grid" method="post" th:action="@{/admin/update}"
-						th:object="${adminVO}" enctype="multipart/form-data">
-
-						<input type="hidden" th:field="*{adminId}">
-
-						<div class="form-group">
-							<label for="adminAccount">帳號 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{adminAccount}">
-							<span class="error" th:if="${#fields.hasErrors('adminAccount')}" th:errors="*{adminAccount}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="adminPassword">密碼 <span class="required">*</span></label>
-							<input class="field" type="password" th:field="*{adminPassword}">
-							<span class="error" th:if="${#fields.hasErrors('adminPassword')}" th:errors="*{adminPassword}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="name">姓名 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{name}">
-							<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="phoneNumber">手機號碼 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{phoneNumber}">
-							<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="accountStatus">帳號狀態</label>
-							<select class="field" th:field="*{accountStatus}">
-								<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
-							</select>
-							<span class="error" th:if="${#fields.hasErrors('accountStatus')}" th:errors="*{accountStatus}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="hiredate">入職日期</label>
-							<input class="field" type="datetime-local" th:field="*{hiredate}">
-							<span class="error" th:if="${#fields.hasErrors('hiredate')}" th:errors="*{hiredate}"></span>
-						</div>
-
-						<div class="form-group full">
-							<label for="profilePic">照片</label>
-							<input class="field" type="file" th:field="*{profilePic}" accept="image/*" data-pic-preview="#picPreview">
-							<span class="form-note">不選擇新照片則保留原本的照片；選擇後會立即在下方預覽。</span>
-							<img class="photo-preview" id="picPreview"
-								th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" alt="管理員照片">
-						</div>
-
-						<div class="form-group full page-actions">
-							<a class="btn ghost" th:href="@{/admin/listAllAdmin}">取消</a>
-							<button class="btn" type="submit">儲存修改</button>
-						</div>
-					</form>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/listAllAdmin}" href="#">回管理員列表</a>
 				</div>
-			</main>
-		</div>
+			</div>
+
+			<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
+
+			<div class="panel">
+				<form class="form-grid" method="post" th:action="@{/admin/update}"
+					th:object="${adminVO}" enctype="multipart/form-data">
+
+					<input type="hidden" th:field="*{adminId}">
+					<!-- 入職日期不開放修改，以隱藏欄位帶住原值（Admin.hiredate 有 @NotNull） -->
+					<input type="hidden" th:field="*{hiredate}">
+
+					<div class="form-group">
+						<label for="adminAccount">帳號</label>
+						<input class="field" type="text" th:field="*{adminAccount}">
+						<span class="error" th:if="${#fields.hasErrors('adminAccount')}" th:errors="*{adminAccount}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="adminPassword">密碼</label>
+						<input class="field" type="password" id="adminPassword" name="adminPassword"
+							placeholder="留空則不變更密碼" autocomplete="new-password">
+						<span class="form-note">若不修改密碼請留空，系統會沿用原本的密碼。</span>
+						<span class="error" th:if="${#fields.hasErrors('adminPassword')}" th:errors="*{adminPassword}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="name">姓名</label>
+						<input class="field" type="text" th:field="*{name}">
+						<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="phoneNumber">手機號碼</label>
+						<input class="field" type="text" th:field="*{phoneNumber}">
+						<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="accountStatus">帳號狀態</label>
+						<select class="field" th:field="*{accountStatus}">
+							<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+						</select>
+						<span class="error" th:if="${#fields.hasErrors('accountStatus')}" th:errors="*{accountStatus}"></span>
+					</div>
+
+					<div class="form-group full">
+						<label for="profilePic">照片</label>
+						<input class="field" type="file" id="profilePic" name="profilePic" accept="image/*" data-pic-preview="#picPreview">
+						<span class="form-note">不選擇新照片則保留原本的照片；選擇後會立即在下方預覽。</span>
+						<img class="photo-preview" id="picPreview"
+							th:src="@{/admin/DBGifReader} + '?adminId=' + ${adminVO.adminId}" alt="管理員照片">
+					</div>
+
+					<div class="form-group full page-actions">
+						<a class="btn btn-ghost" th:href="@{/admin/listAllAdmin}" href="#">取消</a>
+						<button class="btn btn-primary" type="submit">儲存修改</button>
+					</div>
+				</form>
+			</div>
+
+		</main>
 	</div>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<!-- 照片上傳即時預覽 -->
+	<script>
+	document.querySelectorAll('input[type="file"][data-pic-preview]').forEach(function (input) {
+		input.addEventListener('change', function () {
+			var img = document.querySelector(input.dataset.picPreview);
+			var file = input.files && input.files[0];
+			if (!img || !file) return;
+			var reader = new FileReader();
+			reader.onload = function (e) { img.src = e.target.result; img.hidden = false; };
+			reader.readAsDataURL(file);
+		});
+	});
+	</script>
 </body>
 </html>
