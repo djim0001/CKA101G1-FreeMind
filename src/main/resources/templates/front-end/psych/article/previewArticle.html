@@ -1,166 +1,181 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title th:text="'預覽：' + ${article.title}">文章預覽</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title th:text="'預覽：' + ${article.title} + '｜諮由自在 Free Mind'">文章預覽｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
 <style>
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-}
+/* ---------- 頁面背景 ---------- */
+.detail-page { background: var(--bg-warm); padding: 2.4rem 0 3rem; }
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.8;
-}
+/* ---------- 麵包屑 ---------- */
+.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1.6rem; }
+.crumb a { transition: color .18s; }
+.crumb a:hover { color: var(--orange); }
+.crumb span { margin: 0 .45rem; opacity: .5; }
 
-.container {
-	max-width: 860px;
-	margin: 0 auto;
-	padding: 30px 20px;
-}
-
+/* ---------- 預覽提示橫幅 ---------- */
 .preview-banner {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 20px;
-	padding: 12px 18px;
-	background-color: #fff3cd;
-	color: #7a5a00;
-	border: 1px solid #ffe08a;
-	border-radius: 8px;
-	font-size: 14px;
-	font-weight: 500;
+	display: flex; align-items: center; gap: .6rem;
+	max-width: 820px; margin: 0 auto 1.2rem; padding: .8rem 1.2rem;
+	background: #fff8e1; color: #7a5a00;
+	border: 1px solid #ffe08a; border-radius: var(--radius-md);
+	font-size: .88rem; font-weight: 500;
+}
+.preview-banner svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+/* ---------- 文章主卡（置中） ---------- */
+.art-detail-wrap { max-width: 820px; margin: 0 auto; padding: 0 1rem; }
+
+.art-detail-card {
+	background: #fff; border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md); overflow: hidden;
 }
 
-.article-detail {
-	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-	overflow: hidden;
-	padding: 0;
+/* 封面 */
+.art-detail-cover { width: 100%; height: 280px; position: relative; overflow: hidden; }
+.art-detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.art-detail-cover.photo-slot { height: 220px; }
+.art-detail-cover.photo-slot::after { content: none; }
+
+/* 文章主體 */
+.art-detail-body { padding: 2.4rem 2.8rem 3rem; }
+
+/* 分類 */
+.art-detail-meta-top {
+	display: flex; align-items: center; flex-wrap: wrap; gap: .6rem;
+	margin-bottom: 1rem; font-size: .82rem; color: var(--ink-soft);
+}
+.art-detail-meta-top .cat-tag {
+	display: inline-block; padding: .28rem .9rem;
+	background: var(--pink-soft); color: var(--orange-deep);
+	border-radius: 999px; font-size: .78rem; font-weight: 500; letter-spacing: .06em;
 }
 
-.cover-image {
-	width: 100%;
-	height: 380px;
-	overflow: hidden;
-	background-color: #fbf2f2;
+/* 標題 */
+.art-detail-body h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(1.6rem, 2.8vw, 2.2rem); line-height: 1.4;
+	color: var(--ink); margin: .2rem 0 1.4rem;
+}
+.art-detail-body h1.no-title {
+	color: var(--ink-soft); font-style: italic;
 }
 
-.cover-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	display: block;
+/* 分隔線 */
+.preview-divider {
+	height: 1px; background: var(--line); margin-bottom: 2rem;
 }
 
-.article-body {
-	padding: 36px 40px 48px;
+/* 文章內文 */
+.art-detail-content {
+	font-family: var(--sans); font-size: 1.02rem;
+	color: var(--ink); line-height: 1.95;
 }
-
-.article-body h1 {
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
-	margin-bottom: 16px;
-	line-height: 1.4;
+.art-detail-content p { margin-bottom: .9rem; }
+.art-detail-content img { display: inline-block; max-width: 100%; height: auto; border-radius: 12px; margin: .3rem; vertical-align: top; }
+.art-detail-content h2 {
+	font-family: var(--sans) !important;
+	font-size: 1.15rem !important;
+	font-weight: 700; margin: 2rem 0 .8rem; color: var(--ink);
 }
-
-.article-body h1.no-title {
-	color: #bbb;
-	font-style: italic;
+.art-detail-content h3 {
+	font-family: var(--sans) !important;
+	font-size: 1.05rem !important;
+	font-weight: 700; margin: 1.6rem 0 .6rem; color: var(--ink);
 }
-
-.article-meta {
-	display: flex;
-	align-items: center;
-	gap: 16px;
-	margin-bottom: 28px;
-	padding-bottom: 20px;
-	border-bottom: 1px solid #eee;
-	font-size: 14px;
-	color: #888;
+.art-detail-content blockquote {
+	margin: 1.4rem 0; padding: .8rem 1.2rem;
+	border-left: 4px solid var(--orange); background: var(--pink-soft);
+	border-radius: 0 12px 12px 0; font-style: italic; color: var(--ink-soft);
 }
+.art-detail-content ul, .art-detail-content ol { padding-left: 1.5rem; margin-bottom: .9rem; }
+.art-detail-content li { margin-bottom: .3rem; }
 
-.article-meta .cat-tag {
-	display: inline-block;
-	padding: 3px 14px;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border-radius: 14px;
-	font-size: 13px;
-	font-weight: 500;
+.empty-content { color: var(--ink-soft); font-style: italic; }
+
+/* ---------- wave ---------- */
+.detail-wave { display: block; width: 100%; height: 64px; margin-top: -1px; }
+
+/* ---------- RWD ---------- */
+@media (max-width: 900px) {
+	.art-detail-body { padding: 1.8rem 1.6rem 2.4rem; }
+	.art-detail-cover { height: 240px; }
 }
-
-.article-content {
-	font-size: 16px;
-	color: #444;
-	line-height: 1.4;
-}
-
-.article-content p {
-	margin-bottom: 6px;
-}
-
-.article-content img {
-	display: inline-block;
-	max-width: 100%;
-	height: auto;
-	border-radius: 8px;
-	margin: 6px;
-	vertical-align: top;
-}
-
-.article-content h2, .article-content h3 {
-	margin-top: 28px;
-	margin-bottom: 12px;
-	color: #4a3e3e;
-}
-
-.empty-content {
-	color: #bbb;
-	font-style: italic;
-}
-
-@media ( max-width : 640px) {
-	.article-body {
-		padding: 24px 20px 36px;
-	}
-	.cover-image {
-		height: 220px;
-	}
-	.article-body h1 {
-		font-size: 22px;
-	}
-	.article-meta {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 10px;
-	}
+@media (max-width: 640px) {
+	.art-detail-wrap { padding: 0 .5rem; }
+	.art-detail-body { padding: 1.4rem 1.2rem 2rem; }
+	.art-detail-cover { height: 190px; }
+	.art-detail-body h1 { font-size: 1.4rem; }
+	.preview-banner { margin-left: .5rem; margin-right: .5rem; }
 }
 </style>
 </head>
+
 <body>
-	<div class="container">
 
-		<div class="preview-banner">
-			<i class="fa-regular fa-eye"></i>
-			這是預覽畫面，實際發布後排版可能略有不同
+<!-- ================= 導覽列 ================= -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<!-- wave：header 下方，白色過渡到米色 -->
+<svg class="detail-wave" viewBox="0 0 1440 64" preserveAspectRatio="none"
+	 aria-hidden="true" style="margin-top:-1px;">
+	<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z"
+		  fill="#FFFFFF" /></svg>
+
+<!-- ================= 主體 ================= -->
+<section class="detail-page">
+	<div class="wrap">
+		<div class="crumb">
+			<a th:href="@{/}" href="/">首頁</a><span>/</span>
+			<a th:href="@{/psych/article/myArticles}" href="#">我的文章</a><span>/</span>
+			<span style="opacity:1;color:var(--ink)">預覽文章</span>
 		</div>
+	</div>
 
-		<div class="article-detail">
+	<!-- 預覽提示 -->
+	<div class="preview-banner">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+			<circle cx="12" cy="12" r="3"/>
+		</svg>
+		這是預覽畫面，實際發布後排版可能略有不同
+	</div>
 
-			<div class="cover-image" th:if="${article.coverImage != null}">
-				<img th:src="@{/article/{id}/cover(id=${article.articleId})}" />
+	<!-- 文章主卡 -->
+	<div class="art-detail-wrap">
+		<div class="art-detail-card">
+
+			<!-- 封面 -->
+			<div class="art-detail-cover" th:if="${article.articleId != null and article.coverImage != null}">
+				<img th:src="@{/article/{id}/cover(id=${article.articleId})}"
+					 th:alt="${article.title}" />
+			</div>
+			<div class="art-detail-cover photo-slot" th:if="${article.articleId == null or article.coverImage == null}">
+				<div class="ps-inner">
+					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="6" width="18" height="14" rx="3" />
+						<circle cx="12" cy="13" r="3.2" /></svg>
+				</div>
 			</div>
 
-			<div class="article-body">
+			<div class="art-detail-body">
+
+				<!-- 分類 -->
+				<div class="art-detail-meta-top">
+					<span class="cat-tag"
+						  th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}">未分類</span>
+				</div>
+
+				<!-- 標題 -->
 				<h1 th:if="${article.title != null and !#strings.isEmpty(article.title)}"
 					th:text="${article.title}"></h1>
 				<h1 class="no-title"
@@ -168,23 +183,27 @@ body {
 					（尚未填寫標題）
 				</h1>
 
-				<div class="article-meta">
-					<span class="cat-tag"
-						th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}"></span>
-				</div>
+				<div class="preview-divider"></div>
 
-				<!-- 文章內文 (TinyMCE 存的是 HTML，用 utext 才能渲染) -->
-				<div class="article-content"
+				<!-- 文章內文 -->
+				<div class="art-detail-content"
 					th:if="${article.content != null and !#strings.isEmpty(article.content)}"
 					th:utext="${article.content}"></div>
 				<p class="empty-content"
 					th:unless="${article.content != null and !#strings.isEmpty(article.content)}">
 					（尚未填寫內文）
 				</p>
+
 			</div>
-
 		</div>
-
 	</div>
+
+</section>
+
+<!-- ================= Footer ================= -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
 </body>
 </html>

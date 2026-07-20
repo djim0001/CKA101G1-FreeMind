@@ -1,6 +1,7 @@
 package com.freemind.article.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -133,17 +134,18 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 	
 	@Override
-	public Page<Article> getPublishedArticles(Integer catId, String keyword, Integer page) {
-		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("publishedAt").descending());
+	public Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort) {
+		Sort orderBy = "oldest".equals(sort) ? Sort.by("publishedAt").ascending() : Sort.by("publishedAt").descending();
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, orderBy);
 		
-		if (keyword != null && !keyword.isEmpty()) {
-			return articleRepository.findByStatusAndTitleOrAuthor(2, keyword, pageable);
-		}
-		
-		if (catId != null ) {
-			return articleRepository.findByStatusAndCatId(2, catId, pageable);
-		}
-		return articleRepository.findByStatus(2, pageable);
+//		if (catId != null ) return articleRepository.findByStatusAndCatId(2, catId, pageable);
+//		if (keyword != null && !keyword.isEmpty()) return articleRepository.findByStatusAndTitleOrAuthor(2, keyword, pageable);
+	
+		String kw = (keyword != null && !keyword.isBlank()) ? keyword : null;
+	    LocalDateTime from = (dateFrom != null) ? dateFrom.atStartOfDay() : null;
+	    LocalDateTime to   = (dateTo != null)   ? dateTo.plusDays(1).atStartOfDay() : null;
+
+	    return articleRepository.searchArticles(2, catId, kw, from, to, pageable);
 	}
 	
 	@Override

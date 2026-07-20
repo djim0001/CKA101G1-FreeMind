@@ -1,6 +1,7 @@
 package com.freemind.article.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +178,12 @@ public class ArticleInteractionServiceImpl implements ArticleInteractionService{
 			 ArticleViewHistory newHistory = new ArticleViewHistory(article, member, LocalDateTime.now());
 			 articleViewHistoryRepository.save(newHistory);
 		 }
+	}
+
+	@Override
+	public Article getMostSavedArticle() {
+		List<Article> articleList = articleBookmarkRepository.findTopSavedArticles(PageRequest.of(0, 1)); // LIMIT 1
+		return articleList.isEmpty() ? null : articleList.get(0);
 	}
 
 }

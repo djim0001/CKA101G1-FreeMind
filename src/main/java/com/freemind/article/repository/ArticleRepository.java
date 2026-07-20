@@ -1,5 +1,6 @@
 package com.freemind.article.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -37,6 +38,19 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 		   "WHERE a.articleStatus = :status " +
 		   "AND (a.title LIKE %:keyword% OR a.psychologist.name LIKE %:keyword%)")
 	Page<Article> findByStatusAndTitleOrAuthor(@Param("status")Integer articleStatus, @Param("keyword")String keyword, Pageable pageable);
+	
+	// 合併成多條件查詢
+	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status " +
+	       "AND (:catId IS NULL OR a.articleCat.articleCatId = :catId) " +
+	       "AND (:keyword IS NULL OR a.title LIKE %:keyword% OR a.psychologist.name LIKE %:keyword%) " +
+	       "AND (:dateFrom IS NULL OR a.publishedAt >= :dateFrom) " +
+	       "AND (:dateTo IS NULL OR a.publishedAt < :dateTo)")
+	Page<Article> searchArticles(@Param("status") Integer status,
+	                             @Param("catId") Integer catId,
+	                             @Param("keyword") String keyword,
+	                             @Param("dateFrom") LocalDateTime dateFrom,
+	                             @Param("dateTo") LocalDateTime dateTo,
+	                             Pageable pageable);
 
 	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
 	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);
@@ -60,5 +74,5 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	       "WHERE a.articleStatus = 2 AND a.articleCat.articleCatStatus = TRUE " +
 		   "GROUP BY a.articleCat ORDER BY COUNT(a) DESC LIMIT :number")
 	List<ArticleCat> getPopularCats(@Param("number") int number);
-	
+
 }

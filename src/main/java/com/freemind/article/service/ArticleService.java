@@ -1,5 +1,6 @@
 package com.freemind.article.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -19,9 +20,7 @@ public interface ArticleService {
 	
 	Page<Article> getMyArticles(Integer psychId, Integer page);
 	
-	Page<Article> getPublishedArticles(Integer catId, String keyword, Integer page);
-	
-//	Page<Article> searchPublishedArticles(String keyword, Integer page);
+	Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort);
 	
 	Page<Article> getSubmittedArticles(Integer page);
 	
