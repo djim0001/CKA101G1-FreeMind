@@ -150,6 +150,12 @@
 			min-height: 230px;
 		}
 
+		/* 外部會員樣式會以偽元素產生說明卡片，此頁不顯示該文字。 */
+		.dashboard-hero .hero-art::after {
+			display: none !important;
+			content: none !important;
+		}
+
 		.healing-orbit {
 			position: relative;
 			display: grid;
@@ -415,7 +421,6 @@
 				<div class="hero-copy">
 					<p class="dashboard-eyebrow">My Healing Journey</p>
 					<h1 id="dashboard-title">我的<em>療癒足跡</em></h1>
-					<p class="hero-description">管理你的預約、學習、活動與收藏，一站掌握專屬的療癒歷程。每一次照顧自己，都是值得被記住的一小步。</p>
 					<a class="dashboard-primary-action" th:href="@{/member/profile}">
 						<span>管理會員資料</span>
 						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
