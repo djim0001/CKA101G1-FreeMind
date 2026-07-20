@@ -1,183 +1,337 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>心理師管理</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>諮由自在｜心理師管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+	@font-face {
+		font-family: 'OpenHuninn';
+		src:
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.6;
-	padding: 40px 20px;
-}
+	:root {
+		--bg-warm: #FFFAEE;
+		--bg-soothing: #C2D9ED;
+		--blue-soft: #DCEAF5;
+		--orange: #F58E6B;
+		--orange-deep: #E5764F;
+		--pink: #FBD0BE;
+		--pink-soft: #FDE6DB;
+		--ink: #3A4B53;
+		--ink-soft: #6b7981;
+		--white: #FFFFFF;
+		--line: #ecdfce;
+		--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+		--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+		--radius-lg: 34px;
+		--radius-md: 22px;
+		--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+		--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+		--sans: "Noto Sans TC", system-ui, sans-serif;
+		--script: "Caveat", "OpenHuninn", cursive;
+		--display-en: "Baloo 2", sans-serif;
+	}
 
-h1 {
-	max-width: 1000px;
-	margin: 0 auto 28px;
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
-	padding-bottom: 16px;
-	border-bottom: 2px solid #e8b4b4;
-}
+	* { box-sizing: border-box; }
+	html { min-width: 320px; }
 
-.alert {
-	max-width: 1000px;
-	margin: 0 auto 16px;
-	padding: 12px 16px;
-	background-color: #eaf6ec;
-	color: #2e7d43;
-	border: 1px solid #cdead4;
-	border-radius: 6px;
-	font-size: 14px;
-}
+	body {
+		display: flex;
+		min-width: 320px;
+		min-height: 100vh;
+		flex-direction: column;
+		margin: 0;
+		color: var(--ink);
+		background: var(--bg-warm);
+		font-family: var(--sans);
+		line-height: 1.78;
+		-webkit-font-smoothing: antialiased;
+		overflow-x: hidden;
+	}
 
-.card {
-	max-width: 1000px;
-	margin: 0 auto;
-	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-	padding: 24px;
-	overflow-x: auto;
-}
+	a { color: inherit; text-decoration: none; }
+	button { border: 0; background: none; font-family: inherit; cursor: pointer; }
+	img, svg { display: block; max-width: 100%; }
 
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f2dddd; }
-th { color: #7a6b6b; font-weight: 600; background: #fbf2f2; }
-tr:hover td { background: #fdf7f7; }
+	.wrap { width: min(1040px, 92vw); margin-inline: auto; }
 
-.badge {
-	display: inline-block;
-	padding: 2px 10px;
-	border-radius: 999px;
-	font-size: 12px;
-	white-space: nowrap;
-}
-.badge.ok { background: #eaf6ec; color: #2e7d43; }
-.badge.warn { background: #fdf3e7; color: #b26a00; }
-.badge.bad { background: #fdecea; color: #c0392b; }
+	main {
+		width: 100%;
+		flex: 1;
+		padding: clamp(1.25rem, 2vw, 1.75rem) 0 4rem;
+	}
 
-a.detail-link {
-	display: inline-block;
-	padding: 5px 14px;
-	background-color: #e8b4b4;
-	color: #fff;
-	text-decoration: none;
-	border-radius: 6px;
-	font-size: 13px;
-}
-a.detail-link:hover { background-color: #d39393; }
+	.page-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 2rem;
+		margin-bottom: 1.75rem;
+		padding-bottom: 1.4rem;
+		border-bottom: 1px solid var(--line);
+	}
 
-.empty-hint { color: #999; text-align: center; padding: 24px 0; }
+	.page-kicker {
+		display: block;
+		margin-bottom: .35rem;
+		color: var(--orange);
+		font-size: .75rem;
+		font-weight: 700;
+		letter-spacing: .16em;
+		text-transform: uppercase;
+	}
 
-/* 篩選列 */
-.filter-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.filter-form input[type="text"], .filter-form select {
-	padding: 8px 12px;
-	border: 1px solid #f2dddd;
-	border-radius: 6px;
-	font-size: 14px;
-	color: #444;
-	outline: none;
-}
-.filter-form input[type="text"]:focus, .filter-form select:focus {
-	border-color: #e8b4b4;
-	box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
-}
-.filter-form button {
-	padding: 8px 20px;
-	background-color: #e8b4b4;
-	color: #fff;
-	border: none;
-	border-radius: 6px;
-	font-size: 14px;
-	cursor: pointer;
-}
-.filter-form button:hover { background-color: #d39393; }
-.filter-form .reset-link { font-size: 13px; color: #999; text-decoration: none; }
-.filter-form .reset-link:hover { color: #d39393; }
+	h1 {
+		margin: 0;
+		color: var(--ink);
+		font-family: var(--serif);
+		font-size: clamp(1.6rem, 3vw, 2.15rem);
+		line-height: 1.3;
+		letter-spacing: -.02em;
+	}
+
+	.page-header p {
+		max-width: 28rem;
+		margin: 0;
+		color: var(--ink-soft);
+		font-size: .9rem;
+		text-align: right;
+	}
+
+	.alert {
+		margin: 0 0 1.25rem;
+		padding: .85rem 1.15rem;
+		border: 1px solid #cfe6d3;
+		border-radius: 14px;
+		background: #eef8f0;
+		color: #2e7d43;
+		font-size: .9rem;
+	}
+
+	.card {
+		margin-bottom: 1.25rem;
+		padding: 1.5rem;
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
+		background: var(--white);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.card.table-card { overflow-x: auto; box-shadow: var(--shadow-md); }
+
+	.filter-form {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .65rem;
+		align-items: center;
+	}
+
+	.filter-form input[type="text"],
+	.filter-form select {
+		padding: .6rem .85rem;
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		background: var(--bg-warm);
+		font-size: .9rem;
+		font-family: inherit;
+		color: var(--ink);
+		outline: none;
+		transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+	}
+
+	.filter-form input[type="text"]:focus,
+	.filter-form select:focus {
+		border-color: var(--orange);
+		background: var(--white);
+		box-shadow: 0 0 0 3px rgba(245, 142, 107, .18);
+	}
+
+	.btn-primary {
+		padding: .6rem 1.4rem;
+		border-radius: 999px;
+		background: var(--orange);
+		color: var(--white);
+		font-size: .9rem;
+		font-weight: 700;
+		font-family: inherit;
+		cursor: pointer;
+		transition: background .16s ease, transform .16s ease;
+	}
+
+	.btn-primary:hover { background: var(--orange-deep); transform: translateY(-2px); }
+
+	.reset-link {
+		font-size: .84rem;
+		color: var(--ink-soft);
+		transition: color .16s ease;
+	}
+
+	.reset-link:hover { color: var(--orange-deep); }
+
+	table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+
+	th, td {
+		padding: .8rem .85rem;
+		text-align: left;
+		border-bottom: 1px solid var(--line);
+	}
+
+	th {
+		color: var(--ink-soft);
+		font-weight: 700;
+		background: var(--pink-soft);
+		white-space: nowrap;
+	}
+
+	thead th:first-child { border-top-left-radius: 12px; }
+	thead th:last-child { border-top-right-radius: 12px; }
+	tr:hover td { background: var(--bg-warm); }
+
+	.badge {
+		display: inline-block;
+		padding: .15rem .7rem;
+		border-radius: 999px;
+		font-size: .76rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.badge.ok { background: #eaf6ec; color: #2e7d43; }
+	.badge.warn { background: #fdf1e6; color: #b26a00; }
+	.badge.bad { background: #fdecea; color: #c0392b; }
+
+	.detail-link {
+		display: inline-block;
+		padding: .4rem 1rem;
+		border-radius: 999px;
+		background: var(--orange);
+		color: var(--white);
+		font-size: .8rem;
+		font-weight: 700;
+		white-space: nowrap;
+		transition: background .16s ease, transform .16s ease;
+	}
+
+	.detail-link:hover { background: var(--orange-deep); transform: translateY(-1px); }
+
+	.empty-hint { color: var(--ink-soft); text-align: center; padding: 1.75rem 0; }
+
+	:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+	@media (max-width: 640px) {
+		.page-header { display: block; margin-bottom: 1.25rem; }
+		.page-header p { margin-top: .55rem; text-align: left; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		* { transition: none !important; }
+	}
 </style>
 </head>
 <body>
-	<h1>心理師管理</h1>
+	<!-- ================= 導覽列 放在 body 內的最上方 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-	<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
+	<main id="main-content">
+		<div class="wrap">
+			<section class="page-header">
+				<div>
+					<span class="page-kicker">Psychologists</span>
+					<h1>心理師管理</h1>
+				</div>
+				<p>審核心理師帳號與執業資格，維護平台專業服務品質。</p>
+			</section>
 
-	<!-- 篩選列:全部欄位選填,不填=不篩 -->
-	<div class="card" style="margin-bottom: 16px;">
-		<form th:action="@{/admin/psych}" method="get" class="filter-form">
-			<input type="text" name="name" placeholder="姓名" th:value="${name}" />
-			<select name="gender">
-				<option value="">性別(全部)</option>
-				<option value="男" th:selected="${gender == '男'}">男</option>
-				<option value="女" th:selected="${gender == '女'}">女</option>
-			</select>
-			<input type="text" name="psychLoc" placeholder="工作地點" th:value="${psychLoc}" />
-			<select name="accountStatus">
-				<option value="">帳號狀態(全部)</option>
-				<option value="0" th:selected="${accountStatus == 0}">未啟用</option>
-				<option value="1" th:selected="${accountStatus == 1}">已啟用</option>
-				<option value="2" th:selected="${accountStatus == 2}">停權</option>
-			</select>
-			<select name="hasPracticeLicense">
-				<option value="">執業許可(全部)</option>
-				<option value="true" th:selected="${hasPracticeLicense == true}">已通過</option>
-				<option value="false" th:selected="${hasPracticeLicense == false}">審核中/未通過</option>
-			</select>
-			<select name="orderBy">
-				<option value="">排序:最新加入</option>
-				<option value="regisAsc" th:selected="${orderBy == 'regisAsc'}">最早加入</option>
-				<option value="nameAsc" th:selected="${orderBy == 'nameAsc'}">姓名 A→Z</option>
-				<option value="nameDesc" th:selected="${orderBy == 'nameDesc'}">姓名 Z→A</option>
-				<option value="feeAsc" th:selected="${orderBy == 'feeAsc'}">費用低→高</option>
-				<option value="feeDesc" th:selected="${orderBy == 'feeDesc'}">費用高→低</option>
-			</select>
-			<button type="submit">搜尋</button>
-			<a class="reset-link" th:href="@{/admin/psych}">清除條件</a>
-		</form>
-	</div>
+			<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
 
-	<div class="card">
-		<table>
-			<thead>
-				<tr>
-					<th>編號</th>
-					<th>姓名</th>
-					<th>帳號</th>
-					<th>帳號狀態</th>
-					<th>執業許可</th>
-					<th>工作地點</th>
-					<th>諮詢費</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:each="p : ${psychList}">
-					<td th:text="${p.psychId}">1</td>
-					<td th:text="${p.name}">王小明</td>
-					<td th:text="${p.psychAccount}">psych01</td>
-					<td>
-						<span class="badge ok" th:if="${p.accountStatus == 1}">已啟用</span>
-						<span class="badge warn" th:if="${p.accountStatus == 0}">未啟用</span>
-						<span class="badge bad" th:if="${p.accountStatus == 2}">停權</span>
-					</td>
-					<td>
-						<span class="badge ok" th:if="${p.hasPracticeLicense}">已通過</span>
-						<span class="badge warn" th:unless="${p.hasPracticeLicense}">審核中/未通過</span>
-					</td>
-					<td th:text="${p.psychLoc}">台北市</td>
-					<td th:text="'NT$ ' + ${p.psychFee}">NT$ 1800</td>
-					<td>
-						<a class="detail-link" th:href="@{/admin/psych/{id}(id=${p.psychId})}">審核/詳情</a>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		<p class="empty-hint" th:if="${#lists.isEmpty(psychList)}">目前沒有心理師資料</p>
-	</div>
+			<!-- 篩選列:全部欄位選填,不填=不篩 -->
+			<div class="card">
+				<form th:action="@{/admin/psych}" method="get" class="filter-form">
+					<input type="text" name="name" placeholder="姓名" th:value="${name}" />
+					<select name="gender">
+						<option value="">性別(全部)</option>
+						<option value="男" th:selected="${gender == '男'}">男</option>
+						<option value="女" th:selected="${gender == '女'}">女</option>
+					</select>
+					<input type="text" name="psychLoc" placeholder="工作地點" th:value="${psychLoc}" />
+					<select name="accountStatus">
+						<option value="">帳號狀態(全部)</option>
+						<option value="0" th:selected="${accountStatus == 0}">未啟用</option>
+						<option value="1" th:selected="${accountStatus == 1}">已啟用</option>
+						<option value="2" th:selected="${accountStatus == 2}">停權</option>
+					</select>
+					<select name="hasPracticeLicense">
+						<option value="">執業許可(全部)</option>
+						<option value="true" th:selected="${hasPracticeLicense == true}">已通過</option>
+						<option value="false" th:selected="${hasPracticeLicense == false}">審核中/未通過</option>
+					</select>
+					<select name="orderBy">
+						<option value="">排序:最新加入</option>
+						<option value="regisAsc" th:selected="${orderBy == 'regisAsc'}">最早加入</option>
+						<option value="nameAsc" th:selected="${orderBy == 'nameAsc'}">姓名 A→Z</option>
+						<option value="nameDesc" th:selected="${orderBy == 'nameDesc'}">姓名 Z→A</option>
+						<option value="feeAsc" th:selected="${orderBy == 'feeAsc'}">費用低→高</option>
+						<option value="feeDesc" th:selected="${orderBy == 'feeDesc'}">費用高→低</option>
+					</select>
+					<button type="submit" class="btn-primary">搜尋</button>
+					<a class="reset-link" th:href="@{/admin/psych}">清除條件</a>
+				</form>
+			</div>
+
+			<div class="card table-card">
+				<table>
+					<thead>
+						<tr>
+							<th>編號</th>
+							<th>姓名</th>
+							<th>帳號</th>
+							<th>帳號狀態</th>
+							<th>執業許可</th>
+							<th>工作地點</th>
+							<th>諮詢費</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="p : ${psychList}">
+							<td th:text="${p.psychId}">1</td>
+							<td th:text="${p.name}">王小明</td>
+							<td th:text="${p.psychAccount}">psych01</td>
+							<td>
+								<span class="badge ok" th:if="${p.accountStatus == 1}">已啟用</span>
+								<span class="badge warn" th:if="${p.accountStatus == 0}">未啟用</span>
+								<span class="badge bad" th:if="${p.accountStatus == 2}">停權</span>
+							</td>
+							<td>
+								<span class="badge ok" th:if="${p.hasPracticeLicense}">已通過</span>
+								<span class="badge warn" th:unless="${p.hasPracticeLicense}">審核中/未通過</span>
+							</td>
+							<td th:text="${p.psychLoc}">台北市</td>
+							<td th:text="'NT$ ' + ${p.psychFee}">NT$ 1800</td>
+							<td>
+								<a class="detail-link" th:href="@{/admin/psych/{id}(id=${p.psychId})}">審核/詳情</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				<p class="empty-hint" th:if="${#lists.isEmpty(psychList)}">目前沒有心理師資料</p>
+			</div>
+		</div>
+	</main>
+
+	<!-- ================= Footer 放在 body 結束前 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 </body>
 </html>

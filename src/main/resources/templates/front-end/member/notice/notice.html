@@ -10,55 +10,10 @@
 	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 	rel="stylesheet" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
-<!-- 正式環境再加:<link ... th:href="@{/css/member.css}" /> -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/psych/member.css}" href="/css/psych/member.css" />
 
 <style>
-/* ▼▼ 預覽專用:正式環境已在 styles.css。抽檔時整段刪掉。 ▼▼ */
-@font-face {
-	font-family: 'OpenHuninn';
-	src: url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
-		 url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
-	font-weight: 400; font-style: normal; font-display: swap;
-}
-:root {
-	--bg-warm: #FFFAEE; --bg-soothing: #C2D9ED; --blue-soft: #DCEAF5;
-	--orange: #F58E6B; --orange-deep: #E5764F; --pink: #FBD0BE; --pink-soft: #FDE6DB;
-	--ink: #3A4B53; --ink-soft: #6b7981; --white: #FFFFFF; --line: #ecdfce;
-	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07); --shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
-	--radius-lg: 34px; --radius-md: 22px;
-	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
-	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
-	--sans: "Noto Sans TC", system-ui, sans-serif;
-	--script: "Caveat", "OpenHuninn", cursive; --display-en: "Baloo 2", sans-serif;
-}
-body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--bg-warm); line-height: 1.78; }
-/* ▲▲ 預覽專用結束 ▲▲ */
-
-
-/* ===== 會員共用區(→ 之後可抽 member.css,全部包在 .thy2-member 底下) ===== */
-.thy2-member * { box-sizing: border-box; }
-.thy2-member .m-wrap { width: min(720px, 92vw); margin-inline: auto; padding: 2.6rem 0 3.4rem; }
-
-.thy2-member .m-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.4rem; }
-.thy2-member .m-head h1 {
-	font-family: var(--zen-maru); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2rem);
-	color: var(--ink); margin: 0; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
-}
-.thy2-member .m-head .script { display: block; font-family: var(--script); font-size: 1.15rem; color: var(--orange); line-height: 1; }
-.thy2-member .head-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
-
-.thy2-member .btn {
-	display: inline-flex; align-items: center; gap: .4rem; padding: .6rem 1.35rem;
-	border-radius: 999px; font-weight: 500; font-size: .92rem; text-decoration: none;
-	cursor: pointer; border: none; transition: transform .2s, background .2s, color .2s, box-shadow .2s;
-}
-.thy2-member .btn-primary { background: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245,142,107,.4); }
-.thy2-member .btn-primary:hover { transform: translateY(-2px); background: var(--orange-deep); }
-.thy2-member .btn-ghost { background: #fff; color: var(--ink); box-shadow: var(--shadow-sm); }
-.thy2-member .btn-ghost:hover { transform: translateY(-2px); color: var(--orange); }
-
-
-/* ===== 本頁專屬:會員通知 ===== */
+/* 本頁專屬:會員通知 */
 .thy2-member .unread-count { font-family: var(--sans); font-size: .9rem; font-weight: 500; color: var(--orange-deep); }
 .thy2-member .toolbar { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.2rem; }
 .thy2-member .filter-btn {
@@ -77,7 +32,6 @@ body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(-
 .thy2-member .toolbar button:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
 
 .thy2-member .notice-list { display: flex; flex-direction: column; gap: .7rem; }
-.thy2-member .notice-list .empty-hint { text-align: center; color: var(--ink-soft); padding: 2.5rem 0; }
 .thy2-member .notice-card {
 	background: #fff; border-radius: var(--radius-md); padding: 1rem 1.25rem; box-shadow: var(--shadow-sm);
 	border: 1px solid var(--line); border-left: 4px solid transparent; transition: box-shadow .2s, transform .2s;
@@ -98,9 +52,9 @@ body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(-
 
 	<div th:replace="~{fragments/header :: header}"></div>
 
-	<main class="m-wrap">
+	<main class="m-wrap w-md">
 
-		<div class="m-head">
+		<div class="m-head row">
 			<div>
 				<span class="script">Notifications</span>
 				<h1>

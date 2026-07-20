@@ -25,7 +25,6 @@ public class PsychologistMemberController {
 	private final PsychologistService psychologistService;
 	private final ExpertiseService expertiseService;
 	
-	
 	public PsychologistMemberController(PsychologistService psychologistService,
 									ExpertiseService expertiseService) {
 		this.psychologistService = psychologistService;
@@ -47,6 +46,7 @@ public class PsychologistMemberController {
 	        @RequestParam(required = false)
 	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate slotDate,
 	        @RequestParam(required = false) String orderBy,
+	        
 	        Model model) {
 		
 		name = blankToNull(name);
