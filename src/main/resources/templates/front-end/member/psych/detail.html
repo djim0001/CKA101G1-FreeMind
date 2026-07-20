@@ -99,7 +99,7 @@
 
 <div class="detail-container" th:if="${psych != null}">
 
-    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/images/noPsychPic.png}" alt="大頭照">
+    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/psych-images/noPsychPic.png}" alt="大頭照">
     <h2 th:text="${psych.name} + ' 心理師'"></h2>
 
     <p>
