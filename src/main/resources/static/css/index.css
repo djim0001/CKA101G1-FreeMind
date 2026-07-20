@@ -34,6 +34,37 @@
 .approach-photo { width: 190px; height: 190px; border-radius: 40px; flex: 0 0 auto; overflow: hidden; position: relative; }
 .approach-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+/* ---------- 系統公告（位於 .approach 區塊內；白底上用米白卡片做層次） ---------- */
+.notice-box {
+	margin-top: 3rem; padding: 1.8rem 2rem;
+	background: var(--bg-warm); border: 1px solid var(--line);
+	border-radius: var(--radius-md);
+}
+.notice-head { margin-bottom: 1.1rem; }
+.notice-head .script { display: block; font-size: 1.2rem; line-height: 1.4; }
+.notice-head h3 {
+	font-family: var(--serif); font-weight: 700; font-size: 1.35rem;
+	color: var(--ink); margin: .1rem 0 0;
+}
+.notice-list { list-style: none; margin: 0; padding: 0; }
+.notice-item {
+	display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem;
+	padding: .85rem 0; border-bottom: 1px solid var(--line);
+}
+.notice-item:last-child { border-bottom: none; padding-bottom: 0; }
+.notice-item time {
+	color: var(--orange); font-size: .86rem; font-weight: 500;
+	white-space: nowrap; padding-top: .12rem;
+}
+.notice-item p {
+	margin: 0; color: var(--ink); font-size: .95rem;
+	white-space: pre-line; word-break: break-word;
+}
+@media (max-width: 560px) {
+	.notice-box { padding: 1.4rem 1.2rem; }
+	.notice-item { grid-template-columns: 1fr; gap: .2rem; }
+}
+
 /* ============================================================
       我們的陪伴方式（水平四小卡）
       ============================================================ */

@@ -153,6 +153,20 @@
 					<p>無論你在哪個階段，我們都想 <mark class="hl o">陪你一起</mark>，找到剛剛好的那條路。</p>
 				</div>
 			</div>
+
+			<!-- ================= 系統公告（後台發布後才顯示） ================= -->
+			<div class="notice-box" th:if="${notifications != null and !notifications.isEmpty()}">
+				<div class="notice-head">
+					<span class="script">最新消息</span>
+					<h3>系統公告</h3>
+				</div>
+				<ul class="notice-list">
+					<li class="notice-item" th:each="n : ${notifications}">
+						<time th:text="${#dates.format(n.createdAt, 'yyyy.MM.dd')}">2026.07.20</time>
+						<p th:text="${n.systemContent}">公告內容</p>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</section>
 
