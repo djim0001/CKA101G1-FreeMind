@@ -5,7 +5,7 @@ cd CKA101G1-FreeMind
 git pull
 
 # 3. 停掉舊容器（避免名字衝突），資料保留
-docker compose down
+docker compose down -v        # ⚠️ 清掉 DB volume
 
 # 4. 重建映像 + 重新啟動
 docker compose up -d --build
@@ -22,3 +22,5 @@ docker compose up -d        # 注意：不用 --build，映像和資料都還在
 
 docker compose ps
 docker compose logs -f app
+
+docker compose exec mysql mysql -uroot -p123456 dbtest -e "SHOW TABLES;" #看My SQL table

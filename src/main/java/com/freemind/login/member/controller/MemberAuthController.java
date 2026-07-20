@@ -154,7 +154,7 @@ public class MemberAuthController {
 		return "redirect:/front-end/login?verified";
 	}
 
-	/** 重寄註冊 OTP（60 秒冷卻） */
+	/** 重寄註冊 OTP（30 秒冷卻） */
 	@PostMapping("/register/resend")
 	public String registerResend(@RequestParam("email") String email, ModelMap model) {
 		Member member = memberService.findByEmail(email);
@@ -164,7 +164,7 @@ public class MemberAuthController {
 		} else if (sendOtpMail("register", email, "會員註冊")) {
 			model.addAttribute("successMessage", "驗證碼已重新寄出");
 		} else {
-			model.addAttribute("errorMessage", "驗證碼寄送過於頻繁，請 60 秒後再試");
+			model.addAttribute("errorMessage", "驗證碼寄送過於頻繁，請 30 秒後再試");
 		}
 		return "front-end/member/auth/registerVerify";
 	}
@@ -189,7 +189,7 @@ public class MemberAuthController {
 		    return "front-end/member/auth/forgot";
 		}
 		if (!sendOtpMail("reset", email, "重設密碼")) {
-			model.addAttribute("errorMessage", "驗證碼寄送過於頻繁，請 60 秒後再試");
+			model.addAttribute("errorMessage", "驗證碼寄送過於頻繁，請 30 秒後再試");
 			return "front-end/member/auth/forgot";
 		}
 		model.addAttribute("email", email);
