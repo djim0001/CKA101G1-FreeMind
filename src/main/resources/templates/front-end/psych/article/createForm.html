@@ -1,332 +1,307 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="_csrf" th:content="${_csrf.token}" />
 <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-<title>撰寫文章</title>
+<title>撰寫文章｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
 <style>
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+/* ---------- 頁首標題區 ---------- */
+.form-head { background: var(--bg-warm); padding: 2.6rem 0 1.6rem; }
+.form-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.form-head .crumb a:hover { color: var(--orange); }
+.form-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.form-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.form-head h1 em { font-style: normal; color: var(--orange); }
+.form-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
+
+/* ---------- 版面 ---------- */
+.form-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
+
+/* ---------- 頂部動作列 ---------- */
+.form-toolbar {
+	display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+	margin-bottom: 1.6rem;
+}
+.form-toolbar .btn { padding: .68rem 1.4rem; font-size: .9rem; }
+
+/* ---------- 表單卡片 ---------- */
+.form-card {
+	background: #fff; border: 1px solid var(--line);
+	border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	padding: 2.4rem 2.6rem; max-width: 860px; margin: 0 auto;
 }
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.6;
-	padding: 40px 20px;
+.form-card .field { margin-bottom: 1.6rem; }
+
+.form-card label {
+	display: block; margin-bottom: .45rem;
+	font-family: var(--serif); font-size: .9rem; font-weight: 600;
+	color: var(--ink); letter-spacing: .04em;
 }
 
-h1 {
-	max-width: 860px;
-	margin: 0 auto 28px;
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
-	padding-bottom: 16px;
-	border-bottom: 2px solid #e8b4b4;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+.form-card input[type="text"],
+.form-card select {
+	width: 100%; height: 48px; padding: 0 1.2rem;
+	border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .95rem;
+	color: var(--ink); transition: border-color .2s, background .2s;
+}
+.form-card input[type="text"]:focus,
+.form-card select:focus {
+	outline: none; border-color: var(--orange); background: #fff;
 }
 
-h1 a {
-	display: inline-block;
-	padding: 8px 20px;
-	background-color: #e8b4b4;
-	color: #fff;
-	text-decoration: none;
-	border-radius: 6px;
-	font-size: 14px;
-	font-weight: 500;
-	transition: background-color 0.2s;
+.form-card .title-counter {
+	font-size: .78rem; color: var(--ink-soft); text-align: right; margin-top: .25rem;
 }
 
-h1 a:hover {
-	background-color: #d39393;
+.form-card .field-error {
+	color: #c0392b; font-size: .82rem; margin-top: .35rem;
 }
 
-form {
-	max-width: 860px;
-	margin: 0 auto;
-	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-	padding: 40px;
+.form-card .error-msg {
+	background: #fde6e6; color: #c0392b; font-size: .88rem;
+	padding: .7rem 1rem; border-radius: 10px; margin-bottom: 1.4rem;
 }
 
-form>div {
-	margin-bottom: 24px;
+/* ---------- 首圖上傳 ---------- */
+.cover-upload-btn {
+	display: inline-flex; align-items: center; gap: .4rem;
+	padding: .55rem 1.2rem; font-size: .86rem; font-weight: 500;
+	background: #f6f1e8; color: var(--ink-soft);
+	border: 1px solid var(--line); border-radius: 999px;
+	cursor: pointer; transition: all .2s; font-family: inherit;
+}
+.cover-upload-btn:hover {
+	background: var(--orange); color: #fff; border-color: var(--orange);
 }
 
-label {
-	display: block;
-	margin-bottom: 8px;
-	font-size: 15px;
-	font-weight: 600;
-	color: #7a6b6b;
-}
-
-input[type="text"], select {
-	width: 100%;
-	padding: 10px 14px;
-	border: 1px solid #f2dddd;
-	border-radius: 6px;
-	font-size: 15px;
-	color: #444;
-	outline: none;
-	transition: border-color 0.2s;
-}
-
-input[type="text"]:focus, select:focus {
-	border-color: #e8b4b4;
-	box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
-}
-
-input[type="file"] {
-	display: block;
-	width: 100%;
-	padding: 8px 0;
-	font-size: 14px;
-	color: #666;
-}
-
-.field-error {
-	color: #d9534f;
-	font-size: 13px;
-	margin-top: 4px;
-}
-
+/* ---------- 底部按鈕列 ---------- */
 .form-actions {
-	display: flex;
-	align-items: center;
-	gap: 12px;
+	display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+	padding-top: 1.2rem; border-top: 1px solid var(--line); margin-top: .4rem;
 }
 
-.form-actions button,
-.form-actions a.btn-preview {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	height: 42px;
-	padding: 0 24px;
-	font-size: 15px;
-	font-weight: 500;
-	border: none;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: background-color 0.2s, color 0.2s;
-	text-decoration: none;
-	box-sizing: border-box;
-}
+.form-actions .btn { padding: .68rem 1.6rem; font-size: .9rem; }
+.form-actions .btn-spacer { margin-left: auto; }
 
-button[value="draft"] {
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
+/* ---------- RWD ---------- */
+@media (max-width: 640px) {
+	.form-card { padding: 1.6rem 1.2rem; }
+	.form-actions { flex-direction: column; align-items: stretch; }
+	.form-actions .btn { width: 100%; justify-content: center; }
+	.form-actions .btn-spacer { margin-left: 0; }
 }
-
-button[value="draft"]:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-button[value="submit"] {
-	background-color: #e8b4b4;
-	color: #fff;
-}
-
-button[value="submit"]:hover {
-	background-color: #d39393;
-}
-
-.btn-preview {
-	margin-left: auto;
-	background-color: #fff;
-	color: #7a6b6b;
-	border: 1px solid #ccc !important;
-}
-
-.btn-preview:hover {
-	background-color: #f0f0f0;
-}
-
-@media ( max-width : 640px) {
-	form {
-		padding: 24px 20px;
-	}
-	.form-actions {
-		flex-direction: column;
-		align-items: stretch;
-	}
-	.form-actions button,
-	.form-actions a.btn-preview {
-		width: 100%;
-		margin-left: 0;
-	}
-}
-
 </style>
 </head>
+
 <body>
 
-	<h1>
-		<span>撰寫文章</span> 
-		<a th:href="@{/psych/article/myArticles}" id="backLink">返回</a>
-	</h1>
+<!-- ================= 導覽列 ================= -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-	<p th:if="${errorMessage}" th:text="${errorMessage}"
-		style="color: red;"></p>
+<!-- ================= 頁首標題 ================= -->
+<section class="form-head">
+	<div class="wrap">
+		<div class="crumb">
+			<a th:href="@{/}" href="/">首頁</a><span>/</span>
+			<a th:href="@{/psych/article/myArticles}" href="#">我的文章</a><span>/</span>
+			<span style="opacity:1;color:var(--ink)">撰寫文章</span>
+		</div>
+		<span class="script" style="font-size:1.3rem;">把想說的，好好寫下來</span>
+		<h1>撰寫<em>新文章</em></h1>
+	</div>
+</section>
 
-	<form th:action="@{/psych/article/create}" th:object="${form}"
-		method="post" enctype="multipart/form-data">
-		<div>
-	    	<label>標題</label> 
-		    <input type="text" th:field="*{title}" maxlength="50" id="titleInput" />
-		    <p id="titleCounter" style="font-size: 13px; color: #999; text-align: right;">0/50</p>
-		    <p th:if="${titleError}" th:text="${titleError}" class="field-error"></p>
-		</div>
-		
-		<div>
-		    <label>文章分類</label> 
-		    <select th:field="*{articleCatId}" id="articleCatSelect">
-		        <option value="">請選擇分類</option>
-		        <option th:each="cat : ${articleCats}"
-		            th:value="${cat.articleCatId}" th:text="${cat.articleCatName}"></option>
-		    </select>
-		    <p th:if="${catError}" th:text="${catError}" class="field-error"></p>
-		</div>
-		
-		<div>
-		    <label>首圖</label> 
-		    <input type="file" th:field="*{coverImageFile}" />
-		    <p th:if="${coverError}" th:text="${coverError}" class="field-error"></p>
-		</div>
-		
-		<div class="cover-image" th:if="${article != null and article.coverImage != null}"></div>
-		
-		<div>
-		    <label>內文</label>
-		    <textarea id="content" th:field="*{content}"></textarea>
-		    <p th:if="${contentError}" th:text="${contentError}" class="field-error"></p>
+<!-- ================= 主體 ================= -->
+<section class="form-page">
+	<div class="wrap">
+
+		<!-- 頂部動作列 -->
+		<div class="form-toolbar">
+			<a class="btn btn-outline" th:href="@{/psych/article/myArticles}" id="backLink">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+				回我的文章
+			</a>
 		</div>
 
-		<div class="form-actions">
-			<button type="submit" name="action" value="draft">儲存草稿</button>
-			<button type="submit" name="action" value="submit">送審發布</button>
-			<button type="button" class="btn-preview" onclick="openPreview()">預覽文章</button>
+		<!-- 錯誤訊息 -->
+		<p class="error-msg" th:if="${errorMessage}" th:text="${errorMessage}" style="max-width:860px;"></p>
+
+		<!-- 表單 -->
+		<div class="form-card">
+			<form th:action="@{/psych/article/create}" th:object="${form}"
+				method="post" enctype="multipart/form-data" id="mainForm">
+
+				<div class="field">
+					<label>標題</label>
+					<input type="text" th:field="*{title}" maxlength="50" id="titleInput" />
+					<p class="title-counter" id="titleCounter">0/50</p>
+					<p th:if="${titleError}" th:text="${titleError}" class="field-error"></p>
+				</div>
+
+				<div class="field">
+					<label>文章分類</label>
+					<select th:field="*{articleCatId}" id="articleCatSelect">
+						<option value="">請選擇分類</option>
+						<option th:each="cat : ${articleCats}"
+							th:value="${cat.articleCatId}" th:text="${cat.articleCatName}"></option>
+					</select>
+					<p th:if="${catError}" th:text="${catError}" class="field-error"></p>
+				</div>
+
+				<div class="field">
+					<label>首圖</label>
+					<input type="file" th:field="*{coverImageFile}" accept="image/*"
+						   id="coverInput" style="display:none;" />
+					<button type="button" class="cover-upload-btn" onclick="document.getElementById('coverInput').click()">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+						選擇圖片
+					</button>
+					<p id="coverFileName" style="font-size:.78rem; color:var(--ink-soft); margin-top:.3rem;"></p>
+					<p th:if="${coverError}" th:text="${coverError}" class="field-error"></p>
+				</div>
+
+				<div class="field">
+					<label>內文</label>
+					<textarea id="content" th:field="*{content}"></textarea>
+					<p th:if="${contentError}" th:text="${contentError}" class="field-error"></p>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" name="action" value="draft" class="btn btn-outline">儲存草稿</button>
+					<button type="submit" name="action" value="submit" class="btn btn-primary">送審發布</button>
+					<button type="button" class="btn btn-ghost btn-spacer" onclick="openPreview()">預覽文章</button>
+				</div>
+
+			</form>
 		</div>
 
-	</form>
+	</div>
+</section>
 
-	<!-- 隱藏的預覽表單, 跟主表單分開, 避免衝突；開新分頁提交 -->
-	<form id="previewForm" th:action="@{/psych/article/preview}" method="post"
-		target="_blank" style="display: none;">
-		<input type="hidden" name="title" id="previewTitleInput">
-		<input type="hidden" name="content" id="previewContentInput">
-		<input type="hidden" name="articleCatId" id="previewCatIdInput">
-	</form>
-	
-	<script>
-		// 標題字數計數
-		const titleInput = document.getElementById('titleInput');
-		const titleCounter = document.getElementById('titleCounter');
-	
-		function updateTitleCounter() {
-		    titleCounter.textContent = titleInput.value.length + '/50';
+<!-- ================= Footer ================= -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+<!-- 隱藏的預覽表單, 跟主表單分開, 避免衝突；開新分頁提交 -->
+<form id="previewForm" th:action="@{/psych/article/preview}" method="post"
+	target="_blank" style="display: none;">
+	<input type="hidden" name="title" id="previewTitleInput">
+	<input type="hidden" name="content" id="previewContentInput">
+	<input type="hidden" name="articleCatId" id="previewCatIdInput">
+</form>
+
+<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
+<script>
+	// 標題字數計數
+	var titleInput = document.getElementById('titleInput');
+	var titleCounter = document.getElementById('titleCounter');
+
+	function updateTitleCounter() {
+	    titleCounter.textContent = titleInput.value.length + '/50';
+	}
+	titleInput.addEventListener('input', updateTitleCounter);
+	updateTitleCounter();
+
+	// 選檔後顯示檔名
+	document.getElementById('coverInput').addEventListener('change', function(e) {
+	    var file = e.target.files[0];
+	    if (file) {
+	        document.getElementById('coverFileName').textContent = file.name;
+	    }
+	});
+
+	// 編輯過, 點擊返回按鈕確認離開
+	var formChanged = false;
+	document.getElementById('mainForm').addEventListener('input', function() { formChanged = true; });
+	document.getElementById('mainForm').addEventListener('change', function() { formChanged = true; });
+
+	document.getElementById('backLink').addEventListener('click', function(e) {
+	    if (!formChanged) return;
+	    e.preventDefault();
+	    if (confirm('尚未儲存草稿，確定要離開嗎？')) {
+	        window.location.href = this.href;
+	    }
+	});
+
+	// 預覽：把目前表單輸入值複製到隱藏表單，開新分頁送出
+	function openPreview() {
+	    document.getElementById('previewTitleInput').value = titleInput.value;
+	    document.getElementById('previewContentInput').value = tinymce.get('content').getContent();
+	    document.getElementById('previewCatIdInput').value = document.getElementById('articleCatSelect').value;
+	    document.getElementById('previewForm').submit();
+	}
+</script>
+
+<script src="/js/tinymce/tinymce.min.js"></script>
+<script>
+	tinymce.init({
+		selector : '#content',
+		license_key : 'gpl',
+		height : 400,
+		plugins : 'link image',
+		toolbar : 'undo redo | blocks | bold italic | alignleft aligncenter alignright | image link',
+		images_upload_handler : function(blobInfo, progress) {
+			return new Promise(function(resolve, reject) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '/psych/article/uploadImage');
+				xhr.setRequestHeader(
+					document.querySelector('meta[name="_csrf_header"]').content,
+					document.querySelector('meta[name="_csrf"]').content
+				);
+				xhr.upload.onprogress = function(e) {
+					progress(e.loaded / e.total * 100);
+				};
+				xhr.onload = function() {
+					var json;
+					try {
+						json = JSON.parse(xhr.responseText);
+					} catch (e) {
+						json = null;
+					}
+					if (xhr.status !== 200) {
+						reject((json && json.error) ? json.error : 'HTTP Error: ' + xhr.status);
+						return;
+					}
+					if (!json || typeof json.location !== 'string') {
+						reject('Invalid response: ' + xhr.responseText);
+						return;
+					}
+					resolve(json.location);
+				};
+				xhr.onerror = function() {
+					reject('Image upload failed due to a network error');
+				};
+				var formData = new FormData();
+				formData.append('file', blobInfo.blob(), blobInfo.filename());
+				xhr.send(formData);
+			});
+		},
+		relative_urls : false,
+		remove_script_host : true,
+		convert_urls : false,
+		content_css: false,
+		content_style: 'body { line-height: 1.2; margin: 4px auto; max-width: 698px; } p { margin: 0 0 0.3em 0; } img { max-width: 100%; height: auto; }',
+		setup: function(editor) {
+		    editor.on('input change', function() {
+		        formChanged = true;
+		    });
 		}
-	
-		titleInput.addEventListener('input', updateTitleCounter);
-	
-		// 編輯過, 點擊返回按鈕確認離開
-		let formChanged = false;
-		document.querySelector('form').addEventListener('input', function() {
-		    formChanged = true;
-		});
-		document.querySelector('form').addEventListener('change', function() {
-		    formChanged = true;
-		});
-	
-		document.getElementById('backLink').addEventListener('click', function(e) {
-		    if (!formChanged) {
-		        return;
-		    }
-		    e.preventDefault();
-		    const confirmLeave = confirm('尚未儲存草稿，確定要離開嗎？');
-		    if (confirmLeave) {
-		        window.location.href = this.href;
-		    }
-		});
-
-		// 預覽：把目前表單輸入值複製到隱藏表單，開新分頁送出
-		function openPreview() {
-		    document.getElementById('previewTitleInput').value = titleInput.value;
-		    document.getElementById('previewContentInput').value = tinymce.get('content').getContent();
-		    document.getElementById('previewCatIdInput').value = document.getElementById('articleCatSelect').value;
-		    document.getElementById('previewForm').submit();
-		}
-	</script>
-
-	<script src="/js/tinymce/tinymce.min.js"></script>
-	<script>
-		tinymce.init({
-			selector : '#content',
-			license_key : 'gpl',
-			height : 400,
-			plugins : 'link image',
-			toolbar : 'undo redo | blocks | bold italic | alignleft aligncenter alignright | image link',
-			images_upload_handler : function(blobInfo, progress) {
-				return new Promise(function(resolve, reject) {
-					var xhr = new XMLHttpRequest();
-					xhr.open('POST', '/psych/article/uploadImage');
-					xhr.setRequestHeader(
-						document.querySelector('meta[name="_csrf_header"]').content,
-						document.querySelector('meta[name="_csrf"]').content
-					);
-					xhr.upload.onprogress = function(e) {
-						progress(e.loaded / e.total * 100);
-					};
-					xhr.onload = function() {
-						var json;
-						try {
-							json = JSON.parse(xhr.responseText);
-						} catch (e) {
-							json = null;
-						}
-						if (xhr.status !== 200) {
-							reject((json && json.error) ? json.error : 'HTTP Error: ' + xhr.status);
-							return;
-						}
-						if (!json || typeof json.location !== 'string') {
-							reject('Invalid response: ' + xhr.responseText);
-							return;
-						}
-						resolve(json.location);
-					};
-					xhr.onerror = function() {
-						reject('Image upload failed due to a network error');
-					};
-					var formData = new FormData();
-					formData.append('file', blobInfo.blob(), blobInfo.filename());
-					xhr.send(formData);
-				});
-			},
-			relative_urls : false,
-			remove_script_host : true,
-			convert_urls : false,
-			content_css: false,
-			content_style: 'body { line-height: 1.2; margin: 4px; } p { margin: 0 0 0.3em 0; }',
-			setup: function(editor) {
-			    editor.on('input change', function() {
-			        formChanged = true;
-			    });
-			}
-		});
-	</script>
+	});
+</script>
 </body>
 </html>

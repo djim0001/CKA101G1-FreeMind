@@ -42,15 +42,6 @@ public class RecommendationServiceImpl implements RecommendationService{
 		
 	    List<Article> articles = articleRepository.getPopularFromCats(random3, List.of(articleId));
 
-		// Lazy Loading
-	    for (Article a : articles) {
-	        a.getTitle();
-	        a.getContent();
-	        if (a.getArticleCat() != null) a.getArticleCat().getArticleCatName();
-	        if (a.getPsychologist() != null) a.getPsychologist().getName();
-	        a.getCoverImage();
-	    }
-		
 		return articles;
 	}
 
@@ -77,16 +68,7 @@ public class RecommendationServiceImpl implements RecommendationService{
 		
 		List<ArticleCat> catList = top3.stream().map(c -> c.getKey()).collect(Collectors.toList());
 		List<Article> articles = articleRepository.getPopularFromCats(catList, viewedArticleIds);
-		
-		// Lazy Loading
-	    for (Article a : articles) {
-	        a.getTitle();
-	        a.getContent();
-	        if (a.getArticleCat() != null) a.getArticleCat().getArticleCatName();
-	        if (a.getPsychologist() != null) a.getPsychologist().getName();
-	        a.getCoverImage();
-	    }
-		  
+
 		return articles;
 	}
 	

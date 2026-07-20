@@ -34,9 +34,16 @@ public class ArticleImageUploadController {
 			article = articleService.getArticle(articleId, null);
 	    }
 	    
-	    // 根據檔案開頭的位元組(Hex Signature)判斷圖片類型
+	    if (article == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+
 	    byte[] image = article.getCoverImage();
-	    MediaType mediaType = MediaType.IMAGE_JPEG; // 預設 JPEG
+	    if (image == null || image.length == 0) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    MediaType mediaType = MediaType.IMAGE_JPEG;
 
 	    if (image.length > 8 && image[0] == (byte) 0x89 && image[1] == (byte) 0x50) {
 	        mediaType = MediaType.IMAGE_PNG;

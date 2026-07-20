@@ -1,10 +1,12 @@
 package com.freemind.article.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.freemind.article.dto.ArticleRecommendDTO;
+import com.freemind.article.dto.ArticleListRecommendDTO;
 import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
@@ -30,6 +32,7 @@ import com.freemind.article.service.RecommendationService;
 import com.freemind.login.psychologist.dto.PsychologistProfileRes;
 import com.freemind.login.psychologist.service.PsychologistService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
+import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -64,16 +67,43 @@ public class ArticleController {
 	public String getPublishedArticles(Model model, 
 						@RequestParam(name = "page", defaultValue = "1") Integer page,
 						@RequestParam(name = "catId", required = false) Integer catId,
-						@RequestParam(name = "keyword", required = false) String keyword) {
-		Page<Article> articlePage = articleService.getPublishedArticles(catId, keyword, page);
+						@RequestParam(name = "keyword", required = false) String keyword,
+						@RequestParam(name = "sort", defaultValue = "newest") String sort,
+						@RequestParam(name = "dateFrom", required = false) 
+						@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+						@RequestParam(name = "dateTo", required = false) 
+						@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
+		// query param: &dateFrom=2030-01-02&dateTo=2030-01-01
+		String dateError = null;
+		LocalDate today = LocalDate.now();
+		if ((dateFrom != null && dateFrom.isAfter(today)) || (dateTo != null && dateTo.isAfter(today))) {
+			dateError = "發布日期不可選擇未來日期";
+		} else if (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo)) {
+			dateError = "開始日期不可晚於結束日期";
+		} else if ((dateFrom == null) != (dateTo == null)) {
+			dateError = "請同時輸入開始與結束日期";
+		}
+		if (dateError != null) {
+			dateFrom = null;
+			dateTo = null;
+		}
+
+		Page<Article> articlePage = articleService.getPublishedArticles(catId, keyword, dateFrom, dateTo, page, sort);
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("selectedCatId", catId);
 		model.addAttribute("keyword", keyword);
+		model.addAttribute("sort", sort);
+		model.addAttribute("dateFrom", dateFrom);
+		model.addAttribute("dateTo", dateTo);
+		model.addAttribute("dateError", dateError);
 		
 		List<Integer> hotIds = articleViewService.getHotArticleIds(3);
 		List<Article> hotArticles = articleService.getPublishedArticlesByIds(hotIds);
 		model.addAttribute("hotArticles", hotArticles);
+		
+		Article featuredArticle = articleInteractionService.getMostSavedArticle();
+		model.addAttribute("featuredArticle", featuredArticle);
 		
 		return "front-end/member/article/articleList";
 	}
@@ -84,8 +114,11 @@ public class ArticleController {
 						@RequestParam(name = "page", defaultValue = "1") Integer page,
 			            @RequestParam(name = "catId", required = false) Integer catId,
 			            HttpServletRequest request,
-			            @AuthenticationPrincipal MemberUserDetails prinMemberUser) {
-		Article article = articleService.getPublishedArticle(articleId);
+			            @AuthenticationPrincipal MemberUserDetails prinMemberUser,
+			            @AuthenticationPrincipal PsychUserDetails prinPsychUser) {
+		Integer psychId = (prinPsychUser != null) ? prinPsychUser.getPsychologist().getPsychId() : null;
+		
+		Article article = articleService.getArticle(articleId, psychId);
 		
 		if (article == null) {
 			model.addAttribute("errorMessage", "查無此文章");
@@ -121,7 +154,7 @@ public class ArticleController {
 	
 	@ResponseBody
 	@PostMapping("/{articleId}/recommend")
-	public ResponseEntity<ArticleRecommendDTO> getRecommendatedArticles(@PathVariable Integer articleId,
+	public ResponseEntity<ArticleListRecommendDTO> getRecommendatedArticles(@PathVariable Integer articleId,
 																		@AuthenticationPrincipal MemberUserDetails prinMemberUser) {
 		List<Article> articleList;
 		if (prinMemberUser != null) {
@@ -130,7 +163,7 @@ public class ArticleController {
 			articleList = recommendationService.getArticleRecommendation(articleId);
 		}
 		
-		ArticleRecommendDTO dto = new ArticleRecommendDTO(articleList);
+		ArticleListRecommendDTO dto = new ArticleListRecommendDTO(articleList);
 		return ResponseEntity.ok().body(dto);
 	}
 	

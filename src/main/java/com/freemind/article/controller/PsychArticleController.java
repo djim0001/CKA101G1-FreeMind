@@ -2,6 +2,7 @@ package com.freemind.article.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.dto.ArticleCreateForm;
+import com.freemind.article.dto.ArticleWithStatsDTO;
 import com.freemind.article.dto.StatsSummaryDTO;
 import com.freemind.article.entity.Article;
 import com.freemind.article.entity.ArticleCat;
@@ -72,7 +74,14 @@ public class PsychArticleController {
 
 		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
 		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
+
+		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
+		for (Article article : articlePage.getContent()) {
+			articleList.add(articleInteractionService.getArticleStatistics(article));
+		}
+
 		model.addAttribute("articlePage", articlePage);
+		model.addAttribute("articleList", articleList);
 		model.addAttribute("currentPage", page);
 		return "front-end/psych/article/myArticles";
 	}

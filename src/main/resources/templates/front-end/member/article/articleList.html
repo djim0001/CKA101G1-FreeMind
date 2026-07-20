@@ -31,9 +31,6 @@
 /* ---------- 版面 ---------- */
 .art-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
 .art-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2.2rem; align-items: start; }
-@media (min-width: 1041px) {
-	.art-side { position: sticky; top: 92px; }
-}
 
 /* ---------- 側欄卡片 ---------- */
 .side-card {
@@ -50,7 +47,7 @@
 	background: var(--orange); flex: 0 0 auto;
 }
 
-/* 關鍵字搜尋（底色與日期欄相同） */
+/* 關鍵字搜尋 */
 .side-search { position: relative; }
 .side-search input {
 	width: 100%; height: 48px; padding: 0 3rem 0 1.2rem;
@@ -68,6 +65,7 @@
 .side-search button svg { width: 17px; height: 17px; stroke: #fff; }
 
 /* 進階篩選表單 */
+.filter-block { margin-top: 1.2rem; }
 .filter-field { margin-bottom: 1rem; min-width: 0; }
 .filter-field > label {
 	display: block; font-size: .8rem; font-weight: 500; letter-spacing: .1em;
@@ -76,16 +74,37 @@
 .filter-field select,
 .filter-field input[type="date"] {
 	width: 100%; min-width: 0; max-width: 100%;
-	height: 42px; padding: 0 .7rem;
+	height: 42px;
 	border: 1px solid var(--line); border-radius: 12px; background: #f6f1e8;
-	font-family: inherit; font-size: .86rem; color: var(--ink);
+	font-family: inherit; color: var(--ink); box-sizing: border-box;
 }
+.filter-field select { padding: 0 .7rem; font-size: .86rem; }
+
+/* 發布日期 */
+.filter-field input[type="date"] {
+	-webkit-appearance: none; appearance: none;
+	display: flex; align-items: center; justify-content: center;
+	padding: 0 .35rem; font-size: .8rem; line-height: 1; text-align: center;
+}
+.filter-field input[type="date"]::-webkit-datetime-edit {
+	display: flex; align-items: center; justify-content: center;
+	width: 100%; padding: 0;
+}
+.filter-field input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+.filter-field input[type="date"]::-webkit-date-and-time-value { text-align: center; margin: 0; }
+.filter-field input[type="date"]::-webkit-inner-spin-button { display: none; }
+.filter-field input[type="date"]::-webkit-calendar-picker-indicator {
+	flex: 0 0 auto; margin: 0 0 0 .2rem; padding: 0; opacity: .5; cursor: pointer;
+}
+.filter-field input[type="date"]:hover::-webkit-calendar-picker-indicator { opacity: .85; }
+
 .filter-field select:disabled,
 .filter-field input:disabled { color: var(--ink-soft); cursor: not-allowed; }
 .filter-field select:focus, .filter-field input:focus { outline: none; border-color: var(--orange); background: #fff; }
 .filter-dates { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: .5rem; }
-.filter-actions { display: flex; gap: .6rem; margin-top: 1.1rem; }
-.filter-actions .btn { flex: 1 1 0; min-width: 0; justify-content: center; padding: .68rem .6rem; font-size: .9rem; }
+/* 按鈕靠左對齊 */
+.filter-actions { display: flex; gap: .6rem; margin-top: 1.1rem; justify-content: flex-start; }
+.filter-actions .btn { flex: 0 1 auto; min-width: 0; justify-content: center; padding: .68rem 1.4rem; font-size: .9rem; }
 .filter-note { font-size: .76rem; color: var(--ink-soft); margin: .2rem 0 0; line-height: 1.6; }
 
 /* 分類清單 */
@@ -109,12 +128,13 @@
 	line-height: 1.1; color: var(--pink); flex: 0 0 auto; width: 1.4rem;
 }
 .hot-item:nth-child(1) .rank { color: var(--orange); }
-.hot-item .hot-body { min-width: 0; }
+.hot-item .hot-body { min-width: 0; transition: padding-left .18s; }
 .hot-item b {
 	display: block; font-size: .94rem; font-weight: 500; line-height: 1.55;
 	color: var(--ink); transition: color .18s;
 }
-.hot-item a:hover b { color: var(--orange); }
+.hot-item a.hot-body:hover { padding-left: .5rem; }
+.hot-item a.hot-body:hover b { color: var(--orange); }
 .hot-item small { font-size: .76rem; color: var(--ink-soft); letter-spacing: .04em; }
 .hot-msg { font-size: .88rem; color: var(--ink-soft); margin: .4rem 0 0; }
 
@@ -123,7 +143,16 @@
 .side-cta .script { font-size: 1.25rem; }
 .side-cta p { font-size: .9rem; color: var(--ink); margin: .3rem 0 1.1rem; }
 
+/* ---------- 區塊小標（Featured Article / ALL ARTICLES） ---------- */
+.sec-eyebrow {
+	font-family: var(--serif); font-weight: 700; font-size: .85rem;
+	letter-spacing: .12em; text-transform: uppercase;
+	color: var(--orange); margin: 0 0 .4rem;
+}
+
 /* ---------- 結果列 ---------- */
+.result-bar .count-group { display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
+.result-bar .count-group .sec-eyebrow { margin: 0; }
 .result-bar {
 	display: flex; align-items: center; justify-content: space-between;
 	flex-wrap: wrap; gap: .8rem; margin-bottom: 1.4rem;
@@ -135,22 +164,27 @@
 .result-bar .sort select {
 	height: 40px; padding: 0 .9rem; border: 1px solid var(--line);
 	border-radius: 12px; background: #f6f1e8; font-family: inherit;
-	font-size: .88rem; color: var(--ink-soft);
+	font-size: .88rem; color: var(--ink-soft); cursor: pointer;
 }
+.result-bar .sort select:focus { outline: none; border-color: var(--orange); background: #fff; }
 
 /* ---------- 精選文章（橫式長方形） ---------- */
 .featured-card {
 	display: grid; grid-template-columns: minmax(0,1.02fr) minmax(0,1fr);
 	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
-	overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 1.6rem;
+	max-height: 320px;
+	overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: .8rem;
 	transition: transform .25s, box-shadow .25s;
 }
+.featured-body { padding: .7rem 1.9rem; gap: .3rem; }
+.featured-body h2 { margin: .2rem 0 .2rem; font-size: 1.1rem; }
+.featured-body p { display: none; }
+.featured-foot { padding-top: .5rem; margin-top: auto; }
 .featured-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.featured-cover { position: relative; min-height: 236px; }
+.featured-cover { position: relative; min-height: 128px; }
 .featured-cover img { width: 100%; height: 100%; object-fit: cover; }
-/* 移除精選封面的虛線內框 */
 .featured-cover::after { content: none; }
-.featured-body { padding: 1.7rem 1.9rem; display: flex; flex-direction: column; justify-content: center; }
+.featured-body { padding: 1.2rem 1.9rem; display: flex; flex-direction: column; justify-content: center; }
 .featured-badge {
 	align-self: flex-start; background: var(--pink-soft); color: var(--orange-deep);
 	font-size: .74rem; font-weight: 500; letter-spacing: .1em;
@@ -168,29 +202,36 @@
 }
 .featured-foot .go { color: var(--orange); font-weight: 500; }
 
-/* ---------- 文章卡片 ---------- */
-.art-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.6rem; }
+/* ---------- 文章卡片（縮小版，仿 recommend card） ---------- */
+.art-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.2rem; }
 .art-list .art-card {
 	background: #fff; border-radius: var(--radius-md); overflow: hidden;
 	box-shadow: var(--shadow-sm); border: 1px solid var(--line);
 	transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column;
 }
-.art-list .art-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.art-list .art-cover { height: 190px; position: relative; }
+.art-list .art-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.art-list .art-cover { height: 120px; position: relative; }
 .art-list .art-cover img { width: 100%; height: 100%; object-fit: cover; }
-/* 移除卡片封面的虛線內框 */
 .art-cover::after { content: none; }
-.art-list .art-body { padding: 1.3rem 1.4rem 1.5rem; flex: 1; display: flex; flex-direction: column; }
+.art-list .art-body { padding: .9rem 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
 .art-list .art-meta-top {
-	font-size: .74rem; letter-spacing: .12em; text-transform: uppercase;
-	color: var(--orange); font-weight: 500;
+	font-size: .72rem; letter-spacing: .08em; text-transform: uppercase;
+	color: var(--orange); font-weight: 500; margin-bottom: .35rem;
 }
 .art-list .art-body h3 {
-	font-family: var(--serif); font-weight: 700; font-size: 1.15rem;
-	margin: .45rem 0 .5rem; line-height: 1.5;
+	font-family: var(--serif); font-weight: 700; font-size: .98rem;
+	margin: 0 0 .4rem; line-height: 1.5;
+	display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.art-list .art-body p { font-size: .88rem; color: var(--ink-soft); margin: 0 0 1rem; flex: 1; }
-.art-list .art-meta { font-size: .8rem; color: var(--ink-soft); display: flex; justify-content: space-between; gap: .6rem; }
+.art-list .art-body p {
+	font-size: .8rem; color: var(--ink-soft); margin: 0; flex: 1; line-height: 1.7;
+	display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.art-list .art-meta {
+	font-size: .74rem; color: var(--ink-soft); display: flex; justify-content: space-between;
+	align-items: center; gap: .6rem; margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--line);
+}
+.art-list .art-meta .go { color: var(--orange); font-weight: 500; }
 
 /* ---------- 底部分頁 ---------- */
 .art-bottom { border-top: 1px solid var(--line); margin-top: 2.6rem; padding-top: .6rem; }
@@ -211,7 +252,7 @@
 	.art-side { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.2rem; align-items: start; }
 	.art-side .side-cta { grid-column: 1 / -1; }
 	.featured-card { grid-template-columns: 1fr; }
-	.featured-cover { min-height: 180px; }
+	.featured-cover { min-height: 96px; }
 }
 @media (max-width: 720px) {
 	.art-side { grid-template-columns: 1fr; }
@@ -232,8 +273,10 @@
 	kw           = ${keyword == null ? '' : keyword},
 	qs           = ${(selectedCatId == null ? '' : 'catId=' + selectedCatId)
 	                 + ((keyword == null or #strings.isEmpty(keyword)) ? ''
-	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))},
-	showFeatured = ${articlePage != null and articlePage.hasContent() and currentPage != null and currentPage == 1}">
+	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))
+	                 + (dateFrom == null ? '' : '&amp;dateFrom=' + dateFrom)
+	                 + (dateTo == null ? '' : '&amp;dateTo=' + dateTo)},
+	showFeatured = ${featuredArticle != null and currentPage != null and currentPage == 1}">
 
 	<!-- ================= 導覽列 ================= -->
 	<div th:replace="~{fragments/header :: header}"></div>
@@ -258,16 +301,38 @@
 				<!-- ---------- 左側欄 ---------- -->
 				<aside class="art-side">
 
-					<!-- 關鍵字搜尋 -->
+					<!-- 搜尋 + 進階篩選 -->
 					<div class="side-card">
-						<form class="side-search" th:action="@{/article}" method="get" role="search" autocomplete="off">
-							<input type="search" name="keyword" placeholder="搜尋文章關鍵字…"
-								   th:value="${kw}" aria-label="搜尋文章" autocomplete="off" />
+						<form th:action="@{/article}" method="get" role="search" autocomplete="off">
 							<input type="hidden" name="catId" th:if="${selectedCatId != null}" th:value="${selectedCatId}" />
-							<button type="submit" aria-label="搜尋">
-								<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-									<circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></svg>
-							</button>
+
+							<div class="side-search">
+								<input type="search" name="keyword" placeholder="搜尋文章關鍵字…"
+									   th:value="${kw}" aria-label="搜尋文章" autocomplete="off" />
+								<button type="submit" aria-label="搜尋">
+									<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+										<circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></svg>
+								</button>
+							</div>
+
+							<div class="filter-block">
+								<div class="filter-field">
+									<label>發布日期</label>
+									<div class="filter-dates">
+										<input type="date" id="dateFrom" name="dateFrom" aria-label="開始日期"
+											   th:value="${dateFrom}" />
+										<input type="date" id="dateTo" name="dateTo" aria-label="結束日期"
+											   th:value="${dateTo}" />
+									</div>
+									<p class="filter-note date-error" style="color:#e74c3c;"
+									   th:style="${dateError == null} ? 'color:#e74c3c; display:none;' : 'color:#e74c3c;'"
+									   th:text="${dateError}"></p>
+								</div>
+								<div class="filter-actions">
+									<button type="submit" class="btn btn-primary">套用條件</button>
+									<a class="btn btn-outline" th:href="@{/article}" href="#">清除</a>
+								</div>
+							</div>
 						</form>
 					</div>
 
@@ -303,61 +368,20 @@
 							目前還沒有熱門文章，之後再來看看。</p>
 					</div>
 
-					<!-- 進階篩選 -->
-					<div class="side-card">
-						<h3>進階篩選</h3>
-						<form th:action="@{/article}" method="get" autocomplete="off">
-							<input type="hidden" name="keyword" th:value="${kw}" />
-							<input type="hidden" name="catId" th:if="${selectedCatId != null}" th:value="${selectedCatId}" />
-
-							<div class="filter-field">
-								<label for="psychId">作者心理師</label>
-								<select name="psychId" id="psychId" disabled>
-									<option value="">不限作者</option>
-								</select>
-							</div>
-
-							<div class="filter-field">
-								<label>發布日期</label>
-								<div class="filter-dates">
-									<input type="date" name="dateFrom" aria-label="開始日期" disabled />
-									<input type="date" name="dateTo" aria-label="結束日期" disabled />
-								</div>
-							</div>
-
-							<p class="filter-note">此區開發中，後端接上參數後把 disabled 拿掉即可。</p>
-
-							<div class="filter-actions">
-								<button type="submit" class="btn btn-primary" disabled>套用條件</button>
-								<a class="btn btn-outline" th:href="@{/article}" href="#">清除</a>
-							</div>
-						</form>
-					</div>
-
 					<!-- 側欄 CTA -->
 					<div class="side-card side-cta">
 						<span class="script">讀完之後，也可以找人聊聊</span>
 						<p>如果有些事讀著讀著就浮上來了，讓心理師陪你一起看看。</p>
-						<a class="btn btn-primary" th:href="@{/consultation}" href="#">預約諮商</a>
+						<a class="btn btn-primary" th:href="@{/search}" href="#">預約諮商</a>
 					</div>
 				</aside>
 
 				<!-- ---------- 右側文章列表 ---------- -->
 				<main>
-					<div class="result-bar">
-						<div class="count">
-							共 <b th:text="${articlePage != null ? articlePage.totalElements : 0}">36</b> 篇文章
-							<span th:if="${!#strings.isEmpty(kw)}">・關鍵字「<span th:text="${kw}">焦慮</span>」</span>
-						</div>
-						<div class="sort">
-							<label for="sortTop">排序</label>
-							<select id="sortTop" disabled><option>最新發布</option></select>
-						</div>
-					</div>
-
-					<!-- 精選文章：第 1 頁第一篇，th:with 在此把 plain 算好 -->
+					<h3 class="sec-eyebrow" th:if="${showFeatured}">Featured Article</h3>
+					<!-- 精選文章 -->
 					<a class="featured-card" th:if="${showFeatured}"
-					   th:with="top=${articlePage.content[0]},
+					   th:with="top=${featuredArticle},
 					            plain=${top.content == null ? '' :
 					                    top.content.replaceAll('\x3C[^\x3E]*\x3E',' ')
 					                               .replaceAll('&[a-zA-Z#0-9]+;',' ')
@@ -394,10 +418,26 @@
 						</div>
 					</a>
 
-					<!-- 文章卡片列表（第 1 頁跳過第一篇） -->
+					<div class="result-bar">
+						<div class="count count-group">
+							<h3 class="sec-eyebrow">ALL ARTICLES</h3>
+							<span>共 <b th:text="${articlePage != null ? articlePage.totalElements : 0}">36</b> 篇文章
+								<span th:if="${!#strings.isEmpty(kw)}">・關鍵字「<span th:text="${kw}">焦慮</span>」</span>
+							</span>
+						</div>
+						<div class="sort">
+							<label for="sortTop">排序</label>
+							<select id="sortTop" onchange="handleSort(this.value)">
+								<option value="newest" th:selected="${param.sort == null or param.sort[0] == 'newest'}">最新發布</option>
+								<option value="oldest" th:selected="${param.sort != null and param.sort[0] == 'oldest'}">最早發布</option>
+							</select>
+						</div>
+					</div>
+
+					<!-- 文章卡片列表 -->
 					<div class="art-list" th:if="${articlePage != null and articlePage.hasContent()}">
 						<th:block th:each="art, st : ${articlePage.content}">
-							<a class="art-card" th:unless="${showFeatured and st.index == 0}"
+							<a class="art-card" th:unless="${showFeatured and art.articleId == featuredArticle.articleId}"
 							   th:href="@{'/article/' + ${art.articleId}(page=${currentPage}, catId=${selectedCatId})}" href="#"
 							   th:with="plain=${art.content == null ? '' :
 							                   art.content.replaceAll('\x3C[^\x3E]*\x3E',' ')
@@ -424,11 +464,11 @@
 											  th:text="'・' + ${#temporals.format(art.publishedAt, 'yyyy.MM.dd')}">・2026.07.19</span>
 									</span>
 									<h3 th:text="${art.title}">「我沒事」的背後，其實藏了很多事</h3>
-									<p th:text="${#strings.length(plain) > 60 ? #strings.substring(plain,0,60) + '…' : plain}"></p>
+									<p th:text="${#strings.length(plain) > 52 ? #strings.substring(plain,0,52) + '…' : plain}"></p>
 									<div class="art-meta">
 										<span th:if="${art.psychologist != null}"
 											  th:text="${art.psychologist.name} + ' 心理師'">陳語安 心理師</span>
-										<span th:text="${#numbers.formatInteger(art.viewCount, 1, 'COMMA')} + ' 次閱讀'">1,024 次閱讀</span>
+										<span class="go">閱讀 →</span>
 									</div>
 								</div>
 							</a>
@@ -463,6 +503,71 @@
 </th:block>
 
 <script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
-<script></script>
+<script>
+function handleSort(value) {
+	var url = new URL(window.location.href);
+	url.searchParams.set('sort', value);
+	url.searchParams.delete('page');
+	window.location.href = url.toString();
+}
+
+(function() {
+	var form = document.querySelector('form[role="search"]');
+	var dateFrom = document.getElementById('dateFrom');
+	var dateTo = document.getElementById('dateTo');
+	var errorEl = document.querySelector('.date-error');
+
+	var now = new Date();
+	var today = now.getFullYear() + '-'
+		+ String(now.getMonth() + 1).padStart(2, '0') + '-'
+		+ String(now.getDate()).padStart(2, '0');
+	dateFrom.setAttribute('max', today);
+	dateTo.setAttribute('max', today);
+
+	function showError(msg) {
+		errorEl.textContent = msg;
+		errorEl.style.display = 'block';
+	}
+
+	// max 只會讓日曆選擇器變灰，仍可用鍵盤輸入未來日期，這裡直接清掉
+	[dateFrom, dateTo].forEach(function(input) {
+		input.addEventListener('change', function() {
+			if (input.value && input.value > today) {
+				input.value = '';
+				showError('發布日期不可選擇未來日期');
+			} else {
+				errorEl.style.display = 'none';
+			}
+		});
+	});
+
+	form.addEventListener('submit', function(e) {
+		var from = dateFrom.value;
+		var to = dateTo.value;
+		errorEl.style.display = 'none';
+
+		if ((from && from > today) || (to && to > today)) {
+			e.preventDefault();
+			showError('發布日期不可選擇未來日期');
+			return;
+		}
+
+		if ((from && !to) || (!from && to)) {
+			e.preventDefault();
+			errorEl.textContent = '請同時輸入開始與結束日期';
+			errorEl.style.display = 'block';
+			return;
+		}
+
+		if (from && to && from > to) {
+			e.preventDefault();
+			errorEl.textContent = '開始日期不可晚於結束日期';
+			errorEl.style.display = 'block';
+			return;
+		}
+	});
+})();
+
+</script>
 </body>
 </html>

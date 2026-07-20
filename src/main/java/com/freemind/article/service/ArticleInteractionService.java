@@ -30,6 +30,6 @@ public interface ArticleInteractionService {
 
 	Page<Article> getViewHistory(Integer memberId, Integer page);
 	
-	
+	Article getMostSavedArticle();
 	
 }

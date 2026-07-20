@@ -1,461 +1,363 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>我的文章</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的文章｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
 <style>
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+/* ---------- 頁首標題區 ---------- */
+.my-head { background: var(--bg-warm); padding: 2.6rem 0 1.6rem; }
+.my-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.my-head .crumb a:hover { color: var(--orange); }
+.my-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.my-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
 }
+.my-head h1 em { font-style: normal; color: var(--orange); }
+.my-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.6;
-	padding: 40px 20px;
+/* ---------- 頂部動作列 ---------- */
+.my-toolbar {
+	display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+	margin-bottom: 1.6rem;
 }
+.my-toolbar .btn { padding: .68rem 1.4rem; font-size: .9rem; }
+.my-toolbar .btn-spacer { margin-left: auto; }
 
-h1 {
-	max-width: 1100px;
-	margin: 0 auto 10px;
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
-}
+/* ---------- 版面 ---------- */
+.my-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
 
-h3 {
-	max-width: 1100px;
-	margin: 0 auto 24px;
-	display: flex;
-	align-items: center;
-}
-
-h3 a {
-	display: inline-block;
-	padding: 8px 18px;
-	font-size: 14px;
-	font-weight: 500;
-	border-radius: 6px;
-	text-decoration: none;
-	transition: background-color 0.2s, color 0.2s;
-}
-
-h3 a.btn-create {
-	background-color: #e8b4b4;
-	color: #fff;
-	margin-right: 12px;
-}
-
-h3 a.btn-create:hover {
-	background-color: #d39393;
-}
-
-h3 a.btn-dashboard {
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-}
-
-h3 a.btn-dashboard:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-h3 a.btn-home {
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-	margin-left: auto;
-}
-
-h3 a.btn-home:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-table {
-	max-width: 1100px;
-	width: 100%;
-	margin: 0 auto;
-	background: #fff;
-	border-collapse: collapse;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+/* ---------- 表格 ---------- */
+.my-table-wrap {
+	background: #fff; border: 1px solid var(--line);
+	border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
 	overflow: hidden;
-	table-layout: fixed;
 }
-
-th, td {
-	padding: 14px 16px;
-	text-align: left;
-	font-size: 15px;
-	vertical-align: middle;
+.my-table {
+	width: 100%; border-collapse: collapse; table-layout: fixed;
 }
-
-th:nth-child(1), td:nth-child(1) {
-	width: 34%;
+.my-table th, .my-table td {
+	padding: .9rem 1rem; text-align: left; font-size: .92rem; vertical-align: middle;
 }
+.my-table th:nth-child(1), .my-table td:nth-child(1) { width: 34%; }
+.my-table th:nth-child(2), .my-table td:nth-child(2) { width: 15%; white-space: nowrap; }
+.my-table th:nth-child(3), .my-table td:nth-child(3) { width: 10%; }
+.my-table th:nth-child(4), .my-table td:nth-child(4) { width: 13%; }
+.my-table th:nth-child(5), .my-table td:nth-child(5) { width: 28%; }
 
-th:nth-child(2), td:nth-child(2) {
-	width: 15%;
-	white-space: nowrap;
+.my-table thead th {
+	background: var(--pink-soft); color: var(--ink);
+	font-family: var(--serif); font-weight: 600; font-size: .84rem;
+	letter-spacing: .08em; border-bottom: 2px solid var(--line);
 }
-
-th:nth-child(3), td:nth-child(3) {
-	width: 10%;
-}
-
-th:nth-child(4), td:nth-child(4) {
-	width: 13%;
-}
-
-th:nth-child(5), td:nth-child(5) {
-	width: 20%;
-}
-
-th:nth-child(6), td:nth-child(6) {
-	width: 8%;
-}
-
-th {
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	font-weight: 600;
-	border-bottom: 2px solid #f2dddd;
-}
-
-td {
-	color: #555;
-	border-bottom: 1px solid #f9f9f9;
+.my-table tbody td {
+	color: var(--ink-soft); border-bottom: 1px solid var(--line);
 	word-break: break-all;
 }
+.my-table tbody tr:last-child td { border-bottom: none; }
+.my-table tbody tr:hover td { background: rgba(255, 250, 238, .6); }
 
-tr:last-child td {
-	border-bottom: none;
+/* ---------- 狀態標籤 ---------- */
+.status-badge {
+	display: inline-flex; align-items: center; gap: .3rem;
+	font-size: .78rem; font-weight: 500; letter-spacing: .06em;
+	padding: .25rem .7rem; border-radius: 999px;
+}
+.status-badge::before {
+	content: ""; width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+}
+.status-draft { background: #f0ebe3; color: var(--ink-soft); }
+.status-draft::before { background: var(--ink-soft); }
+.status-pending { background: var(--blue-soft); color: #4F7B96; }
+.status-pending::before { background: #4F7B96; }
+.status-published { background: #e2f0de; color: #5A7A57; }
+.status-published::before { background: #5A7A57; }
+.status-rejected { background: #fde6e6; color: #c0392b; }
+.status-rejected::before { background: #c0392b; }
+.status-unpublished { background: #f0ebe3; color: #8c7e71; }
+.status-unpublished::before { background: #8c7e71; }
+
+/* ---------- 操作按鈕 ---------- */
+.action-cell { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+.action-cell form { display: flex; align-items: center; }
+
+.act-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: .3rem;
+	height: 34px; padding: 0 .9rem;
+	font-size: .82rem; font-weight: 500; font-family: inherit;
+	border: 1.4px solid var(--line); border-radius: 999px;
+	background: #fff; color: var(--ink-soft);
+	cursor: pointer; text-decoration: none; white-space: nowrap;
+	transition: all .2s;
+}
+.act-btn:hover {
+	background: var(--orange); color: #fff; border-color: var(--orange);
+	transform: translateY(-1px);
+}
+.act-btn.act-danger:hover {
+	background: #e74c3c; color: #fff; border-color: #e74c3c;
+}
+.act-btn.act-view:hover {
+	background: var(--bg-soothing); color: var(--ink); border-color: var(--bg-soothing);
+}
+.act-btn.disabled {
+	opacity: .35; pointer-events: none; cursor: default;
 }
 
-tr:hover td {
-	background-color: #fdfafaf5;
+/* ---------- 分頁 ---------- */
+.my-bottom { border-top: 1px solid var(--line); margin-top: 2.6rem; padding-top: .6rem; }
+.my-bottom .pager { margin-top: 1.6rem; }
+
+/* ---------- 查無結果 ---------- */
+.empty-state {
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
 }
+.empty-state svg { width: 46px; height: 46px; stroke: var(--orange); margin: 0 auto 1rem; fill: none; }
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; margin-bottom: .3rem; }
+.empty-state p { color: var(--ink-soft); font-size: .92rem; margin: 0 0 1.4rem; }
 
-/* 所有操作按鈕共用的基礎樣式：統一高度，避免高低不一 */
-.action-cell,
-
-.action-cell form {
-	display: flex;
-	align-items: center;
-}
-
-a.btn-edit,
-button.btn-status,
-button[type="submit"] {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	height: 34px;
-	padding: 0 14px;
-	font-size: 13px;
-	font-weight: 500;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-	border-radius: 6px;
-	text-decoration: none;
-	cursor: pointer;
-	transition: all 0.2s;
-	font-family: inherit;
-	white-space: nowrap;
-	box-sizing: border-box;
-}
-
-a.btn-edit:hover,
-button.btn-status:hover,
-button[type="submit"]:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-a.btn-edit.disabled,
-button.btn-status.disabled {
-	opacity: 0.4;
-	pointer-events: none;
-	cursor: default;
-}
-
-.status-rejected {
-	color: #d9534f;
-	font-weight: bold;
-}
-
-.pagination {
-	max-width: 1100px;
-	margin: 24px auto 0;
-	display: flex;
-	justify-content: center;
-	gap: 6px;
-	list-style: none;
-}
-
-.pagination a, .pagination span {
-	display: inline-block;
-	padding: 8px 14px;
-	font-size: 14px;
-	font-weight: 500;
-	border-radius: 6px;
-	text-decoration: none;
-	border: 1px solid #f2dddd;
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	transition: all 0.2s;
-}
-
-.pagination a:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-.pagination .active {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-	pointer-events: none;
-}
-
-.pagination .disabled {
-	opacity: 0.4;
-	pointer-events: none;
-}
-
+/* ---------- Modal ---------- */
 .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 100;
-    justify-content: center;
-    align-items: center;
+	display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+	background: rgba(0,0,0,0.35); z-index: 200;
+	justify-content: center; align-items: center;
 }
-
-.modal-overlay.active {
-    display: flex;
-}
-
+.modal-overlay.active { display: flex; }
 .modal-box {
-    background: #fff;
-    border-radius: 10px;
-    padding: 24px;
-    max-width: 500px;
-    width: 90%;
-    max-height: 70vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+	background: #fff; border-radius: var(--radius-md); padding: 2rem 1.8rem;
+	max-width: 500px; width: 90%; max-height: 70vh; overflow-y: auto;
+	box-shadow: var(--shadow-md);
 }
-
 .modal-box h3 {
-    margin-bottom: 12px;
-    font-size: 18px;
-    color: #4a3e3e;
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem;
+	margin: 0 0 1rem; color: var(--ink);
 }
-
 .modal-box p {
-    margin-bottom: 10px;
-    font-size: 15px;
-    color: #555;
-    white-space: pre-wrap;
-    word-break: break-word;
+	margin-bottom: .6rem; font-size: .92rem; color: var(--ink-soft);
+	white-space: pre-wrap; word-break: break-word; line-height: 1.7;
 }
-
 .modal-close {
-    display: inline-block;
-    margin-top: 16px;
-    padding: 6px 16px;
-    font-size: 14px;
-    background-color: #e8b4b4;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
+	display: inline-flex; align-items: center; gap: .4rem;
+	margin-top: 1.2rem; padding: .6rem 1.4rem;
+	font-size: .88rem; font-weight: 500;
+	background: var(--orange); color: #fff;
+	border: none; border-radius: 999px; cursor: pointer;
+	transition: background .2s;
 }
+.modal-close:hover { background: var(--orange-deep); }
 
-.modal-close:hover {
-    background-color: #d39393;
+/* ---------- RWD ---------- */
+@media (max-width: 900px) {
+	.my-table-wrap { overflow-x: auto; }
+	.my-table { min-width: 700px; table-layout: auto; }
 }
-
-@media ( max-width : 768px) {
-	table {
-		display: block;
-		overflow-x: auto;
-		white-space: nowrap;
-		table-layout: auto;
-	}
+@media (max-width: 600px) {
+	.my-toolbar { gap: .5rem; }
+	.my-toolbar .btn { padding: .55rem 1rem; font-size: .84rem; }
 }
 </style>
 </head>
+
 <body>
-	<h1>我的文章</h1>
-	<h3>
-		<a class="btn-create" th:href="@{/psych/article/create}">新增文章</a>
-		<a class="btn-dashboard" th:href="@{/psych/article/myArticles/statsDashboard}">數據總覽</a>
-		<a class="btn-home" th:href="@{/}">回首頁</a>
-	</h3>
-	<table>
-	<thead>
-		<tr>
-			<th>標題</th>
-			<th>文章分類</th>
-			<th>文章狀態</th>
-			<th>建立時間</th>
-			<th>操作</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr th:each="item : ${articleList}">
-			<td th:text="${item.article.title}"></td>
-			<td
-				th:text="${item.article.articleCat != null ? item.article.articleCat.articleCatName : '未分類'}"></td>
-			<td th:classappend="${item.article.articleStatus == 3} ? 'status-rejected' : ''"
-				th:switch="${item.article.articleStatus}">
-				<span th:case="0">草稿</span>
-				<span th:case="1">送審中</span>
-				<span th:case="2">已上架</span>
-				<span th:case="3">審核未過</span>
-				<span th:case="4">已下架</span>
-				<span th:case="*">未知</span>
-			</td>
-			<td th:text="${item.article.createdAt}"></td>
-				<td>
-				<div class="action-cell">
-				<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
-			    <a th:if="${item.article.articleStatus == 0 || item.article.articleStatus == 2}"
-			       th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
-			       class="btn-edit">編輯</a>
-			
-			    <form th:if="${item.article.articleStatus == 0}"
-			          th:action="@{/psych/article/{id}/submit(id=${item.article.articleId})}"
-			          method="post">
-			        <button type="submit" class="btn-status">送審</button>
-			    </form>
-			
-			    <form th:if="${item.article.articleStatus == 0}"
-			          th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
-			          method="post"
-			          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
-			        <button type="submit" class="btn-status">刪除</button>
-			    </form>
-			
-			    <!-- 審核中 -->
-			    <a th:if="${item.article.articleStatus == 1}"
-			       class="btn-edit disabled">審核中</a>
-			
-			    <!-- 已發布：查看, 下架 -->
-				<a th:if="${item.article.articleStatus == 2}"
-				   th:href="@{/article/{id}(id=${item.article.articleId})}"
-				   target="_blank"
-				   class="btn-edit">查看</a>
-			    <form th:if="${item.article.articleStatus == 2}"
-			          th:action="@{/psych/article/{id}/unpublish(id=${item.article.articleId})}"
-			          method="post"
-			          onsubmit="return confirm('確定要下架此文章嗎？');">
-			        <button type="submit" class="btn-status">下架</button>
-			    </form>
-			
-			    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
-			    <a th:if="${item.article.articleStatus == 3}"
-				   th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
-				   class="btn-edit">編輯</a>
 
-				<button th:if="${item.article.articleStatus == 3}"
-				        class="btn-status"
-				        th:data-reason="${item.article.rejectReason}"
-				        th:data-note="${item.article.rejectNote}"
-				        onclick="showRejectDetail(this)">查看</button>
-			
-				<form th:if="${item.article.articleStatus == 3}"
-				      th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
-				      method="post"
-				      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
-				    <button type="submit" class="btn-status">刪除</button>
-				</form>
+<!-- ================= 導覽列 ================= -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-			    <!-- 已下架：編輯, 查看 -->
-			    <a th:if="${item.article.articleStatus == 4}" class="btn-edit disabled">編輯</a>
-				<button th:if="${item.article.articleStatus == 4}" class="btn-status disabled" disabled>查看</button>
-				</div>
-				</td>
-
-			</tr>
-		</tbody>
-	</table>
-
-	<ul class="pagination" th:if="${articlePage.totalPages > 1}">
-		<li><a th:if="${currentPage > 1}"
-			th:href="@{/psych/article/myArticles(page=${currentPage - 1})}">上一頁</a>
-			<span th:if="${currentPage <= 1}" class="disabled">上一頁</span></li>
-
-		<li th:each="i : ${#numbers.sequence(1, articlePage.totalPages)}">
-			<a th:if="${i != currentPage}"
-			th:href="@{/psych/article/myArticles(page=${i})}" th:text="${i}"></a>
-			<span th:if="${i == currentPage}" class="active" th:text="${i}"></span>
-		</li>
-
-		<li><a th:if="${currentPage < articlePage.totalPages}"
-			th:href="@{/psych/article/myArticles(page=${currentPage + 1})}">下一頁</a>
-			<span th:if="${currentPage >= articlePage.totalPages}"
-			class="disabled">下一頁</span></li>
-	</ul>
-	
-	<!-- 退回原因 Modal -->
-	<div id="rejectModal" class="modal-overlay" onclick="closeModal(event)">
-	    <div class="modal-box">
-	        <h3>退回原因</h3>
-	        <p id="modalReason"></p>
-	        <p id="modalNote"></p>
-	        <button class="modal-close" onclick="closeModal()">關閉</button>
-	    </div>
+<!-- ================= 頁首標題 ================= -->
+<section class="my-head">
+	<div class="wrap">
+		<div class="crumb">
+			<a th:href="@{/}" href="/">首頁</a><span>/</span><span style="opacity:1;color:var(--ink)">我的文章</span>
+		</div>
+		<span class="script" style="font-size:1.3rem;">用文字，傳遞溫柔的力量</span>
+		<h1>我的文章，<em>管理與回顧</em>。</h1>
+		<p>在這裡管理你撰寫的所有文章，追蹤審核進度，隨時回來編輯。</p>
 	</div>
+</section>
 
-	<script th:if="${alertMessage}">
-		window.onload = function() {
-			alert('[[${alertMessage}]]');
-		};
-	</script>	
-		
-	<script>	
-		function showRejectDetail(btn) {
-			const reasonMap = {
-		            '0': '內容品質',
-		            '1': '違反專業法規',
-		            '2': '版權問題',
-		            '3': '違反平台規範',
-		            '4': '其他'
-		        };
-		        const reasonCode = btn.getAttribute('data-reason');
-		        const note = btn.getAttribute('data-note');
-		        const reasonText = reasonMap[reasonCode] || '未知';
+<!-- ================= 主體 ================= -->
+<section class="my-page">
+	<div class="wrap">
 
-		        document.getElementById('modalReason').textContent = '退回原因：' + reasonText;
-		        document.getElementById('modalNote').textContent = note ? '退回說明：' + note : '';
-		        document.getElementById('rejectModal').classList.add('active');
-		    }
+		<!-- 頂部動作列 -->
+		<div class="my-toolbar">
+			<a class="btn btn-primary" th:href="@{/psych/article/create}">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+				新增文章
+			</a>
+			<a class="btn btn-outline" th:href="@{/psych/article/myArticles/statsDashboard}">數據總覽</a>
+		</div>
 
-		    function closeModal(event) {
-		        if (!event || event.target === document.getElementById('rejectModal') || event.target.classList.contains('modal-close')) {
-		            document.getElementById('rejectModal').classList.remove('active');
-		        }
-		    }
+		<!-- 表格 -->
+		<div class="my-table-wrap" th:if="${articleList != null and !articleList.isEmpty()}">
+			<table class="my-table">
+			<thead>
+				<tr>
+					<th>標題</th>
+					<th>文章分類</th>
+					<th>狀態</th>
+					<th>建立時間</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="item : ${articleList}">
+					<td style="color:var(--ink); font-weight:500;" th:text="${item.article.title}"></td>
+					<td th:text="${item.article.articleCat != null ? item.article.articleCat.articleCatName : '未分類'}"></td>
+					<td th:switch="${item.article.articleStatus}">
+						<span th:case="0" class="status-badge status-draft">草稿</span>
+						<span th:case="1" class="status-badge status-pending">送審中</span>
+						<span th:case="2" class="status-badge status-published">已上架</span>
+						<span th:case="3" class="status-badge status-rejected">審核未過</span>
+						<span th:case="4" class="status-badge status-unpublished">已下架</span>
+						<span th:case="*" class="status-badge status-draft">未知</span>
+					</td>
+					<td th:text="${item.article.createdAt}"></td>
+					<td>
+					<div class="action-cell">
+					<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
+				    <a th:if="${item.article.articleStatus == 0 || item.article.articleStatus == 2}"
+				       th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
+				       class="act-btn">編輯</a>
+				
+				    <form th:if="${item.article.articleStatus == 0}"
+				          th:action="@{/psych/article/{id}/submit(id=${item.article.articleId})}"
+				          method="post">
+				        <button type="submit" class="act-btn">送審</button>
+				    </form>
+				
+				    <form th:if="${item.article.articleStatus == 0}"
+				          th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
+				          method="post"
+				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
+				        <button type="submit" class="act-btn act-danger">刪除</button>
+				    </form>
+				
+				    <!-- 審核中 -->
+				    <span th:if="${item.article.articleStatus == 1}"
+				       class="act-btn disabled">審核中</span>
+				
+				    <!-- 已發布：查看, 下架 -->
+					<a th:if="${item.article.articleStatus == 2}"
+					   th:href="@{/article/{id}(id=${item.article.articleId})}"
+					   target="_blank"
+					   class="act-btn act-view">查看</a>
+				    <form th:if="${item.article.articleStatus == 2}"
+				          th:action="@{/psych/article/{id}/unpublish(id=${item.article.articleId})}"
+				          method="post"
+				          onsubmit="return confirm('確定要下架此文章嗎？');">
+				        <button type="submit" class="act-btn act-danger">下架</button>
+				    </form>
+				
+				    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
+				    <a th:if="${item.article.articleStatus == 3}"
+					   th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
+					   class="act-btn">編輯</a>
 
-	</script>
+					<button th:if="${item.article.articleStatus == 3}"
+					        class="act-btn act-view"
+					        th:data-reason="${item.article.rejectReason}"
+					        th:data-note="${item.article.rejectNote}"
+					        onclick="showRejectDetail(this)">查看</button>
+				
+					<form th:if="${item.article.articleStatus == 3}"
+					      th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
+					      method="post"
+					      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
+					    <button type="submit" class="act-btn act-danger">刪除</button>
+					</form>
+
+				    <!-- 已下架：編輯(disabled), 查看(active), 下架(disabled) -->
+				    <span th:if="${item.article.articleStatus == 4}" class="act-btn disabled">編輯</span>
+					<a th:if="${item.article.articleStatus == 4}"
+					   th:href="@{/article/{id}(id=${item.article.articleId})}"
+					   target="_blank"
+					   class="act-btn act-view">查看</a>
+					<span th:if="${item.article.articleStatus == 4}" class="act-btn disabled">下架</span>
+					</div>
+					</td>
+
+				</tr>
+			</tbody>
+			</table>
+		</div>
+
+		<!-- 查無結果 -->
+		<div class="empty-state" th:if="${articleList == null or articleList.isEmpty()}">
+			<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+				<path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
+			<b>還沒有文章</b>
+			<p>點擊「新增文章」開始撰寫你的第一篇吧。</p>
+			<a class="btn btn-primary" th:href="@{/psych/article/create}">新增文章</a>
+		</div>
+
+		<!-- 分頁 -->
+		<div class="my-bottom" th:if="${articlePage != null and articlePage.totalPages > 1}">
+			<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, @{/psych/article/myArticles}, '')}"></div>
+		</div>
+
+	</div>
+</section>
+
+<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+	<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
+
+<!-- ================= Footer ================= -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+<!-- 退回原因 Modal -->
+<div id="rejectModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-box">
+        <h3>退回原因</h3>
+        <p id="modalReason"></p>
+        <p id="modalNote"></p>
+        <button class="modal-close" onclick="closeModal()">關閉</button>
+    </div>
+</div>
+
+<script th:if="${alertMessage}">
+	window.onload = function() {
+		alert('[[${alertMessage}]]');
+	};
+</script>
+
+<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
+<script>
+	function showRejectDetail(btn) {
+		const reasonMap = {
+	            '0': '內容品質',
+	            '1': '違反專業法規',
+	            '2': '版權問題',
+	            '3': '違反平台規範',
+	            '4': '其他'
+	        };
+	        const reasonCode = btn.getAttribute('data-reason');
+	        const note = btn.getAttribute('data-note');
+	        const reasonText = reasonMap[reasonCode] || '未知';
+
+	        document.getElementById('modalReason').textContent = '退回原因：' + reasonText;
+	        document.getElementById('modalNote').textContent = note ? '退回說明：' + note : '';
+	        document.getElementById('rejectModal').classList.add('active');
+	    }
+
+	    function closeModal(event) {
+	        if (!event || event.target === document.getElementById('rejectModal') || event.target.classList.contains('modal-close')) {
+	            document.getElementById('rejectModal').classList.remove('active');
+	        }
+	    }
+</script>
 
 </body>
 </html>

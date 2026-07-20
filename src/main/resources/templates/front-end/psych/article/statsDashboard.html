@@ -1,158 +1,247 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>數據總覽</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>數據總覽｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
 <style>
-* {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+/* ---------- 頁首標題區 ---------- */
+.dash-head { background: var(--bg-warm); padding: 2.6rem 0 1.6rem; }
+.dash-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.dash-head .crumb a:hover { color: var(--orange); }
+.dash-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.dash-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.dash-head h1 em { font-style: normal; color: var(--orange); }
+.dash-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
+
+/* ---------- 頂部動作列 ---------- */
+.dash-toolbar {
+	display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+	margin-bottom: 2rem;
+}
+.dash-toolbar .btn { padding: .68rem 1.4rem; font-size: .9rem; }
+
+/* ---------- 版面 ---------- */
+.dash-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
+
+/* ---------- 泡泡區 ---------- */
+.bubble-area {
+	display: flex; align-items: center; justify-content: center;
+	flex-wrap: wrap; gap: 1.2rem;
+	padding: 2.4rem 1rem; min-height: 320px;
 }
 
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
-		sans-serif;
-	background-color: #f5f5f5;
-	color: #333;
-	line-height: 1.6;
-	padding: 40px 20px;
+.bubble {
+	border-radius: 50%; display: flex; flex-direction: column;
+	align-items: center; justify-content: center;
+	box-shadow: 0 6px 24px rgba(0,0,0,.06);
+	transition: transform .3s ease;
+	position: relative;
+}
+.bubble:hover { transform: scale(1.06); }
+
+.bubble-value {
+	font-family: var(--display-en); font-weight: 800;
+	line-height: 1; color: #fff;
+}
+.bubble-label {
+	font-size: .78rem; font-weight: 500; letter-spacing: .06em;
+	color: rgba(255,255,255,.85); margin-top: .3rem;
 }
 
-h1 {
-	max-width: 1100px;
-	margin: 0 auto 10px;
-	font-size: 28px;
-	font-weight: 700;
-	color: #4a3e3e;
+/* 大小 & 顏色（低飽和莫蘭迪色） */
+.bubble-view {
+	width: 190px; height: 190px;
+	background: #9aacb8;
+}
+.bubble-view .bubble-value { font-size: 2.6rem; }
+
+.bubble-like {
+	width: 155px; height: 155px;
+	background: #c4a5a0;
+}
+.bubble-like .bubble-value { font-size: 2.2rem; }
+
+.bubble-bookmark {
+	width: 140px; height: 140px;
+	background: #a3b89a;
+}
+.bubble-bookmark .bubble-value { font-size: 2rem; }
+
+.bubble-share {
+	width: 120px; height: 120px;
+	background: #b8b09a;
+}
+.bubble-share .bubble-value { font-size: 1.7rem; }
+
+/* ---------- 摘要列表 ---------- */
+.dash-summary {
+	background: #fff; border: 1px solid var(--line);
+	border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	padding: 2rem 2.2rem; margin-top: 2.4rem;
+	max-width: 640px; margin-left: auto; margin-right: auto;
+}
+.dash-summary h2 {
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem;
+	margin: 0 auto 1.2rem; display: flex; align-items: center; gap: .5rem;
+	max-width: 420px;
+}
+.dash-summary h2::before {
+	content: ""; width: 8px; height: 8px; border-radius: 50%;
+	background: var(--orange); flex: 0 0 auto;
 }
 
-h3 {
-	max-width: 1100px;
-	margin: 0 auto 24px;
+.summary-list {
+	list-style: none; margin: 0 auto; padding: 0;
+	max-width: 420px;
+}
+.summary-list li {
+	display: grid; grid-template-columns: 14px 1fr auto;
+	align-items: center; gap: .8rem;
+	padding: .7rem 0; border-bottom: 1px solid var(--line);
+	font-size: .94rem; color: var(--ink);
+}
+.summary-list li:last-child { border-bottom: none; }
+
+.summary-dot {
+	width: 10px; height: 10px; border-radius: 50%;
+}
+.dot-published { background: #a3b89a; }
+.dot-unpublished { background: #c4a5a0; }
+.dot-view { background: #9aacb8; }
+.dot-like { background: #c4a5a0; }
+.dot-bookmark { background: #a3b89a; }
+.dot-share { background: #b8b09a; }
+
+.summary-label { color: var(--ink-soft); }
+.summary-value {
+	font-family: var(--display-en); font-weight: 700;
+	font-size: 1.1rem; color: var(--ink); text-align: center;
+	min-width: 4.5rem;
 }
 
-h3 a {
-	display: inline-block;
-	padding: 8px 18px;
-	font-size: 14px;
-	font-weight: 500;
-	border-radius: 6px;
-	text-decoration: none;
-	transition: background-color 0.2s, color 0.2s;
-}
-
-h3 a.btn-back {
-	background-color: #fbf2f2;
-	color: #7a6b6b;
-	border: 1px solid #f2dddd;
-}
-
-h3 a.btn-back:hover {
-	background-color: #e8b4b4;
-	color: #fff;
-	border-color: #e8b4b4;
-}
-
-.dashboard-wrap {
-	max-width: 1100px;
-	margin: 0 auto;
-}
-
-.section-title {
-	font-size: 16px;
-	font-weight: 700;
-	color: #7a6b6b;
-	margin: 24px 0 12px;
-}
-
-.section-title:first-child {
-	margin-top: 0;
-}
-
-.stats-grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 16px;
-}
-
-.stats-item {
-	background: #fff;
-	border: 1px solid #f2dddd;
-	border-radius: 12px;
-	padding: 24px;
-	text-align: center;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-}
-
-.stats-item .stats-label {
-	font-size: 14px;
-	color: #7a6b6b;
-	margin-bottom: 10px;
-}
-
-.stats-item .stats-value {
-	font-size: 32px;
-	font-weight: 700;
-	color: #4a3e3e;
-}
-
-.stats-item.status-published .stats-value {
-	color: #5a9e6f;
-}
-
-.stats-item.status-unpublished .stats-value {
-	color: #d9534f;
-}
-
-@media (max-width: 768px) {
-	.stats-grid {
-		grid-template-columns: 1fr;
-	}
+/* ---------- RWD ---------- */
+@media (max-width: 600px) {
+	.bubble-area { gap: .8rem; padding: 1.6rem .5rem; }
+	.bubble-view { width: 140px; height: 140px; }
+	.bubble-view .bubble-value { font-size: 2rem; }
+	.bubble-like { width: 115px; height: 115px; }
+	.bubble-like .bubble-value { font-size: 1.7rem; }
+	.bubble-bookmark { width: 100px; height: 100px; }
+	.bubble-bookmark .bubble-value { font-size: 1.5rem; }
+	.bubble-share { width: 88px; height: 88px; }
+	.bubble-share .bubble-value { font-size: 1.3rem; }
+	.dash-summary { padding: 1.4rem 1.2rem; }
 }
 </style>
 </head>
+
 <body>
-	<h1>數據總覽</h1>
-	<h3>
-		<a class="btn-back" th:href="@{/psych/article/myArticles}">回我的文章</a>
-	</h3>
 
-	<div class="dashboard-wrap">
+<!-- ================= 導覽列 ================= -->
+<div th:replace="~{fragments/header :: header}"></div>
 
-		<!-- 文章狀態統計 -->
-		<div class="section-title">文章狀態</div>
-		<div class="stats-grid">
-			<div class="stats-item status-published">
-				<div class="stats-label">已上架文章</div>
-				<div class="stats-value" th:text="${summary.totalPublishedCount}">0</div>
-			</div>
-			<div class="stats-item status-unpublished">
-				<div class="stats-label">已下架文章</div>
-				<div class="stats-value" th:text="${summary.totalUnPublishedCount}">0</div>
-			</div>
+<!-- ================= 頁首標題 ================= -->
+<section class="dash-head">
+	<div class="wrap">
+		<div class="crumb">
+			<a th:href="@{/}" href="/">首頁</a><span>/</span>
+			<a th:href="@{/psych/article/myArticles}" href="#">我的文章</a><span>/</span>
+			<span style="opacity:1;color:var(--ink)">數據總覽</span>
 		</div>
-
-		<!-- 互動數據統計 -->
-		<div class="section-title">互動數據總計</div>
-		<div class="stats-grid">
-			<div class="stats-item">
-				<div class="stats-label">總瀏覽數</div>
-				<div class="stats-value" th:text="${summary.totalViewCount}">0</div>
-			</div>
-			<div class="stats-item">
-				<div class="stats-label">總按讚數</div>
-				<div class="stats-value" th:text="${summary.totalLikeCount}">0</div>
-			</div>
-			<div class="stats-item">
-				<div class="stats-label">總收藏數</div>
-				<div class="stats-value" th:text="${summary.totalBookmarkCount}">0</div>
-			</div>
-			<div class="stats-item">
-				<div class="stats-label">總分享數</div>
-				<div class="stats-value" th:text="${summary.totalShareCount}">0</div>
-			</div>
-		</div>
+		<span class="script" style="font-size:1.3rem;">你的文字，正在被看見</span>
+		<h1>數據總覽，看見<em>文章的影響力</em>。</h1>
+		<p>追蹤你的文章互動數據，了解哪些內容最能觸動讀者。</p>
 	</div>
+</section>
+
+<!-- ================= 主體 ================= -->
+<section class="dash-page">
+	<div class="wrap">
+
+		<!-- 頂部動作列 -->
+		<div class="dash-toolbar">
+			<a class="btn btn-outline" th:href="@{/psych/article/myArticles}">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+				回我的文章
+			</a>
+		</div>
+
+		<!-- 泡泡視覺化 -->
+		<div class="bubble-area">
+			<div class="bubble bubble-view">
+				<span class="bubble-value" th:text="${#numbers.formatInteger(summary.totalViewCount, 1, 'COMMA')}">0</span>
+				<span class="bubble-label">瀏覽</span>
+			</div>
+			<div class="bubble bubble-like">
+				<span class="bubble-value" th:text="${#numbers.formatInteger(summary.totalLikeCount, 1, 'COMMA')}">0</span>
+				<span class="bubble-label">按讚</span>
+			</div>
+			<div class="bubble bubble-bookmark">
+				<span class="bubble-value" th:text="${#numbers.formatInteger(summary.totalBookmarkCount, 1, 'COMMA')}">0</span>
+				<span class="bubble-label">收藏</span>
+			</div>
+			<div class="bubble bubble-share">
+				<span class="bubble-value" th:text="${#numbers.formatInteger(summary.totalShareCount, 1, 'COMMA')}">0</span>
+				<span class="bubble-label">分享</span>
+			</div>
+		</div>
+
+		<!-- 摘要列表 -->
+		<div class="dash-summary">
+			<h2>我的數據</h2>
+			<ul class="summary-list">
+				<li>
+					<span class="summary-dot dot-published"></span>
+					<span class="summary-label">已上架文章</span>
+					<span class="summary-value" th:text="${summary.totalPublishedCount}">0</span>
+				</li>
+				<li>
+					<span class="summary-dot dot-unpublished"></span>
+					<span class="summary-label">已下架文章</span>
+					<span class="summary-value" th:text="${summary.totalUnPublishedCount}">0</span>
+				</li>
+				<li>
+					<span class="summary-dot dot-view"></span>
+					<span class="summary-label">總瀏覽數</span>
+					<span class="summary-value" th:text="${#numbers.formatInteger(summary.totalViewCount, 1, 'COMMA')}">0</span>
+				</li>
+				<li>
+					<span class="summary-dot dot-like"></span>
+					<span class="summary-label">總按讚數</span>
+					<span class="summary-value" th:text="${#numbers.formatInteger(summary.totalLikeCount, 1, 'COMMA')}">0</span>
+				</li>
+				<li>
+					<span class="summary-dot dot-bookmark"></span>
+					<span class="summary-label">總收藏數</span>
+					<span class="summary-value" th:text="${#numbers.formatInteger(summary.totalBookmarkCount, 1, 'COMMA')}">0</span>
+				</li>
+				<li>
+					<span class="summary-dot dot-share"></span>
+					<span class="summary-label">總分享數</span>
+					<span class="summary-value" th:text="${#numbers.formatInteger(summary.totalShareCount, 1, 'COMMA')}">0</span>
+				</li>
+			</ul>
+		</div>
+
+	</div>
+</section>
+
+<!-- ================= Footer ================= -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
 </body>
 </html>
