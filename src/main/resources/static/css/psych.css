@@ -1,0 +1,104 @@
+/* =====================================================================
+   psych.css — 心理師頁面共用樣式
+   ---------------------------------------------------------------------
+   前提:styles.css 已全站載入(提供 :root 變數、@font-face、base body、
+         以及 .btn / .btn-primary / .btn-ghost 按鈕系統)。
+   本檔所有規則都包在 body.psych-page 底下,只作用於掛了
+   class="psych-page" 的頁面,不會影響會員(body.thy2-member)或後台頁。
+   頁面套用方式:<body class="psych-page">
+   ===================================================================== */
+
+/* 心理師頁專用色覆蓋:只在這裡生效,不動全域 :root(所以會員/後台不受影響) */
+body.psych-page { --bg-soothing: #efb4aa; }
+
+/* ---------- 版心 ---------- */
+.psych-page .psych-wrap { width: min(860px, 92vw); margin-inline: auto; padding: 2.6rem 0 3.4rem; }
+.psych-page .psych-wrap.w-md { width: min(720px, 92vw); }   /* 中等寬(通知頁) */
+.psych-page .psych-wrap.w-sm { width: min(520px, 92vw); }   /* 窄版(密碼頁) */
+
+/* ---------- 頁首:標題 + 右上動作按鈕 ---------- */
+.psych-page .psych-head {
+	display: flex; align-items: center; justify-content: space-between;
+	flex-wrap: wrap; gap: 1rem; margin-bottom: 1.6rem;
+}
+.psych-page .psych-head h1 {
+	font-family: var(--zen-maru); font-weight: 700; font-size: clamp(1.6rem, 3vw, 2rem);
+	color: var(--ink); margin: 0; display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap;
+}
+/* .script 的字體/顏色沿用 styles.css,這裡只補當作 eyebrow 的排版 */
+.psych-page .psych-head .script { display: block; font-size: 1.15rem; line-height: 1; }
+.psych-page .head-actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+/* ---------- 卡片 ---------- */
+/* 注意:class 特意取名 .psych-card,避開 index.css 既有的 .card,不會撞版 */
+.psych-page .psych-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm); padding: clamp(1.6rem, 4vw, 2.6rem);
+}
+.psych-page .psych-card > div { margin-bottom: 1.4rem; }
+.psych-page .psych-card > div:last-child { margin-bottom: 0; }
+
+/* ---------- 表單欄位 ---------- */
+.psych-page label { display: block; margin-bottom: .45rem; font-size: .92rem; font-weight: 600; color: var(--ink-soft); }
+.psych-page input[type="text"],
+.psych-page input[type="number"],
+.psych-page input[type="email"],
+.psych-page input[type="password"] {
+	width: 100%; padding: .7rem .9rem; border: 1px solid var(--line); border-radius: 12px;
+	font-family: var(--sans); font-size: .98rem; color: var(--ink);
+	background: var(--bg-warm); outline: none; transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.psych-page input:focus { border-color: var(--orange); background: #fff; box-shadow: 0 0 0 3px rgba(245, 142, 107, .18); }
+
+/* 送出按鈕;加 class="block" 可撐滿整行 */
+.psych-page button[type="submit"] {
+	padding: .8rem 1.8rem; border: none; border-radius: 999px;
+	font-family: var(--sans); font-size: 1rem; font-weight: 500; cursor: pointer;
+	background: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245, 142, 107, .4);
+	transition: transform .2s, background .2s;
+}
+.psych-page button[type="submit"]:hover { transform: translateY(-2px); background: var(--orange-deep); }
+.psych-page button[type="submit"].block { width: 100%; }
+
+/* ---------- 訊息 / 提示 ---------- */
+.psych-page .field-error { color: #c0563f; font-size: .82rem; margin: .3rem 0 0; }
+.psych-page .hint { font-size: .82rem; color: var(--ink-soft); margin: .3rem 0 0; }
+.psych-page .empty-hint { color: var(--ink-soft); font-size: .9rem; }
+.psych-page .error-msg {
+	margin-bottom: 1.2rem; padding: .85rem 1.1rem; border-radius: var(--radius-md);
+	background: #fbe4e0; color: #c0563f; border: 1px solid #f0c8c0; font-size: .9rem;
+}
+.psych-page .success-msg {
+	margin-bottom: 1.2rem; padding: .85rem 1.1rem; border-radius: var(--radius-md);
+	background: #eaf5ec; color: #3f7a52; border: 1px solid #cfe6d5; font-size: .9rem;
+}
+
+/* ---------- 區塊小標 ---------- */
+.psych-page .section-title {
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem; color: var(--ink);
+	margin: 2rem 0 1rem; padding-left: .7rem; border-left: 4px solid var(--orange);
+}
+
+/* ---------- Badge / 標籤 ---------- */
+.psych-page .badge {
+	display: inline-block; padding: .25rem .8rem; border-radius: 999px;
+	font-size: .8rem; font-weight: 500; margin: .5rem .4rem 0 0;
+}
+.psych-page .badge.ok   { background: #eaf5ec; color: #3f7a52; }
+.psych-page .badge.warn { background: var(--pink-soft); color: var(--orange-deep); }
+.psych-page .badge.bad  { background: #fbe4e0; color: #c0563f; }
+.psych-page .tag {
+	display: inline-block; padding: .35rem 1rem; margin: 0 .5rem .5rem 0;
+	background: var(--pink-soft); color: var(--ink); border: 1px solid var(--pink);
+	border-radius: 999px; font-size: .88rem;
+}
+
+/* ---------- 每週時段格子(唯讀 & 可編輯共用底) ---------- */
+.psych-page .week-grid {
+	display: grid; grid-template-columns: 44px repeat(7, 1fr); gap: 3px;
+	max-width: 560px; font-size: 11px; color: var(--ink-soft); user-select: none;
+}
+.psych-page .week-grid .head { text-align: center; padding: 2px 0; color: var(--ink); font-weight: 600; }
+.psych-page .week-grid .hour { text-align: right; padding-right: 6px; line-height: 18px; }
+.psych-page .week-grid .cell { height: 18px; border-radius: 4px; background: #f3ecda; }
+.psych-page .week-grid .cell.on { background: var(--bg-soothing); }

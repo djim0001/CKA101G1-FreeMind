@@ -56,15 +56,15 @@
 					<div class="pop-divider"></div>
 
 					<!-- 只有在該頁的 Controller 有放 notices 進 model 時才顯示清單（例如 /member/notice、/psych/notice） -->
-					<div class="noti-item" role="menuitem" th:if="${notices != null}" th:each="n : ${notices}">
+					<div class="noti-item" role="menuitem" th:if="${recentNotices != null}" th:each="n : ${recentNotices}">
 						<b th:text="${n.noticeTypeMsg}">預約通知</b>
 						<p th:text="${n.noticeContent}">通知內容</p>
 						<time th:text="${#dates.format(n.createdAt, 'yyyy/MM/dd HH:mm')}">2 小時前</time>
 					</div>
-					<div class="noti-item" th:if="${notices == null}">
+					<div class="noti-item" th:if="${recentNotices == null}">
 						<p>點擊下方查看你的通知</p>
 					</div>
-					<div class="noti-item" th:if="${notices != null and #lists.isEmpty(notices)}">
+					<div class="noti-item" th:if="${recentNotices != null and #lists.isEmpty(recentNotices)}">
 						<p>目前沒有新通知</p>
 					</div>
 
