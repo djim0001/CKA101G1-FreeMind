@@ -75,6 +75,16 @@ public class CourseService {
 
 		return repository.findByCourseStatus(COURSE_STATUS_LISTED, pageable);
 	}
+	
+	public Page<Course> findTop3PopularListedCourses() {
+		
+		Sort popularSort = Sort.by(Sort.Order.desc("saveCount"), Sort.Order.desc("reviewCount"),
+				Sort.Order.desc("starCount"), Sort.Order.desc("courseId"));
+		
+		Pageable pageable = PageRequest.of(0, 3, popularSort);
+		
+		return repository.findByCourseStatus(COURSE_STATUS_LISTED, pageable);
+	}
 
 	@Transactional
 	public Page<Course> searchCourses(CourseSearchCondition condition, Integer page) {

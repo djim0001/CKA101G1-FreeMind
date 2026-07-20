@@ -590,21 +590,6 @@ body.thy2-member .tabs .active {
 	color: var(--ink);
 	background: var(--blue-soft);
 }
-body.thy2-member .pagination-ui {
-	display: flex; align-items: center; justify-content: center; gap: .5rem; flex-wrap: wrap;
-	width: fit-content; max-width: 100%; margin: 2.2rem auto 0; padding: .65rem;
-	border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft);
-	background: rgba(255, 255, 255, .94); box-shadow: var(--shadow-sm); font-size: .9rem;
-}
-body.thy2-member .pagination-summary { padding: 0 .75rem; color: var(--ink); font-weight: 700; white-space: nowrap; }
-body.thy2-member .pagination-ui a {
-	display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 .9rem;
-	border: 1px solid transparent; border-radius: 999px; color: var(--ink-soft);
-	background: var(--bg-warm); font-weight: 500; white-space: nowrap;
-	transition: color .2s, background .2s, border-color .2s, transform .2s;
-}
-body.thy2-member .pagination-ui a:hover { color: var(--ink); background: var(--blue-soft); border-color: var(--bg-soothing); transform: translateY(-2px); }
-body.thy2-member .pagination-ui a[aria-current="page"] { color: var(--white); background: var(--orange); border-color: var(--orange); }
 body.thy2-member .notice,
 body.thy2-member .member-message {
 	margin: 1rem 0;
@@ -975,9 +960,6 @@ body.thy2-member :focus-visible {
 	}
 }
 @media (max-width: 560px) {
-	body.thy2-member .pagination-ui { width: 100%; border-radius: var(--radius-md); }
-	body.thy2-member .pagination-summary { width: 100%; text-align: center; }
-	body.thy2-member .pagination-ui a { flex: 1 1 auto; }
 	body.thy2-member #backToTop {
 		top: 148px;
 		right: 16px;

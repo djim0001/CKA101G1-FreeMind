@@ -30,8 +30,8 @@ import com.freemind.course.order.model.OrderDetailService;
 import com.freemind.course.order.model.RefundService;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
+import com.freemind.login.notice.service.NoticeService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -40,6 +40,7 @@ public class CourseForAdminController {
 
 	private final AdminService adminSvc;
 	private final CourseService courseSvc;
+	private final NoticeService noticeSvc;
 	private final RefundService refundService;
 	private final CourseOrderService courseOrderSvc;
 	private final OrderDetailService orderDetailSvc;
@@ -49,11 +50,13 @@ public class CourseForAdminController {
 			AdminService adminSvc, 
 			RefundService refundService,
 			CourseService courseSvc, 
+			NoticeService noticeSvc,
 			CourseOrderService courseOrderSvc,
 			OrderDetailService orderDetailSvc, 
 			CourseCategoriesService courseCategoriesSvc) {
 		this.adminSvc = adminSvc;
 		this.courseSvc = courseSvc;
+		this.noticeSvc = noticeSvc;
 		this.refundService = refundService;
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;

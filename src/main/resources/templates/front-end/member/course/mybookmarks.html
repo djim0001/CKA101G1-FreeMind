@@ -88,6 +88,10 @@
 		color: var(--ink-soft);
 	}
 
+	body.thy2-member .healing-header .eyebrow {
+		color: var(--orange);
+	}
+
 	body.thy2-member .section-head-actions,
 	body.thy2-member .healing-header-actions {
 		display: flex;
@@ -942,7 +946,7 @@
       <p class="eyebrow">My collection</p>
       <h1>收藏課程</h1>
     </div>
-    <a class="btn" th:href="@{/member/dashboard/myLearning}">返回我的學習空間</a>
+    <a class="btn" th:href="@{/member/dashboard/myLearning}">我的學習空間</a>
   </div>
 
   <div data-cart-message hidden th:if="${cartMsg != null}"

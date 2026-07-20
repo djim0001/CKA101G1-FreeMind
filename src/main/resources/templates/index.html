@@ -12,6 +12,197 @@
 	rel="stylesheet" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" href="/css/index.css" />
+<style>
+	/* 首頁公告：共用色票與字體由 styles.css 提供。 */
+	.announcement-section {
+		padding: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+	}
+
+	.announcement-section .notice-box {
+		position: relative;
+		overflow: hidden;
+		margin: 0;
+		padding: clamp(1.4rem, 3vw, 2rem);
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
+		background: rgba(255, 255, 255, .94);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.announcement-section .notice-box::after {
+		position: absolute;
+		top: -54px;
+		right: -42px;
+		width: 132px;
+		height: 132px;
+		border-radius: 50%;
+		background: var(--pink-soft);
+		content: "";
+		opacity: .58;
+		pointer-events: none;
+	}
+
+	.announcement-section .notice-head {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin: 0;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.announcement-section .notice-head .script {
+		display: block;
+		margin-bottom: .18rem;
+		color: var(--orange-deep);
+		font-size: 1.08rem;
+		line-height: 1.4;
+	}
+
+	.announcement-section .notice-head h2 {
+		margin: 0;
+		color: var(--ink);
+		font-family: var(--serif);
+		font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+		line-height: 1.3;
+	}
+
+	.announcement-section .notice-intro {
+		max-width: 26rem;
+		margin: 0;
+		color: var(--ink-soft);
+		font-size: .88rem;
+		text-align: right;
+	}
+
+	.announcement-section .notice-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.announcement-section .notice-item {
+		display: grid;
+		grid-template-columns: 8rem minmax(0, 1fr);
+		align-items: start;
+		gap: 1.25rem;
+		padding: 1rem 0;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.announcement-section .notice-item:last-child {
+		padding-bottom: 0;
+		border-bottom: 0;
+	}
+
+	.announcement-section .notice-item time {
+		display: inline-flex;
+		align-items: center;
+		gap: .55rem;
+		padding-top: .08rem;
+		color: var(--orange-deep);
+		font-size: .86rem;
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.announcement-section .notice-item time::before {
+		width: 7px;
+		height: 7px;
+		flex: 0 0 auto;
+		border-radius: 50%;
+		background: var(--line);
+		content: "";
+	}
+
+	.announcement-section .notice-item:first-child time::before {
+		background: var(--orange);
+		box-shadow: 0 0 0 4px rgba(245, 142, 107, .14);
+	}
+
+	.announcement-section .notice-item p {
+		margin: 0;
+		color: var(--ink);
+		font-size: .95rem;
+		line-height: 1.75;
+		white-space: pre-line;
+		word-break: break-word;
+	}
+
+	.courses .course-empty {
+		grid-column: 1 / -1;
+		margin: 0;
+		padding: 2rem;
+		border: 1px dashed var(--line);
+		border-radius: var(--radius-md);
+		background: var(--white);
+		color: var(--ink-soft);
+		text-align: center;
+	}
+
+	.courses .course-cover::after {
+		display: none;
+	}
+
+	.courses .course-preview-fallback {
+		position: absolute;
+		inset: 14px;
+		display: grid;
+		place-items: center;
+		border: 2px dashed rgba(58, 75, 83, .24);
+	}
+
+	.courses .course-preview-video {
+		position: absolute;
+		z-index: 1;
+		inset: 0;
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: var(--blue-soft);
+		object-fit: cover;
+		transition: transform .35s;
+	}
+
+	.courses .course-preview-video.is-unavailable {
+		display: none;
+	}
+
+	.courses .course-card:hover .course-preview-video {
+		transform: scale(1.035);
+	}
+
+	.courses .course-price {
+		z-index: 2;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.courses .course-preview-video {
+			transition: none;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.announcement-section .notice-head {
+			align-items: flex-start;
+			flex-direction: column;
+			gap: .45rem;
+		}
+
+		.announcement-section .notice-intro {
+			text-align: left;
+		}
+
+		.announcement-section .notice-item {
+			grid-template-columns: 1fr;
+			gap: .35rem;
+		}
+	}
+</style>
 </head>
 
 <body>
@@ -52,6 +243,29 @@
 		aria-hidden="true">
 		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z"
 			fill="#FFFFFF" /></svg>
+
+	<!-- ================= 系統公告（後台發布後才顯示） ================= -->
+	<section class="announcement-section"
+		th:if="${notifications != null and !notifications.isEmpty()}"
+		aria-labelledby="systemNoticeTitle">
+		<div class="wrap">
+			<div class="notice-box">
+				<div class="notice-head">
+					<div>
+						<span class="script">最新消息</span>
+						<h2 id="systemNoticeTitle">系統公告</h2>
+					</div>
+					<p class="notice-intro">平台服務、安全提醒與會員功能更新。</p>
+				</div>
+				<ul class="notice-list">
+					<li class="notice-item" th:each="n : ${notifications}">
+						<time th:text="${#dates.format(n.createdAt, 'yyyy.MM.dd')}">2026.07.20</time>
+						<p th:text="${n.systemContent}">公告內容</p>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</section>
 
 	<!-- ================= 我們的陪伴方式 ================= -->
 	<section class="services">	
@@ -154,19 +368,6 @@
 				</div>
 			</div>
 
-			<!-- ================= 系統公告（後台發布後才顯示） ================= -->
-			<div class="notice-box" th:if="${notifications != null and !notifications.isEmpty()}">
-				<div class="notice-head">
-					<span class="script">最新消息</span>
-					<h3>系統公告</h3>
-				</div>
-				<ul class="notice-list">
-					<li class="notice-item" th:each="n : ${notifications}">
-						<time th:text="${#dates.format(n.createdAt, 'yyyy.MM.dd')}">2026.07.20</time>
-						<p th:text="${n.systemContent}">公告內容</p>
-					</li>
-				</ul>
-			</div>
 		</div>
 	</section>
 
@@ -224,68 +425,44 @@
 			</div>
 
 			<div class="course-row">
-				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
-					<div class="photo-slot pink course-cover">
-						<span class="course-price">NT$1,280</span>
-						<div class="ps-inner">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
-								stroke-linecap="round" stroke-linejoin="round">
-								<rect x="3" y="6" width="18" height="14" rx="3" />
-								<circle cx="12" cy="13" r="3.2" /></svg>
-							<small>課程封面預留</small>
-						</div>
-					</div>
-					<div class="course-body">
-						<span class="course-tag">情緒調節</span>
-						<h3>與焦慮共處：8 堂日常練習課</h3>
-						<p>從呼吸、覺察到自我對話，帶你建立一套屬於自己的安定節奏。</p>
-						<div class="course-meta">
-							<span>共 8 堂 ・ 陳語安 心理師</span>
-							<span class="stars">★ 4.8</span>
-						</div>
-					</div>
-				</a>
+				<p class="course-empty"
+					th:if="${top3Courses == null or top3Courses.isEmpty()}">目前沒有可顯示的熱門課程。</p>
 
-				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
-					<div class="photo-slot blue course-cover">
-						<span class="course-price">NT$980</span>
-						<div class="ps-inner">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
-								stroke-linecap="round" stroke-linejoin="round">
-								<rect x="3" y="6" width="18" height="14" rx="3" />
-								<circle cx="12" cy="13" r="3.2" /></svg>
-							<small>課程封面預留</small>
+				<a class="course-card"
+					th:each="course, courseStat : ${top3Courses}"
+					th:href="@{/member/course/get_one_course/{courseId}(courseId=${course.courseId})}"
+					th:attr="aria-label=${'查看「' + course.courseName + '」課程詳情'}"
+					href="#">
+					<div class="photo-slot course-cover"
+						th:classappend="${courseStat.index == 0} ? ' pink' : (${courseStat.index == 1} ? ' blue' : '')">
+						<span class="course-price">NT$ <span
+							th:text="${course.price}">0</span></span>
+						<div class="course-preview-fallback">
+							<div class="ps-inner">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+									stroke-linecap="round" stroke-linejoin="round">
+									<rect x="3" y="6" width="18" height="14" rx="3" />
+									<circle cx="12" cy="13" r="3.2" /></svg>
+								<small th:text="${course.courseCategories.courseCatName}">課程分類</small>
+							</div>
 						</div>
+						<video class="course-preview-video" muted playsinline
+							preload="metadata" data-home-course-preview
+							th:if="${course.videoSrcPre != null and !#strings.isEmpty(course.videoSrcPre)}"
+							th:src="${course.videoSrcPre}"
+							th:attr="aria-label=${course.courseName + '課程預覽影片'}"></video>
 					</div>
 					<div class="course-body">
-						<span class="course-tag">關係修復</span>
-						<h3>愛裡也有界線：親密關係練習課</h3>
-						<p>學會表達需求、設立界線，讓親密關係裡的兩個人都能好好呼吸。</p>
+						<span class="course-tag"
+							th:text="${course.courseCategories.courseCatName}">課程分類</span>
+						<h3 th:text="${course.courseName}">課程名稱</h3>
+						<p>由 <span th:text="${course.psychologist.name}">心理師</span>
+							心理師設計的線上課程。</p>
 						<div class="course-meta">
-							<span>共 6 堂 ・ 林之默 心理師</span>
-							<span class="stars">★ 4.9</span>
-						</div>
-					</div>
-				</a>
-
-				<a class="course-card" th:href="@{/member/course/select_course}" href="#">
-					<div class="photo-slot course-cover">
-						<span class="course-price">NT$690</span>
-						<div class="ps-inner">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
-								stroke-linecap="round" stroke-linejoin="round">
-								<rect x="3" y="6" width="18" height="14" rx="3" />
-								<circle cx="12" cy="13" r="3.2" /></svg>
-							<small>課程封面預留</small>
-						</div>
-					</div>
-					<div class="course-body">
-						<span class="course-tag">正念紓壓</span>
-						<h3>3 分鐘正念呼吸：忙碌生活的暫停鍵</h3>
-						<p>不需要冥想經驗，跟著引導練習，隨時把自己重新接住。</p>
-						<div class="course-meta">
-							<span>共 5 堂 ・ 諮由自在編輯室</span>
-							<span class="stars">★ 4.7</span>
+							<span>收藏 <b th:text="${course.saveCount}">0</b> ・ 評價
+								<b th:text="${course.reviewCount}">0</b></span>
+							<span class="stars">★ <span
+								th:text="${course.reviewCount == 0 ? 0 : course.starCount / course.reviewCount}">0</span></span>
 						</div>
 					</div>
 				</a>
@@ -396,6 +573,24 @@
 	<div th:replace="~{fragments/footer :: footer}"></div>
 	<div th:replace="~{fragments/footer :: backToTop}"></div>
 
+	<script>
+		document.addEventListener("DOMContentLoaded", () => {
+			document.querySelectorAll("[data-home-course-preview]").forEach(video => {
+				const showPreviewFrame = () => {
+					if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+					video.currentTime = Math.min(1, Math.max(.05, video.duration / 10));
+				};
+
+				if (video.readyState >= 1) showPreviewFrame();
+				else video.addEventListener("loadedmetadata", showPreviewFrame, { once: true });
+
+				video.addEventListener("seeked", () => video.pause(), { once: true });
+				video.addEventListener("error", () => {
+					video.classList.add("is-unavailable");
+				}, { once: true });
+			});
+		});
+	</script>
 	<script src="/js/nav.js"></script>
 </body>
 </html>
