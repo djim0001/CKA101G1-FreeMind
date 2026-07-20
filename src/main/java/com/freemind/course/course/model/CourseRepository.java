@@ -22,6 +22,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
 
 	long countByPsychologist_PsychId(Integer psychId);
 	
+	long countByPsychologist_PsychIdAndCourseStatus(
+	        Integer psychId,
+	        Byte courseStatus
+	);
+	
 	@Query("""
 		    SELECT DISTINCT c
 		    FROM Course c

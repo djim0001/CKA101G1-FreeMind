@@ -198,7 +198,7 @@ public class ShoppingCartController {
 					.multiply(orderCoupon.getCoupon().getDiscount())
 					.intValue();
 			discountAmount = discountLimit > (cartTotal - total) 
-								? (cartTotal - total) : (cartTotal - discountLimit);
+								? (cartTotal - total) : discountLimit;
 			orderCoupon.setCouponStatus((byte)1);
 			memberCouponSvc.updateCoupon(orderCoupon);
 			session.removeAttribute("orderCoupon");
@@ -206,7 +206,7 @@ public class ShoppingCartController {
 		courseOrder.setMember(member);
 		courseOrder.setOrderTotal(cartTotal);
 		courseOrder.setDiscountAmount(discountAmount);
-		courseOrder.setNetAmount(total);
+		courseOrder.setNetAmount(cartTotal - discountAmount);
 		courseOrder.setPaymentMethod(paymentMethod);
 		courseOrder.setOrderedAt(LocalDateTime.now());
 		courseOrderSvc.addOrder(courseOrder);

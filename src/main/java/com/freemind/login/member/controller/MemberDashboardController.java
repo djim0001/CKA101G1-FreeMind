@@ -3,6 +3,7 @@ package com.freemind.login.member.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,8 +22,10 @@ import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 
@@ -39,12 +42,47 @@ public class MemberDashboardController {
 	private MemberService memberSvc;
 	@Autowired
 	private OrderDetailService orderDetailSvc;
+	@Autowired
+	private ShoppingCartRedisService shoppingCartRedisSvc;
+	@Autowired
+	private NoticeService noticeSvc;
 	
-	@ModelAttribute("member")
-    public Member currentMember(Authentication authentication) {
-        return memberSvc.findByAccount(authentication.getName());
-    }
-	
+	@ModelAttribute
+	public void addMemberAttributes(
+	        Authentication authentication,
+	        ModelMap model) {
+
+	    // 訪客的預設資料
+	    model.addAttribute("member", null);
+	    model.addAttribute("countMemberUnread", 0L);
+	    model.addAttribute("countMemberCartCount", 0L);
+
+	    // 未登入或匿名使用者
+	    if (authentication == null
+	            || authentication instanceof AnonymousAuthenticationToken
+	            || !authentication.isAuthenticated()) {
+	        return;
+	    }
+	    Member member =
+	            memberSvc.findByAccount(authentication.getName());
+	    if (member == null) {
+	        System.out.println("找不到對應會員資料");
+	        return;
+	    }
+	    Long unreadCount =
+	            noticeSvc.countMemberUnread(member.getMemberId());
+	    Long cartCount =
+	    		shoppingCartRedisSvc.getCourseCount(member.getMemberId());
+	    model.addAttribute("member", member);
+	    model.addAttribute(
+	            "countMemberUnread",
+	            unreadCount != null ? unreadCount : 0L
+	    );
+	    model.addAttribute(
+	            "countMemberCartCount",
+	            cartCount != null ? cartCount : 0L
+	    );
+	}
 	@GetMapping("/myAppointment")
 	public String myAppointment() {
 		return "redirect:/member/orders/myOrders";
@@ -106,10 +144,13 @@ public class MemberDashboardController {
 	public String courseTabs(
 			@ModelAttribute("member") Member member,
 			@RequestParam(defaultValue = "1") Integer page,
+			@ModelAttribute("countMemberCartCount") Long countMemberCartCount,
 			ModelMap model) {
 		if (page < 1)  page = 1;
 		Integer currentPage = page;
 		Page<Course> myBookmarks = courseSvc.getBookmarkCourses(member.getMemberId(), currentPage - 1);
+		
+		
 		model.addAttribute("myBookmarks", myBookmarks);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", myBookmarks.getTotalPages());
@@ -126,6 +167,7 @@ public class MemberDashboardController {
 		
 		Page<OrderDetail> myCoursePage =
                 orderDetailSvc.getAccessibleOrderDetails(member, currentPage - 1);
+		Long cartCount = (member != null ? shoppingCartRedisSvc.getCourseCount(member.getMemberId()) : null);
 		
 		model.addAttribute("myCoursePage", myCoursePage);
 		model.addAttribute("myCourses", myCoursePage.getContent());

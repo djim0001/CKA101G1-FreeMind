@@ -2,7 +2,9 @@ package com.freemind.course.course.controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,9 @@ import com.freemind.course.order.model.CourseOrder;
 import com.freemind.course.order.model.CourseOrderService;
 import com.freemind.course.order.model.OrderDetail;
 import com.freemind.course.order.model.OrderDetailService;
+import com.freemind.course.order.model.Refund;
+import com.freemind.course.order.model.Refund.CompositeRefund;
+import com.freemind.course.order.model.RefundService;
 import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.course.util.CourseSpecification;
 import com.freemind.login.member.model.Member;
@@ -52,11 +57,13 @@ public class CourseForMemberController {
 	private final ShoppingCartRedisService shoppingCartSvc;
 	private final CourseQaCommentService commentService;
 	private final CourseCategoriesService courseCategoriesSvc;
+	private final RefundService refundService;
 	
 	public CourseForMemberController(
 			CourseService courseSvc, 
 			MemberService memberSvc,
 			NoticeService noticeSvc,
+			RefundService refundService,
 			CourseOrderService courseOrderSvc,
 			OrderDetailService orderDetailSvc,
 			ShoppingCartRedisService shoppingCartSvc,
@@ -68,6 +75,7 @@ public class CourseForMemberController {
 		this.courseOrderSvc = courseOrderSvc;
 		this.orderDetailSvc = orderDetailSvc;
 		this.commentService = commentService;
+		this.refundService =  refundService;
 		this.shoppingCartSvc = shoppingCartSvc;
 		this.courseCategoriesSvc = courseCategoriesSvc;
 	}
@@ -150,6 +158,7 @@ public class CourseForMemberController {
 	@GetMapping("/my_course_order")
 	public String memberSelectCourseOrder(
 			@RequestParam(defaultValue = "1") Integer page,
+			@RequestParam(name="courseOrderId", required = false) Integer courseOrderId,
 			@ModelAttribute("member") Member member,
 			ModelMap model, HttpSession session) {
 		if (page < 1)  page = 1;
@@ -158,6 +167,12 @@ public class CourseForMemberController {
 		model.addAttribute("allMyCourseOrder", allMyCourseOrder);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", allMyCourseOrder.getTotalPages());
+		
+		if(courseOrderId != null) {
+			CompositeRefund compositeRefund = new CompositeRefund(courseOrderId, member.getMemberId());
+			Refund refund = refundService.getRefundById(compositeRefund);
+			model.addAttribute("refundStatus", refund.getRefundStatus());
+		}
 		
 		return "front-end/member/course/allMyCourseOrder";
 	}
@@ -296,4 +311,21 @@ public class CourseForMemberController {
 	    return "front-end/member/course/selectCourse";
 	}
 	
+	
+	private void addRefundStatusMap(Member member, ModelMap model) {
+        Map<Integer, Integer> refundStatusMap = new HashMap<>();
+
+        List<Refund> refundList = refundService.getRefundByMember(member);
+
+        for (Refund refund : refundList) {
+            if (refund.getCourseOrder() != null) {
+                refundStatusMap.put(
+                        refund.getCourseOrder().getCourseOrderId(),
+                        refund.getRefundStatus()
+                );
+            }
+        }
+
+        model.addAttribute("refundStatusMap", refundStatusMap);
+    }
 }

@@ -101,12 +101,13 @@ public class CourseForPsychController {
 		String sortField = (orderBy == null || orderBy.isBlank()) ? "courseId" : orderBy;
 
 		Psychologist psychologist = psychologistService.getOnePsychologist(psych.getPsychId());
+		Integer psychId = psychologist.getPsychId();
 
-		Page<Course> courseListAllPages = courseSvc.searchCourseByPsychologist(keyword, psych.getPsychId(),
+		Page<Course> courseListAllPages = courseSvc.searchCourseByPsychologist(keyword, psychId,
 				currentPage - 1, sortField, courseStatus);
 
-		int wait = courseSvc.countCoursesByStatus((byte) 1);
-		int listed = courseSvc.countCoursesByStatus((byte) 4);
+		long wait = courseSvc.countCoursesByStatusAndPsych(psychId, (byte) 1);
+		long listed = courseSvc.countCoursesByStatusAndPsych(psychId, (byte) 4);
 		int unansweredCount = courseQaCommentSvc.countUnansweredQuestions(psych.getPsychId());
 
 		List<CourseQaComment> questions = courseQaCommentSvc.getQuestionsByPsychId(psych.getPsychId());

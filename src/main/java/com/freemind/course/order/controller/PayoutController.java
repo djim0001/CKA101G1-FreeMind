@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.freemind.course.order.model.OrderDetailService;
 import com.freemind.course.order.model.Payout;
 import com.freemind.course.order.model.PayoutService;
+import com.freemind.login.notice.service.NoticeService;
+import com.freemind.login.psychologist.dto.PsychologistSelfRes;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 
@@ -30,6 +33,15 @@ public class PayoutController {
 	private OrderDetailService orderDetailSvc;
 	@Autowired
 	private PayoutService payoutService;
+	@Autowired
+	private NoticeService noticeSvc;
+	
+	@ModelAttribute("countPsychUnread")
+	public Long psychNotice(
+			ModelMap model,
+			@ModelAttribute("psych") PsychologistSelfRes psych) {
+		return (psych != null ? noticeSvc.countPsychUnread(psych.getPsychId()) : null);
+	}
 
 //	@PostMapping("set_psychId_session")
 //	public String setPsychIdSession(@RequestParam(name = "psychIdSession") Integer psychIdSession, ModelMap model,

@@ -1442,7 +1442,7 @@ body.thy2-member .profile-entry-avatar {
                       method="get" th:action="@{/member/refund/detail}">
                   <input type="hidden" name="courseOrderId" th:value="${order.courseOrderId}">
                   <input type="hidden" name="tab" value="refunds">
-                  <button class="btn secondary" type="submit">申請退款</button>
+                  <button class="btn secondary" type="submit">前往查看</button>
                 </form>
                 <span th:if="${refundStatus == 0}">退款審核中</span>
                 <span th:if="${refundStatus == 1}">退款審核成功</span>
