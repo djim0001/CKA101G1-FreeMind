@@ -1,115 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>取消紀錄</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; }
+    .cancel-section { padding: 3.2rem 0 6rem; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .cancel-card {
+        max-width: 1100px; margin: 0 auto;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 2.4rem 2.2rem;
+    }
+    .cancel-card h3 {
+        font-family: var(--serif); font-size: 1.5rem; color: var(--ink);
+        margin: 0 0 1.3rem; padding-bottom: 1rem; border-bottom: 2px solid var(--pink);
     }
 
-    .card {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
-
-    h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0 0 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 12px 10px;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 14px;
-    }
-
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    tr:nth-child(even) td {
-        background-color: #fdfafa;
-    }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin-top: .6rem; }
+    th, td { border: 1px solid var(--line); padding: .75rem .6rem; text-align: center; vertical-align: middle; font-size: .85rem; }
+    th { background: var(--bg-warm); color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+    tr:nth-child(even) td { background: #fffdf8; }
 
     .nowrap { white-space: nowrap; }
-
-    .status-cancelled {
-        color: #c62828;
-        font-weight: bold;
-    }
-
-    .empty-hint {
-        font-size: 14px;
-        color: #999;
-        margin-top: 12px;
-    }
+    .status-cancelled { color: var(--orange-deep); font-weight: 700; }
+    .empty-hint { font-size: .9rem; color: var(--ink-soft); margin-top: .8rem; }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>取消紀錄</h3>
 
-		<p class="empty-hint" th:if="${#lists.isEmpty(ordersListData)}">目前沒有已取消的訂單。</p>
+<div th:replace="~{fragments/header :: header}"></div>
 
-		<table th:unless="${#lists.isEmpty(ordersListData)}">
-			<tr>
-				<th>訂單編號</th>
-				<th>會員編號</th>
-				<th>姓名</th>
-				<th>開始時間</th>
-				<th>結束時間</th>
-				<th>來訪目的</th>
-				<th>來訪目的備註</th>
-				<th>狀態</th>
-			</tr>
-			<tr th:each="order : ${ordersListData}">
-				<td th:text="${order.orderId}"></td>
-				<td th:text="${order.member.memberId}"></td>
-				<td class="nowrap" th:text="${order.member.name}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-				<td th:switch="${order.visitPurpose}">
-					<span th:case="'emotion'">情緒困擾</span>
-					<span th:case="'stress'">壓力調適</span>
-					<span th:case="'relationship'">人際關係</span>
-					<span th:case="'family'">家庭問題</span>
-					<span th:case="'career'">職涯困惑</span>
-					<span th:case="'academic'">課業壓力</span>
-					<span th:case="'self_growth'">自我探索</span>
-					<span th:case="'sleep'">睡眠問題</span>
-					<span th:case="'anxiety'">焦慮傾向</span>
-					<span th:case="'other'">其他</span>
-					<span th:case="*" th:text="${order.visitPurpose}"></span>
-				</td>
-				<td th:text="${order.visitPurposeNote}"></td>
-				<td class="nowrap status-cancelled">已取消</td>
-			</tr>
-		</table>
-	</div>
+<main class="cancel-section">
+    <div class="wrap">
+        <div class="cancel-card">
+            <h3>取消紀錄</h3>
+
+            <p class="empty-hint" th:if="${#lists.isEmpty(ordersListData)}">目前沒有已取消的訂單。</p>
+
+            <div class="table-wrap">
+                <table th:unless="${#lists.isEmpty(ordersListData)}">
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>會員編號</th>
+                        <th>姓名</th>
+                        <th>開始時間</th>
+                        <th>結束時間</th>
+                        <th>來訪目的</th>
+                        <th>來訪目的備註</th>
+                        <th>狀態</th>
+                    </tr>
+                    <tr th:each="order : ${ordersListData}">
+                        <td th:text="${order.orderId}"></td>
+                        <td th:text="${order.member.memberId}"></td>
+                        <td class="nowrap" th:text="${order.member.name}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:switch="${order.visitPurpose}">
+                            <span th:case="'emotion'">情緒困擾</span>
+                            <span th:case="'stress'">壓力調適</span>
+                            <span th:case="'relationship'">人際關係</span>
+                            <span th:case="'family'">家庭問題</span>
+                            <span th:case="'career'">職涯困惑</span>
+                            <span th:case="'academic'">課業壓力</span>
+                            <span th:case="'self_growth'">自我探索</span>
+                            <span th:case="'sleep'">睡眠問題</span>
+                            <span th:case="'anxiety'">焦慮傾向</span>
+                            <span th:case="'other'">其他</span>
+                            <span th:case="*" th:text="${order.visitPurpose}"></span>
+                        </td>
+                        <td th:text="${order.visitPurposeNote}"></td>
+                        <td class="nowrap status-cancelled">已取消</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

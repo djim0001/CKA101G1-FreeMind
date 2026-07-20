@@ -1,192 +1,491 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我的訂單管理</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif; background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 44px 20px; }
-    .wrap { max-width: 1200px; margin: 0 auto; }
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>預約狀態｜心理師中心｜諮由自在 Free Mind</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+		rel="stylesheet" />
+	<style>
+	@font-face {
+		font-family: 'OpenHuninn';
+		src:
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+	:root {
+		--bg-warm: #FFFAEE; --bg-soothing: #C2D9ED; --blue-soft: #DCEAF5;
+		--orange: #F58E6B; --orange-deep: #E5764F; --pink: #FBD0BE; --pink-soft: #FDE6DB;
+		--ink: #3A4B53; --ink-soft: #6b7981; --white: #FFFFFF; --line: #ecdfce;
+		--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07); --shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+		--radius-lg: 34px; --radius-md: 22px;
+		--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+		--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+		--sans: "Noto Sans TC", system-ui, sans-serif;
+		--script: "Caveat", "OpenHuninn", cursive;
+		--display-en: "Baloo 2", sans-serif;
+	}
+	* { box-sizing: border-box; }
+	html { scroll-behavior: smooth; }
+	body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--bg-warm); line-height: 1.78; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+	a { color: inherit; text-decoration: none; }
+	img, svg { display: block; max-width: 100%; }
+	button, input, select { font: inherit; }
+	button { cursor: pointer; border: none; background: none; color: inherit; }
+	.wrap { width: min(1160px, 92vw); margin-inline: auto; }
+	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    .top { margin-bottom: 20px; }
-    .top h1 { font-size: 26px; font-weight: 700; }
+	header.nav { position: sticky; top: 0; z-index: 100; background: rgba(253, 246, 237, .85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(236, 223, 206, .7); }
+	.nav-inner { display: flex; align-items: center; gap: 1.4rem; height: 74px; }
+	.brand { display: flex; align-items: center; gap: .8rem; }
+	.logo-mind { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-start; line-height: 1; user-select: none; }
+	.logo-mind .word { display: flex; align-items: flex-end; }
+	.logo-mind .word span { display: inline-block; font-family: var(--display-en); font-weight: 700; font-size: 1.5rem; letter-spacing: -.03em; text-align: center; }
+	.logo-mind .word .m { width: 24px; color: #EFB65E; } .logo-mind .word .i { width: 9px; color: #DB93A9; }
+	.logo-mind .word .n { width: 17px; color: #8FB2C9; } .logo-mind .word .d { width: 17px; color: #9BB893; }
+	.logo-mind .faces { display: flex; align-items: flex-start; margin-top: -1px; }
+	.logo-mind .faces svg { display: block; }
+	.logo-mind .faces .fm { width: 24px; height: 11px; } .logo-mind .faces .fi { width: 9px; height: 11px; }
+	.logo-mind .faces .fn { width: 17px; height: 11px; } .logo-mind .faces .fd { width: 17px; height: 11px; }
+	.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+	.brand-text .logo { font-family: var(--zen-maru); font-weight: 700; font-size: 1.18rem; color: var(--ink); letter-spacing: .02em; }
+	.brand-text .en { margin-top: .15em; font-family: var(--display-en); font-size: .85rem; font-weight: 700; color: var(--ink-soft); letter-spacing: .24em; text-transform: uppercase; }
+	.nav-menu { display: flex; gap: .25rem; margin-left: .5rem; }
+	.nav-menu a { padding: .5rem .95rem; border-radius: 999px; font-size: .96rem; font-weight: 500; color: var(--ink-soft); white-space: nowrap; transition: background .2s, color .2s; }
+	.nav-menu a:hover, .nav-menu a.active { background: rgba(194, 217, 237, .4); color: var(--ink); }
+	.nav-right { display: flex; align-items: center; gap: .55rem; margin-left: auto; }
+	.icon-btn { position: relative; display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform .2s; }
+	.icon-btn:hover { transform: translateY(-2px); }
+	.icon-btn svg { width: 20px; height: 20px; stroke: var(--ink); }
+	.avatar-btn { display: grid; width: 44px; height: 44px; place-items: center; overflow: hidden; border: 2px solid #fff; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--bg-soothing)); box-shadow: var(--shadow-sm); transition: transform .2s; }
+	.avatar-btn:hover { transform: translateY(-2px); }
+	.avatar-btn svg { width: 26px; height: 26px; }
+	.dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border: 2px solid #fff; border-radius: 50%; background: var(--orange); }
+	.pop-holder { position: relative; }
+	.pop { position: absolute; top: calc(100% + 12px); right: 0; width: 266px; padding: .6rem; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .22s ease; }
+	.pop.open { opacity: 1; visibility: visible; transform: translateY(0); }
+	.pop-head { padding: .85rem 1rem .4rem; }
+	.pop-head b { font-family: var(--serif); font-size: 1.02rem; }
+	.pop-head p { margin: .15rem 0 0; font-size: .82rem; color: var(--ink-soft); }
+	.pop-item { display: flex; align-items: center; gap: .7rem; padding: .7rem 1rem; border-radius: 13px; font-size: .93rem; color: var(--ink); transition: background .16s; }
+	.pop-item:hover, .pop-item.active { background: var(--bg-warm); }
+	.pop-item svg { flex: 0 0 auto; width: 18px; height: 18px; stroke: var(--orange); }
+	.pop-divider { height: 1px; margin: .4rem .6rem; background: var(--line); }
+	.pop-label { padding: .5rem 1rem .2rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+	.notice-summary { margin: .3rem 0; padding: .8rem 1rem; border-radius: 13px; background: var(--bg-warm); font-size: .9rem; color: var(--ink-soft); }
+	.notice-summary strong { color: var(--orange-deep); }
+	.hamburger { display: none; }
+	.mobile-menu { display: none; flex-direction: column; gap: .2rem; padding: .6rem 4vw 1.2rem; border-bottom: 1px solid var(--line); background: var(--bg-warm); }
+	.mobile-menu.open { display: flex; }
+	.mobile-menu a { padding: .7rem .4rem; border-radius: 10px; font-weight: 500; color: var(--ink); }
+	.mobile-menu a:hover, .mobile-menu a.active { background: rgba(194, 217, 237, .4); }
 
-    /* 頁籤 */
-    .tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 2px solid #f2e0dc; }
-    .tab { display: flex; align-items: center; gap: 8px; padding: 11px 22px; font-size: 15px; font-weight: 600; color: #a99a95; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-    .tab:hover { color: #c07d7d; }
-    .tab.active { color: #c07d7d; border-bottom-color: #e8b4b4; }
-    .tab .count { background: #f2dddd; color: #c07d7d; font-size: 12.5px; font-weight: 600; padding: 1px 10px; border-radius: 999px; }
-    .tab.active .count { background: #e8b4b4; color: #fff; }
+	.page-main { padding: 2.6rem 0 4.5rem; }
+	.page-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1.6rem; padding: 0 .3rem 1.5rem; border-bottom: 1px solid var(--line); }
+	.eyebrow { display: inline-block; margin-bottom: .35rem; font-size: .8rem; font-weight: 500; letter-spacing: .22em; color: var(--orange); }
+	.page-intro h1 { margin: 0; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.2; letter-spacing: .02em; }
+	.page-intro p { max-width: 42rem; margin: .55rem 0 0; color: var(--ink-soft); font-size: 1rem; }
+	.btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 44px; padding: .72rem 1.35rem; border: 1px solid transparent; border-radius: 999px; font-weight: 500; font-size: .94rem; letter-spacing: .02em; white-space: nowrap; transition: transform .2s, box-shadow .2s, background .2s, color .2s; }
+	.btn-primary { background: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245, 142, 107, .32); }
+	.btn-primary:hover { background: var(--orange-deep); transform: translateY(-2px); }
+	.btn-secondary { border-color: var(--line); background: #fff; color: var(--ink); }
+	.btn-secondary:hover { border-color: var(--bg-soothing); background: var(--blue-soft); }
+	.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
+	.stats-2 { grid-template-columns: repeat(2, 1fr); }
+	.stat { position: relative; overflow: hidden; min-height: 118px; padding: 1.35rem 1.45rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); box-shadow: var(--shadow-sm); }
+	.stat::after { content: ""; position: absolute; right: -28px; bottom: -38px; width: 92px; height: 92px; border-radius: 50%; background: var(--pink-soft); }
+	.stat:nth-child(even)::after { background: var(--blue-soft); }
+	.stat span { position: relative; z-index: 1; color: var(--ink-soft); font-size: .9rem; }
+	.stat strong { position: relative; z-index: 1; display: block; margin-top: .2rem; font-family: var(--serif); font-size: 2rem; line-height: 1.2; }
+	.workspace { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--white); box-shadow: var(--shadow-md); }
+	.tabs { display: flex; gap: .35rem; padding: 1rem 1.2rem 0; border-bottom: 1px solid var(--line); background: rgba(220, 234, 245, .22); }
+	.tabs button { position: relative; padding: .8rem 1.25rem .95rem; font-weight: 500; color: var(--ink-soft); }
+	.tabs button::after { content: ""; position: absolute; right: 1rem; bottom: -1px; left: 1rem; height: 3px; border-radius: 999px 999px 0 0; background: transparent; }
+	.tabs button:hover, .tabs button.active { color: var(--ink); }
+	.tabs button.active::after { background: var(--orange); }
+	.tab-panel { padding: 1.5rem; }
+	.field { width: 100%; min-height: 46px; padding: .68rem .95rem; border: 1px solid var(--line); border-radius: 14px; outline: none; background: #fff; color: var(--ink); transition: border-color .18s, box-shadow .18s; }
+	.field:focus { border-color: var(--bg-soothing); box-shadow: 0 0 0 4px rgba(194, 217, 237, .28); }
+	.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; }
+	table { width: 100%; border-collapse: collapse; min-width: 830px; }
+	th, td { padding: 1rem 1.05rem; text-align: left; vertical-align: middle; }
+	th { border-bottom: 1px solid var(--line); background: var(--bg-warm); font-size: .84rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+	td { border-bottom: 1px solid rgba(236, 223, 206, .72); font-size: .92rem; }
+	tbody tr:last-child td { border-bottom: 0; }
+	tbody tr:hover { background: rgba(220, 234, 245, .16); }
+	.status { display: inline-flex; align-items: center; min-height: 31px; padding: .26rem .75rem; border-radius: 999px; background: var(--blue-soft); font-size: .82rem; font-weight: 500; white-space: nowrap; }
+	.status.warning { background: #fff0c8; }
+	.status.danger { background: var(--pink-soft); color: var(--orange-deep); }
+	.status.info { background: var(--blue-soft); color: var(--ink); }
+	.inline-form { display: inline-flex; margin: 0; }
+	.empty-state { padding: 3.4rem 1rem; text-align: center; color: var(--ink-soft); }
 
-    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 3px 14px rgba(160,120,120,0.07); }
-    thead th { background: #fbf2f2; color: #7a6b6b; font-weight: 600; font-size: 13.5px; padding: 13px 10px; white-space: nowrap; text-align: center; }
-    tbody td { padding: 12px 10px; font-size: 13.5px; border-bottom: 1px solid #f2e9e5; text-align: center; vertical-align: middle; }
-    .nowrap { white-space: nowrap; }
+	.action-stack { display: grid; gap: .45rem; }
+	.field-note { min-height: 70px; resize: none; }
+	.deadline-note { font-size: .78rem; color: var(--ink-soft); margin-bottom: .4rem; }
+	.deadline-note .over { color: var(--orange-deep); font-weight: 700; }
+	.compete-row td { background: rgba(245, 142, 107, .1) !important; }
+	.compete-badge { display: block; margin-top: .3rem; font-size: .78rem; color: var(--orange-deep); font-weight: 700; }
+	.btn-approve { background: var(--orange); color: #fff; }
+	.btn-approve:hover { background: var(--orange-deep); }
+	.btn-reject { border-color: var(--pink); color: var(--orange-deep); background: #fff; }
+	.btn-reject:hover { background: var(--pink-soft); }
+	.btn-complete { background: var(--ink); color: #fff; }
+	.btn-complete:hover { background: #2c3a40; }
+	.btn-noshow { background: var(--orange-deep); color: #fff; }
+	.btn-noshow:hover { background: #cf5f3c; }
 
-    /* 同時段競爭：整列淡橘 + 徽章 */
-    tr.competing td { background: #fff7ed !important; }
-    .compete-badge { margin-top: 4px; font-size: 12px; color: #c2410c; font-weight: bold; white-space: nowrap; }
+	footer.ft { padding: 3.2rem 0 2rem; border-top: 1px solid var(--line); background: var(--white); }
+	.ft-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 2rem; }
+	.ft .brand { margin-bottom: 1rem; }
+	.ft-about { max-width: 22rem; color: var(--ink-soft); font-size: .9rem; }
+	.ft-col h4 { margin: .2rem 0 1rem; font-family: var(--serif); font-weight: 700; font-size: 1rem; }
+	.ft-col a { display: block; padding: .3rem 0; color: var(--ink-soft); font-size: .9rem; transition: color .16s; }
+	.ft-col a:hover { color: var(--orange); }
+	.ft-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem; margin-top: 2.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .82rem; }
+	#backToTop { position: fixed; right: 24px; bottom: 24px; z-index: 90; display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: var(--orange); color: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .25s, transform .25s, background .2s; }
+	#backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
+	#backToTop:hover { background: var(--orange-deep); }
+	#backToTop svg { width: 22px; height: 22px; }
+	:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
 
-    textarea { width: 100%; height: 66px; resize: none; font-family: inherit; font-size: 13px; padding: 8px; border: 1px solid #e0d5d5; border-radius: 6px; }
-    textarea:focus { outline: none; border-color: #e8b4b4; }
-    .deadline { font-size: 12px; color: #7a6b6b; margin-bottom: 6px; }
-    .deadline .over { color: #c62828; font-weight: bold; }
-
-    .action-form { margin-bottom: 6px; }
-    .btn { width: 100%; padding: 8px 0; border: none; border-radius: 6px; cursor: pointer; color: #fff; font-size: 0.9rem; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.85; }
-    .btn-approve  { background: #2e7d32; }
-    .btn-reject   { background: #c62828; }
-    .btn-complete { background: #1565c0; margin-top: 6px; }
-    .btn-noshow   { background: #ef6c00; }
-
-    .empty { color: #b3a5a0; font-size: 14px; padding: 44px; text-align: center; background: #fff; border-radius: 12px; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-
-    /* 中文來訪目的欄用 */
-    .purpose { white-space: nowrap; }
-</style>
+	@media (max-width: 1080px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+	@media (max-width: 940px) { .nav-menu { display: none; } .hamburger { display: grid; } .ft-grid { grid-template-columns: 1fr 1fr; } }
+	@media (max-width: 700px) {
+		.page-main { padding-top: 1.8rem; }
+		.page-intro { align-items: flex-start; flex-direction: column; gap: 1rem; }
+		.page-intro .btn { width: 100%; }
+		.stats, .stats-2 { grid-template-columns: 1fr; }
+		.tab-panel { padding: 1rem; }
+	}
+	@media (max-width: 520px) {
+		.ft-grid { grid-template-columns: 1fr; }
+		#backToTop { right: 16px; bottom: 16px; width: 42px; height: 42px; }
+		.pop { position: fixed; top: 82px; right: 4vw; left: 4vw; width: auto; }
+	}
+	@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+	</style>
 </head>
-<body>
-    <div class="wrap">
-        <div class="top">
-            <h1>心理師編號 <span th:text="${psychId}"></span> 的訂單管理</h1>
-        </div>
+<body th:with="activePage='orders'">
+	<header class="nav">
+		<div class="wrap nav-inner">
+			<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
+				<span class="logo-mind" aria-hidden="true">
+					<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
+					<span class="faces">
+						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
+					</span>
+				</span>
+				<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+			</a>
 
-        <!-- 頁籤 -->
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('pending', this)">
-                待確認 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 0])}"></span>
-            </button>
-            <button class="tab" onclick="showTab('confirmed', this)">
-                已確認 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 1])}"></span>
-            </button>
-        </div>
+			<nav class="nav-menu" aria-label="心理師主選單">
+				<a th:class="${activePage == 'slots'} ? 'active' : null" th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+				<a th:class="${activePage == 'orders'} ? 'active' : null" th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders" aria-current="page">預約狀態</a>
+				<a th:class="${activePage == 'history'} ? 'active' : null" th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+				<a th:class="${activePage == 'reviews'} ? 'active' : null" th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews">查看評價</a>
+			</nav>
 
-        <!-- 待確認 -->
-        <div id="pending" class="panel active">
-            <table th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 0])}">
-                <thead>
-                    <tr>
-                        <th>訂單編號</th><th>會員編號</th><th>姓名</th>
-                        <th>開始時間</th><th>結束時間</th>
-                        <th>來訪目的</th><th>來訪目的備註</th><th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 0}"
-                        th:classappend="${competitionMap.containsKey(order.orderId)} ? 'competing' : ''">
-                        <td th:text="${order.orderId}"></td>
-                        <td th:text="${order.member.memberId}"></td>
-                        <td class="nowrap" th:text="${order.member.name}"></td>
-                        <td class="nowrap">
-                            <span th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></span>
-                            <div th:if="${competitionMap.containsKey(order.orderId)}" class="compete-badge"
-                                 th:text="'⚠ 同時段 ' + ${competitionMap.get(order.orderId)} + ' 人'"></div>
-                        </td>
-                        <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td class="purpose" th:switch="${order.visitPurpose}">
-                            <span th:case="'emotion'">情緒困擾</span><span th:case="'stress'">壓力調適</span>
-                            <span th:case="'relationship'">人際關係</span><span th:case="'family'">家庭問題</span>
-                            <span th:case="'career'">職涯困惑</span><span th:case="'academic'">課業壓力</span>
-                            <span th:case="'self_growth'">自我探索</span><span th:case="'sleep'">睡眠問題</span>
-                            <span th:case="'anxiety'">焦慮傾向</span><span th:case="'other'">其他</span>
-                            <span th:case="*" th:text="${order.visitPurpose}"></span>
-                        </td>
-                        <td th:text="${order.visitPurposeNote}"></td>
-                        <td class="nowrap">
-                            <form method="post" th:action="@{/psych/orders/approve}" class="action-form">
-                                <input type="hidden" name="orderId" th:value="${order.orderId}">
-                                <input type="hidden" name="psychId" th:value="${psychId}">
-                                <button type="submit" class="btn btn-approve">同意</button>
-                            </form>
-                            <form method="post" th:action="@{/psych/orders/reject}" class="action-form">
-                                <input type="hidden" name="orderId" th:value="${order.orderId}">
-                                <input type="hidden" name="psychId" th:value="${psychId}">
-                                <button type="submit" class="btn btn-reject"
-                                        onclick="return confirm('確定要拒絕這筆訂單嗎？拒絕後時段將重新開放。')">拒絕</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="empty" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 0])}">目前沒有待確認的訂單。</div>
-        </div>
+			<div class="nav-right">
+				<div class="pop-holder">
+					<button class="icon-btn" id="bellBtn" type="button" aria-label="心理師通知" aria-haspopup="true" aria-expanded="false" aria-controls="bellPop">
+						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+						<span class="dot" th:if="${countPsychUnread != null and countPsychUnread > 0}" aria-hidden="true"></span>
+					</button>
+					<div class="pop" id="bellPop" role="menu">
+						<div class="pop-head"><b>心理師通知</b><p>查看目前的未讀通知數量。</p></div>
+						<div class="pop-divider"></div>
+						<p class="notice-summary" th:if="${countPsychUnread != null and countPsychUnread > 0}">你有 <strong th:text="${countPsychUnread}">0</strong> 則未讀通知。</p>
+						<p class="notice-summary" th:unless="${countPsychUnread != null and countPsychUnread > 0}">目前沒有未讀通知。</p>
+					</div>
+				</div>
 
-        <!-- 已確認 -->
-        <div id="confirmed" class="panel">
-            <table th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 1])}">
-                <thead>
-                    <tr>
-                        <th>訂單編號</th><th>會員編號</th><th>姓名</th>
-                        <th>開始時間</th><th>結束時間</th>
-                        <th>來訪目的</th><th>來訪目的備註</th>
-                        <th>晤談筆記</th><th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 1}">
-                        <td th:text="${order.orderId}"></td>
-                        <td th:text="${order.member.memberId}"></td>
-                        <td class="nowrap" th:text="${order.member.name}"></td>
-                        <td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td class="nowrap" th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td class="purpose" th:switch="${order.visitPurpose}">
-                            <span th:case="'emotion'">情緒困擾</span><span th:case="'stress'">壓力調適</span>
-                            <span th:case="'relationship'">人際關係</span><span th:case="'family'">家庭問題</span>
-                            <span th:case="'career'">職涯困惑</span><span th:case="'academic'">課業壓力</span>
-                            <span th:case="'self_growth'">自我探索</span><span th:case="'sleep'">睡眠問題</span>
-                            <span th:case="'anxiety'">焦慮傾向</span><span th:case="'other'">其他</span>
-                            <span th:case="*" th:text="${order.visitPurpose}"></span>
-                        </td>
-                        <td th:text="${order.visitPurposeNote}"></td>
-                        <td style="min-width:220px;">
-                            <form class="action-form" method="post" th:action="@{/psych/orders/complete}">
-                                <input type="hidden" name="orderId" th:value="${order.orderId}">
-                                <input type="hidden" name="psychId" th:value="${psychId}">
-                                <div class="deadline">
-                                    完成期限：<span th:text="${#temporals.format(order.consEnd.plusDays(3), 'yyyy-MM-dd HH:mm')}"></span>
-                                    <span th:if="${overdueOrders.contains(order.orderId)}" class="over">（已逾期）</span>
-                                </div>
-                                <textarea name="psychNote" rows="3" required placeholder="這次諮商的重點記錄，會員將能看到"></textarea>
-                                <button type="submit" class="btn btn-complete"
-                                        onclick="return confirmComplete(this)">標記為已完成</button>
-                            </form>
-                        </td>
-                        <td class="nowrap">
-                            <form method="post" th:action="@{/psych/orders/noShow}" class="action-form">
-                                <input type="hidden" name="orderId" th:value="${order.orderId}">
-                                <input type="hidden" name="psychId" th:value="${psychId}">
-                                <button type="submit" class="btn btn-noshow"
-                                        onclick="return confirm('確定會員沒有出席這次諮商嗎？')">未出席</button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="empty" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 1])}">目前沒有已確認的訂單。</div>
-        </div>
-    </div>
+				<div class="pop-holder">
+					<button class="avatar-btn" id="avatarBtn" type="button" aria-label="心理師功能選單" aria-haspopup="true" aria-expanded="false" aria-controls="avatarPop">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.4" fill="#3A4B53" /><path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19" stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
+					</button>
+					<div class="pop" id="avatarPop" role="menu">
+						<div class="pop-head"><b th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</b><p>心理師專區・管理預約、課程與個人資料。</p></div>
+						<div class="pop-divider"></div>
+						<div class="pop-label">功能選單</div>
+						<a class="pop-item active" th:href="@{/psych/orders/home}" href="/psych/orders/home" role="menuitem" aria-current="page">預約管理</a>
+						<a class="pop-item" th:href="@{/psych/course/select_course}" href="/psych/course/select_course" role="menuitem">課程商城（心理師）</a>
+						<a class="pop-item" th:href="@{/psych/profile/password}" href="/psych/profile/password" role="menuitem">修改密碼</a>
+						<a class="pop-item" th:href="@{/psych/profile/edit}" href="/psych/profile/edit" role="menuitem">編輯資料</a>
+					</div>
+				</div>
 
-    <script>
-        function showTab(id, btn) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            btn.classList.add('active');
-        }
-        function confirmComplete(btn) {
-            var note = btn.form.querySelector('textarea[name="psychNote"]');
-            if (!note.value.trim()) {
-                alert('請先填寫晤談筆記，才能標記為已完成。');
-                note.focus();
-                return false;
-            }
-            return confirm('確定這次諮商已經結束了嗎？');
-        }
-    </script>
+				<button class="icon-btn hamburger" id="hambBtn" type="button" aria-label="開啟選單" aria-controls="mobileMenu" aria-expanded="false">
+					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+				</button>
+			</div>
+		</div>
+
+		<nav class="mobile-menu" id="mobileMenu" aria-label="心理師行動選單">
+			<a th:class="${activePage == 'slots'} ? 'active' : null" th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+			<a th:class="${activePage == 'orders'} ? 'active' : null" th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders">預約狀態</a>
+			<a th:class="${activePage == 'history'} ? 'active' : null" th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+			<a th:class="${activePage == 'reviews'} ? 'active' : null" th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews">查看評價</a>
+		</nav>
+	</header>
+
+	<main class="page-main">
+		<div class="wrap">
+			<section class="page-intro" aria-labelledby="pageTitle">
+				<div>
+					<span class="eyebrow">心理師中心</span>
+					<h1 id="pageTitle">預約狀態</h1>
+					<p>查看待確認與已確認的預約，同意、拒絕或標記完成。</p>
+				</div>
+			</section>
+
+			<section class="stats stats-2" aria-label="訂單統計">
+				<article class="stat">
+					<span>待確認</span>
+					<strong th:text="${#lists.size(ordersListData.?[orderStatus == 0])}">0</strong>
+				</article>
+				<article class="stat">
+					<span>已確認</span>
+					<strong th:text="${#lists.size(ordersListData.?[orderStatus == 1])}">0</strong>
+				</article>
+			</section>
+
+			<section class="workspace" aria-label="訂單管理工作區">
+				<div class="tabs" data-tabs role="tablist" aria-label="訂單分類">
+					<button class="active" id="pendingTab" type="button" data-tab="pending" role="tab" aria-selected="true" aria-controls="pendingPanel">待確認</button>
+					<button id="confirmedTab" type="button" data-tab="confirmed" role="tab" aria-selected="false" aria-controls="confirmedPanel">已確認</button>
+				</div>
+
+				<section class="tab-panel" id="pendingPanel" data-panel="pending" role="tabpanel" aria-labelledby="pendingTab">
+					<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 0])}">
+						<table>
+							<thead>
+								<tr><th>訂單編號</th><th>會員編號</th><th>姓名</th><th>開始時間</th><th>結束時間</th><th>來訪目的</th><th>備註</th><th>操作</th></tr>
+							</thead>
+							<tbody>
+								<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 0}"
+									th:classappend="${competitionMap.containsKey(order.orderId)} ? 'compete-row' : ''">
+									<td th:text="${order.orderId}"></td>
+									<td th:text="${order.member.memberId}"></td>
+									<td th:text="${order.member.name}"></td>
+									<td>
+										<span th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></span>
+										<span th:if="${competitionMap.containsKey(order.orderId)}" class="compete-badge"
+											th:text="'⚠ 同時段 ' + ${competitionMap.get(order.orderId)} + ' 人'"></span>
+									</td>
+									<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+									<td th:switch="${order.visitPurpose}">
+										<span th:case="'emotion'">情緒困擾</span><span th:case="'stress'">壓力調適</span>
+										<span th:case="'relationship'">人際關係</span><span th:case="'family'">家庭問題</span>
+										<span th:case="'career'">職涯困惑</span><span th:case="'academic'">課業壓力</span>
+										<span th:case="'self_growth'">自我探索</span><span th:case="'sleep'">睡眠問題</span>
+										<span th:case="'anxiety'">焦慮傾向</span><span th:case="'other'">其他</span>
+										<span th:case="*" th:text="${order.visitPurpose}"></span>
+									</td>
+									<td th:text="${order.visitPurposeNote}"></td>
+									<td>
+										<div class="action-stack">
+											<form class="inline-form" method="post" th:action="@{/psych/orders/approve}">
+												<input type="hidden" name="orderId" th:value="${order.orderId}">
+												<input type="hidden" name="psychId" th:value="${psychId}">
+												<button type="submit" class="btn btn-approve">同意</button>
+											</form>
+											<form class="inline-form" method="post" th:action="@{/psych/orders/reject}">
+												<input type="hidden" name="orderId" th:value="${order.orderId}">
+												<input type="hidden" name="psychId" th:value="${psychId}">
+												<button type="submit" class="btn btn-reject"
+													onclick="return confirm('確定要拒絕這筆訂單嗎？拒絕後時段將重新開放。')">拒絕</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 0])}">目前沒有待確認的訂單。</p>
+				</section>
+
+				<section class="tab-panel" id="confirmedPanel" data-panel="confirmed" role="tabpanel" aria-labelledby="confirmedTab" hidden>
+					<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 1])}">
+						<table>
+							<thead>
+								<tr><th>訂單編號</th><th>會員編號</th><th>姓名</th><th>開始時間</th><th>結束時間</th><th>來訪目的</th><th>備註</th><th>晤談筆記</th><th>操作</th></tr>
+							</thead>
+							<tbody>
+								<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 1}">
+									<td th:text="${order.orderId}"></td>
+									<td th:text="${order.member.memberId}"></td>
+									<td th:text="${order.member.name}"></td>
+									<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+									<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+									<td th:switch="${order.visitPurpose}">
+										<span th:case="'emotion'">情緒困擾</span><span th:case="'stress'">壓力調適</span>
+										<span th:case="'relationship'">人際關係</span><span th:case="'family'">家庭問題</span>
+										<span th:case="'career'">職涯困惑</span><span th:case="'academic'">課業壓力</span>
+										<span th:case="'self_growth'">自我探索</span><span th:case="'sleep'">睡眠問題</span>
+										<span th:case="'anxiety'">焦慮傾向</span><span th:case="'other'">其他</span>
+										<span th:case="*" th:text="${order.visitPurpose}"></span>
+									</td>
+									<td th:text="${order.visitPurposeNote}"></td>
+									<td style="min-width:220px;">
+										<form method="post" th:action="@{/psych/orders/complete}">
+											<input type="hidden" name="orderId" th:value="${order.orderId}">
+											<input type="hidden" name="psychId" th:value="${psychId}">
+											<div class="deadline-note">
+												完成期限：<span th:text="${#temporals.format(order.consEnd.plusDays(3), 'yyyy-MM-dd HH:mm')}"></span>
+												<span th:if="${overdueOrders.contains(order.orderId)}" class="over">（已逾期）</span>
+											</div>
+											<textarea class="field field-note" name="psychNote" rows="3" required placeholder="這次諮商的重點記錄，會員將能看到"></textarea>
+											<button type="submit" class="btn btn-complete" style="width:100%; margin-top:.5rem;"
+												onclick="return confirmComplete(this)">標記為已完成</button>
+										</form>
+									</td>
+									<td>
+										<form class="inline-form" method="post" th:action="@{/psych/orders/noShow}">
+											<input type="hidden" name="orderId" th:value="${order.orderId}">
+											<input type="hidden" name="psychId" th:value="${psychId}">
+											<button type="submit" class="btn btn-noshow"
+												onclick="return confirm('確定會員沒有出席這次諮商嗎？')">未出席</button>
+										</form>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 1])}">目前沒有已確認的訂單。</p>
+				</section>
+			</section>
+		</div>
+	</main>
+
+	<footer class="ft" id="siteFooter">
+		<div class="wrap">
+			<div class="ft-grid">
+				<div>
+					<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
+						<span class="logo-mind" aria-hidden="true">
+							<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
+							<span class="faces">
+								<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+								<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+								<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+								<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
+							</span>
+						</span>
+						<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+					</a>
+					<p class="ft-about">一個把心理諮商、課程、專欄與陪伴社群整合在一起的地方。願你在這裡，能慢慢地、安心地，成為更自在的自己。</p>
+				</div>
+				<div class="ft-col">
+					<h4>預約管理</h4>
+					<a th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+					<a th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders">預約狀態</a>
+					<a th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+					<a th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews">查看評價</a>
+				</div>
+				<div class="ft-col">
+					<h4>心理師專區</h4>
+					<a th:href="@{/psych/course/select_course}" href="/psych/course/select_course">課程商城（心理師）</a>
+					<a th:href="@{/psych/profile/password}" href="/psych/profile/password">修改密碼</a>
+					<a th:href="@{/psych/profile/edit}" href="/psych/profile/edit">編輯資料</a>
+				</div>
+				<div class="ft-col">
+					<h4>帳號</h4>
+					<a th:href="@{/psych/psychologistLogin}" href="/psych/psychologistLogin">心理師登入</a>
+				</div>
+			</div>
+			<div class="ft-bottom">
+				<span>© 2026 諮由自在 FreeMind｜CKA101G1</span>
+				<span>本平台不提供緊急危機處理，若有立即危險請撥打 1995 安心專線。</span>
+			</div>
+		</div>
+	</footer>
+
+	<button id="backToTop" type="button" aria-label="回到頂部">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+	</button>
+
+	<script>
+	(() => {
+		const popupPairs = [['bellBtn', 'bellPop'], ['avatarBtn', 'avatarPop']];
+		const closePopups = except => {
+			popupPairs.forEach(([buttonId, popupId]) => {
+				const button = document.getElementById(buttonId);
+				const popup = document.getElementById(popupId);
+				if (!button || !popup || popup === except) return;
+				popup.classList.remove('open');
+				button.setAttribute('aria-expanded', 'false');
+			});
+		};
+		popupPairs.forEach(([buttonId, popupId]) => {
+			const button = document.getElementById(buttonId);
+			const popup = document.getElementById(popupId);
+			if (!button || !popup) return;
+			button.addEventListener('click', event => {
+				event.stopPropagation();
+				const shouldOpen = !popup.classList.contains('open');
+				closePopups(popup);
+				popup.classList.toggle('open', shouldOpen);
+				button.setAttribute('aria-expanded', String(shouldOpen));
+			});
+			popup.addEventListener('click', event => event.stopPropagation());
+		});
+		document.addEventListener('click', () => closePopups());
+
+		const hamburger = document.getElementById('hambBtn');
+		const mobileMenu = document.getElementById('mobileMenu');
+		if (hamburger && mobileMenu) {
+			hamburger.addEventListener('click', event => {
+				event.stopPropagation();
+				const shouldOpen = !mobileMenu.classList.contains('open');
+				mobileMenu.classList.toggle('open', shouldOpen);
+				hamburger.setAttribute('aria-expanded', String(shouldOpen));
+			});
+		}
+
+		const tabs = document.querySelector('[data-tabs]');
+		if (tabs) {
+			const buttons = [...tabs.querySelectorAll('[data-tab]')];
+			const panels = [...document.querySelectorAll('[data-panel]')];
+			buttons.forEach(button => {
+				button.addEventListener('click', () => {
+					buttons.forEach(item => {
+						const selected = item === button;
+						item.classList.toggle('active', selected);
+						item.setAttribute('aria-selected', String(selected));
+					});
+					panels.forEach(panel => { panel.hidden = panel.dataset.panel !== button.dataset.tab; });
+				});
+			});
+		}
+
+		const backToTop = document.getElementById('backToTop');
+		if (backToTop) {
+			const updateVisibility = () => backToTop.classList.toggle('show', window.scrollY > 480);
+			window.addEventListener('scroll', updateVisibility, { passive: true });
+			updateVisibility();
+			backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+		}
+	})();
+
+	function confirmComplete(btn) {
+		var note = btn.form.querySelector('textarea[name="psychNote"]');
+		if (!note.value.trim()) {
+			alert('請先填寫晤談筆記，才能標記為已完成。');
+			note.focus();
+			return false;
+		}
+		return confirm('確定這次諮商已經結束了嗎？');
+	}
+	</script>
 </body>
 </html>
