@@ -51,14 +51,15 @@ body.psych-page { --bg-soothing: #efb4aa; }
 .psych-page input:focus { border-color: var(--orange); background: #fff; box-shadow: 0 0 0 3px rgba(245, 142, 107, .18); }
 
 /* 送出按鈕;加 class="block" 可撐滿整行 */
-.psych-page button[type="submit"] {
+.psych-page  button[type="submit"]:hover { transform: translateY(-2px); background: var(--orange-deep); }
+.psych-page .psych-card button[type="submit"] {
 	padding: .8rem 1.8rem; border: none; border-radius: 999px;
 	font-family: var(--sans); font-size: 1rem; font-weight: 500; cursor: pointer;
 	background: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245, 142, 107, .4);
 	transition: transform .2s, background .2s;
 }
-.psych-page button[type="submit"]:hover { transform: translateY(-2px); background: var(--orange-deep); }
-.psych-page button[type="submit"].block { width: 100%; }
+.psych-page .psych-card button[type="submit"]:hover { transform: translateY(-2px); background: var(--orange-deep); }
+.psych-page .psych-card button[type="submit"].block { width: 100%; }
 
 /* ---------- 訊息 / 提示 ---------- */
 .psych-page .field-error { color: #c0563f; font-size: .82rem; margin: .3rem 0 0; }
