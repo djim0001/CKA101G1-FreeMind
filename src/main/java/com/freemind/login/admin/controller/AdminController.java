@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Controller
@@ -36,6 +38,19 @@ public class AdminController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	/*
+	 * 供 adminHeader fragment 顯示登入中的管理員（帳號／姓名）。
+	 * 直接取登入時載入的 principal，不需再查 DB；非管理員回 null。
+	 */
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+		if (authentication == null
+				|| !(authentication.getPrincipal() instanceof AdminUserDetails ud)) {
+			return null;
+		}
+		return ud.getAdmin();
+	}
 
 	/*
 	 * 轉交至 addAdmin.html
@@ -150,6 +165,15 @@ public class AdminController {
 			}
 		}
 
+		// 密碼留空 = 不變更：清掉 @NotEmpty 的錯誤，並沿用資料庫舊密碼
+		// （舊密碼已是 BCrypt 雜湊，不可再 encode，否則會二次加密導致無法登入）
+		String rawPassword = adminVO.getAdminPassword();
+		boolean keepOldPassword = (rawPassword == null || rawPassword.isBlank());
+		if (keepOldPassword) {
+			result = removeFieldError(adminVO, result, "adminPassword");
+			adminVO.setAdminPassword(adminSvc.getOneAdmin(adminVO.getAdminId()).getAdminPassword());
+		}
+
 		if (result.hasErrors()) {
 			return "back-end/login/admin/update_admin_input"; // 驗證失敗，回原修改頁面
 		}
@@ -159,8 +183,10 @@ public class AdminController {
 		adminVO.setPermissions(adminSvc.getOneAdmin(adminVO.getAdminId()).getPermissions());
 
 		/*************************** 2.開始修改資料 *****************************************/
-		// 密碼存檔前先用 BCrypt 編碼
-		adminVO.setAdminPassword(passwordEncoder.encode(adminVO.getAdminPassword()));
+		// 只有真的輸入了新密碼才做 BCrypt 編碼；留空時上面已沿用舊的雜湊值
+		if (!keepOldPassword) {
+			adminVO.setAdminPassword(passwordEncoder.encode(rawPassword));
+		}
 
 		adminSvc.updateAdmin(adminVO);
 

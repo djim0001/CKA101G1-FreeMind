@@ -1,48 +1,73 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>新增系統公告｜諮由自在後台</title>
-<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
-<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
 </head>
-<body class="thy2-page thy2-profile">
-	<div class="layout">
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
 		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('notification')}"></aside>
-		<div class="main">
-			<div th:replace="~{fragments/admin/adminTopbar :: topbar('訊息與公告')}"></div>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>新增系統公告</h1>
-						<p>新增後預設為「隱藏」，請於公告列表點擊「發布」上架至首頁。</p>
-					</div>
-					<div class="page-actions">
-						<a class="btn ghost" th:href="@{/admin/notifications/listAllNotification}">回公告列表</a>
-					</div>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<a th:href="@{/admin/notifications/listAllNotification}" href="#">系統公告</a><span>/</span>
+				<span class="current">新增公告</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>新增<em>系統公告</em></h1>
+					<p>新增後預設為「隱藏」，請於公告列表點擊「發布」上架至首頁。</p>
 				</div>
-
-				<div class="panel">
-					<form class="form-grid" method="post" th:action="@{/admin/notifications/insert}" th:object="${notification}">
-						<div class="form-group full">
-							<label for="systemContent">公告內容</label>
-							<textarea class="field" id="systemContent" th:field="*{systemContent}" maxlength="1000" placeholder="輸入公告內容…"></textarea>
-							<span class="error" th:if="${#fields.hasErrors('systemContent')}" th:errors="*{systemContent}"></span>
-						</div>
-
-						<!-- 新增一律預設隱藏(0)，通過 @NotNull 驗證；實際狀態由後端強制設為0 -->
-						<input type="hidden" name="noticeStatus" value="0">
-
-						<div class="form-group full page-actions">
-							<a class="btn ghost" th:href="@{/admin/notifications/listAllNotification}">取消</a>
-							<button class="btn" type="submit">新增</button>
-						</div>
-					</form>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/notifications/listAllNotification}" href="#">回公告列表</a>
 				</div>
-			</main>
-		</div>
+			</div>
+
+			<div class="panel">
+				<form class="form-grid" method="post" th:action="@{/admin/notifications/insert}" th:object="${notification}">
+
+					<div class="form-group full">
+						<label for="systemContent">公告內容</label>
+						<textarea class="field" id="systemContent" th:field="*{systemContent}"
+							maxlength="1000" placeholder="輸入公告內容…"></textarea>
+						<span class="error" th:if="${#fields.hasErrors('systemContent')}" th:errors="*{systemContent}"></span>
+					</div>
+
+					<!-- 新增一律預設隱藏(0)，通過 @NotNull 驗證；實際狀態由後端強制設為0 -->
+					<input type="hidden" name="noticeStatus" value="0">
+
+					<div class="form-group full page-actions">
+						<a class="btn btn-ghost" th:href="@{/admin/notifications/listAllNotification}" href="#">取消</a>
+						<button class="btn btn-primary" type="submit">新增</button>
+					</div>
+				</form>
+			</div>
+
+		</main>
 	</div>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 </body>
 </html>

@@ -1,119 +1,143 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>查詢管理員｜諮由自在後台</title>
-<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
-<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
 </head>
-<body class="thy2-page thy2-profile">
-	<div class="layout">
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
 		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('admin-query')}"></aside>
-		<div class="main">
-			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>查詢管理員</h1>
-						<p>依編號快速查詢，或以多個條件複合查詢。</p>
-					</div>
-					<div class="page-actions">
-						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
-						<a class="btn" th:href="@{/admin/addAdmin}">新增管理員</a>
-					</div>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<span class="current">查詢管理員</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>查詢<em>管理員</em></h1>
+					<p>依編號快速查詢，或以多個條件複合查詢。</p>
 				</div>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/listAllAdmin}" href="#">回管理員列表</a>
+					<a class="btn btn-primary" th:href="@{/admin/addAdmin}" href="#">新增管理員</a>
+				</div>
+			</div>
 
-				<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
+			<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
 
-				<div class="grid-2">
-					<div class="panel">
-						<h2>依編號查詢</h2>
-						<form class="form-grid" method="post" th:action="@{/admin/getOne_For_Display}">
-							<div class="form-group full">
-								<label for="queryAdminId">管理員編號</label>
-								<input class="field" type="text" id="queryAdminId" name="adminId" placeholder="輸入管理員編號…">
-							</div>
-							<div class="form-group full page-actions">
-								<button class="btn" type="submit">查詢</button>
-							</div>
-						</form>
+			<div class="grid-2">
 
-						<div th:if="${adminVO != null}">
-							<h2>查詢結果</h2>
-							<dl class="summary-list">
-								<div>
-									<dt>編號</dt>
-									<dd th:text="${adminVO.adminId}"></dd>
-								</div>
-								<div>
-									<dt>帳號</dt>
-									<dd th:text="${adminVO.adminAccount}"></dd>
-								</div>
-								<div>
-									<dt>帳號狀態</dt>
-									<dd>
-										<span class="status"
-											th:classappend="${adminVO.accountStatus == 1} ? 'green' : (${adminVO.accountStatus == 2} ? 'red' : 'amber')"
-											th:text="${accountStatusMap.get(adminVO.accountStatus)}"></span>
-									</dd>
-								</div>
-								<div>
-									<dt>姓名</dt>
-									<dd th:text="${adminVO.name}"></dd>
-								</div>
-								<div>
-									<dt>手機號碼</dt>
-									<dd th:text="${adminVO.phoneNumber}"></dd>
-								</div>
-								<div>
-									<dt>入職日期</dt>
-									<dd th:text="${adminVO.hiredate}"></dd>
-								</div>
-							</dl>
+				<div class="panel">
+					<h2>依編號查詢</h2>
+					<form class="form-grid" method="post" th:action="@{/admin/getOne_For_Display}">
+						<div class="form-group full">
+							<label for="queryAdminId">管理員編號</label>
+							<input class="field" type="text" id="queryAdminId" name="adminId" placeholder="輸入管理員編號…">
 						</div>
-					</div>
+						<div class="form-group full page-actions">
+							<button class="btn btn-primary" type="submit">查詢</button>
+						</div>
+					</form>
 
-					<div class="panel">
-						<h2>複合查詢</h2>
-						<form class="form-grid" method="post" th:action="@{/admin/listAdmins_ByCompositeQuery}">
-							<div class="form-group">
-								<label for="compositeAdminId">編號</label>
-								<input class="field" type="text" id="compositeAdminId" name="adminId">
+					<div th:if="${adminVO != null}">
+						<h2 style="margin-top:1.6rem;">查詢結果</h2>
+						<dl class="summary-list">
+							<div>
+								<dt>編號</dt>
+								<dd th:text="${adminVO.adminId}"></dd>
 							</div>
-							<div class="form-group">
-								<label for="compositeAdminAccount">帳號</label>
-								<input class="field" type="text" id="compositeAdminAccount" name="adminAccount">
+							<div>
+								<dt>帳號</dt>
+								<dd th:text="${adminVO.adminAccount}"></dd>
 							</div>
-							<div class="form-group">
-								<label for="compositeName">姓名</label>
-								<input class="field" type="text" id="compositeName" name="name">
+							<div>
+								<dt>帳號狀態</dt>
+								<dd>
+									<span class="status"
+										th:classappend="${adminVO.accountStatus == 1} ? 'green' : (${adminVO.accountStatus == 2} ? 'red' : 'amber')"
+										th:text="${accountStatusMap.get(adminVO.accountStatus)}"></span>
+								</dd>
 							</div>
-							<div class="form-group">
-								<label for="compositePhoneNumber">手機號碼</label>
-								<input class="field" type="text" id="compositePhoneNumber" name="phoneNumber">
+							<div>
+								<dt>姓名</dt>
+								<dd th:text="${adminVO.name}"></dd>
 							</div>
-							<div class="form-group">
-								<label for="compositeAccountStatus">帳號狀態</label>
-								<select class="field" id="compositeAccountStatus" name="accountStatus">
-									<option value="">不指定</option>
-									<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
-								</select>
+							<div>
+								<dt>手機號碼</dt>
+								<dd th:text="${adminVO.phoneNumber}"></dd>
 							</div>
-							<div class="form-group">
-								<label for="compositeHiredate">入職日期</label>
-								<input class="field" type="datetime-local" id="compositeHiredate" name="hiredate">
+							<div>
+								<dt>入職日期</dt>
+								<dd th:text="${adminVO.hiredate}"></dd>
 							</div>
-							<div class="form-group full page-actions">
-								<button class="btn" type="submit">複合查詢</button>
-							</div>
-						</form>
-						<p class="form-note">未填寫的欄位不列入篩選條件，查詢結果會顯示在管理員列表。</p>
+						</dl>
 					</div>
 				</div>
-			</main>
-		</div>
+
+				<div class="panel">
+					<h2>複合查詢</h2>
+					<form class="form-grid" method="post" th:action="@{/admin/listAdmins_ByCompositeQuery}">
+						<div class="form-group">
+							<label for="compositeAdminId">編號</label>
+							<input class="field" type="text" id="compositeAdminId" name="adminId">
+						</div>
+						<div class="form-group">
+							<label for="compositeAdminAccount">帳號</label>
+							<input class="field" type="text" id="compositeAdminAccount" name="adminAccount">
+						</div>
+						<div class="form-group">
+							<label for="compositeName">姓名</label>
+							<input class="field" type="text" id="compositeName" name="name">
+						</div>
+						<div class="form-group">
+							<label for="compositePhoneNumber">手機號碼</label>
+							<input class="field" type="text" id="compositePhoneNumber" name="phoneNumber">
+						</div>
+						<div class="form-group">
+							<label for="compositeAccountStatus">帳號狀態</label>
+							<select class="field" id="compositeAccountStatus" name="accountStatus">
+								<option value="">不指定</option>
+								<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="compositeHiredate">入職日期</label>
+							<input class="field" type="datetime-local" id="compositeHiredate" name="hiredate">
+						</div>
+						<div class="form-group full page-actions">
+							<button class="btn btn-primary" type="submit">複合查詢</button>
+						</div>
+					</form>
+					<p class="form-note">未填寫的欄位不列入篩選條件，查詢結果會顯示在管理員列表。</p>
+				</div>
+
+			</div>
+
+		</main>
 	</div>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 </body>
 </html>
