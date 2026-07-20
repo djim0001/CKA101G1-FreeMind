@@ -39,3 +39,7 @@ uploads/*
 
 !uploads/psych-images/
 !uploads/psych-images/**
+
+!uploads/videos/
+!uploads/videos/**
+uploads/videos/*.mp4
