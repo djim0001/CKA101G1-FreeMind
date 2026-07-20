@@ -23,6 +23,11 @@
     }
     .success-card h3 { font-family: var(--serif); font-size: 1.3rem; color: var(--ink); margin: 0 0 1.8rem; }
     .success-home { display: inline-flex; }
+    .success-back {
+        display: block; margin-top: 1.1rem;
+        font-size: .88rem; color: var(--ink-soft); text-decoration: none;
+    }
+    .success-back:hover { color: var(--orange); text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -34,6 +39,7 @@
         <div class="success-check">✓</div>
         <h3 th:text="${success}"></h3>
         <a class="btn btn-primary success-home" th:href="@{/psych/slots/manageSlotsForm}">繼續調整其他日期</a>
+        <a th:href="@{/psych/orders/home}" class="success-back">← 回上頁</a>
     </div>
 </main>
 

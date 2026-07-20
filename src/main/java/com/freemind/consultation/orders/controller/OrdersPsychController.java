@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.freemind.consultation.orders.model.Orders;
 import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.SlotsService;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 @Controller
@@ -26,6 +27,9 @@ public class OrdersPsychController {
 
 	@Autowired
 	private SlotsService slotsSvc;
+	
+	@Autowired
+	private NoticeService noticeService;
 
 	@GetMapping("psychPendingForm")
 	public String psychPendingForm(ModelMap model) {
@@ -60,7 +64,28 @@ public class OrdersPsychController {
 	@PostMapping("approve")
 	public String approve(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			ModelMap model) {
-		ordersSvc.approveOrder(Integer.valueOf(orderId), slotsSvc);
+		Integer oid = Integer.valueOf(orderId);
+		ordersSvc.approveOrder(oid, slotsSvc);
+
+		Orders order = ordersSvc.getOneOrders(oid);
+
+		// 通知會員：預約已確認
+		noticeService.sendToMember(order.getMember().getMemberId(), null,
+				"您 " + order.getConsStart() + " 的預約已被心理師確認，請準時出席。", (byte) 0);
+
+		// 同時段競爭：同心理師、同開始時間、其他還在待確認的訂單 → 取消並通知落選會員
+		List<Orders> sameSlot = ordersSvc.getPendingOrdersByPsychId(Integer.valueOf(psychId));
+		for (Orders other : sameSlot) {
+			if (other.getOrderId().equals(oid)) continue;
+			if (other.getConsStart() == null
+					|| !other.getConsStart().equals(order.getConsStart())) continue;
+			other.setOrderStatus(2);                 // 只改狀態為已取消，不動時段（時段已被 A 佔用）
+			ordersSvc.updateOrders(other);
+			noticeService.sendToMember(other.getMember().getMemberId(), null,
+					"很抱歉，您 " + other.getConsStart()
+							+ " 的預約時段已由其他會員先行預約成功，此筆預約已取消。", (byte) 0);
+		}
+
 		return "redirect:/psych/orders/psychOrders";
 	}
 
@@ -68,6 +93,11 @@ public class OrdersPsychController {
 	public String reject(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			ModelMap model) {
 		ordersSvc.rejectOrder(Integer.valueOf(orderId));
+
+		Orders order = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+		noticeService.sendToMember(order.getMember().getMemberId(), null,
+				"很抱歉，您 " + order.getConsStart() + " 的預約未被接受，該時段已重新開放。", (byte) 0);
+
 		return "redirect:/psych/orders/psychOrders";
 	}
 
@@ -111,12 +141,19 @@ public class OrdersPsychController {
 
 	@PostMapping("complete")
 	public String complete(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
-			@RequestParam(value = "psychNote", required = false) String psychNote, ModelMap model) {
-		// 沒寫晤談筆記就不允許標記完成
+			@RequestParam(value = "psychNote", required = false) String psychNote,
+			ModelMap model) {
+		// 沒寫晤談筆記不能完成
 		if (psychNote == null || psychNote.isBlank()) {
 			return "redirect:/psych/orders/psychOrders";
 		}
 		ordersSvc.completeOrder(Integer.valueOf(orderId), psychNote);
+
+		// ★ 通知會員諮商已完成、可撰寫評論
+		Orders order = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+		noticeService.sendToMember(order.getMember().getMemberId(), null,
+				"您 " + order.getConsStart() + " 的諮商已完成，歡迎於三日內撰寫心得評論。", (byte) 0);
+
 		return "redirect:/psych/orders/psychOrders";
 	}
 
@@ -125,6 +162,12 @@ public class OrdersPsychController {
 	public String noShow(@RequestParam("orderId") String orderId, @RequestParam("psychId") String psychId,
 			ModelMap model) {
 		ordersSvc.noShowOrder(Integer.valueOf(orderId));
+
+		// ★ 通知會員被標記未出席
+		Orders order = ordersSvc.getOneOrders(Integer.valueOf(orderId));
+		noticeService.sendToMember(order.getMember().getMemberId(), null,
+				"您 " + order.getConsStart() + " 的預約已被標記為未出席。", (byte) 0);
+
 		return "redirect:/psych/orders/psychOrders";
 	}
 	

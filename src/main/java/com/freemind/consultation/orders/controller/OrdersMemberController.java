@@ -17,6 +17,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.consultation.slots.model.Slots;
 import com.freemind.consultation.slots.model.SlotsService;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.repository.PsychologistRepository;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
@@ -37,6 +38,9 @@ public class OrdersMemberController {
 	@Autowired
 	private com.freemind.consultation.reports.model.ReportsService reportsSvc;
 
+	@Autowired
+	private NoticeService noticeService;   
+	
 	private List<Psychologist> getActivePsychologists() {
 		return psychologistRepository.findAll().stream()
 				.filter(p -> p.getAccountStatus() != null && p.getAccountStatus() == 1)
@@ -209,6 +213,8 @@ public class OrdersMemberController {
 		orders.setGovSubsidy(false);
 
 		ordersSvc.addOrders(orders);
+		noticeService.sendToPsych(pid, null,
+				"您有一筆新的預約（" + consStart + "），請至訂單管理確認。", (byte) 1);
 
 		model.addAttribute("success", "預約成功！等待心理師確認。");
 		return "front-end/member/consultation/orders/bookSuccess";
