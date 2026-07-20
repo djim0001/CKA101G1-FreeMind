@@ -154,6 +154,23 @@
 						<a class="pop-item" th:href="@{/support}" href="#" role="menuitem">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7">
 								<path d="M21 12a9 9 0 1 0-3.6 7.2L21 20l-.8-3.4A8.9 8.9 0 0 0 21 12Z" /></svg>聯繫客服</a>
+
+						<!-- 登出：依角色送到各自的 logoutUrl（POST，Thymeleaf 會自動帶 CSRF） -->
+						<div class="pop-divider"></div>
+						<form sec:authorize="hasRole('ROLE_MEMBER')" th:action="@{/front-end/logout}" method="post">
+							<button class="pop-item pop-logout" type="submit" role="menuitem">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
+									<path d="M16 17l5-5-5-5" />
+									<path d="M21 12H9" /></svg>登出</button>
+						</form>
+						<form sec:authorize="hasRole('ROLE_PSYCH')" th:action="@{/psych/logout}" method="post">
+							<button class="pop-item pop-logout" type="submit" role="menuitem">
+								<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3" />
+									<path d="M16 17l5-5-5-5" />
+									<path d="M21 12H9" /></svg>登出</button>
+						</form>
 					</div>
 				</div>
 			</div>

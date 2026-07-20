@@ -164,6 +164,8 @@ header.nav {
 .pop-item { display: flex; align-items: center; gap: .7rem; padding: .7rem 1rem; border-radius: 13px; font-size: .93rem; color: var(--ink); transition: background .16s; }
 .pop-item:hover { background: var(--bg-warm); }
 .pop-item svg { width: 18px; height: 18px; stroke: var(--orange); flex: 0 0 auto; }
+/* 下拉選單內的 button（登出）：撐滿並靠左，與 <a> 版面一致 */
+.pop-item.pop-logout { width: 100%; text-align: left; }
 .pop-divider { height: 1px; background: var(--line); margin: .4rem .6rem; }
 .pop-login { display: flex; gap: .5rem; padding: .4rem .6rem .7rem; }
 .pop-login a { flex: 1; text-align: center; padding: .62rem; border-radius: 12px; font-size: .88rem; font-weight: 500; }
