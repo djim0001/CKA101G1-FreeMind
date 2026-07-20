@@ -53,9 +53,9 @@ public class CourseOrderController {
 	@Autowired
 	private CourseQaCommentService commentService;
 	@Autowired
-	NoticeService noticeSvc;
+	private NoticeService noticeSvc;
 	@Autowired
-	ShoppingCartRedisService shoppingCartSvc;
+	private ShoppingCartRedisService shoppingCartSvc;
 
 	@ModelAttribute("member")
 	public Member currentMember(Authentication authentication) {
@@ -190,8 +190,17 @@ public class CourseOrderController {
 	        );
 			return "redirect:" + returnUrl;
 		}
-		if(orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId)) 
+		if(orderDetailSvc.hasCoursePermission(member.getMemberId(), courseId)) {
 			commentService.addQuestion(courseSvc.getOneCourse(courseId), member, courseQuestion);
+			Course course = courseSvc.getOneCourse(courseId);
+			noticeSvc.sendToPsych(
+					course
+					.getPsychologist()
+					.getPsychId()
+					, null,
+					"你的課程" + course.getCourseName() + "有新的提問",
+					(byte)2);
+		}
 		else
 			redirectAttributes.addFlashAttribute(
 	                "courseQuestionMsg",

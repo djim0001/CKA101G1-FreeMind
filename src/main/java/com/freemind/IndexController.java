@@ -1,10 +1,17 @@
 package com.freemind;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
 import com.freemind.login.notice.service.NotificationService;
 
 @Controller
@@ -12,6 +19,27 @@ public class IndexController {
 	
     @Autowired
     private NotificationService notificationSvc;
+    @Autowired
+    private AdminService adminSvc;
+    @Autowired
+    private MemberService memberSvc;
+    
+    @ModelAttribute("admin")
+    public Admin currentAdmin(Authentication authentication) {
+        // 訪客（未登入或匿名）時不放 member 進 model
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return adminSvc.findByAccount(authentication.getName());
+    }
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+    	// 訪客（未登入或匿名）時不放 member 進 model
+    	if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+    		return null;
+    	}
+    	return memberSvc.findByAccount(authentication.getName());
+    }
 
     @GetMapping("/")
     public String index(Model model) {
@@ -21,7 +49,9 @@ public class IndexController {
     }
     
     @GetMapping("/admin/home")   
-	public String adminHome() {
+	public String adminHome(Model model) {
+//    		Admin admin = (Admin)model.getAttribute("admin");
+//    	model.addAttribute("admin", admin);
 		return "back-end/adminHome";
 	}
   
