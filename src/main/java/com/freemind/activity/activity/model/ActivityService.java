@@ -1,9 +1,11 @@
 package com.freemind.activity.activity.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,9 @@ public class ActivityService {
 	
 	@Autowired
 	private NoticeService noticeService;
+	
+	// 精選活動用
+	private static final int PUBLISHED_STATUS = 2;
 	
 	public void addActivity(Activity activity) {
 	    LocalDateTime now = LocalDateTime.now();
@@ -302,5 +307,36 @@ public class ActivityService {
 	    noticeService.sendToMember(existing.getMember().getMemberId(), null,
 	        "您發起的活動「" + existing.getActivityName() + "」已通過審核，將於 "
 	        + scheduledAt.toLocalDate() + " " + scheduledAt.toLocalTime() + " 正式發布。", (byte) 2);
+	}
+	
+	// 精選活動：從已發布且尚未結束的活動中，隨機抽 count 筆
+	public List<Activity> getFeaturedActivities(int count) {
+	    List<Activity> eligible = repository.findByActivityStatusAndActivityEndAfter(
+	        PUBLISHED_STATUS, LocalDateTime.now());
+
+	    // 濾掉已額滿的活動：精選活動應該要能報名，額滿的不適合出現在這裡
+	    List<Activity> notFull = new ArrayList<>();
+	    for (Activity a : eligible) {
+	        if (!a.isFull()) {
+	            notFull.add(a);
+	        }
+	    }
+
+	    // Fisher-Yates 洗牌：從陣列尾端開始，每輪跟前面隨機一個位置交換
+	    Random random = new Random();
+	    for (int i = notFull.size() - 1; i > 0; i--) {
+	        int j = random.nextInt(i + 1);
+	        Activity temp = notFull.get(i);
+	        notFull.set(i, notFull.get(j));
+	        notFull.set(j, temp);
+	    }
+
+	    // 取前 count 筆，不足 count 筆就全部回傳
+	    List<Activity> result = new ArrayList<>();
+	    int limit = Math.min(count, notFull.size());
+	    for (int i = 0; i < limit; i++) {
+	        result.add(notFull.get(i));
+	    }
+	    return result;
 	}
 }
