@@ -34,9 +34,9 @@ public interface ArticleService {
 	
 	List<Article> getPublishedArticlesByIds(List<Integer> articleIds);
 	
-	Article getEditableArticle(Integer articleId, Integer pysch);
-	
-	Article createEditCopy(Integer articleId, Integer pysch);
+	Article getEditableArticle(Integer articleId, Integer psychId);
+
+	Article createEditCopy(Integer articleId, Integer psychId);
 	
 	Article updateDraft(Integer articleId, ArticleCreateForm form, Integer psychId);
 	

@@ -167,28 +167,28 @@ th {
 			</tr>
 		</thead>
 		<tbody>
-			<tr th:each="item : ${articleList}">
-				<td th:text="${item.article.articleId}"></td>
-				<td th:text="${item.article.title}"></td>
-				<td th:text="${item.article.articleCat.articleCatName}"></td>
-				<td><span th:if="${item.article.articleStatus == 2}">已上架</span> <span
-					th:if="${item.article.articleStatus == 3}">已退回</span> <span
-					th:if="${item.article.articleStatus == 4}">已下架</span></td>
-				<td th:text="${item.article.reviewedAt}"></td>
+			<tr th:each="article, stat : ${articlePage.content}" th:with="item=${articleList[stat.index]}">
+				<td th:text="${article.articleId}"></td>
+				<td th:text="${article.title}"></td>
+				<td th:text="${article.articleCat.articleCatName}"></td>
+				<td><span th:if="${article.articleStatus == 2}">已上架</span> <span
+					th:if="${article.articleStatus == 3}">已退回</span> <span
+					th:if="${article.articleStatus == 4}">已下架</span></td>
+				<td th:text="${article.reviewedAt}"></td>
 				<td>
-					<form th:if="${item.article.articleStatus == 2}"
-						th:action="@{/admin/article/{id}/unpublish(id=${item.article.articleId})}"
+					<form th:if="${article.articleStatus == 2}"
+						th:action="@{/admin/article/{id}/unpublish(id=${article.articleId})}"
 						method="post" onsubmit="return confirm('確定要下架這篇文章嗎？');"
 						style="display: inline;">
 						<button type="submit">下架</button>
 					</form>
 				</td>
 				<td>
-					<button th:if="${item.articleStatistics != null}"
-					        th:data-view="${item.articleStatistics.viewCount}"
-					        th:data-like="${item.articleStatistics.likeCount}"
-					        th:data-favorite="${item.articleStatistics.bookmarkCount}"
-					        th:data-share="${item.articleStatistics.shareCount}"
+					<button th:if="${item != null}"
+					        th:data-view="${item.viewCount}"
+					        th:data-like="${item.likeCount}"
+					        th:data-favorite="${item.bookmarkCount}"
+					        th:data-share="${item.shareCount}"
 					        onclick="showStatsDetail(this)">查看</button>
 				</td>
 			</tr>
