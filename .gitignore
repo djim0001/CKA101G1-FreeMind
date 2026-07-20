@@ -35,5 +35,7 @@ build/
 ### Upload settings ###
 uploads/*
 !uploads/activity-images/
-!uploads/activity-images/**
+!uploads/activity-images/**	
 
+!uploads/psych-images/
+!uploads/psych-images/**
