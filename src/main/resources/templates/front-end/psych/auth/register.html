@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>心理師註冊｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+</head>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: authHeader}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Sign up</p>
+				<h2>心理師註冊</h2>
+			</div>
+		</div>
+
+		<div class="auth-card wide">
+			<div class="panel">
+				<p class="meta"><span style="color:#a85f52;font-weight:700;">*</span> 為必填欄位</p>
+
+				<!-- Google 帳號註冊模式：email 已由 Google 驗證，鎖定不可改，送出後免驗證碼 -->
+				<div class="notice" th:if="${googleRegister}"
+					style="color:#2b5578;background:#e8f0fe;border-color:#b9d1f6;">
+					正在使用 Google 帳號 <strong th:text="${registerForm.email}"></strong> 註冊，
+					信箱已完成驗證，填妥其餘資料送出後即可用 Google 一鍵登入。
+				</div>
+
+				<form th:action="@{/psych/register}" th:object="${registerForm}" method="post">
+					<div class="form-grid">
+						<div class="form-group">
+							<label class="required">帳號</label>
+							<input type="text" class="field" th:field="*{psychAccount}">
+							<span class="error" th:if="${#fields.hasErrors('psychAccount')}" th:errors="*{psychAccount}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">姓名</label>
+							<input type="text" class="field" th:field="*{name}">
+							<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">密碼</label>
+							<div class="pw-wrap">
+								<input type="password" class="field" th:field="*{psychPassword}">
+								<button type="button" class="pw-toggle" aria-label="顯示密碼">
+									<svg class="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+									<svg class="icon-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+								</button>
+							</div>
+							<span class="error" th:if="${#fields.hasErrors('psychPassword')}" th:errors="*{psychPassword}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">確認密碼</label>
+							<div class="pw-wrap">
+								<input type="password" class="field" th:field="*{confirmPassword}">
+								<button type="button" class="pw-toggle" aria-label="顯示密碼">
+									<svg class="icon-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+									<svg class="icon-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+								</button>
+							</div>
+							<span class="error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">性別</label>
+							<select class="select" th:field="*{gender}">
+								<option value="">請選擇</option>
+								<option value="男">男</option>
+								<option value="女">女</option>
+							</select>
+							<span class="error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">手機號碼</label>
+							<input type="text" class="field" th:field="*{phoneNumber}" maxlength="10">
+							<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+						</div>
+
+						<div class="form-group full">
+							<!-- Google 註冊時 email 唯讀（後端仍以 session 的 Google email 為準比對） -->
+							<label class="required">信箱</label>
+							<input type="text" class="field" th:field="*{email}" th:readonly="${googleRegister}">
+							<span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+						</div>
+
+						<div class="form-group full">
+							<label class="required">心理師證照</label>
+							<input type="text" class="field" th:field="*{psychCertificate}" placeholder="例：諮商心理師證書字號">
+							<span class="error" th:if="${#fields.hasErrors('psychCertificate')}" th:errors="*{psychCertificate}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">工作地點</label>
+							<input type="text" class="field" th:field="*{psychLoc}" maxlength="50">
+							<span class="error" th:if="${#fields.hasErrors('psychLoc')}" th:errors="*{psychLoc}"></span>
+						</div>
+
+						<div class="form-group">
+							<label class="required">諮詢費（每次）</label>
+							<input type="number" class="field" th:field="*{psychFee}" min="0" step="1">
+							<span class="error" th:if="${#fields.hasErrors('psychFee')}" th:errors="*{psychFee}"></span>
+						</div>
+					</div>
+
+					<div class="section-head-actions" style="margin-top:22px;">
+						<a class="btn ghost" th:href="@{/front-end/psychologist/login}">已有帳號？回登入頁</a>
+						<button type="submit" class="btn">送出註冊</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
+</body>
+</html>

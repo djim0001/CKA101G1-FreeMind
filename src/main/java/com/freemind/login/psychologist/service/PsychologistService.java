@@ -104,6 +104,23 @@ public class PsychologistService {
 	}
 	
 	
+	public List<Psychologist> getAll() {
+		return psychologistRepository.findAll();
+	}
+	
+	public Psychologist findByAccount(String account) {
+		return psychologistRepository.findByPsychAccount(account);
+	}
+ 
+	public Psychologist findByEmail(String email) {
+		return psychologistRepository.findByEmail(email);
+	}
+	
+	public Psychologist addPsychologist(Psychologist psychologist) {
+		return psychologistRepository.save(psychologist);
+	}
+	
+	
 	
 	public PsychologistAdminRes getAdmin(Integer psychId) {
 		Psychologist p = psychologistRepository.findById(psychId)
@@ -252,9 +269,6 @@ public class PsychologistService {
 	
 	
 	
-	public Psychologist findByAccount(String account) {
-		return psychologistRepository.findByPsychAccount(account);
-	}
 
 	
 	
