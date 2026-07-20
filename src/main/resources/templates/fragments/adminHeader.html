@@ -4,17 +4,383 @@
 
 	<!--
 		管理員共用頁首。
-		用法：<div th:replace="~{fragments/admin/header :: header}"></div>
+		用法：<div th:replace="~{fragments/adminHeader :: header}"></div>
 		「系統管理後台」為 admin_home.html 專屬文字，不放入共用 Fragment。
 	-->
 	<th:block th:fragment="header">
-		<a class="skip-link" href="#main-content">跳至主要內容</a>
+		<style data-admin-fragment-styles="header">
+			@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
 
-		<header class="nav site-header">
-			<div class="wrap nav-inner">
-				<a class="brand" th:href="@{/admin/home}" href="#main-content"
+			@font-face {
+				font-family: 'OpenHuninn';
+				src:
+					url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+					url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+				font-weight: 400;
+				font-style: normal;
+				font-display: swap;
+			}
+
+			.admin-skip-link,
+			.admin-site-header,
+			.admin-site-header *,
+			.admin-site-header *::before,
+			.admin-site-header *::after {
+				box-sizing: border-box;
+			}
+
+			.admin-skip-link {
+				position: fixed;
+				top: .75rem;
+				left: .75rem;
+				z-index: 999;
+				padding: .65rem 1rem;
+				border-radius: 999px;
+				color: #FFFFFF;
+				background: #F58E6B;
+				font-family: "Noto Sans TC", system-ui, sans-serif;
+				font-size: 1rem;
+				line-height: 1.78;
+				text-decoration: none;
+				transform: translateY(-160%);
+			}
+
+			.admin-skip-link:focus {
+				transform: translateY(0);
+			}
+
+			header.admin-site-header {
+				--admin-bg-soothing: #C2D9ED;
+				--admin-blue-soft: #DCEAF5;
+				--admin-orange: #F58E6B;
+				--admin-orange-deep: #E5764F;
+				--admin-pink: #FBD0BE;
+				--admin-ink: #3A4B53;
+				--admin-ink-soft: #6b7981;
+				--admin-white: #FFFFFF;
+				--admin-line: #ecdfce;
+				--admin-shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+				--admin-zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+				--admin-sans: "Noto Sans TC", system-ui, sans-serif;
+				--admin-display-en: "Baloo 2", sans-serif;
+				position: sticky;
+				top: 0;
+				z-index: 100;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+				border-bottom: 1px solid rgba(236, 223, 206, .7);
+				color: var(--admin-ink);
+				background: rgba(253, 246, 237, .85);
+				font-family: var(--admin-sans);
+				line-height: 1.78;
+				-webkit-font-smoothing: antialiased;
+				backdrop-filter: blur(12px);
+			}
+
+			.admin-site-header a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			.admin-site-header button {
+				margin: 0;
+				border: 0;
+				background: none;
+				font-family: inherit;
+				cursor: pointer;
+			}
+
+			.admin-site-header img,
+			.admin-site-header svg {
+				display: block;
+				max-width: 100%;
+			}
+
+			.admin-site-header .admin-header-inner {
+				display: flex;
+				align-items: center;
+				gap: 1.4rem;
+				width: min(1160px, 92vw);
+				height: 74px;
+				margin-inline: auto;
+			}
+
+			.admin-site-header .admin-header-brand {
+				display: flex;
+				align-items: center;
+				gap: .8rem;
+				flex: 0 0 auto;
+				margin: 0;
+				padding: 0;
+			}
+
+			.admin-site-header .admin-header-logo-mind {
+				display: flex;
+				flex: 0 0 auto;
+				flex-direction: column;
+				align-items: flex-start;
+				line-height: 1;
+				user-select: none;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word {
+				display: flex;
+				align-items: flex-end;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word span {
+				display: inline-block;
+				font-family: var(--admin-display-en);
+				font-size: 1.5rem;
+				font-weight: 700;
+				letter-spacing: -.03em;
+				text-align: center;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word .m {
+				width: 24px;
+				color: #EFB65E;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word .i {
+				width: 9px;
+				color: #DB93A9;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word .n {
+				width: 17px;
+				color: #8FB2C9;
+			}
+
+			.admin-site-header .admin-header-logo-mind .word .d {
+				width: 17px;
+				color: #9BB893;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces {
+				display: flex;
+				align-items: flex-start;
+				margin-top: -1px;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces svg {
+				display: block;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces .fm {
+				width: 24px;
+				height: 11px;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces .fi {
+				width: 9px;
+				height: 11px;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces .fn {
+				width: 17px;
+				height: 11px;
+			}
+
+			.admin-site-header .admin-header-logo-mind .faces .fd {
+				width: 17px;
+				height: 11px;
+			}
+
+			.admin-site-header .admin-header-brand-text {
+				display: flex;
+				flex-direction: column;
+				line-height: 1.15;
+			}
+
+			.admin-site-header .admin-header-brand-text .logo {
+				color: var(--admin-ink);
+				font-family: var(--admin-zen-maru);
+				font-size: 1.18rem;
+				font-weight: 700;
+				letter-spacing: .02em;
+			}
+
+			.admin-site-header .admin-header-brand-text .en {
+				margin-top: .15em;
+				color: var(--admin-ink-soft);
+				font-family: var(--admin-display-en);
+				font-size: .85rem;
+				font-weight: 700;
+				letter-spacing: .24em;
+				text-transform: uppercase;
+			}
+
+			.admin-site-header .admin-header-actions {
+				display: flex;
+				align-items: center;
+				gap: .55rem;
+				margin-left: auto;
+			}
+
+			.admin-site-header .admin-profile-entry {
+				display: flex;
+				align-items: center;
+				gap: .65rem;
+				min-height: 46px;
+				margin: 0;
+				padding: .3rem .75rem .3rem .35rem;
+				border: 1px solid var(--admin-line);
+				border-radius: 999px;
+				background: var(--admin-white);
+				box-shadow: var(--admin-shadow-sm);
+				transition: border-color .16s ease, background .16s ease, transform .16s ease;
+			}
+
+			.admin-site-header .admin-profile-entry:hover {
+				border-color: var(--admin-bg-soothing);
+				background: var(--admin-blue-soft);
+				transform: translateY(-2px);
+			}
+
+			.admin-site-header .admin-profile-photo {
+				display: grid;
+				place-items: center;
+				width: 36px;
+				height: 36px;
+				flex: 0 0 auto;
+				border-radius: 50%;
+				color: var(--admin-ink);
+				background: linear-gradient(135deg, var(--admin-pink), var(--admin-bg-soothing));
+			}
+
+			.admin-site-header .admin-profile-photo svg {
+				width: 21px;
+				height: 21px;
+				stroke: currentColor;
+			}
+
+			.admin-site-header .admin-profile-photo img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.admin-site-header .admin-profile-copy {
+				display: flex;
+				min-width: 0;
+				flex-direction: column;
+				line-height: 1.25;
+			}
+
+			.admin-site-header .admin-profile-copy small {
+				color: var(--admin-ink-soft);
+				font-size: .68rem;
+			}
+
+			.admin-site-header .admin-profile-copy strong {
+				max-width: 9.5rem;
+				overflow: hidden;
+				color: var(--admin-ink);
+				font-size: .82rem;
+				font-weight: 500;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.admin-site-header .admin-logout-form {
+				margin: 0;
+			}
+
+			.admin-site-header .admin-logout-button {
+				display: inline-flex;
+				align-items: center;
+				gap: .4rem;
+				min-height: 46px;
+				padding: .6rem .8rem;
+				border: 1px solid var(--admin-line);
+				border-radius: 999px;
+				color: var(--admin-ink);
+				background: var(--admin-white);
+				box-shadow: var(--admin-shadow-sm);
+				cursor: pointer;
+				transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+			}
+
+			.admin-site-header .admin-logout-button:hover {
+				border-color: var(--admin-orange);
+				color: var(--admin-white);
+				background: var(--admin-orange-deep);
+				transform: translateY(-2px);
+			}
+
+			.admin-site-header .admin-logout-button svg {
+				width: 17px;
+				height: 17px;
+				stroke: currentColor;
+			}
+
+			.admin-site-header :focus-visible {
+				outline: 3px solid var(--admin-orange);
+				outline-offset: 3px;
+			}
+
+			@media (max-width: 940px) {
+				.admin-site-header .admin-profile-copy {
+					display: none;
+				}
+
+				.admin-site-header .admin-profile-entry {
+					padding: .28rem;
+				}
+			}
+
+			@media (max-width: 640px) {
+				.admin-site-header .admin-header-inner {
+					gap: .55rem;
+					height: 64px;
+				}
+
+				.admin-site-header .admin-logout-button span {
+					display: none;
+				}
+
+				.admin-site-header .admin-logout-button {
+					display: grid;
+					place-items: center;
+					width: 42px;
+					min-height: 42px;
+					padding: 0;
+				}
+
+				.admin-site-header .admin-profile-photo {
+					width: 34px;
+					height: 34px;
+				}
+			}
+
+			@media (max-width: 430px) {
+				.admin-site-header .admin-profile-entry {
+					display: none;
+				}
+
+				.admin-site-header .admin-header-actions {
+					gap: .35rem;
+				}
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.admin-skip-link,
+				.admin-site-header,
+				.admin-site-header * {
+					transition: none !important;
+				}
+			}
+		</style>
+
+		<a class="skip-link admin-skip-link" href="#main-content">跳至主要內容</a>
+
+		<header class="nav site-header admin-site-header">
+			<div class="wrap nav-inner admin-header-inner">
+				<a class="brand admin-header-brand" th:href="@{/admin/home}" href="#main-content"
 					aria-label="諮由自在後台管理首頁">
-					<span class="logo-mind" aria-hidden="true">
+					<span class="logo-mind admin-header-logo-mind" aria-hidden="true">
 						<span class="word">
 							<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
 						</span>
@@ -44,16 +410,16 @@
 							</svg>
 						</span>
 					</span>
-					<span class="brand-text">
+					<span class="brand-text admin-header-brand-text">
 						<span class="logo">諮由自在</span>
 						<span class="en">Free&nbsp;Mind</span>
 					</span>
 				</a>
 
-				<div class="nav-actions">
-					<a class="profile-entry" th:href="@{/admin/select_page}"
+				<div class="nav-actions admin-header-actions">
+					<a class="profile-entry admin-profile-entry" th:href="@{/admin/select_page}"
 						aria-label="前往管理員檔案">
-						<span class="profile-photo" aria-hidden="true">
+						<span class="profile-photo admin-profile-photo" aria-hidden="true">
 							<img
 								th:if="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
 								th:src="${admin.profilePic}"
@@ -67,7 +433,7 @@
 								<circle cx="12" cy="7" r="4" stroke-width="1.8" />
 							</svg>
 						</span>
-						<span class="profile-copy">
+						<span class="profile-copy admin-profile-copy">
 							<small
 								th:text="${admin != null ? admin.adminAccount : '管理員帳號'}">管理員帳號</small>
 							<strong
@@ -75,9 +441,9 @@
 						</span>
 					</a>
 
-					<form class="logout-form" th:action="@{/back-end/logout}"
+					<form class="logout-form admin-logout-form" th:action="@{/back-end/logout}"
 						method="post">
-						<button class="logout-button" type="submit"
+						<button class="logout-button admin-logout-button" type="submit"
 							aria-label="登出後台">
 							<svg viewBox="0 0 24 24" fill="none"
 								aria-hidden="true">

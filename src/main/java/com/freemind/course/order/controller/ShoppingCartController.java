@@ -104,9 +104,10 @@ public class ShoppingCartController {
 		if (orderCoupon != null
 				&& orderCoupon.getMember().getMemberId() == member.getMemberId()) {
 			model.addAttribute("couponName", orderCoupon.getCoupon().getCouponName());
-			cartTotal = BigDecimal.valueOf(cartTotal)
-						.multiply(orderCoupon.getCoupon().getDiscount())
-						.intValue();
+			cartTotal = (Integer)session.getAttribute("discountLimitTotal");
+//			cartTotal = BigDecimal.valueOf(cartTotal)
+//						.multiply(orderCoupon.getCoupon().getDiscount())
+//						.intValue();
 			model.addAttribute("orderCoupon", orderCoupon);
 		}else {
 			session.removeAttribute("orderCoupon");
@@ -132,14 +133,6 @@ public class ShoppingCartController {
 		Integer memberId = member.getMemberId();
 		String cartMsg = orderDetailSvc.canCourseToCart(memberId, courseId);
 		boolean cart = ShoppingCartRedisSvc.isCourseInCart(memberId, courseId);
-//		if(cartMsg != "")
-//			redirectAttributes.addFlashAttribute("cartMsg", cartMsg);
-//		if (ShoppingCartRedisSvc.isCourseInCart(member.getMemberId(), courseId)) {
-//		        redirectAttributes.addFlashAttribute("cartMsg", "此課程已在購物車中");
-//		} else {
-//			ShoppingCartRedisSvc.addCourse(member.getMemberId(), courseId);
-//		    redirectAttributes.addFlashAttribute("cartMsg", "成功加入購物車!");
-//		}
 		if (cartMsg == "") 
 			cartMsg = cart ? "此課程已在購物車中" : "成功加入購物車!";
 		if(cartMsg == "成功加入購物車!") 
@@ -192,18 +185,27 @@ public class ShoppingCartController {
 		
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
 		Integer total = cartTotal;
+		
+		if(total <= 0) {
+			return "redirect:/member/course/select_course";
+		}
+		
+		Integer discountAmount = 0;
 		if (orderCoupon != null) {
 			courseOrder.setMemberCoupon(orderCoupon);
+			Integer discountLimit = orderCoupon.getCoupon().getDiscountLimit();
 			total = BigDecimal.valueOf(cartTotal)
 					.multiply(orderCoupon.getCoupon().getDiscount())
 					.intValue();
+			discountAmount = discountLimit > (cartTotal - total) 
+								? (cartTotal - total) : (cartTotal - discountLimit);
 			orderCoupon.setCouponStatus((byte)1);
 			memberCouponSvc.updateCoupon(orderCoupon);
 			session.removeAttribute("orderCoupon");
 		}
 		courseOrder.setMember(member);
 		courseOrder.setOrderTotal(cartTotal);
-		courseOrder.setDiscountAmount(cartTotal - total);
+		courseOrder.setDiscountAmount(discountAmount);
 		courseOrder.setNetAmount(total);
 		courseOrder.setPaymentMethod(paymentMethod);
 		courseOrder.setOrderedAt(LocalDateTime.now());
