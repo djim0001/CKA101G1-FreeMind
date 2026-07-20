@@ -45,5 +45,8 @@ public interface ActivityReportRepository extends JpaRepository<ActivityReport, 
 	Optional<ActivityReport> findByIdWithDetails(@Param("reportId") Integer reportId);
 
 	boolean existsByMemberAndActivity(Member member, Activity activity);
+
+	long countByReportStatus(Integer reportStatus);
+
 }
  

@@ -1,7 +1,8 @@
 package com.freemind.activity.activity.controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.activity.model.ActivityService;
 import com.freemind.activity.registration.model.RegistrationService;
+import com.freemind.activity.report.model.ActivityReportService;
 import com.freemind.activity.util.PageUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,37 +28,22 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ActivityAdminController {
 
     @Autowired
-    ActivityService activitySvc;
+    private ActivityService activitySvc;
     
     @Autowired
     private RegistrationService regisSvc;
     
+    @Autowired
+    private ActivityReportService reportSvc;
+    
     private static final int PAGE_SIZE = 3;
 
-    // 後台查詢
-    @GetMapping("listAllActivity")
-    public String listAllActivity(ModelMap model) {
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-
-        List<Activity> list = activitySvc.getAllForAdmin(emptyMap, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
-        model.addAttribute("currentPage", currentPage);
-
-        long total = activitySvc.getTotalCountForAdmin(emptyMap);
-        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
-
-        return "back-end/activity/activity/listAllActivity";
-    }
-
-    @PostMapping("listActivities_ByCompositeQuery")
+    // 後台活動列表(唯一入口)
+    @GetMapping("listActivities_ByCompositeQuery")
     public String listActivities_ByCompositeQuery(HttpServletRequest req,
-                        @RequestParam(value = "currentPage", required = false) Integer currentPage,
+                        @RequestParam(value = "page", required = false) Integer page,
                         ModelMap model) {
-        if (currentPage == null) {
-            currentPage = 1;
-        }
+        Integer currentPage = (page == null) ? 1 : page;
 
         Map<String, String[]> map = req.getParameterMap();
         List<Activity> list = activitySvc.getAllForAdmin(map, currentPage);
@@ -66,12 +53,31 @@ public class ActivityAdminController {
 
         long total = activitySvc.getTotalCountForAdmin(map);
         model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
+        model.addAttribute("totalCount", total);
 
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
         }
 
+        model.addAttribute("qs", buildQueryString(map, "page"));
+        model.addAttribute("countPending", activitySvc.countByStatus(0));      // 待審核
+        model.addAttribute("countApproved", activitySvc.countByStatus(1));     // 已審核/待發布
+        model.addAttribute("countPublished", activitySvc.countByStatus(2));    // 已發布
+        model.addAttribute("countReportPending", reportSvc.countByStatus(0)); // 問題待處理
+        model.addAttribute("countReportProcessing", reportSvc.countByStatus(1)); // 問題處理中
+        model.addAttribute("countReportDone", reportSvc.countByStatus(2));    // 問題已處理
         return "back-end/activity/activity/listAllActivity";
+    }
+    
+    // 查詢表單送出：只負責把條件組成query string，轉址到下面的GET方法
+    @PostMapping("listActivities_ByCompositeQuery")
+    public String searchActivities(HttpServletRequest req) {
+        String qs = buildQueryString(req.getParameterMap(), "currentPage", "page");
+        String redirectUrl = "redirect:/admin/activity/listActivities_ByCompositeQuery?page=1";
+        if (!qs.isEmpty()) {
+            redirectUrl += "&" + qs;
+        }
+        return redirectUrl;
     }
     
     
@@ -159,7 +165,7 @@ public class ActivityAdminController {
         return "back-end/activity/activity/listOneActivity";   
     }
     
-    // 排程發布
+ // 排程發布
     @PostMapping("schedulePublish")
     public String schedulePublish(@RequestParam("activityId") Integer activityId,
                                    @RequestParam("scheduledPublishAt") String scheduledPublishAt,
@@ -175,5 +181,36 @@ public class ActivityAdminController {
         }
         return "redirect:/admin/activity/listOneActivity?activityId=" + activityId;
     }
+    
+ // 把Map<String, String[]>轉成query string，可指定要排除的欄位(例如page/currentPage)
+    private String buildQueryString(Map<String, String[]> params, String... excludeKeys) {
+        StringBuilder qs = new StringBuilder();
+        for (Map.Entry<String, String[]> entry : params.entrySet()) {
+            String key = entry.getKey();
+            boolean excluded = false;
+            for (String ex : excludeKeys) {
+                if (key.equals(ex)) {
+                    excluded = true;
+                    break;
+                }
+            }
+            if (excluded) {
+                continue;
+            }
+            for (String value : entry.getValue()) {
+                if (value == null || value.isEmpty()) {
+                    continue;
+                }
+                if (qs.length() > 0) {
+                    qs.append("&");
+                }
+                qs.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+                  .append("=")
+                  .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+            }
+        }
+        return qs.toString();
+    }
+
     
 }

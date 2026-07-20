@@ -2,49 +2,171 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title>查看單一活動詳情</title>
-    
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />  
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title th:text="${activity.activityName} + '｜諮由自在 Free Mind'">活動詳情｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
 <style>
-    
+/* ---------- 頁首標題區 ---------- */
+.act-head { background: var(--bg-warm); padding: 2.2rem 0 1.4rem; }
+.act-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.act-head .crumb a:hover { color: var(--orange); }
+.act-head .crumb span { margin: 0 .45rem; opacity: .5; }
+
+.act-page { background: var(--bg-warm); padding: .4rem 0 3.4rem; }
+.act-narrow { width: min(1080px, 92vw) !important; }
+
+.msg-error {
+	color: #c0392b; background-color: #fdecea;
+	padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem;
+	display: inline-block;
+}
+.msg-success {
+	color: #4F7B96; background-color: var(--blue-soft);
+	padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem;
+	display: inline-block;
+}
+
+/* ---------- 上半部：圖片 + 資訊卡 ---------- */
+.detail-top { display: grid; grid-template-columns: 1fr 1.1fr; gap: 2rem; align-items: stretch; margin-bottom: 1.8rem; }
+.detail-cover {
+	border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm);
+	height: 100%; min-height: 420px; position: relative;
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.detail-info-wrap { position: relative; }
+.corner-actions {
+	position: absolute; top: -3.6rem; right: 0; z-index: 2;
+	display: flex; gap: .6rem;
+}
+
+.info-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	padding: 1.8rem 2rem; box-shadow: var(--shadow-sm); height: 100%;
+}
+.info-cat { font-size: .78rem; letter-spacing: .1em; color: var(--orange); font-weight: 600; text-transform: uppercase; }
+.info-card h1 {
+	font-family: var(--zen-maru); font-weight: 700; font-size: clamp(1.5rem, 2.6vw, 2rem);
+	color: var(--ink); margin: .5rem 0 1rem; line-height: 1.35;
+}
+.info-row { display: flex; gap: .6rem; align-items: flex-start; font-size: .92rem; color: var(--ink); margin-bottom: .7rem; }
+.info-row svg { width: 18px; height: 18px; stroke: var(--orange); flex: 0 0 auto; margin-top: .1rem; }
+.info-row .label { color: var(--ink-soft); flex: 0 0 auto; }
+
+.capacity-box {
+	background: var(--bg-warm); border-radius: 12px; padding: 1rem 1.2rem; margin: 1.1rem 0;
+	font-size: .88rem; color: var(--ink); line-height: 1.9;
+}
+.capacity-box b { color: var(--ink); }
+
+.reg-status-row { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
 .status-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 14px;
-    border: 1px solid;
+	display: inline-flex; align-items: center; padding: .35rem .9rem; border-radius: 999px;
+	font-size: .82rem; font-weight: 500; border: 1px solid;
 }
-.status-pending {
-    color: #b8860b;
-    border-color: #b8860b;
-    background-color: #fff8e6;
+.status-pending { color: #b8860b; border-color: #b8860b; background-color: #fff8e6; }
+.status-confirmed { color: #5A7A57; border-color: #5A7A57; background-color: #eef4ec; }
+
+/* 報名狀態文字對應色（依 registrationStatusText 內容分色） */
+.status-open   { color: #5A7A57; border-color: #5A7A57; background-color: #eef4ec; }
+.status-notyet { color: #b8860b; border-color: #b8860b; background-color: #fff8e6; }
+.status-full   { color: var(--orange-deep); border-color: var(--orange); background-color: var(--pink-soft); }
+.status-closed { color: var(--ink-soft); border-color: var(--line); background-color: var(--bg-warm); }
+
+/* 報名表單 */
+.motivation-field { margin-bottom: .9rem; }
+.motivation-field label { display: block; font-size: .84rem; color: var(--ink); margin-bottom: .4rem; }
+.motivation-field textarea {
+	width: 100%; min-height: 70px; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .88rem; color: var(--ink); resize: vertical; line-height: 1.7;
 }
-.status-confirmed {
-    color: #2e7d32;
-    border-color: #2e7d32;
-    background-color: #e8f5e9;
+.motivation-field textarea:focus { outline: none; border-color: var(--orange); background: #fff; }
+
+.btn-follow {
+	background: #fff; border: 1px solid var(--line); color: var(--ink-soft); border-radius: 999px;
+	height: 42px; padding: 0 1.2rem; display: inline-flex; align-items: center; gap: .4rem; font-size: .86rem;
+	cursor: pointer; font-family: inherit; transition: all .18s; box-shadow: var(--shadow-sm);
+}
+.btn-follow:hover { border-color: var(--orange); color: var(--orange-deep); }
+.btn-follow.is-following { background: var(--pink-soft); border-color: var(--pink-soft); color: var(--orange-deep); }
+.btn-share {
+	background: #fff; border: 1px solid var(--line); color: var(--ink-soft); border-radius: 999px;
+	height: 42px; padding: 0 1.2rem; display: inline-flex; align-items: center; gap: .4rem; font-size: .86rem;
+	cursor: pointer; font-family: inherit; transition: all .18s; box-shadow: var(--shadow-sm);
+}
+.btn-share:hover { border-color: var(--orange); color: var(--orange-deep); }
+
+.reg-btn-row { margin-top: 1rem; }
+.reg-btn-row .btn { height: 46px; padding: 0 1.6rem; display: inline-flex; align-items: center; justify-content: center; font-size: .92rem; }
+
+/* ---------- 內容卡片（活動內容 / 評價） ---------- */
+.content-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	padding: 1.8rem 2rem; box-shadow: var(--shadow-sm); margin-bottom: 1.6rem;
+}
+.content-card h3 {
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem; color: var(--ink);
+	margin: 0 0 1.2rem; display: flex; align-items: center; gap: .5rem;
+}
+.content-card h3::before {
+	content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); flex: 0 0 auto;
+}
+.content-body { white-space: pre-wrap; font-size: .92rem; color: var(--ink); line-height: 1.9; }
+
+/* 評價列表 */
+.review-item { padding: 1rem 0; border-top: 1px solid var(--line); }
+.review-item:first-child { border-top: none; padding-top: 0; }
+.review-head { display: flex; align-items: center; gap: .7rem; margin-bottom: .4rem; flex-wrap: wrap; }
+.review-head b { font-size: .92rem; color: var(--ink); }
+.review-head .stars { color: var(--orange); font-size: .88rem; font-weight: 500; }
+.review-head .date { font-size: .78rem; color: var(--ink-soft); }
+.review-content { font-size: .9rem; color: var(--ink); line-height: 1.8; }
+.review-empty { color: var(--ink-soft); font-size: .9rem; }
+
+/* ---------- 底部連結（我的關注 / 我的報名，靠右對齊） ---------- */
+.detail-links { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: flex-end; margin-top: .6rem; }
+.detail-links a {
+	display: inline-flex; align-items: center; gap: .4rem;
+	padding: .6rem 1.3rem; border-radius: 999px; border: 1px solid var(--line);
+	background: #fff; font-size: .88rem; color: var(--ink-soft); transition: all .18s;
+}
+.detail-links a.link-follow:hover { border-color: var(--orange-deep); color: #fff; background: var(--orange-deep); }
+.detail-links a.link-regis:hover { border-color: #8FB2C9; color: #fff; background: #4F7B96; }
+
+@media (max-width: 940px) {
+	.detail-top { grid-template-columns: 1fr; }
+	.detail-cover { min-height: 260px; }
+	.corner-actions { position: static; justify-content: flex-end; margin-bottom: 1rem; }
 }
 
 /* ---------- 分享彈窗 ---------- */
 .share-modal-overlay {
 	display: none; position: fixed; inset: 0;
-	background: rgba(255,255,255,.55); backdrop-filter: blur(6px);
+	background: rgba(58,75,83,.35); backdrop-filter: blur(6px);
 	z-index: 500; align-items: center; justify-content: center;
 	opacity: 0; transition: opacity .2s;
 }
 .share-modal-overlay.show { display: flex; opacity: 1; }
 .share-modal-panel {
-	background: #fff; border-radius: 12px;
-	box-shadow: 0 8px 24px rgba(0,0,0,.12); width: 90%; max-width: 400px; padding: 1.6rem;
+	background: #fff; border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md); width: 90%; max-width: 400px; padding: 1.6rem;
 	transform: translateY(10px); transition: transform .2s;
-	font-family: 'Noto Sans TC', sans-serif;
+	font-family: var(--sans);
 }
 .share-modal-overlay.show .share-modal-panel { transform: translateY(0); }
 .share-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.3rem; }
-.share-modal-header span { font-size: 1.05rem; font-weight: 700; color: #333; }
-.share-modal-close { background: none; border: none; font-size: 22px; color: #888; cursor: pointer; line-height: 1; }
-.share-modal-close:hover { color: #333; }
+.share-modal-header span { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.share-modal-close { background: none; border: none; font-size: 22px; color: var(--ink-soft); cursor: pointer; line-height: 1; }
+.share-modal-close:hover { color: var(--ink); }
 .share-modal-options { display: flex; justify-content: space-between; gap: .5rem; }
 .share-option { display: flex; flex-direction: column; align-items: center; gap: .5rem; border: none; background: none; cursor: pointer; font-family: inherit; flex: 1; }
 .share-icon {
@@ -53,215 +175,280 @@
 	font-size: 22px; color: #fff; transition: transform .15s;
 }
 .share-option:hover .share-icon { transform: scale(1.1); }
-.share-label { font-size: .74rem; color: #888; }
-.copy-icon      { background: #555; }
+.share-label { font-size: .74rem; color: var(--ink-soft); }
+.copy-icon      { background: var(--ink-soft); }
 .line-icon      { background: #06C755; }
 .instagram-icon { background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
 .facebook-icon  { background: #1877F2; }
-.threads-icon   { background: #000; }
-.share-toast { margin-top: 1rem; text-align: center; font-size: .78rem; color: #888; min-height: 16px; }
- 
-    
+.threads-icon   { background: var(--ink); }
+.share-toast { margin-top: 1rem; text-align: center; font-size: .78rem; color: var(--ink-soft); min-height: 16px; }
 </style>
 </head>
 <body>
-    <h1 th:text="${activity.activityName}"></h1>
 
-	<p th:if="${errorMessage}" th:text="${errorMessage}" style="color:red;"></p>
-	<p th:if="${successMessage}" th:text="${successMessage}" style="color:blue;"></p>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <img th:if="${activity.picture != null}" 
-         th:src="@{'/activity-images/' + ${activity.picture}}" 
-         style="max-width: 400px;">
-    <img th:unless="${activity.picture != null}" 
-         th:src="@{/images/no-image.jpg}" 
-         style="max-width: 400px;">
+	<!-- ================= 頁首麵包屑 ================= -->
+	<section class="act-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">揪團活動</a><span>/</span>
+				<span style="opacity:1;color:var(--ink)" th:text="${activity.activityName}">活動詳情</span>
+			</div>
+		</div>
+	</section>
 
-    <p>活動分類：<span th:text="${activity.activityCat.activityCatName}"></span></p>
-    <p>地點：<span th:text="${activity.activityCity} + ${activity.activityDist} + ${activity.activityLoc}"></span></p>
+	<!-- ================= 主體 ================= -->
+	<section class="act-page">
+		<div class="wrap act-narrow">
 
-    <p>活動內容：</p>
-    <p th:text="${activity.activityContent}" style="white-space: pre-wrap;"></p>
+			<p th:if="${errorMessage}" th:text="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:text="${successMessage}" class="msg-success"></p>
 
-    <p>報名時間：
-        <span th:text="${#temporals.format(activity.regisStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
-        <span th:text="${#temporals.format(activity.regisEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
-    </p>
-    <p>活動時間：
-        <span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')}"></span> ~ 
-        <span th:text="${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
-    </p>
-    <p>正取名額：<span id="confirmedCount" th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></span></p>
-	<p>備取名額：<span id="waitlistCount" th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></span></p>
-	<p>已報名人數：<span id="totalRegisteredCount" th:text="${activity.regisCount + activity.waitlistCount + pendingCount} + ' / ' + ${activity.capacity + activity.waitlistCapacity}"></span></p>
-    <p>報名狀態：<span th:text="${activity.registrationStatusText}"></span></p>
+			<!-- ---------- 上半部：封面圖 + 資訊卡 ---------- -->
+			<div class="detail-top">
+				<div class="detail-cover">
+					<img th:if="${activity.picture != null}"
+						 th:src="@{'/activity-images/' + ${activity.picture}}"
+						 th:alt="${activity.activityName}" />
+					<img th:unless="${activity.picture != null}"
+						 th:src="@{/images/no-image.jpg}"
+						 th:alt="${activity.activityName}" />
+				</div>
 
-	<span th:if="${myRegisMap.get(activity.activityId) == 0}" class="status-badge status-pending">審核中</span>
-	<span th:if="${myRegisMap.get(activity.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
-	<span th:if="${myRegisMap.get(activity.activityId) == 4}" class="status-badge status-confirmed">已候補</span>
-						
-	
-	<!-- 報名功能 -->
-	<th:block th:if="${myRegisMap.get(activity.activityId) == null}">
-	    <!-- 已登入會員：顯示報名表單 -->
-	    <form th:if="${activity.registrable}" sec:authorize="hasRole('MEMBER')"
-	          th:action="@{/member/activity/registration/register}" method="post" style="display:inline;">
-	        <th:block th:if="${activity.member.memberId != #authentication.principal.member.memberId}">
-	            <input type="hidden" name="activityId" th:value="${activity.activityId}">
-	            <input type="hidden" name="redirectUrl" th:value="@{/member/activity/listOneActivity(activityId=${activity.activityId})}">
-	            <br>
-	            <label>報名動機：</label><br>
-	            <textarea name="motivation" required maxlength="200" placeholder="簡單說說你想參加這個活動的原因" style="width:300px; height:60px;"></textarea><br>
-	            <button type="submit">報名</button>
-	        </th:block>
-	    </form>
-	
-	    <!-- 未登入：導去登入頁 -->
-	    <a th:if="${activity.registrable}" sec:authorize="isAnonymous()"
-	       th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
-	        <button type="button">報名</button>
-	    </a>
-	</th:block>
-	
-	<!-- 關注功能 -->
-	<!-- 已登入會員：關注功能 -->
-	<div sec:authorize="hasRole('MEMBER')" style="display:inline;">
-	    <form th:if="${!isFollowing}"
-	          th:action="@{/member/activity/follow/follow}" method="post" style="display:inline;">
-	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
-	        <button type="submit">♡ 關注</button>
-	    </form>
-	
-	    <form th:if="${isFollowing}"
-	          th:action="@{/member/activity/follow/unfollow}" method="post" style="display:inline;">
-	        <input type="hidden" name="activityId" th:value="${activity.activityId}">
-	        <button type="submit">♥ 已關注</button>
-	    </form>
+				<div class="detail-info-wrap">
+					<!-- 關注 / 分享：卡片外右上方 -->
+					<div class="corner-actions">
+						<div sec:authorize="hasRole('MEMBER')" style="display:contents;">
+							<form th:if="${!isFollowing}"
+								  th:action="@{/member/activity/follow/follow}" method="post" style="display:inline;">
+								<input type="hidden" name="activityId" th:value="${activity.activityId}">
+								<button type="submit" class="btn-follow">♡ 關注</button>
+							</form>
+							<form th:if="${isFollowing}"
+								  th:action="@{/member/activity/follow/unfollow}" method="post" style="display:inline;">
+								<input type="hidden" name="activityId" th:value="${activity.activityId}">
+								<button type="submit" class="btn-follow is-following">♥ 已關注</button>
+							</form>
+						</div>
+						<a sec:authorize="isAnonymous()"
+						   th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
+							<button type="button" class="btn-follow">♡ 關注</button>
+						</a>
+
+						<button type="button" class="btn-share" onclick="openShareModal()">
+							<i class="fa-regular fa-share-from-square"></i> 分享
+						</button>
+					</div>
+
+					<div class="info-card">
+						<span class="info-cat" th:text="${activity.activityCat.activityCatName}">活動分類</span>
+						<h1 th:text="${activity.activityName}">活動名稱</h1>
+
+						<div class="info-row">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+							<span th:text="${activity.activityCity} + ${activity.activityDist} + ${activity.activityLoc}">地點</span>
+						</div>
+						<div class="info-row">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+							<span class="label">活動時間：</span>
+							<span th:text="${#temporals.format(activity.activityStart, 'yyyy/MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(activity.activityEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
+						</div>
+						<div class="info-row">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+							<span class="label">報名時間：</span>
+							<span th:text="${#temporals.format(activity.regisStart, 'yyyy/MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(activity.regisEnd, 'yyyy/MM/dd(E) HH:mm')}"></span>
+						</div>
+
+						<div class="capacity-box">
+							正取名額：<b id="confirmedCount" th:text="${activity.regisCount} + ' / ' + ${activity.capacity}"></b><br>
+							備取名額：<b id="waitlistCount" th:text="${activity.waitlistCount} + ' / ' + ${activity.waitlistCapacity}"></b><br>
+							已報名人數：<b id="totalRegisteredCount" th:text="${activity.regisCount + activity.waitlistCount + pendingCount} + ' / ' + ${activity.capacity + activity.waitlistCapacity}"></b>
+						</div>
+
+						<div class="reg-status-row">
+							<span th:if="${myRegisMap.get(activity.activityId) == 0}" class="status-badge status-pending">審核中</span>
+							<span th:if="${myRegisMap.get(activity.activityId) == 1}" class="status-badge status-confirmed">已報名</span>
+							<span th:if="${myRegisMap.get(activity.activityId) == 4}" class="status-badge status-confirmed">已候補</span>
+
+							<!-- 報名狀態文字依內容對應不同顏色 -->
+							<span class="status-badge"
+								  th:classappend="${activity.registrationStatusText == '可報名中'} ? ' status-open'
+								                   : (${activity.registrationStatusText == '尚未開放報名'} ? ' status-notyet'
+								                   : (${activity.registrationStatusText == '已額滿' or activity.registrationStatusText == '候補中'} ? ' status-full'
+								                   : ' status-closed'))"
+								  th:text="${activity.registrationStatusText}">報名狀態</span>
+						</div>
+
+						<!-- 報名功能 -->
+						<th:block th:if="${myRegisMap.get(activity.activityId) == null}">
+							<!-- 已登入會員：顯示報名表單 -->
+							<form th:if="${activity.registrable}" sec:authorize="hasRole('MEMBER')"
+								  th:action="@{/member/activity/registration/register}" method="post">
+								<th:block th:if="${activity.member.memberId != #authentication.principal.member.memberId}">
+									<input type="hidden" name="activityId" th:value="${activity.activityId}">
+									<input type="hidden" name="redirectUrl" th:value="@{/member/activity/listOneActivity(activityId=${activity.activityId})}">
+									<div class="motivation-field">
+										<label>報名動機</label>
+										<textarea name="motivation" required maxlength="200" placeholder="簡單說說你想參加這個活動的原因"></textarea>
+									</div>
+									<div class="reg-btn-row">
+										<button type="submit" class="btn btn-primary">報名</button>
+									</div>
+								</th:block>
+							</form>
+
+							<!-- 未登入：導去登入頁 -->
+							<a th:if="${activity.registrable}" sec:authorize="isAnonymous()"
+							   th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
+								<div class="reg-btn-row">
+									<button type="button" class="btn btn-primary">報名</button>
+								</div>
+							</a>
+						</th:block>
+					</div>
+				</div>
+			</div>
+
+			<!-- ---------- 活動內容 ---------- -->
+			<div class="content-card">
+				<h3>活動內容</h3>
+				<div class="content-body" th:text="${activity.activityContent}"></div>
+			</div>
+
+			<!-- ---------- 活動評價 ---------- -->
+			<div class="content-card">
+				<h3>活動評價</h3>
+				<div th:each="rv : ${reviewListData}" class="review-item">
+					<div class="review-head">
+						<b th:text="${#strings.isEmpty(rv.member.nickname) ? rv.member.name : rv.member.nickname}">會員</b>
+						<span class="stars" th:text="'★' + ${rv.rating}">★5</span>
+						<span class="date" th:text="${#temporals.format(rv.reviewedAt, 'yyyy/MM/dd')}">2026/07/20</span>
+					</div>
+					<p class="review-content" th:text="${rv.reviewContent}"></p>
+				</div>
+				<p class="review-empty" th:if="${#lists.isEmpty(reviewListData)}">尚無評價。</p>
+			</div>
+
+			<!-- ---------- 底部連結：我的關注 / 我的報名紀錄 ---------- -->
+			<div class="detail-links">
+				<a class="link-follow" th:href="@{/member/activity/follow/myFollows}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+					查看我的關注
+				</a>
+				<a class="link-regis" th:href="@{/member/activity/registration/myRegistrations}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+					查看我的報名紀錄
+				</a>
+			</div>
+
+		</div>
+	</section>
+
+	<div id="activityData"
+		 th:data-activity-id="${activity.activityId}"
+		 th:data-capacity="${activity.capacity}"
+		 th:data-waitlist-capacity="${activity.waitlistCapacity}"
+		 style="display:none;"></div>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<!-- 分享彈窗 -->
+	<div class="share-modal-overlay" id="shareModal" onclick="closeShareModalOutside(event)">
+		<div class="share-modal-panel">
+			<div class="share-modal-header">
+				<span>分享活動</span>
+				<button type="button" class="share-modal-close" onclick="closeShareModal()">&times;</button>
+			</div>
+			<div class="share-modal-options">
+				<button type="button" class="share-option" onclick="copyLink()">
+					<span class="share-icon copy-icon"><i class="fa-regular fa-copy"></i></span>
+					<span class="share-label">複製連結</span>
+				</button>
+				<button type="button" class="share-option" onclick="shareToLine()">
+					<span class="share-icon line-icon"><i class="fa-brands fa-line"></i></span>
+					<span class="share-label">LINE</span>
+				</button>
+				<button type="button" class="share-option" onclick="shareToInstagram()">
+					<span class="share-icon instagram-icon"><i class="fa-brands fa-instagram"></i></span>
+					<span class="share-label">Instagram</span>
+				</button>
+				<button type="button" class="share-option" onclick="shareToFacebook()">
+					<span class="share-icon facebook-icon"><i class="fa-brands fa-facebook"></i></span>
+					<span class="share-label">Facebook</span>
+				</button>
+				<button type="button" class="share-option" onclick="shareToThreads()">
+					<span class="share-icon threads-icon"><i class="fa-brands fa-at"></i></span>
+					<span class="share-label">Threads</span>
+				</button>
+			</div>
+			<div class="share-toast" id="shareToast"></div>
+		</div>
 	</div>
-	
-	<!-- 未登入：導去登入頁 -->
-	<a sec:authorize="isAnonymous()"
-	   th:href="@{/front-end/login(redirect='/member/activity/listOneActivity?activityId=' + ${activity.activityId})}">
-	    <button type="button">♡ 關注</button>
-	</a>
-	
-	<button type="button" onclick="openShareModal()">
-	    <i class="fa-regular fa-share-from-square"></i> 分享
-	</button>
-	
-	<br>
-	<h3>活動評價</h3>
-		<div th:each="rv : ${reviewListData}">
-		    <p>
-		        <b th:text="${#strings.isEmpty(rv.member.nickname) ? rv.member.name : rv.member.nickname}"></b>
-		        <span th:text="'★' + ${rv.rating}"></span>
-		        <span th:text="${#temporals.format(rv.reviewedAt, 'yyyy/MM/dd')}" style="color:gray;"></span>
-		    </p>
-		    <p th:text="${rv.reviewContent}"></p>
-		    <hr>
-		</div>
-	<p th:if="${#lists.isEmpty(reviewListData)}">尚無評價。</p>
-	<br>
-	<br>
- 	<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">返回活動列表</a>｜<a th:href="@{/member/activity/follow/myFollows}">我的關注</a>｜	<a th:href="@{/member/activity/registration/myRegistrations}">我的報名</a>
 
-<div id="activityData" 
-     th:data-activity-id="${activity.activityId}"
-     th:data-capacity="${activity.capacity}"
-     th:data-waitlist-capacity="${activity.waitlistCapacity}"
-     style="display:none;"></div>
+	<script src="/js/nav.js"></script>
+	<script>
+	(function() {
+		var activityId = document.getElementById('activityData').getAttribute('data-activity-id');
+		var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+		var socket = new WebSocket(wsUrl);
 
+		socket.onmessage = function(event) {
+			var data = JSON.parse(event.data);
+			var confirmedCap = document.getElementById('activityData').getAttribute('data-capacity');
+			var waitlistCap = document.getElementById('activityData').getAttribute('data-waitlist-capacity');
 
-<!-- 分享連結 -->
-<div class="share-modal-overlay" id="shareModal" onclick="closeShareModalOutside(event)">
-	<div class="share-modal-panel">
-		<div class="share-modal-header">
-			<span>分享活動</span>
-			<button type="button" class="share-modal-close" onclick="closeShareModal()">&times;</button>
-		</div>
-		<div class="share-modal-options">
-			<button type="button" class="share-option" onclick="copyLink()">
-				<span class="share-icon copy-icon"><i class="fa-regular fa-copy"></i></span>
-				<span class="share-label">複製連結</span>
-			</button>
-			<button type="button" class="share-option" onclick="shareToLine()">
-				<span class="share-icon line-icon"><i class="fa-brands fa-line"></i></span>
-				<span class="share-label">LINE</span>
-			</button>
-			<button type="button" class="share-option" onclick="shareToInstagram()">
-				<span class="share-icon instagram-icon"><i class="fa-brands fa-instagram"></i></span>
-				<span class="share-label">Instagram</span>
-			</button>
-			<button type="button" class="share-option" onclick="shareToFacebook()">
-				<span class="share-icon facebook-icon"><i class="fa-brands fa-facebook"></i></span>
-				<span class="share-label">Facebook</span>
-			</button>
-			<button type="button" class="share-option" onclick="shareToThreads()">
-				<span class="share-icon threads-icon"><i class="fa-brands fa-at"></i></span>
-				<span class="share-label">Threads</span>
-			</button>
-		</div>
-		<div class="share-toast" id="shareToast"></div>
-	</div>
-</div>
-<script>
-(function() {
-    var activityId = document.getElementById('activityData').getAttribute('data-activity-id');
-    var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
-    var socket = new WebSocket(wsUrl);
+			document.getElementById('confirmedCount').innerText = data['正取'] + ' / ' + confirmedCap;
+			document.getElementById('waitlistCount').innerText = data['備取'] + ' / ' + waitlistCap;
 
-    socket.onmessage = function(event) {
-        var data = JSON.parse(event.data);
-        var confirmedCap = document.getElementById('activityData').getAttribute('data-capacity');
-        var waitlistCap = document.getElementById('activityData').getAttribute('data-waitlist-capacity');
+			var total = data['正取'] + data['備取'] + data['未審核'];
+			var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+			document.getElementById('totalRegisteredCount').innerText = total + ' / ' + totalCap;
+		};
 
-        document.getElementById('confirmedCount').innerText = data['正取'] + ' / ' + confirmedCap;
-        document.getElementById('waitlistCount').innerText = data['備取'] + ' / ' + waitlistCap;
+		socket.onerror = function(e) {
+			console.log('WebSocket錯誤:', e);
+		};
+	})();
+	</script>
 
-        var total = data['正取'] + data['備取'] + data['未審核'];
-        var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
-        document.getElementById('totalRegisteredCount').innerText = total + ' / ' + totalCap;
-    };
+	<script>
+	function openShareModal() {
+		document.getElementById('shareToast').textContent = '';
+		document.getElementById('shareModal').classList.add('show');
+	}
+	function closeShareModal() { document.getElementById('shareModal').classList.remove('show'); }
+	function closeShareModalOutside(e) { if (e.target.id === 'shareModal') closeShareModal(); }
 
-    socket.onerror = function(e) {
-        console.log('WebSocket錯誤:', e);
-    };
-})();
-</script>
-
-<script>
-function openShareModal() {
-	document.getElementById('shareToast').textContent = '';
-	document.getElementById('shareModal').classList.add('show');
-}
-function closeShareModal() { document.getElementById('shareModal').classList.remove('show'); }
-function closeShareModalOutside(e) { if (e.target.id === 'shareModal') closeShareModal(); }
-
-function copyLink() {
-	navigator.clipboard.writeText(location.href).then(function() {
-		document.getElementById('shareToast').textContent = '連結已複製！';
-	}).catch(function() {
-		document.getElementById('shareToast').textContent = '複製失敗，請手動複製網址';
-	});
-}
-function openSharePopup(url) {
-	var w=600,h=500,l=(screen.width-w)/2,t=(screen.height-h)/2;
-	window.open(url,'_blank','width='+w+',height='+h+',left='+l+',top='+t+',noopener,noreferrer');
-}
-function shareToLine() {
-	openSharePopup('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title));
-}
-function shareToInstagram() {
-	navigator.clipboard.writeText(location.href).then(function() {
-		document.getElementById('shareToast').textContent = 'Instagram 不支援直接分享，已複製連結，請至 Instagram App 貼上。';
-	});
-}
-function shareToFacebook() {
-	openSharePopup('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href));
-}
-function shareToThreads() {
-	openSharePopup('https://www.threads.net/intent/post?text='+encodeURIComponent(document.title+' '+location.href));
-}
-</script>
+	function copyLink() {
+		navigator.clipboard.writeText(location.href).then(function() {
+			document.getElementById('shareToast').textContent = '連結已複製！';
+		}).catch(function() {
+			document.getElementById('shareToast').textContent = '複製失敗，請手動複製網址';
+		});
+	}
+	function openSharePopup(url) {
+		var w=600,h=500,l=(screen.width-w)/2,t=(screen.height-h)/2;
+		window.open(url,'_blank','width='+w+',height='+h+',left='+l+',top='+t+',noopener,noreferrer');
+	}
+	function shareToLine() {
+		openSharePopup('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title));
+	}
+	function shareToInstagram() {
+		navigator.clipboard.writeText(location.href).then(function() {
+			document.getElementById('shareToast').textContent = 'Instagram 不支援直接分享，已複製連結，請至 Instagram App 貼上。';
+		});
+	}
+	function shareToFacebook() {
+		openSharePopup('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href));
+	}
+	function shareToThreads() {
+		openSharePopup('https://www.threads.net/intent/post?text='+encodeURIComponent(document.title+' '+location.href));
+	}
+	</script>
 </body>
 </html>

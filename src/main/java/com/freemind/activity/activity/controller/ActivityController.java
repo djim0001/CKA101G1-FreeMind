@@ -242,60 +242,49 @@ public class ActivityController {
     
     // 查看我發起的活動
     @GetMapping("ownedActivities")
-    public String ownedActivities(@AuthenticationPrincipal MemberUserDetails userDetails, ModelMap model) {
-    	 	if (userDetails == null) {
-    	        return "redirect:/front-end/login";
-    	    }
-    	
-    		Integer memberId = userDetails.getMember().getMemberId();
-        
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-        
-        List<Activity> list = activitySvc.getAllForOwner(emptyMap, memberId, currentPage);
+    public String ownedActivities(HttpServletRequest req,
+                        @RequestParam(value = "page", required = false) Integer page,
+                        @AuthenticationPrincipal MemberUserDetails userDetails,
+                        ModelMap model) {
+        if (userDetails == null) {
+            return "redirect:/front-end/login";
+        }
+        Integer memberId = userDetails.getMember().getMemberId();
+        Integer currentPage = (page == null) ? 1 : page;
+
+        Map<String, String[]> map = req.getParameterMap();
+        List<Activity> list = activitySvc.getAllForOwner(map, memberId, currentPage);
         model.addAttribute("activityListData", list);
         model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForOwner(emptyMap, memberId);
+
+        long total = activitySvc.getTotalCountForOwner(map, memberId);
         model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
+        model.addAttribute("totalCount", total);
         model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
+        model.addAttribute("qs", buildQueryString(map, "page"));
+
         return "front-end/member/activity/ownedActivities";
     }
  
 
     @PostMapping("ownedActivities_search")
-    public String ownedActivitiesSearch(HttpServletRequest req,
-    				@RequestParam(value = "currentPage", required = false) Integer currentPage, 
-    				@AuthenticationPrincipal MemberUserDetails userDetails,
-    				ModelMap model) {
-    		if (userDetails == null) {
+    public String ownedActivitiesSearch(HttpServletRequest req, @AuthenticationPrincipal MemberUserDetails userDetails) {
+        if (userDetails == null) {
             return "redirect:/front-end/login";
         }
-    	
-    		Integer memberId = userDetails.getMember().getMemberId();
-        
-        if (currentPage == null) {
-            currentPage = 1;
-        }
-        
         Map<String, String[]> map = req.getParameterMap();
-        List<Activity> list = activitySvc.getAllForOwner(map, memberId, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("currentPage", currentPage);
-        
-        long total = activitySvc.getTotalCountForOwner(map, memberId);
-        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
-        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));  
-        
-        if (list.isEmpty()) {
-            model.addAttribute("errorMessage", "查無符合條件的活動");
+        String qs = buildQueryString(map, "currentPage", "page");
+        String redirectUrl = "redirect:/member/activity/ownedActivities?page=1";
+        if (!qs.isEmpty()) {
+            redirectUrl += "&" + qs;
         }
-        return "front-end/member/activity/ownedActivities";
+        return redirectUrl;
     }
   
     @PostMapping("cancel")
     public String cancel(@RequestParam("activityId") Integer activityId,
                          @RequestParam("cancelNote") String cancelNote,
+                         @RequestParam(value = "currentPage", required = false) Integer currentPage,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
@@ -314,12 +303,14 @@ public class ActivityController {
         		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-        return "redirect:/member/activity/ownedActivities";
+    		 int page = (currentPage != null) ? currentPage : 1;
+    		 return "redirect:/member/activity/ownedActivities?page=" + page;
     }
     
     @PostMapping("postpone")
     public String postpone(@RequestParam("activityId") Integer activityId,
                             @RequestParam("postponeNote") String postponeNote,
+                            @RequestParam(value = "currentPage", required = false) Integer currentPage,
                             @AuthenticationPrincipal MemberUserDetails userDetails,
                             RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
@@ -337,7 +328,8 @@ public class ActivityController {
         		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
         }
 
-    		return "redirect:/member/activity/ownedActivities";
+    		int page = (currentPage != null) ? currentPage : 1;
+    		return "redirect:/member/activity/ownedActivities?page=" + page;
     }
     
     @PostMapping("confirmNewSchedule")
@@ -346,12 +338,13 @@ public class ActivityController {
                                       @RequestParam("activityEnd") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime activityEnd,
                                       @RequestParam(value = "regisStart", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisStart,
                                       @RequestParam(value = "regisEnd", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime regisEnd,
+                                      @RequestParam(value = "currentPage", required = false) Integer currentPage,
                                       @AuthenticationPrincipal MemberUserDetails userDetails,
                                       RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
             return "redirect:/front-end/login";
         }
-    	
+
     		try {
             Activity activity = activitySvc.getOneActivity(activityId);
             if (!activity.getMember().getMemberId().equals(userDetails.getMember().getMemberId())) {
@@ -359,11 +352,13 @@ public class ActivityController {
             }
             activitySvc.confirmNewSchedule(activityId, activityStart, activityEnd, regisStart, regisEnd);
             redirectAttributes.addFlashAttribute("success", "成功更新活動時間");
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
         		redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+        		redirectAttributes.addFlashAttribute("scheduleErrorActivityId", activityId);   // 記住是哪個活動的彈窗出錯
         }
 
-    		return "redirect:/member/activity/ownedActivities";
+    		int page = (currentPage != null) ? currentPage : 1;
+    		return "redirect:/member/activity/ownedActivities?page=" + page;
     }
     
 //    @GetMapping("activityImage")

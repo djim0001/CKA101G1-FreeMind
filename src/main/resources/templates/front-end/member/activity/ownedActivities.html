@@ -2,243 +2,411 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title>我發起的活動</title>
-    <style>
-  /* =================================================================== */
-  /* 分配寬度比例 (100%) */
-  /* =================================================================== */
-  th:nth-child(1) { width: 9%; }  /* 活動圖片 */
-  th:nth-child(2) { width: 4%; }  /* 編號 */
-  th:nth-child(3) { width: 17%; } /* 活動名稱 */
-  th:nth-child(4) { width: 7%; } /* 活動狀態 */
-  th:nth-child(5) { width: 12%; } /* 活動時間 */
-  th:nth-child(6) { width: 11%; }  /* 已報名/名額 */
-  th:nth-child(7) { width: 12%; } /* 報名時間 */
-  th:nth-child(8) { width: 6%; }  /* 報名狀態狀態 */
-  th:nth-child(9) { width: 9%; } /* 查看詳情按鈕欄位 */	
-  th:nth-child(10) { width: 9%; } /* 其他操作按鈕欄位 */	
-  
-  td:nth-child(9) {
-    white-space: nowrap; 
-  }
-  td:nth-child(10) {
-    white-space: nowrap; 
-  }
-  .action-block {
-    display: inline-block;
-  }
-  
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我發起的活動｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<style>
+/* ---------- 頁首標題區 ---------- */
+.act-head { background: var(--bg-warm); padding: 2.2rem 0 1.4rem; }
+.act-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.act-head .crumb a:hover { color: var(--orange); }
+.act-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.act-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(1.9rem, 3.2vw, 2.5rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.act-head p { color: var(--ink-soft); margin: 0; max-width: 36rem; }
+
+.act-page { background: var(--bg-warm); padding: .4rem 0 3.4rem; }
+.act-wide { width: min(1320px, 92vw) !important; }
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+/* ---------- 區塊小標題 ---------- */
+.section-eyebrow {
+	font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+	color: var(--orange); font-weight: 600; margin-bottom: .35rem; display: block;
+}
+.section-title { font-family: var(--serif); font-weight: 700; font-size: 1.35rem; color: var(--ink); margin: 0; }
+
+/* ---------- 篩選（輕量單行，不用白卡） ---------- */
+.filter-inline { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.filter-inline label { font-size: .88rem; color: var(--ink); font-weight: 500; }
+.filter-inline select {
+	height: 42px; padding: 0 1rem; border: 1px solid var(--line); border-radius: 10px;
+	background: #fff; font-family: inherit; font-size: .88rem; color: var(--ink); box-shadow: var(--shadow-sm);
+}
+.filter-inline select:focus { outline: none; border-color: var(--orange); }
+.filter-inline .btn { height: 42px; padding: 0 1.4rem; display: inline-flex; align-items: center; justify-content: center; }
+
+/* ---------- 結果列 + 標題（對齊） ---------- */
+.list-head {
+	display: flex; align-items: center; justify-content: space-between;
+	flex-wrap: wrap; gap: .6rem; margin-bottom: 1.6rem;
+}
+.list-count { font-size: .9rem; color: var(--ink-soft); }
+.list-count b { color: var(--ink); font-weight: 700; }
+
+/* ---------- 表格 ---------- */
+.table-card {
+	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
+}
+table { width: 100%; border-collapse: collapse; }
+th:nth-child(1) { width: 9%; }
+th:nth-child(2) { width: 4%; }
+th:nth-child(3) { width: 15%; }
+th:nth-child(4) { width: 7%; }
+th:nth-child(5) { width: 11%; }
+th:nth-child(6) { width: 11%; }
+th:nth-child(7) { width: 11%; }
+th:nth-child(8) { width: 7%; }
+th:nth-child(9) { width: 11%; }
+th:nth-child(10) { width: 11%; }
+
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .92rem; font-weight: 700; padding: 1rem .5rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .75rem .5rem; font-size: .85rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+
+/* 圖片：固定寬高 + 裁切，避免直式照片撐爆列高 */
+.table-card img { width: 90px; height: 64px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto; }
+
+td:nth-child(5), td:nth-child(6), td:nth-child(7) { text-align: left; font-size: .8rem; color: var(--ink-soft); }
+td:nth-child(9), td:nth-child(10) { white-space: nowrap; }
+
+.activity-status {
+	display: inline-block; padding: .3rem .8rem; border-radius: 999px;
+	font-size: .78rem; font-weight: 500; background: var(--bg-warm); color: var(--ink-soft);
+}
+
+/* ---------- 操作按鈕群組 ---------- */
+.btn-group { display: flex; flex-direction: column; gap: .4rem; align-items: stretch; }
+.btn-mini {
+	display: block; width: 100%; padding: .45rem .6rem; border-radius: 8px; font-size: .78rem;
+	white-space: nowrap; cursor: pointer; transition: all .18s; font-family: var(--sans);
+	background: #fff; color: var(--ink-soft); border: 1px solid var(--line); text-align: center;
+}
+.btn-mini:hover { background-color: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-mini.danger:hover { background-color: #c0392b; border-color: #c0392b; }
+.btn-mini.info:hover { background-color: #4F7B96; border-color: #4F7B96; }
+.btn-mini.accent:hover { background-color: var(--orange); border-color: var(--orange); }
+
+.empty-state {
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; margin-bottom: .3rem; color: var(--ink); }
+.empty-state p { color: var(--ink-soft); font-size: .92rem; margin: 0; }
+
+/* ---------- 操作彈窗 ---------- */
+.op-modal-overlay {
+	display: none; position: fixed; inset: 0;
+	background: rgba(58,75,83,.35); backdrop-filter: blur(6px);
+	z-index: 500; align-items: center; justify-content: center;
+	opacity: 0; transition: opacity .2s;
+}
+.op-modal-overlay.show { display: flex; opacity: 1; }
+.op-modal-panel {
+	background: #fff; border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md); width: 90%; max-width: 420px; padding: 1.8rem;
+	transform: translateY(10px); transition: transform .2s;
+	text-align: left; font-family: var(--sans);
+}
+.op-modal-overlay.show .op-modal-panel { transform: translateY(0); }
+.op-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.op-modal-header span { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.op-modal-close { background: none; border: none; font-size: 22px; color: var(--ink-soft); cursor: pointer; line-height: 1; }
+.op-modal-close:hover { color: var(--ink); }
+.op-modal-panel input[type="text"], .op-modal-panel input[type="datetime-local"] {
+	width: 100%; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .88rem; color: var(--ink); margin-bottom: .9rem;
+}
+.op-modal-panel input:focus { outline: none; border-color: var(--orange); background: #fff; }
+.op-modal-panel p.field-label { font-size: .84rem; color: var(--ink); margin: 0 0 .4rem; }
+.op-modal-submit { width: 100%; height: 46px; display: inline-flex; align-items: center; justify-content: center; font-size: .92rem; border: none; cursor: pointer; border-radius: 999px; font-family: inherit; }
+.op-modal-panel .modal-error {
+	color: #c0392b; background-color: #fdecea;
+	padding: .6rem .9rem; border-radius: 10px; margin: 0 0 1rem; font-size: .84rem;
+}
+
+@media (max-width: 900px) {
+	.table-card { overflow-x: auto; }
+	table { min-width: 1000px; }
+}
+</style>
 </head>
 <body>
-	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
-    <h1>我發起的活動</h1>
 
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-	<p th:if="${success}" th:utext="${success}" style="color:blue;"></p>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-	<h3><a th:href="@{/member/activity/select_page}">回活動首頁</a></h3>
-	    
-	<form th:action="@{/member/activity/ownedActivities_search}" method="post">
-        <p>
-            活動狀態：
-            <select name="activityStatus">
-                <option value="">全部</option>
-                <option value="0">待審核</option>
-                <option value="1">已審核</option>
-                <option value="2">已發布</option>
-                <option value="3">已退回</option>
-                <option value="4">取消</option>
-                <option value="5">延期</option>
-            </select>
-        <button type="submit">篩選</button>
-        </p>
-    </form>
+	<!-- ================= 頁首標題 ================= -->
+	<section class="act-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">揪團活動</a><span>/</span>
+				<span style="opacity:1;color:var(--ink)">我發起的活動</span>
+			</div>
+			<h1>我發起的活動</h1>
+			<p>查看你發起的活動進度，管理報名名單、修改內容，或安排取消與延期。</p>
+		</div>
+	</section>
 
-    <table border="1">
-        <tr>
-            <th>圖片</th>
-            <th>編號</th>
-            <th>活動名稱</th>
-            <th>活動狀態</th>
-            <th>活動時間</th>
-			<th>名額</th>
-			<th>報名時間</th>
-			<th>報名狀態</th>
-			<th></th>
-			<th></th>
-        </tr>
-        <tr th:each="a : ${activityListData}">
-		    <td>
-		        <img th:if="${a.picture != null}" 
-		             th:src="@{'/activity-images/' + ${a.picture}}" 
-		             style="max-width: 100px;">
-		        <img th:unless="${a.picture != null}" 
-		             th:src="@{/images/no-image.jpg}" 
-		             style="max-width: 100px;">
-		    </td>
-		    <td th:text="${a.activityId}"></td>
-		    <td th:text="${a.activityName}"></td>
-		    <td th:text="${a.activityStatusText}"></td>
-		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
-			    正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
-			    備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
-			    已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
-			</td>
-		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:text="${a.registrationStatusText}"></td>
-		    <td>
-		        <form class="action-block" th:action="@{/member/activity/registration/activityRegistrations}" method="get" style="display:inline;">
-				    <input type="hidden" name="activityId" th:value="${a.activityId}">
-				    <button type="submit">報名名單</button>
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
+
+	<!-- ================= 主體 ================= -->
+	<section class="act-page">
+		<div class="wrap act-wide">
+
+			<!-- 頁面頂端：確認新時間的錯誤不要在這裡顯示，只顯示其他一般錯誤 -->
+			<p th:if="${errorMessage != null and scheduleErrorActivityId == null}" th:utext="${errorMessage}" class="msg-error"></p>
+			<p th:if="${success}" th:utext="${success}" class="msg-success"></p>
+
+			<!-- 活動列表標題 -->
+			<div class="section-block-head" style="margin-bottom:1.1rem;">
+				<span class="section-eyebrow">All Activities</span>
+				<h2 class="section-title">活動列表</h2>
+			</div>
+
+			<!-- 篩選表單 + 共N筆 -->
+			<div class="list-head">
+				<form class="filter-inline" style="margin-bottom:0;" th:action="@{/member/activity/ownedActivities_search}" method="post">
+					<label>活動狀態</label>
+					<select name="activityStatus">
+						<option value="">全部</option>
+						<option value="0" th:selected="${param.activityStatus != null and param.activityStatus[0] == '0'}">待審核</option>
+						<option value="1" th:selected="${param.activityStatus != null and param.activityStatus[0] == '1'}">已審核</option>
+						<option value="2" th:selected="${param.activityStatus != null and param.activityStatus[0] == '2'}">已發布</option>
+						<option value="3" th:selected="${param.activityStatus != null and param.activityStatus[0] == '3'}">已退回</option>
+						<option value="4" th:selected="${param.activityStatus != null and param.activityStatus[0] == '4'}">取消</option>
+						<option value="5" th:selected="${param.activityStatus != null and param.activityStatus[0] == '5'}">延期</option>
+					</select>
+					<button type="submit" class="btn btn-primary">篩選</button>
 				</form>
-		        <form class="action-block" th:action="@{/member/activity/listOneActivity}" method="get" style="display:inline;">
-		            <input type="hidden" name="activityId" th:value="${a.activityId}">
-		            <button type="submit">查看詳情</button>
-		        </form>
-		    </td>
-		    
-			<td>
-			    <div class="action-block" th:if="${a.activityStatus == 0 || a.activityStatus == 3}">
-			        <form th:action="@{/member/activity/getOne_For_Update}" method="get" style="display:inline;">
-			            <input type="hidden" name="activityId" th:value="${a.activityId}">
-			            <button type="submit">修改</button>
-			        </form>
-			    </div>
-			
-				<div class="action-block" th:if="${(a.activityStatus == 0 || a.activityStatus == 1 || a.activityStatus == 2 || a.activityStatus == 5) && !a.ended}">
-				    <button type="button" th:id="'cancelBtn' + ${a.activityId}"
-				            th:onclick="'toggleCancelForm(' + ${a.activityId} + ')'">取消活動</button>
-				
-				    <div th:id="'cancelForm' + ${a.activityId}" style="display:none;">
-				        <form th:action="@{/member/activity/cancel}" method="post"
-				              onsubmit="return confirm('確定要取消這個活動嗎？')">
-				            <input type="hidden" name="activityId" th:value="${a.activityId}">
-				            <input type="text" name="cancelNote" placeholder="請填取消原因" required>
-				            <button type="submit">確認取消</button>
-				        </form>
-				    </div>
+				<div class="list-count">
+					共 <b th:text="${totalCount != null ? totalCount : 0}">0</b> 場活動
 				</div>
-			    
-			    <div class="action-block" th:if="${a.activityStatus == 2 && !a.ended}">
-			        <button type="button"  th:id="'postponeBtn' + ${a.activityId}"
-			                th:onclick="'togglePostponeForm(' + ${a.activityId} + ')'">延期</button>
-			
-			        <div th:id="'postponeForm' + ${a.activityId}" style="display:none;">
-			            <form th:action="@{/member/activity/postpone}" method="post"
-			                  onsubmit="return confirm('確定要延期這個活動嗎？')">
-			                <input type="hidden" name="activityId" th:value="${a.activityId}">
-			                <input type="text" name="postponeNote" placeholder="請填延期原因" required>
-			                <button type="submit">確認延期</button>
-			            </form>
-			        </div>
-			    </div>
-			    
-			    <div class="action-block" th:if="${a.activityStatus == 5}">
-			        <button type="button"  th:id="'scheduleBtn' + ${a.activityId}"
-			        			th:onclick="'toggleScheduleForm(' + ${a.activityId} + ')'">確認新時間</button>
-			
-			        <div th:id="'scheduleForm' + ${a.activityId}" style="display:none;">
-			            <form th:action="@{/member/activity/confirmNewSchedule}" method="post"
-			                  onsubmit="return confirm('確定要送出新的活動時間嗎？')">
-			                <input type="hidden" name="activityId" th:value="${a.activityId}">
-			                <p>新活動開始時間：<input type="datetime-local" name="activityStart" required></p>
-			                <p>新活動結束時間：<input type="datetime-local" name="activityEnd" required></p>
-			                <p>新報名開始時間（選填）：<input type="datetime-local" name="regisStart"></p>
-			                <p>新報名截止時間（選填）：<input type="datetime-local" name="regisEnd"></p>
-			                <button type="submit">確認送出</button>
-			            </form>
-			        </div>
-			    </div>
-			</td>
-        </tr>
-    </table>
-    <div>
-	    <form th:action="@{/member/activity/ownedActivities_search}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
-	        <input type="hidden" name="currentPage" th:value="${i}">
-	        <input type="hidden" name="activityStatus" th:value="${param.activityStatus}">
-	        <button type="submit" th:text="${i}" 
-	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
-	    </form>
-	</div>
+			</div>
 
+			<!-- 表格 -->
+			<div class="table-card" th:if="${activityListData != null and !activityListData.isEmpty()}">
+				<table>
+					<thead>
+						<tr>
+							<th>圖片</th>
+							<th>編號</th>
+							<th>活動名稱</th>
+							<th>活動狀態</th>
+							<th>活動時間</th>
+							<th>名額</th>
+							<th>報名時間</th>
+							<th>報名狀態</th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="a : ${activityListData}">
+							<td>
+								<img th:if="${a.picture != null}"
+									 th:src="@{'/activity-images/' + ${a.picture}}">
+								<img th:unless="${a.picture != null}"
+									 th:src="@{/images/no-image.jpg}">
+							</td>
+							<td th:text="${a.activityId}"></td>
+							<td th:text="${a.activityName}"></td>
+							<td><span class="activity-status" th:text="${a.activityStatusText}"></span></td>
+							<td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+							<td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
+								正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+								備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
+								已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
+							</td>
+							<td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+							<td th:text="${a.registrationStatusText}"></td>
+							<td>
+								<div class="btn-group">
+									<form th:action="@{/member/activity/registration/activityRegistrations}" method="get">
+										<input type="hidden" name="activityId" th:value="${a.activityId}">
+										<button type="submit" class="btn-mini">報名名單</button>
+									</form>
+									<form th:action="@{/member/activity/listOneActivity}" method="get">
+										<input type="hidden" name="activityId" th:value="${a.activityId}">
+										<button type="submit" class="btn-mini">查看詳情</button>
+									</form>
+								</div>
+							</td>
 
-<script>
-function toggleCancelForm(activityId) {
-    const form = document.getElementById('cancelForm' + activityId);
-    const button = document.getElementById('cancelBtn' + activityId);
-    
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.style.backgroundColor = 'black';
-        button.style.color = 'white';
-    } else {
-        form.style.display = 'none';
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    }
-}
+							<td>
+								<div class="btn-group">
+									<form th:if="${a.activityStatus == 0 || a.activityStatus == 3}" th:action="@{/member/activity/getOne_For_Update}" method="get">
+										<input type="hidden" name="activityId" th:value="${a.activityId}">
+										<button type="submit" class="btn-mini">修改</button>
+									</form>
 
-function togglePostponeForm(activityId) {
-    const form = document.getElementById('postponeForm' + activityId);
-    const button = document.getElementById('postponeBtn' + activityId);
-    
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.style.backgroundColor = 'black';
-        button.style.color = 'white';
-    } else {
-        form.style.display = 'none';
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    }
-}
+									<button th:if="${(a.activityStatus == 0 || a.activityStatus == 1 || a.activityStatus == 2 || a.activityStatus == 5) && !a.ended}"
+											type="button" class="btn-mini danger" th:onclick="'openOpModal(\'cancelModal' + ${a.activityId} + '\')'">取消活動</button>
 
-function toggleScheduleForm(activityId) {
-    const form = document.getElementById('scheduleForm' + activityId);
-    const button = document.getElementById('scheduleBtn' + activityId);
-    
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.style.backgroundColor = 'black';
-        button.style.color = 'white';
-    } else {
-        form.style.display = 'none';
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    }
-}
+									<button th:if="${a.activityStatus == 2 && !a.ended}"
+											type="button" class="btn-mini info" th:onclick="'openOpModal(\'postponeModal' + ${a.activityId} + '\')'">延期</button>
 
+									<button th:if="${a.activityStatus == 5}"
+											type="button" class="btn-mini accent" th:onclick="'openOpModal(\'scheduleModal' + ${a.activityId} + '\')'">確認新時間</button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${activityListData == null or activityListData.isEmpty()}">
+				<b>你還沒有發起任何活動</b>
+				<p>選擇別的篩選條件，或發起你的第一場活動。</p>
+			</div>
 
-(function() {
-    var rows = document.querySelectorAll('[data-activity-id]');
-    rows.forEach(function(row) {
-        var activityId = row.getAttribute('data-activity-id');
-        var confirmedCap = row.getAttribute('data-capacity');
-        var waitlistCap = row.getAttribute('data-waitlist-capacity');
+			<!-- 分頁 -->
+			<div th:if="${activityListData != null and !activityListData.isEmpty()}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/member/activity/ownedActivities}, ${qs})}"></div>
 
-        var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
-        var socket = new WebSocket(wsUrl);
+		</div>
+	</section>
 
-        socket.onmessage = function(event) {
-            var data = JSON.parse(event.data);
+	<!-- ================= 操作彈窗（每筆活動各一組） ================= -->
+	<th:block th:each="a : ${activityListData}">
+		<!-- 取消活動彈窗 -->
+		<div class="op-modal-overlay" th:id="'cancelModal' + ${a.activityId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>取消活動</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'cancelModal' + ${a.activityId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/member/activity/cancel}" method="post" onsubmit="return confirm('確定要取消這個活動嗎？')">
+					<input type="hidden" name="activityId" th:value="${a.activityId}">
+					<input type="hidden" name="currentPage" th:value="${currentPage}">
+					<p class="field-label">取消原因</p>
+					<input type="text" name="cancelNote" placeholder="請填取消原因" required>
+					<button type="submit" class="op-modal-submit" style="background:#c0392b;color:#fff;">確認取消</button>
+				</form>
+			</div>
+		</div>
 
-            document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
-            document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+		<!-- 延期彈窗 -->
+		<div class="op-modal-overlay" th:id="'postponeModal' + ${a.activityId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>延期活動</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'postponeModal' + ${a.activityId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/member/activity/postpone}" method="post" onsubmit="return confirm('確定要延期這個活動嗎？')">
+					<input type="hidden" name="activityId" th:value="${a.activityId}">
+					<input type="hidden" name="currentPage" th:value="${currentPage}">
+					<p class="field-label">延期原因</p>
+					<input type="text" name="postponeNote" placeholder="請填延期原因" required>
+					<button type="submit" class="op-modal-submit" style="background:#4F7B96;color:#fff;">確認延期</button>
+				</form>
+			</div>
+		</div>
 
-            var total = data['正取'] + data['備取'] + data['未審核'];
-            var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
-            document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
-        };
+		<!-- 確認新時間彈窗 -->
+		<div class="op-modal-overlay" th:id="'scheduleModal' + ${a.activityId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>確認新時間</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'scheduleModal' + ${a.activityId} + '\')'">&times;</button>
+				</div>
 
-        socket.onerror = function(e) {
-            console.log('WebSocket錯誤(活動' + activityId + '):', e);
-        };
-    });
-})();
-</script>
+				<!-- 錯誤訊息：用 .toString() 比對，不是 #strings.toString()（該方法不存在） -->
+				<p class="modal-error"
+				   th:if="${errorMessage != null and scheduleErrorActivityId != null and scheduleErrorActivityId.toString() == a.activityId.toString()}"
+				   th:text="${errorMessage}"></p>
+
+				<form th:action="@{/member/activity/confirmNewSchedule}" method="post" onsubmit="return confirm('確定要送出新的活動時間嗎？')">
+					<input type="hidden" name="activityId" th:value="${a.activityId}">
+					<input type="hidden" name="currentPage" th:value="${currentPage}">
+					<p class="field-label">新活動開始時間</p>
+					<input type="datetime-local" name="activityStart" required>
+					<p class="field-label">新活動結束時間</p>
+					<input type="datetime-local" name="activityEnd" required>
+					<p class="field-label">新報名開始時間（選填）</p>
+					<input type="datetime-local" name="regisStart">
+					<p class="field-label">新報名截止時間（選填）</p>
+					<input type="datetime-local" name="regisEnd">
+					<button type="submit" class="op-modal-submit" style="background:var(--orange);color:#fff;">確認送出</button>
+				</form>
+			</div>
+		</div>
+	</th:block>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<div id="scheduleErrorData" th:attr="data-activity-id=${scheduleErrorActivityId}" style="display:none;"></div>
+
+	<script src="/js/nav.js"></script>
+	<script>
+	function openOpModal(id) {
+		document.getElementById(id).classList.add('show');
+	}
+	function closeOpModal(id) {
+		document.getElementById(id).classList.remove('show');
+	}
+	function closeOpModalOutside(e, overlay) {
+		if (e.target === overlay) overlay.classList.remove('show');
+	}
+
+	// 確認新時間送出失敗時，自動重新打開對應彈窗
+	(function() {
+		var errId = document.getElementById('scheduleErrorData').getAttribute('data-activity-id');
+		if (errId && errId !== 'null' && errId !== '') {
+			openOpModal('scheduleModal' + errId);
+		}
+	})();
+
+	// websocket
+	(function() {
+		var rows = document.querySelectorAll('[data-activity-id]');
+		rows.forEach(function(row) {
+			var activityId = row.getAttribute('data-activity-id');
+			var confirmedCap = row.getAttribute('data-capacity');
+			var waitlistCap = row.getAttribute('data-waitlist-capacity');
+
+			var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+			var socket = new WebSocket(wsUrl);
+
+			socket.onmessage = function(event) {
+				var data = JSON.parse(event.data);
+				document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
+				document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+				var total = data['正取'] + data['備取'] + data['未審核'];
+				var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+				document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
+			};
+			socket.onerror = function(e) {
+				console.log('WebSocket錯誤(活動' + activityId + '):', e);
+			};
+		});
+	})();
+	</script>
+
 </body>
 </html>

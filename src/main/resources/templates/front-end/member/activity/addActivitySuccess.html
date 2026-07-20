@@ -1,16 +1,69 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>活動新增成功</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>新增成功｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<style>
+.result-page {
+	background: var(--bg-warm); min-height: 60vh;
+	display: flex; align-items: center; justify-content: center;
+	padding: 3.5rem 1rem;
+}
+.result-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm); padding: 3.2rem 2.6rem; max-width: 480px; width: 100%;
+	text-align: center;
+}
+
+.result-icon {
+	width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 1.4rem;
+	background: var(--bg-soothing); display: grid; place-items: center;
+}
+.result-icon svg { width: 30px; height: 30px; stroke: var(--ink); }
+
+.result-card .script { font-size: 1.15rem; display: block; margin-bottom: .3rem; }
+.result-card h1 {
+	font-family: var(--zen-maru); font-weight: 700; font-size: 1.7rem; color: var(--ink);
+	margin: 0 0 .9rem;
+}
+.result-card p {
+	color: var(--ink-soft); font-size: .94rem; line-height: 1.8; margin: 0 0 1.8rem;
+}
+.result-card .btn { height: 46px; padding: 0 2rem; display: inline-flex; align-items: center; justify-content: center; }
+</style>
 </head>
 <body>
 
-    <h1><h1>新增成功，待審核</h1></h1>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <p>您的活動申請已送出，將由後台審核，審核結果將另行通知。</p>
+	<!-- ================= 主體 ================= -->
+	<section class="result-page">
+		<div class="result-card">
+			<div class="result-icon">
+				<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M20 6L9 17l-5-5" /></svg>
+			</div>
+			<span class="script">想聚聚，就從這裡開始</span>
+			<h1>已送出，待審核</h1>
+			<p>你的活動申請已經送出，將由團隊審核，<br>審核結果將另行通知。</p>
+			<a class="btn btn-primary" th:href="@{/member/activity/listActivities_ByCompositeQuery}" href="#">返回活動列表</a>
+		</div>
+	</section>
 
-    <a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
 
+	<script src="/js/nav.js"></script>
 </body>
 </html>

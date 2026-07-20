@@ -1,52 +1,178 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>我的關注活動</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的關注｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<style>
+/* ---------- 頁首標題區 ---------- */
+.act-head { background: var(--bg-warm); padding: 2.2rem 0 1.4rem; }
+.act-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.act-head .crumb a:hover { color: var(--orange); }
+.act-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.act-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(1.9rem, 3.2vw, 2.5rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.act-head p { color: var(--ink-soft); margin: 0; max-width: 36rem; }
+
+.act-page { background: var(--bg-warm); padding: .4rem 0 3.4rem; }
+.act-narrow { width: min(900px, 92vw) !important; }
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+/* ---------- 結果列 ---------- */
+.list-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .6rem; margin-bottom: 1.4rem; }
+.list-count { font-size: .9rem; color: var(--ink-soft); }
+.list-count b { color: var(--ink); font-weight: 700; }
+
+/* ---------- 關注清單卡片 ---------- */
+.follow-list { display: flex; flex-direction: column; gap: .9rem; margin-bottom: 1.6rem; }
+.follow-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	padding: 1.3rem 1.5rem; box-shadow: var(--shadow-sm);
+	display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; flex-wrap: wrap;
+}
+.follow-main { min-width: 0; flex: 1; }
+.follow-main a {
+	font-family: var(--serif); font-weight: 700; font-size: 1.05rem; color: var(--ink);
+	transition: color .18s;
+}
+.follow-main a:hover { color: var(--orange-deep); }
+.follow-time { font-size: .84rem; color: var(--ink-soft); margin-top: .3rem; }
+
+.follow-side { display: flex; align-items: center; gap: .8rem; flex: 0 0 auto; }
+.follow-status {
+	display: inline-block; padding: .3rem .8rem; border-radius: 999px;
+	font-size: .78rem; font-weight: 500; background: var(--bg-warm); color: var(--ink-soft);
+}
+.btn-unfollow {
+	height: 40px; padding: 0 1.2rem; border-radius: 999px; border: 1px solid var(--line);
+	background: #fff; color: var(--ink-soft); font-size: .84rem; cursor: pointer;
+	font-family: inherit; display: inline-flex; align-items: center; transition: all .18s;
+}
+.btn-unfollow:hover { background-color: #c0392b; border-color: #c0392b; color: #fff; }
+
+.empty-state {
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state svg { width: 40px; height: 40px; stroke: var(--orange); margin: 0 auto 1rem; fill: none; }
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; margin-bottom: .3rem; color: var(--ink); }
+.empty-state p { color: var(--ink-soft); font-size: .92rem; margin: 0 0 1.4rem; }
+
+/* ---------- 底部連結 ---------- */
+.bottom-links { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; margin-top: .6rem; }
+.bottom-links a {
+	display: inline-flex; align-items: center; gap: .4rem;
+	padding: .6rem 1.3rem; border-radius: 999px; border: 1px solid var(--line);
+	background: #fff; font-size: .88rem; color: var(--ink-soft); transition: all .18s;
+}
+.bottom-links a:hover { border-color: var(--orange); color: var(--orange-deep); background: var(--pink-soft); }
+
+@media (max-width: 560px) {
+	.follow-card { flex-direction: column; align-items: flex-start; }
+	.follow-side { width: 100%; justify-content: space-between; }
+}
+</style>
 </head>
 <body>
 
-    <h1>我的關注活動</h1>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-    <p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+	<!-- ================= 頁首標題 ================= -->
+	<section class="act-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">揪團活動</a><span>/</span>
+				<span style="opacity:1;color:var(--ink)">我的關注</span>
+			</div>
+			<h1>我的關注</h1>
+			<p>你關注的活動都在這裡，隨時回來看看有沒有新消息。</p>
+		</div>
+	</section>
 
-    <table border="1">
-        <tr>
-            <th>活動名稱</th>
-            <th>活動時間</th>
-            <th>活動狀態</th>
-            <th></th>
-        </tr>
-        <tr th:each="a : ${followListData}">
-            <td>
-                <a th:href="@{/member/activity/listOneActivity(activityId=${a.activityId})}"
-                   th:text="${a.activityName}"></a>
-            </td>
-            <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-            <td th:text="${a.memberViewStatusText}"></td>
-            <td>
-                <form th:action="@{/member/activity/follow/unfollow}" method="post"
-                      onsubmit="return confirm('確定取消關注嗎？')">
-                    <input type="hidden" name="activityId" th:value="${a.activityId}">
-                    <button type="submit">取消關注</button>
-                </form>
-            </td>
-        </tr>
-    </table>
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
 
-    <p th:if="${#lists.isEmpty(followListData)}">目前沒有關注任何活動。</p>
-	
-	<div th:if="${totalPages > 1}">
-	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/member/activity/follow/myFollows(currentPage=${i})}"
-	       th:text="${i}"
-	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
-	    </a>
-	</div>
-	
-	<br>
-    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/activity/select_page}">活動首頁</a>｜<a th:href="@{/member/dashboard/myCollection}">我的收藏</a>
+	<!-- ================= 主體 ================= -->
+	<section class="act-page">
+		<div class="wrap act-narrow">
 
+			<p th:if="${errorMessage}" th:utext="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:utext="${successMessage}" class="msg-success"></p>
+
+			<div class="list-head" th:if="${!#lists.isEmpty(followListData)}">
+				<div class="list-count">
+					共 <b th:text="${#lists.size(followListData)}">0</b> 場關注中
+				</div>
+			</div>
+
+			<!-- 關注清單 -->
+			<div class="follow-list" th:if="${!#lists.isEmpty(followListData)}">
+				<div class="follow-card" th:each="a : ${followListData}">
+					<div class="follow-main">
+						<a th:href="@{/member/activity/listOneActivity(activityId=${a.activityId})}"
+						   th:text="${a.activityName}">活動名稱</a>
+						<div class="follow-time"
+							 th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></div>
+					</div>
+					<div class="follow-side">
+						<span class="follow-status" th:text="${a.memberViewStatusText}"></span>
+						<form th:action="@{/member/activity/follow/unfollow}" method="post"
+							  onsubmit="return confirm('確定取消關注嗎？')">
+							<input type="hidden" name="activityId" th:value="${a.activityId}">
+							<input type="hidden" name="page" th:value="${currentPage}">
+							<input type="hidden" name="redirectTo" value="myFollows">
+							<button type="submit" class="btn-unfollow">取消關注</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${#lists.isEmpty(followListData)}">
+				<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+				<b>目前沒有關注任何活動</b>
+				<p>去看看有哪些活動想加入吧。</p>
+				<a class="btn btn-primary" th:href="@{/member/activity/listActivities_ByCompositeQuery}" href="#">瀏覽揪團活動</a>
+			</div>
+
+			<!-- 分頁 -->
+			<div th:if="${!#lists.isEmpty(followListData)}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/member/activity/follow/myFollows}, '')}"></div>
+
+			<!-- 底部連結 -->
+			<div class="bottom-links">
+				<a th:href="@{/member/activity/registration/myRegistrations}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+					查看我的報名紀錄
+				</a>
+				<a th:href="@{/member/activity/ownedActivities}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+					查看我發起的活動
+				</a>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script src="/js/nav.js"></script>
 </body>
 </html>
