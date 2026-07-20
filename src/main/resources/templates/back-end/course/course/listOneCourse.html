@@ -5,14 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="description" content="課程審核預覽後台管理頁面" />
 	<title>課程審核預覽｜管理後台</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link
-		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
-		rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 	<style>
-
 		@font-face {
 			font-family: 'OpenHuninn';
 			src:
@@ -46,54 +39,24 @@
 			--display-en: "Baloo 2", sans-serif;
 		}
 
-		* {
-			box-sizing: border-box;
-		}
-
-		html {
-			min-width: 320px;
-			scroll-behavior: smooth;
-		}
-
 		body.admin-course-page {
-			display: flex;
-			min-width: 320px;
-			min-height: 100vh;
-			flex-direction: column;
 			margin: 0;
 			color: var(--ink);
 			background: var(--bg-warm);
 			font-family: var(--sans);
 			line-height: 1.78;
 			-webkit-font-smoothing: antialiased;
-			overflow-x: hidden;
 		}
 
-		body.admin-course-page a {
-			color: inherit;
-			text-decoration: none;
+		body.admin-course-page *,
+		body.admin-course-page *::before,
+		body.admin-course-page *::after {
+			box-sizing: border-box;
 		}
 
-		body.admin-course-page button,
-		body.admin-course-page input,
-		body.admin-course-page select,
-		body.admin-course-page textarea {
-			font: inherit;
-		}
-
-		body.admin-course-page button {
-			border: 0;
-			cursor: pointer;
-		}
-
-		body.admin-course-page img,
-		body.admin-course-page svg {
-			display: block;
-			max-width: 100%;
-		}
-
-		body.admin-course-page [hidden] {
-			display: none !important;
+		body.admin-course-page .admin-main {
+			min-height: 70vh;
+			padding: clamp(2rem, 4vw, 3.5rem) 0 4.5rem;
 		}
 
 		body.admin-course-page .wrap {
@@ -101,265 +64,21 @@
 			margin-inline: auto;
 		}
 
-		body.admin-course-page .skip-link {
-			position: fixed;
-			top: .75rem;
-			left: .75rem;
-			z-index: 999;
-			padding: .65rem 1rem;
-			border-radius: 999px;
-			color: var(--white);
-			background: var(--orange);
-			transform: translateY(-160%);
-		}
-
-		body.admin-course-page .skip-link:focus {
-			transform: translateY(0);
-		}
-
-		body.admin-course-page .site-header {
-			position: sticky;
-			top: 0;
-			z-index: 100;
-			border-bottom: 1px solid rgba(236, 223, 206, .7);
-			color: var(--ink);
-			background: rgba(253, 246, 237, .85);
-			backdrop-filter: blur(12px);
-		}
-
-		body.admin-course-page .nav-inner {
-			display: flex;
-			align-items: center;
-			gap: 1.4rem;
-			height: 74px;
-		}
-
-		body.admin-course-page .brand {
-			display: flex;
-			align-items: center;
-			gap: .8rem;
-			flex: 0 0 auto;
-		}
-
-		body.admin-course-page .logo-mind {
-			display: flex;
-			flex: 0 0 auto;
-			flex-direction: column;
-			align-items: flex-start;
-			line-height: 1;
-			user-select: none;
-		}
-
-		body.admin-course-page .logo-mind .word,
-		body.admin-course-page .logo-mind .faces {
-			display: flex;
-			align-items: flex-end;
-		}
-
-		body.admin-course-page .logo-mind .faces {
-			align-items: flex-start;
-			margin-top: -1px;
-		}
-
-		body.admin-course-page .logo-mind .word span {
-			display: inline-block;
-			font-family: var(--display-en);
-			font-size: 1.5rem;
-			font-weight: 700;
-			letter-spacing: -.03em;
-			text-align: center;
-		}
-
-		body.admin-course-page .logo-mind .word .m { width: 24px; color: #EFB65E; }
-		body.admin-course-page .logo-mind .word .i { width: 9px; color: #DB93A9; }
-		body.admin-course-page .logo-mind .word .n { width: 17px; color: #8FB2C9; }
-		body.admin-course-page .logo-mind .word .d { width: 17px; color: #9BB893; }
-		body.admin-course-page .logo-mind .faces .fm { width: 24px; height: 11px; }
-		body.admin-course-page .logo-mind .faces .fi { width: 9px; height: 11px; }
-		body.admin-course-page .logo-mind .faces .fn { width: 17px; height: 11px; }
-		body.admin-course-page .logo-mind .faces .fd { width: 17px; height: 11px; }
-
-		body.admin-course-page .brand-text {
-			display: flex;
-			flex-direction: column;
-			line-height: 1.15;
-		}
-
-		body.admin-course-page .brand-text .logo {
-			color: var(--ink);
-			font-family: var(--zen-maru);
-			font-size: 1.18rem;
-			font-weight: 700;
-			letter-spacing: .02em;
-		}
-
-		body.admin-course-page .brand-text .en {
-			margin-top: .15em;
-			color: var(--ink-soft);
-			font-family: var(--display-en);
-			font-size: .85rem;
-			font-weight: 700;
-			letter-spacing: .24em;
-			text-transform: uppercase;
-		}
-
-		body.admin-course-page .admin-badge {
-			padding-left: 1.05rem;
-			border-left: 1px solid var(--line);
-			color: var(--ink-soft);
-			font-size: .84rem;
-			font-weight: 700;
-			letter-spacing: .08em;
-		}
-
-		body.admin-course-page .nav-actions {
-			display: flex;
-			align-items: center;
-			gap: .55rem;
-			margin-left: auto;
-		}
-
-		body.admin-course-page .profile-entry {
-			display: flex;
-			align-items: center;
-			gap: .65rem;
-			min-height: 46px;
-			padding: .3rem .75rem .3rem .35rem;
-			border: 1px solid var(--line);
-			border-radius: 999px;
-			background: var(--white);
-			box-shadow: var(--shadow-sm);
-			transition: border-color .16s ease, background .16s ease, transform .16s ease;
-		}
-
-		body.admin-course-page .profile-entry:hover {
-			border-color: var(--bg-soothing);
-			background: var(--blue-soft);
-			transform: translateY(-2px);
-		}
-
-		body.admin-course-page .profile-photo {
-			display: grid;
-			place-items: center;
-			width: 36px;
-			height: 36px;
-			flex: 0 0 auto;
-			border-radius: 50%;
-			color: var(--ink);
-			background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
-		}
-
-		body.admin-course-page .profile-photo svg {
-			width: 21px;
-			height: 21px;
-			stroke: currentColor;
-		}
-
-		body.admin-course-page .profile-copy {
-			display: flex;
-			min-width: 0;
-			flex-direction: column;
-			line-height: 1.25;
-		}
-
-		body.admin-course-page .profile-copy small {
-			color: var(--ink-soft);
-			font-size: .68rem;
-		}
-
-		body.admin-course-page .profile-copy strong {
-			max-width: 9.5rem;
-			overflow: hidden;
-			color: var(--ink);
-			font-size: .82rem;
-			font-weight: 500;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		body.admin-course-page .logout-form {
-			margin: 0;
-		}
-
-		body.admin-course-page .logout-button {
-			display: inline-flex;
-			align-items: center;
-			gap: .4rem;
-			min-height: 46px;
-			padding: .6rem .8rem;
-			border: 1px solid var(--line);
-			border-radius: 999px;
-			color: var(--ink);
-			background: var(--white);
-			box-shadow: var(--shadow-sm);
-			transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
-		}
-
-		body.admin-course-page .logout-button:hover {
-			border-color: var(--orange);
-			color: var(--white);
-			background: var(--orange-deep);
-			transform: translateY(-2px);
-		}
-
-		body.admin-course-page .logout-button svg {
-			width: 17px;
-			height: 17px;
-			stroke: currentColor;
-		}
-
-		body.admin-course-page .course-nav {
-			display: flex;
-			align-items: center;
-			gap: .1rem;
-			min-width: 0;
-			margin-left: .35rem;
-			padding: 0;
-			overflow-x: auto;
-			scrollbar-width: thin;
-		}
-
-		body.admin-course-page .course-nav a {
-			flex: 0 0 auto;
-			padding: .44rem .7rem;
-			border: 1px solid transparent;
-			border-radius: 999px;
-			color: var(--ink-soft);
-			background: transparent;
-			box-shadow: none;
-			font-size: .84rem;
-			font-weight: 500;
-			white-space: nowrap;
-			transition: color .16s ease;
-		}
-
-		body.admin-course-page .course-nav a:hover {
-			border-color: transparent;
-			color: var(--ink);
-			background: transparent;
-		}
-
-		body.admin-course-page .course-nav a.active,
-		body.admin-course-page .course-nav a[aria-current="page"] {
-			border-color: rgba(194, 217, 237, .9);
-			color: var(--ink);
-			background: var(--blue-soft);
-		}
-
-		body.admin-course-page .admin-main {
-			width: 100%;
-			flex: 1;
-			padding: clamp(1.25rem, 2vw, 1.75rem) 0 4rem;
-		}
-
 		body.admin-course-page .page-head {
 			display: flex;
 			align-items: flex-end;
 			justify-content: space-between;
-			gap: 2rem;
-			margin-bottom: 1.75rem;
-			padding-bottom: 1.4rem;
-			border-bottom: 1px solid var(--line);
+			gap: 1.5rem;
+			margin-bottom: 1.25rem;
+		}
+
+		body.admin-course-page .page-kicker {
+			display: inline-block;
+			margin-bottom: .25rem;
+			color: var(--orange-deep);
+			font-size: .82rem;
+			font-weight: 700;
+			letter-spacing: .14em;
 		}
 
 		body.admin-course-page h1,
@@ -369,382 +88,159 @@
 			margin-top: 0;
 		}
 
-		body.admin-course-page h1 {
-			margin-bottom: .3rem;
+		body.admin-course-page h1,
+		body.admin-course-page h2,
+		body.admin-course-page h3 {
 			font-family: var(--serif);
-			font-size: clamp(1.75rem, 3vw, 2.35rem);
-			line-height: 1.3;
+			color: var(--ink);
 		}
 
-		body.admin-course-page .page-kicker {
-			display: block;
-			margin-bottom: .35rem;
-			color: var(--orange);
-			font-size: .75rem;
-			font-weight: 700;
-			letter-spacing: .16em;
-			text-transform: uppercase;
-		}
-
-		body.admin-course-page .page-head-actions {
-			display: flex;
-			flex-wrap: wrap;
-			align-items: center;
-			justify-content: flex-end;
-			gap: 1rem;
-			margin-left: auto;
-		}
-
-		body.admin-course-page .page-head-actions .page-function-nav {
-			display: flex;
-			flex-flow: row nowrap;
-			align-items: center;
-			justify-content: flex-end;
-			gap: .25rem;
-			width: max-content;
-			max-width: 100%;
-			margin-left: 0;
-			padding: 0;
-			overflow-x: auto;
-		}
-
-		body.admin-course-page .page-head-actions .page-function-nav a {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			min-height: 42px;
-			padding: .5rem .8rem;
-			font-size: .84rem;
-			line-height: 1.2;
-		}
-
-		body.admin-course-page .page-head-actions p {
-			max-width: 31rem;
-			margin: 0;
-			color: var(--ink-soft);
-			font-size: .92rem;
-			text-align: right;
-		}
-
-		body.admin-course-page .page-head h1 {
-			margin: 0;
+		body.admin-course-page h1 {
+			margin-bottom: 0;
+			font-size: clamp(1.8rem, 4vw, 2.5rem);
+			line-height: 1.35;
 		}
 
 		body.admin-course-page h2 {
-			margin-bottom: .8rem;
-			font-family: var(--serif);
-			font-size: 1.08rem;
+			margin-bottom: .35rem;
+			font-size: clamp(1.3rem, 2.5vw, 1.65rem);
 		}
 
 		body.admin-course-page h3 {
-			font-family: var(--serif);
-			font-size: .98rem;
+			font-size: 1.05rem;
 		}
 
-		body.admin-course-page .page-head p,
-		body.admin-course-page .meta,
-		body.admin-course-page .form-note {
-			margin-bottom: 0;
+		body.admin-course-page .course-nav {
+			display: grid;
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+			gap: .65rem;
+			margin-bottom: 1.5rem;
+			padding: .7rem;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: rgba(255, 255, 255, .72);
+			box-shadow: var(--shadow-sm);
+		}
+
+		body.admin-course-page .course-nav a {
+			display: flex;
+			min-height: 44px;
+			align-items: center;
+			justify-content: center;
+			padding: .65rem .8rem;
+			border-radius: 14px;
 			color: var(--ink-soft);
-			font-size: .84rem;
+			font-size: .9rem;
+			font-weight: 700;
+			text-align: center;
+			text-decoration: none;
+			transition: background .2s ease, color .2s ease, transform .2s ease;
+		}
+
+		body.admin-course-page .course-nav a:hover {
+			color: var(--ink);
+			background: var(--blue-soft);
+			transform: translateY(-1px);
+		}
+
+		body.admin-course-page .course-nav a.active,
+		body.admin-course-page .course-nav a[aria-current="page"] {
+			color: var(--ink);
+			background: var(--bg-soothing);
 		}
 
 		body.admin-course-page .btn {
 			display: inline-flex;
+			min-height: 44px;
 			align-items: center;
 			justify-content: center;
-			min-height: 40px;
-			padding: .55rem 1rem;
-			border: 1px solid var(--orange);
+			gap: .45rem;
+			padding: .72rem 1.35rem;
+			border: 1px solid transparent;
 			border-radius: 999px;
 			color: var(--white);
 			background: var(--orange);
-			box-shadow: 0 6px 16px rgba(245, 142, 107, .22);
-			font-size: .85rem;
+			box-shadow: 0 7px 18px rgba(245, 142, 107, .25);
+			font: inherit;
 			font-weight: 700;
-			white-space: nowrap;
-			transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+			text-decoration: none;
+			cursor: pointer;
+			transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
 		}
 
 		body.admin-course-page .btn:hover {
-			border-color: var(--orange-deep);
 			background: var(--orange-deep);
-			transform: translateY(-1px);
+			box-shadow: 0 10px 22px rgba(245, 142, 107, .32);
+			transform: translateY(-2px);
 		}
 
-		body.admin-course-page .btn.ghost,
-		body.admin-course-page .btn.secondary {
+		body.admin-course-page .btn.ghost {
 			border-color: var(--line);
 			color: var(--ink);
 			background: var(--white);
 			box-shadow: var(--shadow-sm);
 		}
 
-		body.admin-course-page .btn.secondary {
-			border-color: rgba(194, 217, 237, .95);
-			background: var(--blue-soft);
+		body.admin-course-page .btn.ghost:hover {
+			border-color: var(--orange);
+			color: var(--orange-deep);
+			background: var(--white);
 		}
 
 		body.admin-course-page .btn.danger {
-			border-color: var(--orange-deep);
-			background: var(--orange-deep);
+			border-color: #D99090;
+			color: #9B4646;
+			background: #FFF7F5;
+			box-shadow: none;
 		}
 
-		body.admin-course-page .stats {
+		body.admin-course-page .btn.danger:hover {
+			color: var(--white);
+			background: #B85C5C;
+		}
+
+		body.admin-course-page .course-preview-layout {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-			gap: 1rem;
-			margin-bottom: 1.4rem;
+			gap: 1.25rem;
 		}
 
-		body.admin-course-page .stat,
-		body.admin-course-page .panel,
-		body.admin-course-page .tab-panel {
+		body.admin-course-page .panel {
+			padding: clamp(1.35rem, 3vw, 2rem);
 			border: 1px solid var(--line);
 			border-radius: var(--radius-md);
 			background: var(--white);
 			box-shadow: var(--shadow-sm);
 		}
 
-		body.admin-course-page .stat {
-			padding: 1.1rem 1.2rem;
-		}
-
-		body.admin-course-page .stat span {
-			display: block;
-			color: var(--ink-soft);
-			font-size: .78rem;
-		}
-
-		body.admin-course-page .stat strong {
-			display: block;
-			margin-top: .2rem;
-			font-family: var(--serif);
-			font-size: 1.7rem;
-		}
-
-		body.admin-course-page .tabs {
-			display: flex;
-			gap: .45rem;
-			margin-bottom: 1rem;
-			overflow-x: auto;
-		}
-
-		body.admin-course-page .tabs button {
-			padding: .65rem 1rem;
-			border: 1px solid var(--line);
-			border-radius: 999px;
-			color: var(--ink-soft);
-			background: var(--white);
-			white-space: nowrap;
-		}
-
-		body.admin-course-page .tabs button.active {
-			border-color: var(--bg-soothing);
-			color: var(--ink);
-			background: var(--blue-soft);
-			font-weight: 700;
-		}
-
-		body.admin-course-page .tab-panel,
-		body.admin-course-page .panel {
-			padding: 1.25rem;
-		}
-
-		body.admin-course-page .tab-panel > .panel {
-			padding: 0;
-			border: 0;
-			box-shadow: none;
-		}
-
 		body.admin-course-page .panel-heading {
 			display: flex;
-			align-items: center;
+			align-items: flex-start;
 			justify-content: space-between;
 			gap: 1rem;
-			margin: -1.25rem -1.25rem 1.2rem;
-			padding: 1rem 1.25rem;
-			border-bottom: 1px solid var(--line);
-			border-radius: var(--radius-md) var(--radius-md) 0 0;
-			background: linear-gradient(90deg, var(--pink-soft), var(--white) 52%, var(--blue-soft));
+			margin-bottom: 1.3rem;
 		}
 
-		body.admin-course-page .panel-heading h2,
-		body.admin-course-page .panel-heading p {
+		body.admin-course-page .meta {
 			margin-bottom: 0;
-		}
-
-		body.admin-course-page .toolbar,
-		body.admin-course-page .form-grid,
-		body.admin-course-page .page-actions,
-		body.admin-course-page .inline-actions,
-		body.admin-course-page .dialog-actions {
-			display: flex;
-			align-items: flex-end;
-			gap: .75rem;
-			flex-wrap: wrap;
-		}
-
-		body.admin-course-page .toolbar {
-			margin-bottom: 1rem;
-			padding: 1rem;
-			border: 1px solid var(--line);
-			border-radius: 16px;
-			background: var(--bg-warm);
-		}
-
-		body.admin-course-page .form-grid {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		body.admin-course-page .form-group {
-			min-width: 0;
-		}
-
-		body.admin-course-page label {
-			display: block;
-			margin-bottom: .35rem;
-			color: var(--ink);
-			font-size: .82rem;
-			font-weight: 700;
-		}
-
-		body.admin-course-page .field {
-			width: 100%;
-			min-height: 42px;
-			padding: .62rem .78rem;
-			border: 1px solid var(--line);
-			border-radius: 12px;
-			color: var(--ink);
-			background: var(--white);
-			outline: none;
-			transition: border-color .16s ease, box-shadow .16s ease;
-		}
-
-		body.admin-course-page textarea.field {
-			min-height: 112px;
-			resize: vertical;
-		}
-
-		body.admin-course-page .field:focus {
-			border-color: var(--orange);
-			box-shadow: 0 0 0 3px rgba(245, 142, 107, .14);
-		}
-
-		body.admin-course-page .error,
-		body.admin-course-page .required {
-			color: var(--orange-deep);
-			font-size: .78rem;
-		}
-
-		body.admin-course-page .notice {
-			padding: .85rem 1rem;
-			border: 1px solid rgba(194, 217, 237, .9);
-			border-radius: 14px;
-			color: var(--ink);
-			background: var(--blue-soft);
-			font-size: .84rem;
-		}
-
-		body.admin-course-page .grid-2,
-		body.admin-course-page .detail-grid,
-		body.admin-course-page .video-grid,
-		body.admin-course-page .review-shell {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 1.2rem;
-		}
-
-		body.admin-course-page .review-shell {
-			grid-template-columns: minmax(0, 1fr) minmax(260px, .34fr);
-			align-items: start;
-		}
-
-		body.admin-course-page .review-shell-full {
-			grid-template-columns: 1fr;
-		}
-
-		body.admin-course-page .review-side {
-			position: sticky;
-			top: 154px;
-		}
-
-		body.admin-course-page .table-wrap {
-			width: 100%;
-			overflow-x: auto;
-			border: 1px solid var(--line);
-			border-radius: 16px;
-			background: var(--white);
-		}
-
-		body.admin-course-page table {
-			width: 100%;
-			min-width: 720px;
-			border-collapse: collapse;
-			font-size: .82rem;
-		}
-
-		body.admin-course-page th,
-		body.admin-course-page td {
-			padding: .78rem .85rem;
-			border-bottom: 1px solid var(--line);
-			text-align: left;
-			vertical-align: middle;
-		}
-
-		body.admin-course-page th {
-			color: var(--ink);
-			background: var(--bg-warm);
-			font-size: .76rem;
-			font-weight: 700;
-			letter-spacing: .03em;
-			white-space: nowrap;
-		}
-
-		body.admin-course-page tbody tr:last-child td {
-			border-bottom: 0;
-		}
-
-		body.admin-course-page tbody tr:hover td {
-			background: rgba(220, 234, 245, .28);
-		}
-
-		body.admin-course-page .empty-state {
-			padding: 2rem 1rem;
 			color: var(--ink-soft);
-			text-align: center;
+			font-size: .92rem;
 		}
 
-		body.admin-course-page .course-summary {
-			display: flex;
-			min-width: 150px;
-			flex-direction: column;
-		}
-
-		body.admin-course-page .status,
-		body.admin-course-page .status-paid,
-		body.admin-course-page .status-unpaid,
-		body.admin-course-page .status-cancelled,
-		body.admin-course-page .status-refunded {
-			display: inline-flex;
-			padding: .22rem .58rem;
+		body.admin-course-page .status {
+			flex: 0 0 auto;
+			padding: .38rem .85rem;
 			border-radius: 999px;
 			color: var(--ink);
 			background: var(--blue-soft);
-			font-size: .76rem;
+			font-size: .82rem;
 			font-weight: 700;
-			white-space: nowrap;
 		}
 
-		body.admin-course-page .status-paid { background: #DCEBDD; }
-		body.admin-course-page .status-unpaid { background: var(--pink-soft); }
-		body.admin-course-page .status-cancelled,
-		body.admin-course-page .status-refunded { background: var(--pink); }
-
-		body.admin-course-page .inline-form,
-		body.admin-course-page .page-actions form {
-			margin: 0;
+		body.admin-course-page .detail-grid,
+		body.admin-course-page .video-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1.25rem;
 		}
 
 		body.admin-course-page .summary-list {
@@ -753,9 +249,9 @@
 
 		body.admin-course-page .summary-list > div {
 			display: grid;
-			grid-template-columns: minmax(100px, .42fr) minmax(0, 1fr);
-			gap: .8rem;
-			padding: .7rem 0;
+			grid-template-columns: minmax(7rem, .42fr) minmax(0, 1fr);
+			gap: 1rem;
+			padding: .8rem 0;
 			border-bottom: 1px solid var(--line);
 		}
 
@@ -765,679 +261,279 @@
 
 		body.admin-course-page dt {
 			color: var(--ink-soft);
-			font-size: .8rem;
+			font-size: .88rem;
 		}
 
 		body.admin-course-page dd {
 			margin: 0;
-			font-weight: 500;
+			font-weight: 700;
+			overflow-wrap: anywhere;
+		}
+
+		body.admin-course-page .video-grid {
+			margin-top: 1.5rem;
 		}
 
 		body.admin-course-page .video-card {
-			overflow: hidden;
+			padding: 1rem;
 			border: 1px solid var(--line);
-			border-radius: 16px;
+			border-radius: 18px;
 			background: var(--bg-warm);
 		}
 
 		body.admin-course-page .video-card h3 {
-			margin: 0;
-			padding: .7rem .9rem;
-			border-bottom: 1px solid var(--line);
+			margin-bottom: .75rem;
 		}
 
 		body.admin-course-page .video-card video {
 			display: block;
 			width: 100%;
 			aspect-ratio: 16 / 9;
-			background: var(--ink);
+			border-radius: 14px;
+			background: #1F2A30;
 		}
 
 		body.admin-course-page .outline-box {
-			padding: 1rem;
+			min-height: 9rem;
+			padding: 1.1rem 1.2rem;
 			border: 1px solid var(--line);
-			border-radius: 14px;
+			border-radius: 16px;
+			color: var(--ink);
 			background: var(--bg-warm);
 			white-space: pre-wrap;
+			overflow-wrap: anywhere;
 		}
 
-		body.admin-course-page .check-list {
+		body.admin-course-page .review-actions-panel {
 			display: grid;
-			gap: .55rem;
-			margin: 1rem 0;
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: center;
+			gap: 1.5rem;
+			border-left: 5px solid var(--orange);
 		}
 
-		body.admin-course-page .check-list label {
+		body.admin-course-page .review-actions-panel .page-kicker {
+			margin-bottom: .2rem;
+		}
+
+		body.admin-course-page .review-actions-panel h2 {
+			margin-bottom: .2rem;
+		}
+
+		body.admin-course-page .page-actions {
 			display: flex;
 			align-items: center;
-			gap: .5rem;
-			margin: 0;
-			font-weight: 500;
-		}
-
-		body.admin-course-page .pending-data {
-			color: var(--ink-soft);
-			font-size: .82rem;
-		}
-
-		body.admin-course-page .pagination-ui {
-			display: flex;
-			justify-content: center;
-			gap: .4rem;
-			flex-wrap: wrap;
-			margin-top: 1.15rem;
-		}
-
-		body.admin-course-page .pagination-ui a {
-			display: grid;
-			place-items: center;
-			min-width: 38px;
-			min-height: 38px;
-			padding: .35rem .65rem;
-			border: 1px solid var(--line);
-			border-radius: 10px;
-			color: var(--ink-soft);
-			background: var(--white);
-		}
-
-		body.admin-course-page .pagination-ui a[aria-current="page"] {
-			border-color: var(--orange);
-			color: var(--white);
-			background: var(--orange);
-		}
-
-		body.admin-course-page .revenue-chart {
-			display: grid;
-			gap: .9rem;
-		}
-
-		body.admin-course-page .revenue-chart-row {
-			display: grid;
-			grid-template-columns: 30px minmax(100px, .35fr) minmax(160px, 1fr) auto;
+			justify-content: flex-end;
 			gap: .75rem;
-			align-items: center;
-		}
-
-		body.admin-course-page .revenue-rank {
-			display: grid;
-			place-items: center;
-			width: 28px;
-			height: 28px;
-			border-radius: 50%;
-			background: var(--pink-soft);
-			font-weight: 700;
-		}
-
-		body.admin-course-page .revenue-bar-track {
-			height: 12px;
-			overflow: hidden;
-			border-radius: 999px;
-			background: var(--blue-soft);
-		}
-
-		body.admin-course-page [data-revenue-bar] {
-			display: block;
-			width: 0;
-			height: 100%;
-			border-radius: inherit;
-			background: var(--orange);
-		}
-
-		body.admin-course-page dialog.admin-dialog {
-			width: min(520px, 92vw);
-			padding: 1.3rem;
-			border: 1px solid var(--line);
-			border-radius: var(--radius-md);
-			color: var(--ink);
-			background: var(--white);
-			box-shadow: var(--shadow-md);
-		}
-
-		body.admin-course-page dialog::backdrop {
-			background: rgba(58, 75, 83, .35);
-			backdrop-filter: blur(3px);
-		}
-
-		body.admin-course-page .dialog-head {
-			display: flex;
-			align-items: flex-start;
-			justify-content: space-between;
-			gap: 1rem;
-			margin-bottom: 1rem;
-		}
-
-		body.admin-course-page .dialog-kicker {
-			color: var(--orange);
-			font-size: .72rem;
-			font-weight: 700;
-			letter-spacing: .14em;
-		}
-
-		body.admin-course-page .dialog-close {
-			display: grid;
-			place-items: center;
-			width: 38px;
-			height: 38px;
-			border-radius: 50%;
-			color: var(--ink);
-			background: var(--bg-warm);
-			font-size: 1.25rem;
-		}
-
-		body.admin-course-page .modal,
-		body.admin-course-page .coupon-modal {
-			position: fixed;
-			inset: 0;
-			z-index: 200;
-			display: grid;
-			place-items: center;
-			padding: 1rem;
-			background: rgba(58, 75, 83, .35);
-			backdrop-filter: blur(3px);
-		}
-
-		body.admin-course-page .modal-content,
-		body.admin-course-page .coupon-modal-content {
-			width: min(900px, 94vw);
-			max-height: 88vh;
-			padding: 1.35rem;
-			overflow: auto;
-			border: 1px solid var(--line);
-			border-radius: var(--radius-md);
-			background: var(--white);
-			box-shadow: var(--shadow-md);
-		}
-
-		body.admin-course-page .coupon-modal-content {
-			width: min(480px, 94vw);
-		}
-
-		body.admin-course-page .toast {
-			position: fixed;
-			right: 22px;
-			bottom: 22px;
-			z-index: 300;
-			padding: .75rem 1rem;
-			border-radius: 14px;
-			color: var(--white);
-			background: var(--ink);
-			box-shadow: var(--shadow-md);
-			opacity: 0;
-			transform: translateY(12px);
-			transition: opacity .2s ease, transform .2s ease;
-			pointer-events: none;
-		}
-
-		body.admin-course-page .toast.show {
-			opacity: 1;
-			transform: translateY(0);
-		}
-
-		body.admin-course-page .site-footer {
-			padding: 1.35rem 0;
-			border-top: 1px solid var(--line);
-			color: var(--ink-soft);
-			background: var(--white);
-			font-size: .78rem;
-		}
-
-		body.admin-course-page .footer-inner {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			gap: 1rem;
 			flex-wrap: wrap;
 		}
 
-		body.admin-course-page .footer-inner strong {
-			color: var(--ink);
-			font-weight: 700;
-		}
-
-		/* 與 admin_home.html 共用的頁首、Logo 與頁尾視覺規則。 */
-		body.admin-course-page {
-			border-top: 0 !important;
-			font-size: 16px !important;
-		}
-
-		body.admin-course-page::before {
-			display: none !important;
-			content: none !important;
-		}
-
-		body.admin-course-page .site-header {
-			position: sticky !important;
-			top: 0 !important;
-			z-index: 100 !important;
-			border-top: 0 !important;
-			border-bottom: 1px solid rgba(236, 223, 206, .7) !important;
-			color: var(--ink) !important;
-			background: rgba(253, 246, 237, .85) !important;
-			backdrop-filter: blur(12px) !important;
-			box-shadow: none !important;
-		}
-
-		body.admin-course-page .wrap {
-			width: min(1160px, 92vw) !important;
-			margin-inline: auto !important;
-		}
-
-		body.admin-course-page .nav-inner {
-			display: flex !important;
-			align-items: center !important;
-			gap: 1.4rem !important;
-			height: 74px !important;
-		}
-
-		body.admin-course-page .brand {
-			min-height: 0 !important;
-			padding: 0 !important;
-			border: 0 !important;
-			border-radius: 0 !important;
-			color: inherit !important;
-			background: transparent !important;
-			box-shadow: none !important;
-			filter: none !important;
-			opacity: 1 !important;
-			mix-blend-mode: normal !important;
-		}
-
-		body.admin-course-page .brand::before,
-		body.admin-course-page .brand::after {
-			display: none !important;
-			content: none !important;
-		}
-
-		body.admin-course-page .logo-mind,
-		body.admin-course-page .brand-text,
-		body.admin-course-page .brand-text .logo,
-		body.admin-course-page .brand-text .en {
-			background: transparent !important;
-			box-shadow: none !important;
-			filter: none !important;
-			opacity: 1 !important;
-			mix-blend-mode: normal !important;
-		}
-
-		body.admin-course-page .logo-mind svg {
-			filter: none !important;
-			opacity: 1 !important;
-		}
-
-		body.admin-course-page .brand-text .logo {
-			color: var(--ink) !important;
-		}
-
-		body.admin-course-page .brand-text .en {
-			color: var(--ink-soft) !important;
-		}
-
-		body.admin-course-page .nav-actions {
-			display: flex !important;
-			align-items: center !important;
-			gap: .55rem !important;
-			margin-left: auto !important;
-		}
-
-		body.admin-course-page .profile-entry {
-			display: flex !important;
-			align-items: center !important;
-			gap: .65rem !important;
-			min-height: 46px !important;
-			padding: .3rem .75rem .3rem .35rem !important;
-			border: 1px solid var(--line) !important;
-			border-radius: 999px !important;
-			background: var(--white) !important;
-			box-shadow: var(--shadow-sm) !important;
-		}
-
-		body.admin-course-page .profile-entry:hover {
-			border-color: var(--bg-soothing) !important;
-			background: var(--blue-soft) !important;
-			transform: translateY(-2px) !important;
-		}
-
-		body.admin-course-page .profile-photo {
-			display: grid !important;
-			place-items: center !important;
-			width: 36px !important;
-			height: 36px !important;
-			flex: 0 0 auto !important;
-			overflow: hidden;
-			border-radius: 50% !important;
-			color: var(--ink) !important;
-			background: linear-gradient(135deg, var(--pink), var(--bg-soothing)) !important;
-		}
-
-		body.admin-course-page .profile-photo img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-
-		body.admin-course-page .profile-copy {
-			display: flex !important;
-			min-width: 0 !important;
-			flex-direction: column !important;
-			line-height: 1.25 !important;
-		}
-
-		body.admin-course-page .profile-copy small {
-			color: var(--ink-soft) !important;
-			font-size: .68rem !important;
-		}
-
-		body.admin-course-page .profile-copy strong {
-			max-width: 9.5rem !important;
-			overflow: hidden !important;
-			color: var(--ink) !important;
-			font-size: .82rem !important;
-			font-weight: 500 !important;
-			text-overflow: ellipsis !important;
-			white-space: nowrap !important;
-		}
-
-		body.admin-course-page .logout-form {
-			margin: 0 !important;
-		}
-
-		body.admin-course-page .logout-button {
-			display: inline-flex !important;
-			align-items: center !important;
-			gap: .4rem !important;
-			min-height: 46px !important;
-			padding: .6rem .8rem !important;
-			border: 1px solid var(--line) !important;
-			border-radius: 999px !important;
-			color: var(--ink) !important;
-			background: var(--white) !important;
-			box-shadow: var(--shadow-sm) !important;
-		}
-
-		body.admin-course-page .logout-button svg {
-			width: 17px !important;
-			height: 17px !important;
-			stroke: currentColor !important;
-		}
-
-		body.admin-course-page .logout-button:hover {
-			border-color: var(--orange) !important;
-			color: var(--white) !important;
-			background: var(--orange-deep) !important;
-			transform: translateY(-2px) !important;
-		}
-
-		body.admin-course-page .nav-inner > .header-course-nav {
-			display: none !important;
-		}
-
-		body.admin-course-page .site-footer {
-			padding: 1.35rem 0 !important;
-			border-top: 1px solid var(--line) !important;
-			color: var(--ink-soft) !important;
-			background: var(--white) !important;
-			font-size: .78rem !important;
+		body.admin-course-page .page-actions form {
+			margin: 0;
 		}
 
 		body.admin-course-page :focus-visible {
-			outline: 3px solid var(--orange);
+			outline: 3px solid rgba(245, 142, 107, .55);
 			outline-offset: 3px;
 		}
 
-		@media (max-width: 940px) {
-			body.admin-course-page .profile-copy,
-			body.admin-course-page .admin-badge {
-				display: none !important;
+		@media (max-width: 900px) {
+			body.admin-course-page .course-nav {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
 			}
 
-			body.admin-course-page .profile-entry {
-				padding: .28rem !important;
-			}
-
-			body.admin-course-page .review-shell,
-			body.admin-course-page .grid-2 {
-				grid-template-columns: 1fr;
-			}
-
-			body.admin-course-page .review-side {
-				position: static;
-			}
-		}
-
-		@media (max-width: 640px) {
-			body.admin-course-page .nav-inner {
-				gap: .55rem !important;
-				height: 64px !important;
-			}
-
-			body.admin-course-page .logout-button span {
-				display: none;
-			}
-
-			body.admin-course-page .logout-button {
-				display: grid !important;
-				place-items: center;
-				width: 42px;
-				min-height: 42px !important;
-				padding: 0 !important;
-			}
-
-			body.admin-course-page .profile-photo {
-				width: 34px !important;
-				height: 34px !important;
-			}
-
-			body.admin-course-page .admin-main {
-				padding-top: 1.25rem;
-			}
-
-			body.admin-course-page .page-head-actions {
-				display: flex;
-				flex-direction: column;
-				align-items: flex-start;
-				margin-left: 0;
-			}
-
-			body.admin-course-page .page-head-actions p {
-				margin-top: .55rem;
-				text-align: left;
-			}
-
-			body.admin-course-page .page-head,
-			body.admin-course-page .panel-heading {
-				display: block;
-			}
-
-			body.admin-course-page .page-head > :last-child {
-				margin-top: .75rem;
-			}
-
-			body.admin-course-page .form-grid,
+			body.admin-course-page .detail-grid,
 			body.admin-course-page .video-grid {
 				grid-template-columns: 1fr;
 			}
 
-			body.admin-course-page .revenue-chart-row {
-				grid-template-columns: 30px minmax(0, 1fr) auto;
+			body.admin-course-page .review-actions-panel {
+				grid-template-columns: 1fr;
 			}
 
-			body.admin-course-page .revenue-bar-track {
-				grid-column: 2 / -1;
+			body.admin-course-page .page-actions {
+				justify-content: flex-start;
 			}
 		}
 
-		@media (max-width: 430px) {
-			body.admin-course-page .profile-entry {
-				display: none !important;
-			}
-
+		@media (max-width: 620px) {
 			body.admin-course-page .admin-main {
-				padding-top: 1.25rem;
+				padding-top: 1.5rem;
 			}
 
-			body.admin-course-page .tab-panel,
-			body.admin-course-page .panel {
-				padding: 1rem;
+			body.admin-course-page .page-head,
+			body.admin-course-page .panel-heading {
+				align-items: stretch;
+				flex-direction: column;
+			}
+
+			body.admin-course-page .course-nav {
+				grid-template-columns: 1fr;
+			}
+
+			body.admin-course-page .summary-list > div {
+				grid-template-columns: 1fr;
+				gap: .2rem;
+			}
+
+			body.admin-course-page .page-actions,
+			body.admin-course-page .page-actions form,
+			body.admin-course-page .page-actions .btn,
+			body.admin-course-page .page-head > .btn {
+				width: 100%;
 			}
 		}
 
 		@media (prefers-reduced-motion: reduce) {
-			* {
+			body.admin-course-page *,
+			body.admin-course-page *::before,
+			body.admin-course-page *::after {
 				scroll-behavior: auto !important;
 				transition: none !important;
 			}
 		}
-
-		/* 所有課程後台頁面共用：固定功能導覽的尺寸、色調與位置。 */
-		body.admin-course-page .page-head-actions,
-		body.admin-course-page .page-head-actions .page-function-nav,
-		body.admin-course-page .page-head-actions .page-function-nav a {
-			box-sizing: border-box;
-		}
-
-		body.admin-course-page .page-head-actions .page-function-nav a {
-			min-height: 48px;
-			border-color: transparent;
-			color: var(--ink-soft);
-			background: transparent;
-			font-size: .84rem;
-			font-weight: 500;
-			line-height: 1.2;
-		}
-
-		body.admin-course-page .page-head-actions .page-function-nav a:hover {
-			border-color: transparent;
-			color: var(--ink);
-			background: transparent;
-		}
-
-		body.admin-course-page .page-head-actions .page-function-nav a.active,
-		body.admin-course-page .page-head-actions .page-function-nav a[aria-current="page"] {
-			border-color: var(--bg-soothing);
-			color: var(--ink);
-			background: var(--blue-soft);
-		}
-
-		@media (min-width: 1281px) {
-			body.admin-course-page .page-head {
-				display: grid;
-				grid-template-columns: minmax(16rem, 1fr) 55rem;
-				align-items: end;
-				gap: 1.5rem;
-			}
-
-			body.admin-course-page .page-head-actions {
-				display: grid;
-				grid-template-columns: 44rem 10rem;
-				align-items: center;
-				justify-content: end;
-				gap: 1rem;
-				width: 55rem;
-				margin-left: 0;
-			}
-
-			body.admin-course-page .page-head-actions .page-function-nav {
-				display: grid;
-				grid-template-columns: repeat(5, minmax(0, 1fr));
-				gap: .25rem;
-				width: 44rem;
-				max-width: none;
-				margin: 0;
-				overflow: visible;
-			}
-
-			body.admin-course-page .page-head-actions .page-function-nav a {
-				width: 100%;
-				min-width: 0;
-				padding: .65rem .5rem;
-			}
-
-			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
-				width: 10rem;
-				min-width: 10rem;
-				max-width: 10rem;
-				min-height: 48px;
-			}
-		}
-
-		@media (max-width: 1280px) {
-			body.admin-course-page .page-head {
-				display: block;
-			}
-
-			body.admin-course-page .page-head-actions {
-				display: grid;
-				grid-template-columns: minmax(0, 1fr) 10rem;
-				width: 100%;
-				align-items: center;
-				gap: 1rem;
-				margin: 1rem 0 0;
-			}
-
-			body.admin-course-page .page-head-actions .page-function-nav {
-				display: grid;
-				grid-template-columns: repeat(5, minmax(8.25rem, 1fr));
-				gap: .25rem;
-				width: 100%;
-				max-width: none;
-				margin: 0;
-				overflow-x: auto;
-			}
-
-			body.admin-course-page .page-head-actions .page-function-nav a {
-				width: 100%;
-				min-width: 0;
-				padding: .65rem .5rem;
-			}
-
-			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
-				align-self: center;
-				justify-self: end;
-				width: 10rem;
-				min-width: 10rem;
-				max-width: 10rem;
-				min-height: 48px;
-			}
-		}
-
-		@media (max-width: 760px) {
-			body.admin-course-page .page-head-actions {
-				grid-template-columns: minmax(0, 1fr);
-				gap: .75rem;
-			}
-
-			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
-				justify-self: stretch;
-				width: 100%;
-				min-width: 0;
-				max-width: none;
-			}
-		}
-
 	</style>
 </head>
 <body class="thy2-page admin-course-page">
 	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
 	<main id="main-content" class="admin-main">
 		<div class="wrap">
-<div class="page-head">
+			<header class="page-head">
+				<div>
+					<span class="page-kicker">後台管理</span>
+					<h1 th:text="${course.courseName}">課程名稱</h1>
+				</div>
+				<a class="btn ghost" th:href="@{/admin/course/select_course}">返回課程發布管理</a>
+			</header>
+
+			<nav class="course-nav page-function-nav" aria-label="課程商城管理" data-admin-course-nav>
+				<a data-admin-nav="courses" th:href="@{/admin/course/select_course}">課程發布管理</a>
+				<a data-admin-nav="orders" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
+				<a data-admin-nav="payout" th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
+				<a data-admin-nav="coupon" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+				<a data-admin-nav="categories" th:href="@{/admin/course/select_course_categories}">課程分類</a>
+			</nav>
+
+			<div class="course-preview-layout">
+				<section class="panel" aria-labelledby="course-detail-title">
+					<div class="panel-heading">
+						<div>
+							<h2 id="course-detail-title">課程資料</h2>
+							<p class="meta">
+								<span th:text="${course.courseCategories.courseCatName}">分類</span>
+								・
+								<span th:text="${course.psychologist.name}">心理師</span>
+								心理師
+							</p>
+						</div>
+						<span class="status" th:text="${course.courseStatusText}">狀態</span>
+					</div>
+
+					<div class="detail-grid">
+						<dl class="summary-list">
+							<div>
+								<dt>課程名稱</dt>
+								<dd th:text="${course.courseName}">課程</dd>
+							</div>
+							<div>
+								<dt>課程定價</dt>
+								<dd>NT$ <span th:text="${course.price}">0</span></dd>
+							</div>
+							<div>
+								<dt>收藏／評價／提問</dt>
+								<dd>
+									<span th:text="${course.saveCount}">0</span>
+									／
+									<span th:text="${course.reviewCount}">0</span>
+									／
+									<span th:text="${course.commentCount}">0</span>
+								</dd>
+							</div>
+						</dl>
+
+						<dl class="summary-list">
+							<div th:if="${course.courseStatus == 4}">
+								<dt>上架時間</dt>
+								<dd th:text="${#temporals.format(course.listedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+							</div>
+							<div th:if="${course.courseStatus == 5}">
+								<dt>下架時間</dt>
+								<dd th:text="${#temporals.format(course.delistedAt,'yyyy年MM月dd日 HH:mm')}">—</dd>
+							</div>
+							<div th:if="${course.courseStatus == 5}">
+								<dt>下架原因</dt>
+								<dd th:text="${course.delistReason != null and course.delistReason.label != null ? course.delistReason.label : '--'}">--</dd>
+							</div>
+							<th:block th:if="${course.psychDiscount != null}">
+								<div>
+									<dt>心理師折扣</dt>
+									<dd th:text="${course.psychDiscount}">—</dd>
+								</div>
+								<div>
+									<dt>折扣開始</dt>
+									<dd th:text="${course.discountStart != null ? #temporals.format(course.discountStart,'yyyy/MM/dd HH:mm') : '--'}">--</dd>
+								</div>
+								<div>
+									<dt>折扣結束</dt>
+									<dd th:text="${course.discountEnd != null ? #temporals.format(course.discountEnd,'yyyy/MM/dd HH:mm') : '--'}">--</dd>
+								</div>
+							</th:block>
+						</dl>
+					</div>
+
+					<div class="video-grid">
+						<article class="video-card">
+							<h3>完整課程影片</h3>
+							<video controls>
+								<source th:src="@{${course.videoSrc}}" type="video/mp4" />
+							</video>
+						</article>
+						<article class="video-card">
+							<h3>課程預覽影片</h3>
+							<video controls>
+								<source th:src="@{${course.videoSrcPre}}" type="video/mp4" />
+							</video>
+						</article>
+					</div>
+				</section>
+
+				<section class="panel" aria-labelledby="course-outline-title">
+					<h2 id="course-outline-title">純文字內容大綱</h2>
+					<div class="outline-box" th:text="${course.outline}">課程大綱</div>
+				</section>
+
+				<section class="panel review-actions-panel"
+					th:if="${course.courseStatus == 1}"
+					aria-labelledby="course-review-actions-title">
 					<div>
-						<span class="page-kicker">後台管理</span>
-						<h1 th:text="${course.courseName}">課程名稱</h1>
+						<span class="page-kicker">課程審核</span>
+						<h2 id="course-review-actions-title">選擇審核結果</h2>
+						<p class="meta">請確認課程資料、影片與內容大綱後，再送出審核結果。</p>
 					</div>
-					<div class="page-head-actions">
-						<nav class="course-nav page-function-nav" aria-label="課程商城管理" data-admin-course-nav>
-							<a data-admin-nav="courses" th:href="@{/admin/course/select_course}">課程發布管理</a>
-							<a data-admin-nav="orders" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
-							<a data-admin-nav="payout" th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
-							<a data-admin-nav="coupon" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
-							<a data-admin-nav="categories" th:href="@{/admin/course/select_course_categories}">課程分類</a>
-						</nav>
-						<a class="btn ghost" th:href="@{/admin/course/select_course}">返回課程發布管理</a>
+					<div class="page-actions">
+						<form class="inline-form"
+							method="post"
+							th:action="@{examine_course}"
+							data-confirm-form="確定退回此課程？">
+							<input type="hidden" name="courseId" th:value="${course.courseId}" />
+							<input type="hidden" name="courseStatus" value="3" />
+							<button class="btn danger" type="submit">退回修改</button>
+						</form>
+						<form class="inline-form"
+							method="post"
+							th:action="@{examine_course}"
+							data-confirm-form="確定核准此課程？">
+							<input type="hidden" name="courseId" th:value="${course.courseId}" />
+							<input type="hidden" name="courseStatus" value="2" />
+							<button class="btn" type="submit">核准課程</button>
+						</form>
 					</div>
-				</div><div class="review-shell" th:classappend="${course.courseStatus == 4 or course.courseStatus == 5} ? ' review-shell-full' : ''"><div><section class="panel"><div class="panel-heading"><div><h2>課程資料</h2><p class="meta"><span th:text="${course.courseCategories.courseCatName}">分類</span>・<span th:text="${course.psychologist.name}">心理師</span> 心理師</p></div><span class="status" th:text="${course.courseStatusText}">狀態</span></div><div class="detail-grid"><dl class="summary-list"><div><dt>課程名稱</dt><dd th:text="${course.courseName}">課程</dd></div><div><dt>課程定價</dt><dd>NT$ <span th:text="${course.price}">0</span></dd></div><div><dt>收藏／評價／提問</dt><dd><span th:text="${course.saveCount}">0</span>／<span th:text="${course.reviewCount}">0</span>／<span th:text="${course.commentCount}">0</span></dd></div></dl><dl class="summary-list"><div th:if="${course.courseStatus == 4}"><dt>上架時間</dt><dd th:text="${#temporals.format(course.listedAt,'yyyy年MM月dd日 HH:mm')}">—</dd></div><div th:if="${course.courseStatus == 5}"><dt>下架時間</dt><dd th:text="${#temporals.format(course.delistedAt,'yyyy年MM月dd日 HH:mm')}">—</dd></div><div th:if="${course.courseStatus == 5}"><dt>下架原因</dt><dd th:text="${course.delistReason != null and course.delistReason.label != null ? course.delistReason.label : '--'}">--</dd></div><th:block th:if="${course.psychDiscount != null}"><div><dt>心理師折扣</dt><dd th:text="${course.psychDiscount}">—</dd></div><div><dt>折扣開始</dt><dd th:text="${course.discountStart != null ? #temporals.format(course.discountStart,'yyyy/MM/dd HH:mm') : '--'}">--</dd></div><div><dt>折扣結束</dt><dd th:text="${course.discountEnd != null ? #temporals.format(course.discountEnd,'yyyy/MM/dd HH:mm') : '--'}">--</dd></div></th:block></dl></div><div class="video-grid"><div class="video-card"><h3>完整課程影片</h3><video controls><source th:src="@{${course.videoSrc}}" type="video/mp4"></video></div><div class="video-card"><h3>課程預覽影片</h3><video controls><source th:src="@{${course.videoSrcPre}}" type="video/mp4"></video></div></div></section><section class="panel" style="margin-top:20px"><h2>純文字內容大綱</h2><div class="outline-box" th:text="${course.outline}">課程大綱</div></section></div><aside class="panel review-side" th:if="${course.courseStatus != 4 and course.courseStatus != 5}"><p class="meta">上架申請審核</p><h2>審核檢核表</h2><p><span class="pending-data" data-thymeleaf-pending>申請時間待後端欄位</span></p><div class="check-list"><label><input type="checkbox">心理師資格有效</label><label><input type="checkbox">課程名稱與介紹清楚</label><label><input type="checkbox">內容大綱為純文字</label><label><input type="checkbox">內容符合平台規範</label><label><input type="checkbox">原價設定合理</label></div><div class="form-group"><label for="review-note">員工審核備註</label><textarea id="review-note" class="field" placeholder="此欄尚未有已知後端接收欄位"></textarea><span class="form-note">畫面功能保留，待 後端控制器 增加備註欄位後再綁定。</span></div><div th:if="${course.courseStatus == 1}" class="page-actions" style="margin-top:18px"><form class="inline-form" method="post" th:action="@{examine_course}" data-confirm-form="確定退回此課程？"><input type="hidden" name="courseId" th:value="${course.courseId}"><input type="hidden" name="courseStatus" value="3"><button class="btn danger" type="submit">退回修改</button></form><form class="inline-form" method="post" th:action="@{examine_course}" data-confirm-form="確定核准此課程？"><input type="hidden" name="courseId" th:value="${course.courseId}"><input type="hidden" name="courseStatus" value="2"><button class="btn" type="submit" data-approve-review>核准課程</button></form></div></aside></div>
+				</section>
+			</div>
 		</div>
 	</main>
+
 	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>

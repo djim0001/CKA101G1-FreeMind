@@ -2,7 +2,6 @@ package com.freemind.course.coupon.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -24,8 +22,10 @@ import com.freemind.course.coupon.model.Coupon;
 import com.freemind.course.coupon.model.CouponService;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 
@@ -35,10 +35,18 @@ public class CouponController {
 
 	private final CouponService couponSvc;
 	private final AdminService adminSvc;
+	private final MemberService memberSvc;
+	private final NoticeService noticeSvc;
 
-	public CouponController(AdminService adminSvc, CouponService couponSvc) {
+	public CouponController(
+			AdminService adminSvc, 
+			CouponService couponSvc,
+			NoticeService noticeSvc,
+			MemberService memberSvc) {
 		this.couponSvc = couponSvc;
 		this.adminSvc = adminSvc;
+		this.memberSvc = memberSvc;
+		this.noticeSvc = noticeSvc;
 	}
 
 	@ModelAttribute("admin")
@@ -65,21 +73,21 @@ public class CouponController {
 		return "back-end/course/course/selectCoupon";
 	}
 
-	@GetMapping("/add_coupon")
-	public String addCoupon(ModelMap model) {
-		Coupon coupon = new Coupon();
-		model.addAttribute("coupon", coupon);
-		return "back-end/course/course/addCoupon";
-	}
-
-	@PostMapping("/select_one_coupon")
-	public String listOneCoupon(
-			@RequestParam("couponId") String couponId, 
-			ModelMap model) {
-		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
-		model.addAttribute("coupon", coupon);
-		return "back-end/course/course/listOneCoupon";
-	}
+//	@GetMapping("/add_coupon")
+//	public String addCoupon(ModelMap model) {
+//		Coupon coupon = new Coupon();
+//		model.addAttribute("coupon", coupon);
+//		return "back-end/course/course/addCoupon";
+//	}
+//
+//	@PostMapping("/select_one_coupon")
+//	public String listOneCoupon(
+//			@RequestParam("couponId") String couponId, 
+//			ModelMap model) {
+//		Coupon coupon = couponSvc.getOneCoupon(Integer.valueOf(couponId));
+//		model.addAttribute("coupon", coupon);
+//		return "back-end/course/course/listOneCoupon";
+//	}
 
 	@PostMapping("/insert_coupon")
 	public String insertCoupon(@Valid Coupon coupon, BindingResult result, ModelMap model) {
@@ -103,6 +111,11 @@ public class CouponController {
 			couponSvc.publishCoupon(couponId, stock, ttlHours);
 
 			redirectAttributes.addFlashAttribute("couponMsg", "優惠券發布成功");
+			List<Member> allMember = memberSvc.getAll();
+			List<Integer> memberIds = allMember.stream()
+			        .map(Member::getMemberId)
+			        .toList();
+			noticeSvc.sendToMembers(memberIds, 0, "有新的優惠券發放了喔~~", (byte)1);
 
 		} catch (IllegalArgumentException e) {
 

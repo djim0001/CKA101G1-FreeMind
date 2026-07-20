@@ -470,9 +470,32 @@
 		.discount-chip.active { background: var(--orange); color: #fff; }
 		.qa-search-form {
 			display: grid;
-			grid-template-columns: minmax(220px, 1fr) minmax(180px, .4fr) auto;
-			gap: .75rem;
-			margin-bottom: 1rem;
+			grid-template-columns: minmax(260px, 1.6fr) minmax(210px, .7fr) auto;
+			align-items: end;
+			gap: 1rem;
+			margin-bottom: 1.25rem;
+			padding: 1rem 1.1rem;
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			background: rgba(255, 250, 238, .72);
+		}
+		.qa-filter-group {
+			display: grid;
+			min-width: 0;
+			gap: .45rem;
+		}
+		.qa-filter-group label {
+			color: var(--ink);
+			font-size: .88rem;
+			font-weight: 700;
+		}
+		.qa-search-form .field {
+			min-height: 48px;
+			background: var(--white);
+		}
+		.qa-search-form .qa-submit {
+			min-width: 110px;
+			min-height: 48px;
 		}
 		[data-qa-search-pagination] { margin-top: 1.25rem; }
 		[data-qa-search-pagination] > div {
@@ -533,7 +556,10 @@
 		@media (max-width: 940px) {
 			.course-search-form { grid-template-columns: 1fr 1fr; }
 			.qa-search-form { grid-template-columns: 1fr 1fr; }
-			.qa-search-form .btn { grid-column: 1 / -1; }
+			.qa-search-form .qa-submit {
+				grid-column: 1 / -1;
+				width: 100%;
+			}
 		}
 		@media (max-width: 700px) {
 			.page-main { padding-top: 1.8rem; }
@@ -551,7 +577,7 @@
 			.preview-hero { padding: 1rem; }
 			.panel-title-row { flex-direction: column; }
 			.qa-search-form { grid-template-columns: 1fr; }
-			.qa-search-form .btn { grid-column: auto; }
+			.qa-search-form .qa-submit { grid-column: auto; }
 			.bar-row { grid-template-columns: 1fr; gap: .3rem; }
 			.bar-row strong { text-align: right; }
 		}
@@ -705,26 +731,31 @@
 					</div>
 
 					<form class="qa-search-form" method="get"
-					th:action="@{/psych/course/psych_qa}" action="/psych/course/psych_qa"
-					data-qa-search-form>
-					<label class="sr-only" for="qaKeyword">搜尋課程或會員</label>
-					<input class="field" id="qaKeyword" type="search" name="keyword"
-						th:value="${param.keyword != null ? param.keyword[0] : ''}"
-						placeholder="搜尋課程或會員……" />
+						th:action="@{/psych/course/psych_qa}" action="/psych/course/psych_qa"
+						data-qa-search-form role="search">
+						<div class="qa-filter-group">
+							<label for="qaKeyword">搜尋課程或會員</label>
+							<input class="field" id="qaKeyword" type="search" name="keyword"
+								th:value="${param.keyword != null ? param.keyword[0] : ''}"
+								placeholder="輸入課程名稱或會員姓名" />
+						</div>
 
-					<label class="sr-only" for="qaOrderBy">排序方式</label>
-					<select class="field" id="qaOrderBy" name="orderBy">
-						<option value="courseIdDesc"
-							th:selected="${param.orderBy == null or param.orderBy[0] == 'courseId' or param.orderBy[0] == 'courseIdDesc'}">
-							提問時間新至舊
-						</option>
-						<option value="courseIdAsc"
-							th:selected="${param.orderBy != null and param.orderBy[0] == 'courseIdAsc'}">
-							提問時間舊至新
-						</option>
-					</select>
-					<input type="hidden" name="page" value="1" />
-					<button class="btn btn-secondary" type="submit">搜尋</button>
+						<div class="qa-filter-group">
+							<label for="qaOrderBy">排序方式</label>
+							<select class="field" id="qaOrderBy" name="orderBy">
+								<option value="courseIdDesc"
+									th:selected="${param.orderBy == null or param.orderBy[0] == 'courseId' or param.orderBy[0] == 'courseIdDesc'}">
+									提問時間新至舊
+								</option>
+								<option value="courseIdAsc"
+									th:selected="${param.orderBy != null and param.orderBy[0] == 'courseIdAsc'}">
+									提問時間舊至新
+								</option>
+							</select>
+						</div>
+
+						<input type="hidden" name="page" value="1" />
+						<button class="btn btn-primary qa-submit" type="submit">搜尋</button>
 					</form>
 
 					<div class="table-wrap">
