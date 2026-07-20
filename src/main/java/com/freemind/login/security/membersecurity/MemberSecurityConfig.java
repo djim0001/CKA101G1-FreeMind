@@ -48,7 +48,7 @@ public class MemberSecurityConfig {
     	// POST(按讚/收藏)不保存，避免登入後被重放成JSON頁        
        
     	http
-            .securityMatcher("/","/front-end/**","/member/**", "/article/**")
+            .securityMatcher("/","/front-end/**","/member/**", "/article/**", "/search/**")
             .authorizeHttpRequests(auth -> auth
 
             		//登入頁面
@@ -78,7 +78,7 @@ public class MemberSecurityConfig {
                 	    "/member/activity/listOneActivity",
                 	    "/member/activity/activityImage"
                 	).permitAll()
-                
+                .requestMatchers("/search/**").permitAll() 
                 .anyRequest().hasAnyRole("MEMBER")
             )
 

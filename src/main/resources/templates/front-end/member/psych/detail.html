@@ -1,147 +1,141 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${psych.name} + ' 心理師 - 詳細資料'"></title>
-    <style>
-    .detail-container {
-        max-width: 700px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+<meta charset="UTF-8">
+<title th:text="${psych.name} + ' 心理師 - 詳細資料'">心理師詳細資料</title>
 
-    .detail-container img {
-        width: 200px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 12px;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/psych/member.css}" href="/css/psych/member.css" />
 
-    .expertise-tag {
-        display: inline-block;
-        background: #e8f4f8;
-        color: #2c7a9e;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-        margin: 2px 4px 2px 0;
-    }
+<style>
+/* 本頁專屬:心理師詳細 */
+.thy2-member .detail-card {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm); padding: clamp(1.6rem, 4vw, 2.4rem);
+}
+.thy2-member .detail-top { display: flex; gap: 1.8rem; align-items: flex-start; flex-wrap: wrap; }
+.thy2-member .detail-photo {
+	width: 180px; height: 180px; object-fit: cover; border-radius: var(--radius-md);
+	border: 4px solid #fff; box-shadow: 0 0 0 2px var(--pink); flex: 0 0 auto;
+}
+.thy2-member .detail-meta { flex: 1; min-width: 240px; }
+.thy2-member .detail-meta p { margin: .3rem 0; font-size: .95rem; color: var(--ink); }
+.thy2-member .detail-meta .license { display: inline-block; margin-left: .3rem; padding: .1rem .6rem; border-radius: 999px; background: #eaf5ec; color: #3f7a52; font-size: .75rem; }
+.thy2-member .detail-meta .tags { margin-top: .6rem; }
 
-    .calendar {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-        margin-top: 16px;
-    }
+/* 兩顆跳轉鈕:課程=實心深橘,文章=白底橘框 */
+.thy2-member .cross-links { display: flex; gap: .7rem; flex-wrap: wrap; margin-top: 1.2rem; }
+.thy2-member .cross-btn {
+	display: inline-flex; align-items: center; gap: .4rem; padding: .6rem 1.4rem;
+	border-radius: 999px; font-size: .92rem; font-weight: 500; text-decoration: none; cursor: pointer;
+	transition: transform .2s, background .2s, color .2s, box-shadow .2s;
+}
+.thy2-member .cross-course { background: var(--orange-deep); color: #fff; box-shadow: 0 8px 20px rgba(229,118,79,.32); }
+.thy2-member .cross-course:hover { transform: translateY(-2px); background: #d4653f; }
+.thy2-member .cross-article { background: #fff; color: var(--ink); border: 1.5px solid var(--orange); }
+.thy2-member .cross-article:hover { transform: translateY(-2px); background: var(--pink-soft); color: var(--orange-deep); }
 
-    .calendar-day {
-        border-radius: 8px;
-        text-align: center;
-        overflow: hidden;
-    }
-
-    .calendar-day.available {
-        background: #d4f4dd;
-        border: 1px solid #4caf50;
-    }
-
-    .calendar-day.unavailable {
-        background: #f0f0f0;
-        color: #999;
-        border: 1px solid #ddd;
-    }
-
-    .calendar-day.empty {
-        background: #f0f0f0;
-        border: 1px solid #ddd;
-    }
-
-    .day-link {
-        display: block;
-        width: 100%;
-        height: 100%;
-        padding: 10px 6px;
-        text-decoration: none;
-        color: inherit;
-        cursor: pointer;
-        box-sizing: border-box;
-    }
-
-    .day-link:hover {
-        background: #a8e6b8;
-    }
-
-    .calendar-day.unavailable > div,
-    .calendar-day.empty {
-        padding: 10px 6px;
-        box-sizing: border-box;
-    }
-
-    .day-of-week {
-        display: block;
-        font-size: 12px;
-        font-weight: bold;
-        color: #666;
-        margin-bottom: 4px;
-    }
-
-    .day-date {
-        display: block;
-    }
-
-    .error-message {
-        color: red;
-        margin-bottom: 12px;
-    }
+/* 可預約日曆 */
+.thy2-member .section-title-m {
+	font-family: var(--serif); font-weight: 700; font-size: 1.1rem; color: var(--ink);
+	margin: 1.8rem 0 1rem; padding-left: .7rem; border-left: 4px solid var(--orange);
+}
+.thy2-member .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: .5rem; }
+.thy2-member .calendar-day { border-radius: 12px; text-align: center; overflow: hidden; font-size: .82rem; border: 1px solid var(--line); }
+.thy2-member .calendar-day.available { background: #eaf5ec; border-color: #bfe0c8; }
+.thy2-member .calendar-day.unavailable { background: var(--bg-warm); color: var(--ink-soft); }
+.thy2-member .calendar-day.empty { background: transparent; border-color: transparent; }
+.thy2-member .day-link { display: block; width: 100%; height: 100%; padding: .6rem .4rem; text-decoration: none; color: #3f7a52; cursor: pointer; box-sizing: border-box; transition: background .15s; }
+.thy2-member .day-link:hover { background: #d8ecdd; }
+.thy2-member .calendar-day.unavailable > div { padding: .6rem .4rem; box-sizing: border-box; }
+.thy2-member .day-of-week { display: block; font-size: .72rem; font-weight: 700; color: var(--ink-soft); margin-bottom: .2rem; }
+.thy2-member .calendar-day.available .day-of-week { color: #3f7a52; }
+.thy2-member .day-date { display: block; }
 </style>
 </head>
-<body>
 
-<div class="detail-container" th:if="${psych != null}">
+<body class="thy2-member">
 
-    <img th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/psych-images/noPsychPic.png}" alt="大頭照">
-    <h2 th:text="${psych.name} + ' 心理師'"></h2>
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <p>
-        性別：<span th:text="${psych.gender}"></span>
-        <span th:if="${psych.hasPracticeLicense}"> | 已通過執業許可 ✓</span>
-    </p>
-    <p>證照：<span th:text="${psych.psychCertificate}"></span></p>
-    <p>地點：<span th:text="${psych.psychLoc}"></span></p>
-    <p>費用：$<span th:text="${psych.psychFee}"></span> / 次</p>
+	<main class="m-wrap">
 
-    <p>
-        專長：
-        <span class="expertise-tag" th:each="e : ${psych.expertiseList}" th:text="${e}"></span>
-    </p>
+		<div class="m-head row" th:if="${psych != null}">
+			<div>
+				<span class="script">Therapist</span>
+				<h1 th:text="${psych.name} + ' 心理師'">王小明 心理師</h1>
+			</div>
+			<div class="head-actions">
+				<a class="btn btn-ghost" th:href="@{/search}">← 返回搜尋</a>
+			</div>
+		</div>
 
-    <h3>未來可預約日期</h3>
-<div class="calendar">
-    <div th:each="d : ${psych.availableDates}"
-         th:class="${d.isEmpty} ? 'calendar-day empty' : (${d.hasAvailability} ? 'calendar-day available' : 'calendar-day unavailable')">
+		<div class="detail-card" th:if="${psych != null}">
+			<div class="detail-top">
+				<img class="detail-photo"
+					th:src="${psych.profilePic != null && !psych.profilePic.isEmpty()} ? @{'/psych-images/' + ${psych.profilePic}} : @{/psych-images/noPsychPic.png}"
+					alt="大頭照">
 
-        <!-- 有空的格子：整格包成可點擊連結 -->
-        <a th:if="${!d.isEmpty && d.hasAvailability}"
-		   class="day-link"
-		   th:href="@{/member/orders/bookLookup(psychId=${psych.psychId}, slotDate=${d.date})}">
-		    <span class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></span>
-		    <span class="day-date" th:text="${d.date}"></span>
-		</a>
+				<div class="detail-meta">
+					<p>
+						性別:<span th:text="${psych.gender}"></span>
+						<span class="license" th:if="${psych.hasPracticeLicense}">已通過執業許可 ✓</span>
+					</p>
+					<p>證照:<span th:text="${psych.psychCertificate}"></span></p>
+					<p>地點:<span th:text="${psych.psychLoc}"></span></p>
+					<p>費用:$<span th:text="${psych.psychFee}"></span> / 次</p>
+					<p class="tags">
+						專長:
+						<span class="expertise-tag" th:each="e : ${psych.expertiseList}" th:text="${e}"></span>
+					</p>
 
-        <!-- 沒空的格子：純顯示，不可點擊 -->
-        <div th:if="${!d.isEmpty && !d.hasAvailability}">
-            <div class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></div>
-            <div th:text="${d.date}"></div>
-        </div>
+					<!-- 跳轉:以心理師名字當關鍵字,查看他的課程 / 專欄文章 -->
+					<div class="cross-links">
+						<a class="cross-btn cross-course"
+							th:href="@{/member/course/select_course(keyword=${psych.name}, orderBy='listedAt')}"
+							th:text="${psych.name} + ' 的課程'">Ta 的課程</a>
+						<a class="cross-btn cross-article"
+							th:href="@{/article(keyword=${psych.name}, dateFrom='', dateTo='')}"
+							th:text="${psych.name} + ' 的專欄文章'">Ta 的專欄文章</a>
+					</div>
+				</div>
+			</div>
 
-        <!-- 空白格：isEmpty=true，內部不渲染任何東西 -->
+			<p class="section-title-m">未來可預約日期</p>
+			<div class="calendar">
+				<div th:each="d : ${psych.availableDates}"
+					th:class="${d.isEmpty} ? 'calendar-day empty' : (${d.hasAvailability} ? 'calendar-day available' : 'calendar-day unavailable')">
 
-    </div>
-</div>
+					<!-- 有空的格子:整格包成可點擊連結 -->
+					<a th:if="${!d.isEmpty && d.hasAvailability}"
+					   class="day-link"
+					   th:href="@{/member/orders/bookLookup(psychId=${psych.psychId}, slotDate=${d.date})}">
+						<span class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></span>
+						<span class="day-date" th:text="${d.date}"></span>
+					</a>
 
-</div>
+					<!-- 沒空的格子:純顯示,不可點擊 -->
+					<div th:if="${!d.isEmpty && !d.hasAvailability}">
+						<div class="day-of-week" th:text="${#temporals.dayOfWeekName(d.date)}"></div>
+						<div th:text="${d.date}"></div>
+					</div>
 
-<div th:if="${errorMessage != null}" th:text="${errorMessage}" style="color:red;"></div>
+					<!-- 空白格:isEmpty=true,內部不渲染任何東西 -->
+				</div>
+			</div>
+		</div>
 
+		<div class="error-message" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+	<script src="/js/nav.js"></script>
 </body>
 </html>
