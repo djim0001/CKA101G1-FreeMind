@@ -2,6 +2,9 @@
 CREATE DATABASE IF NOT EXISTS dbtest; SET NAMES utf8mb4;
 USE dbtest;
 SET FOREIGN_KEY_CHECKS = 0;
+
+
+DROP TABLE IF EXISTS persistent_logins;
 DROP TABLE IF EXISTS consultation_reports;
 DROP TABLE IF EXISTS consultation_orders;
 DROP TABLE IF EXISTS consultation_slots;
@@ -122,6 +125,13 @@ INSERT INTO permissions VALUES
 -- ==========================================
 -- 4. 管理員權限 (admin_permissions)
 -- ==========================================
+CREATE TABLE persistent_logins (
+  username  VARCHAR(64) NOT NULL,
+  series    VARCHAR(64) PRIMARY KEY,
+  token     VARCHAR(64) NOT NULL,
+  last_used TIMESTAMP   NOT NULL
+);
+
 CREATE TABLE admin_permissions (
   admin_id INT NOT NULL,
   perm_id INT NOT NULL,
