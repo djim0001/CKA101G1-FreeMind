@@ -2,76 +2,211 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title>我的問題回報清單</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的問題回報｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 
 <style>
-	th:nth-child(1) { width: 12%; }  /* 活動名稱 */
-	th:nth-child(2) { width: 33%; }  /* 回報內容 */
-	th:nth-child(3) { width: 8%;  }  /* 處理狀態 */
-	th:nth-child(4) { width: 12%; }  /* 回報時間 */
-	th:nth-child(5) { width: 35%; }  /* 管理員回覆 */
+/* ---------- 頁首標題區 ---------- */
+.act-head { background: var(--bg-warm); padding: 2.2rem 0 1.4rem; }
+.act-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.act-head .crumb a:hover { color: var(--orange); }
+.act-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.act-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(1.9rem, 3.2vw, 2.5rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.act-head p { color: var(--ink-soft); margin: 0; max-width: 36rem; }
+
+.act-page { background: var(--bg-warm); padding: .4rem 0 3.4rem; }
+.act-wide { width: min(1180px, 92vw) !important; }
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+/* ---------- 分頁籤 ---------- */
+.tab-nav { display: flex; gap: .6rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.tab-nav a { text-decoration: none; }
+.tab-btn {
+	display: inline-flex; align-items: center; padding: .6rem 1.5rem;
+	background-color: #fff; color: var(--ink-soft); border: 1px solid var(--line);
+	border-radius: 999px; font-size: .9rem; font-weight: 500; cursor: pointer;
+	transition: all .18s; box-shadow: var(--shadow-sm);
+}
+.tab-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
+.tab-btn.active { background-color: var(--orange); color: #fff; border-color: var(--orange); font-weight: 700; }
+
+/* ---------- 表格 ---------- */
+.table-card {
+	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
+}
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th:nth-child(1) { width: 14%; }  /* 活動名稱 */
+th:nth-child(2) { width: 28%; }  /* 回報內容 */
+th:nth-child(3) { width: 10%; }  /* 處理狀態 */
+th:nth-child(4) { width: 14%; }  /* 回報時間 */
+th:nth-child(5) { width: 34%; }  /* 管理員回覆 */
+
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .92rem; font-weight: 700; padding: 1rem .5rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .8rem .5rem; font-size: .85rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: top; text-align: center;
+	word-break: break-word;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+
+.report-status {
+	display: inline-block; padding: .3rem .8rem; border-radius: 999px;
+	font-size: .78rem; font-weight: 500; white-space: nowrap;
+}
+.status-pending { color: #b8860b; background-color: #fff8e6; }
+.status-processing { color: #4F7B96; background-color: var(--blue-soft); }
+.status-done { color: #5A7A57; background-color: #eef4ec; }
+
+.reply-box { text-align: left; }
+.reply-box .reply-time { display: block; font-size: .76rem; color: var(--ink-soft); margin-top: .3rem; }
+.reply-empty { color: var(--ink-soft); opacity: .5; }
+
+.empty-state {
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; color: var(--ink); }
+
+/* ---------- 底部連結 ---------- */
+.bottom-links { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
+.bottom-links a {
+	display: inline-flex; align-items: center; gap: .4rem;
+	padding: .6rem 1.3rem; border-radius: 999px; border: 1px solid var(--line);
+	background: #fff; font-size: .88rem; color: var(--ink-soft); transition: all .18s;
+}
+.bottom-links a:hover { border-color: var(--orange); color: var(--orange-deep); background: var(--pink-soft); }
+
+@media (max-width: 800px) {
+	.table-card { overflow-x: auto; }
+	table { min-width: 760px; }
+}
 </style>
 </head>
 <body>
 
-    <h1>我的問題回報清單</h1>
-	
-	<p>Hello, <span sec:authentication="principal.member.name"></span>!</p>
-	
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-	<p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
-	
-	<!-- 分頁籤 -->
-	<div>
-	    <a th:href="@{/member/activity/report/myReports(tab='pending')}">
-	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold;' : ''">待處理</button>
-	    </a>
-	    <a th:href="@{/member/activity/report/myReports(tab='processing')}">
-	        <button type="button" th:style="${currentTab == 'processing'} ? 'font-weight:bold;' : ''">處理中</button>
-	    </a>
-	    <a th:href="@{/member/activity/report/myReports(tab='done')}">
-	        <button type="button" th:style="${currentTab == 'done'} ? 'font-weight:bold;' : ''">已處理</button>
-	    </a>
-	</div>
-	
-	<table border="1" style="table-layout: fixed; width: 100%;">
-        <tr>
-            <th>活動名稱</th>
-            <th>回報內容</th>
-            <th>處理狀態</th>
-            <th>回報時間</th>
-            <th>管理員回覆</th>
-        </tr>
-        <tr th:each="r : ${reportListData}">
-            <td th:text="${r.activity.activityName}"></td>
-            <td th:text="${r.reportContent}"></td>
-            <td th:text="${r.reportStatusText}"></td>
-            <td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
-            <td>
-                <div th:if="${r.repliedAt != null}">
-                    <span th:text="${r.replyContent}"></span><br>
-                    <small th:text="'(回覆於 ' + ${#temporals.format(r.repliedAt, 'yyyy/MM/dd HH:mm')} + ')'"></small>
-                </div>
-                <span th:if="${r.repliedAt == null}">—</span>
-            </td>
-        </tr>
-    </table>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
+	<!-- ================= 頁首標題 ================= -->
+	<section class="act-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span>
+				<a th:href="@{/member/activity/registration/myRegistrations}">我的報名紀錄</a><span>/</span>
+				<span style="opacity:1;color:var(--ink)">我的問題回報</span>
+			</div>
+			<h1>我的問題回報</h1>
+			<p>查看你回報過的問題，以及團隊的處理進度與回覆。</p>
+		</div>
+	</section>
 
-	<!-- 分頁按鈕 -->
-	<div th:if="${totalPages > 1}">
-	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/member/activity/report/myReports(currentPage=${i})}"
-	       th:text="${i}"
-	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
-	    </a>
-	</div>
+	<svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
+		<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
 
-	<br>
-    <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/registration/myRegistrations}">我的活動報名清單</a>｜<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">查看全部活動列表</a>
+	<!-- ================= 主體 ================= -->
+	<section class="act-page">
+		<div class="wrap act-wide">
 
+			<p th:if="${errorMessage}" th:utext="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:utext="${successMessage}" class="msg-success"></p>
 
+			<!-- 分頁籤 -->
+			<div class="tab-nav">
+				<a th:href="@{/member/activity/report/myReports(tab='pending')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'pending'} ? ' active' : ''">待處理</button>
+				</a>
+				<a th:href="@{/member/activity/report/myReports(tab='processing')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'processing'} ? ' active' : ''">處理中</button>
+				</a>
+				<a th:href="@{/member/activity/report/myReports(tab='done')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'done'} ? ' active' : ''">已處理</button>
+				</a>
+			</div>
+
+			<!-- 表格 -->
+			<div class="table-card" th:if="${!#lists.isEmpty(reportListData)}">
+				<table>
+					<thead>
+						<tr>
+							<th>活動名稱</th>
+							<th>回報內容</th>
+							<th>處理狀態</th>
+							<th>回報時間</th>
+							<th>管理員回覆</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="r : ${reportListData}">
+							<td th:text="${r.activity.activityName}"></td>
+							<td class="text-left" th:text="${r.reportContent}"></td>
+							<td>
+								<span class="report-status"
+									  th:classappend="${currentTab == 'pending'} ? ' status-pending' : (${currentTab == 'processing'} ? ' status-processing' : ' status-done')"
+									  th:text="${r.reportStatusText}"></span>
+							</td>
+							<td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+							<td class="reply-box">
+								<div th:if="${r.repliedAt != null}">
+									<span th:text="${r.replyContent}"></span>
+									<span class="reply-time" th:text="'回覆於 ' + ${#temporals.format(r.repliedAt, 'yyyy/MM/dd HH:mm')}"></span>
+								</div>
+								<span th:if="${r.repliedAt == null}" class="reply-empty">尚未回覆</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${#lists.isEmpty(reportListData)}">
+				<b>目前沒有任何問題回報紀錄</b>
+			</div>
+
+			<!-- 分頁 -->
+			<div th:if="${!#lists.isEmpty(reportListData)}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/member/activity/report/myReports}, ${qs})}"></div>
+
+			<!-- 底部連結 -->
+			<div class="bottom-links">
+				<a th:href="@{/member/dashboard}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+					我的療癒足跡
+				</a>
+				<a th:href="@{/member/activity/registration/myRegistrations}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+					我的活動報名清單
+				</a>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 22V12h6v10M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+					查看全部活動列表
+				</a>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script src="/js/nav.js"></script>
 </body>
 </html>

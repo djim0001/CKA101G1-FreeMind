@@ -36,7 +36,7 @@ public class ActivityReportController {
 	// 我的回報紀錄
 	@GetMapping("myReports")
 	public String myReports(@RequestParam(value = "tab", defaultValue = "pending") String tab,
-							@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+							@RequestParam(value = "page", defaultValue = "1") Integer page,
 							@AuthenticationPrincipal MemberUserDetails userDetails,
 	                        ModelMap model) {
 	    if (userDetails == null) {
@@ -44,6 +44,7 @@ public class ActivityReportController {
 	    }
 		
 		Member member = userDetails.getMember();
+		Integer currentPage = page;
 		
 		Integer status;
 		  if ("processing".equals(tab)) {
@@ -80,6 +81,7 @@ public class ActivityReportController {
 	    model.addAttribute("currentPage", currentPage);
 	    model.addAttribute("totalPages", totalPages);
 	    model.addAttribute("currentTab", tab);
+	    model.addAttribute("qs", "tab=" + tab);
 		return "front-end/member/activity/report/myReports";
 	}
 
@@ -87,6 +89,8 @@ public class ActivityReportController {
 	@PostMapping("submit")
 	public String submit(@RequestParam("activityId") Integer activityId,
 	                     @RequestParam("reportContent") String reportContent,
+	                     @RequestParam(value = "tab", required = false) String tab,
+	                     @RequestParam(value = "page", required = false) Integer page,
 	                     @AuthenticationPrincipal MemberUserDetails userDetails,
 	                     RedirectAttributes redirectAttributes) {
 	    if (userDetails == null) {
@@ -96,6 +100,11 @@ public class ActivityReportController {
 		
 		Member member = userDetails.getMember();
 		Activity activity = activitySvc.getOneActivity(activityId);
+		
+		String t = (tab != null) ? tab : "upcoming";
+	    int p = (page != null) ? page : 1;
+	    String redirectTarget = "redirect:/member/activity/registration/myRegistrations?tab=" + t + "&page=" + p;
+
 		
 		if (activity == null) {
 			redirectAttributes.addFlashAttribute("errorMessage", "活動不存在");
@@ -107,6 +116,6 @@ public class ActivityReportController {
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		return "redirect:/member/activity/report/myReports";
+		 return redirectTarget;
 	}
 }

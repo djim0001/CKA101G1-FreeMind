@@ -48,54 +48,62 @@ public class ActivityFollowController {
  
     @PostMapping("unfollow")
     public String unfollow(@RequestParam("activityId") Integer activityId,
-                           @AuthenticationPrincipal MemberUserDetails userDetails,
-                           RedirectAttributes redirectAttributes) {
+                              @RequestParam(value = "page", required = false) Integer page,
+                              @RequestParam(value = "redirectTo", required = false) String redirectTo,
+                              @AuthenticationPrincipal MemberUserDetails userDetails,
+                              RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
             return "redirect:/front-end/login";
         }
-    	
-    		Integer memberId = userDetails.getMember().getMemberId();
-    		try {
-    			followSvc.unfollow(memberId, activityId);
-    			redirectAttributes.addFlashAttribute("successMessage", "已取消關注");
-    		} catch (IllegalStateException e) {
-    			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-    		}
-    		 return "redirect:/member/activity/listOneActivity?activityId=" + activityId;
-    }
-    
 
-    // 我的關注清單
+        Integer memberId = userDetails.getMember().getMemberId();
+        try {
+            followSvc.unfollow(memberId, activityId);
+            redirectAttributes.addFlashAttribute("successMessage", "已取消關注");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        if ("myFollows".equals(redirectTo)) {
+            int p = (page != null) ? page : 1;
+            return "redirect:/member/activity/follow/myFollows?page=" + p;
+        }
+        return "redirect:/member/activity/listOneActivity?activityId=" + activityId;
+    }
+
+ // 我的關注清單
     @GetMapping("myFollows")
-    public String myFollows(@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
-    							@AuthenticationPrincipal MemberUserDetails userDetails,
-    							ModelMap model) {
+    public String myFollows(@RequestParam(value = "page", required = false) Integer page,
+        						@AuthenticationPrincipal MemberUserDetails userDetails,
+        						ModelMap model) {
         if (userDetails == null) {
             return "redirect:/front-end/login";
         }
-    	
-    		Integer memberId = userDetails.getMember().getMemberId();
-    		List<Activity> list = followSvc.myFollows(memberId);
-    		
-    		int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
-    	    if (currentPage < 1) {
-    	        currentPage = 1;
-    	    } else if (currentPage > totalPages) {
-    	        currentPage = totalPages;
-    	    }
 
-    	    int fromIndex = (currentPage - 1) * PAGE_SIZE;
-    	    int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
-    	    List<Activity> pageData = fromIndex < toIndex 
-    	            ? list.subList(fromIndex, toIndex) 
-    	            : new ArrayList<>();
+        Integer memberId = userDetails.getMember().getMemberId();
+        List<Activity> list = followSvc.myFollows(memberId);
 
-    	    model.addAttribute("followListData", pageData);
-    	    model.addAttribute("currentPage", currentPage);
-    	    model.addAttribute("totalPages", totalPages);
-    		
-    		return "front-end/member/activity/follow/myFollows";
+        int totalPages = PageUtils.calculateTotalPages(list.size(), PAGE_SIZE);
+
+        int currentPage = (page == null) ? 1 : page;
+        if (currentPage < 1) {
+            currentPage = 1;
+        } else if (totalPages > 0 && currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        int fromIndex = (currentPage - 1) * PAGE_SIZE;
+        int toIndex = Math.min(fromIndex + PAGE_SIZE, list.size());
+        List<Activity> pageData = fromIndex < toIndex
+                ? list.subList(fromIndex, toIndex)
+                : new ArrayList<>();
+
+        model.addAttribute("followListData", pageData);
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+
+        return "front-end/member/activity/follow/myFollows";
     }
     
 }

@@ -1,47 +1,296 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>活動分類列表</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>活動分類管理｜諮由自在 Free Mind</title>
+
+<style>
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--script: "Caveat", "OpenHuninn", cursive;
+	--display-en: "Baloo 2", sans-serif;
+}
+
+.admin-wide { width: min(1160px, 92vw) !important; max-width: 1160px; margin-inline: auto; }
+
+.page-head {
+	display: flex; align-items: flex-end; justify-content: space-between;
+	gap: 2rem; margin-bottom: 1.75rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line);
+	flex-wrap: wrap;
+}
+.page-head h1 {
+	margin: 0; color: var(--ink); font-family: var(--serif);
+	font-size: clamp(1.75rem, 3vw, 2.35rem); line-height: 1.3; letter-spacing: -.02em;
+}
+.page-head p { max-width: 31rem; margin: .3rem 0 0; color: var(--ink-soft); font-size: .92rem; }
+
+.page-function-nav { display: flex; gap: .35rem; flex-wrap: wrap; }
+.page-function-nav a {
+	display: inline-flex; align-items: center; justify-content: center;
+	min-height: 44px; padding: .55rem 1.2rem;
+	border: 1px solid transparent; border-radius: 999px;
+	color: var(--ink-soft); background: transparent;
+	font-size: .88rem; font-weight: 500; white-space: nowrap;
+	transition: all .16s ease;
+}
+.page-function-nav a:hover { color: var(--ink); background: var(--bg-warm); }
+.page-function-nav a.active {
+	border-color: rgba(194, 217, 237, .9); color: var(--ink); background: var(--blue-soft); font-weight: 700;
+}
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+.two-col-layout { display: grid; grid-template-columns: 40fr 60fr; gap: 1.6rem; align-items: start; }
+.left-col { display: flex; flex-direction: column; gap: 1.6rem; }
+
+.section-eyebrow {
+	font-size: .72rem; letter-spacing: .16em; text-transform: uppercase;
+	color: var(--orange); font-weight: 600; margin-bottom: .35rem; display: block;
+}
+.section-title { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; color: var(--ink); margin: 0; }
+.section-block-head { margin-bottom: 1.1rem; }
+
+.filter-card, .add-card {
+	background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md);
+	padding: 1.4rem 1.5rem; box-shadow: var(--shadow-sm);
+	overflow: hidden;
+}
+
+.filter-field { display: flex; flex-direction: column; gap: .35rem; font-size: .82rem; color: var(--ink-soft); }
+.filter-field input {
+	width: 100%; height: 42px; padding: 0 .8rem; border: 1px solid var(--line); border-radius: 10px;
+	background: var(--bg-warm); font-family: inherit; font-size: .88rem; color: var(--ink);
+}
+.filter-field input:focus, .filter-field textarea:focus {
+	outline: none;
+	border-color: var(--orange);
+	background: #fff;
+	box-shadow: 0 0 0 2px rgba(245, 142, 107, .15);
+}
+.filter-field input, .filter-field textarea { box-sizing: border-box; }
+.filter-actions { display: flex; gap: .6rem; }
+
+@media (max-width: 860px) {
+	.two-col-layout { grid-template-columns: 1fr; }
+}
+.btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+	height: 42px; padding: 0 1.6rem; border-radius: 999px; font-weight: 500; font-size: .9rem;
+	transition: all .18s; border: none; cursor: pointer; font-family: inherit; text-decoration: none;
+}
+.btn-primary { background: var(--orange); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--orange-deep); }
+.btn-outline { border: 1.6px solid var(--ink); color: var(--ink); background: transparent; }
+.btn-outline:hover { background: var(--ink); color: #fff; }
+
+.list-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
+.list-count { font-size: .9rem; color: var(--ink-soft); }
+.list-count b { color: var(--ink); font-weight: 700; }
+
+.table-card {
+	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
+}
+table { width: 100%; border-collapse: collapse; }
+th:nth-child(1) { width: 12%; }
+th:nth-child(2) { width: 58%; }
+th:nth-child(3) { width: 15%; }
+th:nth-child(4) { width: 15%; }
+
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .98rem; font-weight: 700; padding: 1.1rem .6rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .85rem .6rem; font-size: .92rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+td:nth-child(2) { text-align: left; }
+
+.btn-mini {
+	display: inline-block; padding: .4rem .9rem; border-radius: 999px; font-size: .84rem;
+	white-space: nowrap; cursor: pointer; transition: all .18s; font-family: var(--sans);
+	background: #fff; color: var(--ink-soft); border: 1px solid var(--line);
+}
+.btn-mini:hover { background-color: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-mini.danger:hover { background-color: #c0392b; border-color: #c0392b; }
+
+.empty-state {
+	background: var(--white); border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; color: var(--ink); }
+
+/* ---------- 彈窗 ---------- */
+.op-modal-overlay {
+	display: none; position: fixed; inset: 0;
+	background: rgba(58,75,83,.35); backdrop-filter: blur(6px);
+	z-index: 500; align-items: center; justify-content: center;
+	opacity: 0; transition: opacity .2s;
+}
+.op-modal-overlay.show { display: flex; opacity: 1; }
+.op-modal-panel {
+	background: #fff; border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md); width: 90%; max-width: 420px; padding: 1.8rem;
+	transform: translateY(10px); transition: transform .2s;
+	text-align: left; font-family: var(--sans);
+}
+.op-modal-overlay.show .op-modal-panel { transform: translateY(0); }
+.op-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.op-modal-header span { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.op-modal-close { background: none; border: none; font-size: 22px; color: var(--ink-soft); cursor: pointer; line-height: 1; }
+.op-modal-close:hover { color: var(--ink); }
+.op-modal-panel input[type="text"] {
+	width: 100%; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .88rem; color: var(--ink); margin-bottom: .9rem;
+}
+.op-modal-panel input:focus { outline: none; border-color: var(--orange); background: #fff; }
+.op-modal-panel p.field-label { font-size: .84rem; color: var(--ink); margin: 0 0 .4rem; }
+.op-modal-submit { width: 100%; height: 46px; display: inline-flex; align-items: center; justify-content: center; font-size: .92rem; border: none; cursor: pointer; border-radius: 999px; font-family: inherit; }
+</style>
 </head>
 <body>
 
-    <h1>活動分類列表</h1>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-	<p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-	<p th:if="${success}" th:utext="${success}" style="color:blue;"></p>
+	<main id="main-content">
+		<div class="wrap admin-wide" style="padding-top: clamp(1.25rem, 2vw, 1.75rem); padding-bottom: 4rem;">
 
-	<form th:action="@{/admin/activityCat/searchByName}" method="post">
-	    <input type="text" name="keyword" th:value="${keyword}" placeholder="輸入分類名稱關鍵字">
-	    <button type="submit">搜尋</button>
-	</form>
+			<div class="page-head">
+				<div>
+					<h1>活動分類管理</h1>
+					<p>新增、搜尋、修改或刪除揪團活動的分類項目。</p>
+				</div>
+				<nav class="page-function-nav" aria-label="活動管理">
+					<a th:href="@{/admin/activity/listActivities_ByCompositeQuery}">活動列表</a>
+					<a class="active" th:href="@{/admin/activityCat/listAllActivityCat}">活動分類</a>
+					<a th:href="@{/admin/activity/report/list}">問題回報</a>
+				</nav>
+			</div>
 
-    <table>
-        <tr>
-            <th>分類編號</th>
-            <th>分類名稱</th>
-        </tr>
-        <tr th:each="cat : ${activityCatListData}">  <!-- 把清單裡每筆資料依序取出來，取名叫cat -->
-            <td th:text="${cat.activityCatId}"></td>
-            <td th:text="${cat.activityCatName}"></td>
-            <td>
-			    <form th:action="@{/admin/activityCat/getOne_For_Update}" method="post">
-			        <input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
-			        <button type="submit">修改</button>
-			    </form>
-			</td>
-			<td>
-			    <form th:action="@{/admin/activityCat/delete}" method="post">
-			        <input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
-			        <button type="submit" onclick="return confirm('確定要刪除這筆分類嗎？')">刪除</button>
-			    </form>
-			</td>
-        </tr>
-    </table>
-	
-	<br>
-	<a th:href="@{/admin/activityCat/addActivityCat}">新增活動分類</a>
-	<br>
-	<a th:href="@{/admin/activity/activityAdminIndex}">回後台活動導覽頁</a>
+			<p th:if="${success}" th:text="${success}" class="msg-success"></p>
+			<p th:if="${errorMessage}" th:utext="${errorMessage}" class="msg-error"></p>
+
+			<!-- 左右兩欄：左邊(搜尋+新增) / 右邊(分類列表) -->
+			<div class="two-col-layout">
+			
+				<!-- 左欄 -->
+				<div class="left-col">
+					<!-- 搜尋分類卡片 -->
+					<div class="filter-card">
+						<div class="section-block-head">
+							<span class="section-eyebrow">Find Category</span>
+							<h2 class="section-title">搜尋分類</h2>
+						</div>
+						<form th:action="@{/admin/activityCat/searchByName}" method="post">
+							<div class="filter-field" style="margin-bottom:1rem;">
+								<label>分類名稱</label>
+								<input type="text" name="keyword" placeholder="輸入分類名稱查詢" th:value="${keyword}">
+							</div>
+							<div class="filter-actions" style="width:100%;">
+								<button type="submit" class="btn btn-primary" style="flex:1;">查詢</button>
+								<a class="btn btn-outline" style="flex:1;" th:href="@{/admin/activityCat/listAllActivityCat}" href="#">清除</a>
+							</div>
+						</form>
+					</div>
+			
+					<!-- 新增分類卡片 -->
+					<div class="add-card">
+						<div class="section-block-head">
+							<span class="section-eyebrow">Add Category</span>
+							<h2 class="section-title">新增分類</h2>
+						</div>
+						<form th:action="@{/admin/activityCat/insert}" method="post">
+							<div class="filter-field" style="margin-bottom:1rem;">
+								<label>分類名稱</label>
+								<input type="text" name="activityCatName" placeholder="請輸入分類名稱" required maxlength="20">
+							</div>
+							<button type="submit" class="btn btn-primary" style="width:100%;">＋ 新增分類</button>
+						</form>
+					</div>
+				</div>
+			
+				<!-- 右欄：分類列表 -->
+				<div class="right-col">
+					<div class="list-head">
+						<div class="section-block-head" style="margin-bottom:0;">
+							<span class="section-eyebrow">All Categories</span>
+							<h2 class="section-title">分類列表</h2>
+						</div>
+						<div class="list-count">
+							共 <b th:text="${activityCatListData != null ? #lists.size(activityCatListData) : 0}">0</b> 筆分類
+						</div>
+					</div>
+			
+					<div class="table-card" th:if="${activityCatListData != null and !activityCatListData.isEmpty()}">
+						<table>
+							<thead>
+								<tr>
+									<th>編號</th>
+									<th>分類名稱</th>
+									<th></th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="cat : ${activityCatListData}">
+									<td th:text="${cat.activityCatId}"></td>
+									<td th:text="${cat.activityCatName}"></td>
+									<td>
+										<button type="button" class="btn-mini"
+												th:onclick="'openOpModal(\'editModal' + ${cat.activityCatId} + '\')'">修改</button>
+									</td>
+									<td>
+										<form th:action="@{/admin/activityCat/delete}" method="post"
+											  onsubmit="return confirm('確定要刪除這個分類嗎？')">
+											<input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
+											<button type="submit" class="btn-mini danger">刪除</button>
+										</form>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+			
+					<div class="empty-state" th:if="${activityCatListData == null or activityCatListData.isEmpty()}">
+						<b>查無分類資料</b>
+					</div>
+				</div>
+			</div>
+
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<script>
+	function openOpModal(id) {
+		document.getElementById(id).classList.add('show');
+	}
+	function closeOpModal(id) {
+		document.getElementById(id).classList.remove('show');
+	}
+	function closeOpModalOutside(e, overlay) {
+		if (e.target === overlay) overlay.classList.remove('show');
+	}
+	</script>
 </body>
 </html>

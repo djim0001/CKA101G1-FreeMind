@@ -2,532 +2,367 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <title>我的活動報名清單</title>
-    <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的報名紀錄｜諮由自在 Free Mind</title>
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-        background-color: #f5f5f5;
-        color: #333;
-        line-height: 1.6;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 30px 20px;
-    }
+<style>
+/* ---------- 頁首標題區 ---------- */
+.act-head { background: var(--bg-warm); padding: 2.2rem 0 1.4rem; }
+.act-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.act-head .crumb a:hover { color: var(--orange); }
+.act-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.act-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(1.9rem, 3.2vw, 2.5rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.act-head p { color: var(--ink-soft); margin: 0; max-width: 36rem; }
 
-    .page-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-        padding-bottom: 16px;
-        border-bottom: 2px solid #e8b4b4;
-    }
+.act-page { background: var(--bg-warm); padding: .4rem 0 3.4rem; }
+.act-wide { width: min(1320px, 92vw) !important; }
 
-    .page-header h1 {
-        font-size: 28px;
-        font-weight: 700;
-        color: #4a3e3e;
-    }
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
 
-    .hello-text {
-        margin-bottom: 20px;
-        color: #7a6b6b;
-        font-size: 14px;
-    }
+/* ---------- 分頁籤 ---------- */
+.tab-nav { display: flex; gap: .6rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.tab-nav a { text-decoration: none; }
+.tab-btn {
+	display: inline-flex; align-items: center; padding: .6rem 1.5rem;
+	background-color: #fff; color: var(--ink-soft); border: 1px solid var(--line);
+	border-radius: 999px; font-size: .9rem; font-weight: 500; cursor: pointer;
+	transition: all .18s; box-shadow: var(--shadow-sm);
+}
+.tab-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
+.tab-btn.active { background-color: var(--orange); color: #fff; border-color: var(--orange); font-weight: 700; }
 
-    .msg-error {
-        color: #c0392b;
-        background-color: #fdecea;
-        padding: 10px 16px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-    }
+/* ---------- 表格 ---------- */
+.table-card {
+	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
+}
+table { width: 100%; border-collapse: collapse; }
+th:nth-child(1) { width: 13%; }  /* 活動名稱 */
+th:nth-child(2) { width: 12%; }  /* 活動時間 */
+th:nth-child(3) { width: 10%; }  /* 報名時間 */
+th:nth-child(4) { width: 21%; }  /* 報名動機 */
+th:nth-child(5) { width: 11%; }  /* 報名狀態 */
+th:nth-child(6) { width: 8%; }   /* 活動狀態 */
+th:nth-child(7) { width: 8%; }   /* 我的評價 */
+th:nth-child(8) { width: 8%; }   /* 問題回報 */
+th:nth-child(9) { width: 9%; }   /* 操作按鈕 */
 
-    .msg-success {
-        color: #2e7d32;
-        background-color: #e8f5e9;
-        padding: 10px 16px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-    }
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .92rem; font-weight: 700; padding: 1rem .5rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .8rem .5rem; font-size: .85rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+.text-left { text-align: left; }
+.no-wrap { white-space: nowrap; }
 
-    /* 分頁籤 */
-    .tab-nav {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 24px;
-    }
+.activity-link { color: var(--ink); transition: color .18s; }
+.activity-link:hover { color: var(--orange-deep); text-decoration: underline; }
 
-    .tab-nav a {
-        text-decoration: none;
-    }
+.status-badge {
+	display: inline-block; padding: .3rem .8rem; border-radius: 999px;
+	font-size: .78rem; font-weight: 500; border: 1px solid; white-space: nowrap;
+}
+.status-reported { color: var(--ink-soft); border-color: var(--line); background-color: var(--bg-warm); }
+.status-none { color: var(--ink-soft); opacity: .5; }
 
-    .tab-btn {
-        display: inline-block;
-        padding: 8px 22px;
-        background-color: #fff;
-        color: #7a6b6b;
-        border: 1px solid #e8d5d5;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
+/* ---------- 操作按鈕群組 ---------- */
+.action-stack { display: flex; flex-direction: column; align-items: stretch; gap: .4rem; }
+.btn-mini {
+	display: block; width: 100%; padding: .45rem .6rem; border-radius: 8px; font-size: .78rem;
+	white-space: nowrap; cursor: pointer; transition: all .18s; font-family: var(--sans);
+	background: #fff; color: var(--ink-soft); border: 1px solid var(--line); text-align: center;
+}
+.btn-mini:hover { background-color: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-mini.danger:hover { background-color: #c0392b; border-color: #c0392b; }
+.btn-mini.accent:hover { background-color: var(--orange); border-color: var(--orange); }
+.btn-mini.info:hover { background-color: #4F7B96; border-color: #4F7B96; }
 
-    .tab-btn:hover {
-        background-color: #fbf2f2;
-    }
+.empty-state {
+	background: #fff; border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; color: var(--ink); }
 
-    .tab-btn.active {
-        background-color: #e8b4b4;
-        color: #fff;
-        border-color: #e8b4b4;
-        font-weight: 700;
-    }
+/* ---------- 操作彈窗 ---------- */
+.op-modal-overlay {
+	display: none; position: fixed; inset: 0;
+	background: rgba(58,75,83,.35); backdrop-filter: blur(6px);
+	z-index: 500; align-items: center; justify-content: center;
+	opacity: 0; transition: opacity .2s;
+}
+.op-modal-overlay.show { display: flex; opacity: 1; }
+.op-modal-panel {
+	background: #fff; border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md); width: 90%; max-width: 420px; padding: 1.8rem;
+	transform: translateY(10px); transition: transform .2s;
+	text-align: left; font-family: var(--sans);
+}
+.op-modal-overlay.show .op-modal-panel { transform: translateY(0); }
+.op-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.op-modal-header span { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.op-modal-close { background: none; border: none; font-size: 22px; color: var(--ink-soft); cursor: pointer; line-height: 1; }
+.op-modal-close:hover { color: var(--ink); }
+.op-modal-panel select, .op-modal-panel input[type="text"], .op-modal-panel textarea {
+	width: 100%; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .88rem; color: var(--ink); margin-bottom: .9rem;
+}
+.op-modal-panel textarea { min-height: 110px; resize: vertical; line-height: 1.7; }
+.op-modal-panel select:focus, .op-modal-panel input:focus, .op-modal-panel textarea:focus { outline: none; border-color: var(--orange); background: #fff; }
+.op-modal-panel p.field-label { font-size: .84rem; color: var(--ink); margin: 0 0 .4rem; }
+.op-modal-submit { width: 100%; height: 46px; display: inline-flex; align-items: center; justify-content: center; font-size: .92rem; border: none; cursor: pointer; border-radius: 999px; font-family: inherit; }
 
-    /* 表格卡片 */
-    .table-card {
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-        margin-bottom: 24px;
-    }
+/* ---------- 底部連結 ---------- */
+.bottom-links { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
+.bottom-links a {
+	display: inline-flex; align-items: center; gap: .4rem;
+	padding: .6rem 1.3rem; border-radius: 999px; border: 1px solid var(--line);
+	background: #fff; font-size: .88rem; color: var(--ink-soft); transition: all .18s;
+}
+.bottom-links a:hover { border-color: var(--orange); color: var(--orange-deep); background: var(--pink-soft); }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    thead th {
-        background-color: #fbf2f2;
-        color: #4a3e3e;
-        font-size: 15px;
-        font-weight: 600;
-        padding: 18px 10px;
-        text-align: center;
-        white-space: nowrap;
-        border-bottom: 2px solid #f2dddd;
-    }
-
-    tbody td {
-        padding: 14px 10px;
-        font-size: 14px;
-        text-align: center;
-        border-bottom: 1px solid #f2eeee;
-        vertical-align: middle;
-    }
-
-    tbody tr:hover {
-        background-color: #fdf7f7;
-    }
-
-    /* 動作按鈕（取消報名/填寫評論/回報問題） */
-	.btn-action {
-	    display: inline-block;
-	    padding: 6px 14px;
-	    margin: 3px 0;
-	    background-color: #fff;
-	    border-radius: 20px;
-	    font-size: 13px;
-	    white-space: nowrap;
-	    cursor: pointer;
-	    transition: all 0.2s;
-	    border: 1px solid;
-	}
-	
-	.btn-cancel {
-	    color: #a67c7c;
-	    border-color: #e8b4b4;
-	}
-	.btn-cancel:hover,
-	.btn-cancel.is-open {
-	    background-color: #e8b4b4;
-	    border-color: #e8b4b4;
-	    color: #fff;
-	}
-	
-	.btn-review {
-	    color: #a67c7c;
-	    border-color: #d9a876;
-	}
-	.btn-review:hover,
-	.btn-review.is-open {
-	    background-color: #f0c29a;
-	    border-color: #f0c29a;
-	    color: #fff;
-	}
-	
-	.btn-report {
-	    color: #a67c7c;
-	    border-color: #c3aed6;
-	}
-	.btn-report:hover,
-	.btn-report.is-open {
-	    background-color: #c3aed6;
-	    border-color: #c3aed6;
-	    color: #fff;
-	}
-	
-	.action-stack {
-	    display: flex;
-	    flex-direction: column;
-	    align-items: center;
-	    gap: 4px;
-	}
-
-    /* 展開的小表單 */
-    .inline-form {
-        margin-top: 10px;
-        padding: 14px;
-        background-color: #fbf2f2;
-        border-radius: 8px;
-        text-align: left;
-        font-size: 13px;
-    }
-
-    .inline-form select,
-    .inline-form input[type="text"],
-    .inline-form textarea {
-        padding: 6px 10px;
-        border: 1px solid #e8d5d5;
-        border-radius: 6px;
-        font-size: 13px;
-        outline: none;
-        margin: 4px 0;
-    }
-
-    .inline-form select:focus,
-    .inline-form input:focus,
-    .inline-form textarea:focus {
-        border-color: #e8b4b4;
-    }
-
-    .inline-form textarea {
-        width: 100%;
-        box-sizing: border-box;
-        resize: vertical;
-    }
-
-    .inline-form button[type="submit"] {
-        display: inline-block;
-        padding: 6px 18px;
-        margin-top: 6px;
-        background-color: #e8b4b4;
-        color: #fff;
-        border: none;
-        border-radius: 20px;
-        font-size: 13px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-
-    .inline-form button[type="submit"]:hover {
-        background-color: #d39393;
-    }
-
-    /* 已回報問題 / 無評價 等狀態文字 */
-    .status-badge {
-        display: inline-block;
-        width: 90px;
-        text-align: center;
-        padding: 4px 0;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        border: 1px solid;
-    }
-    .status-reported {
-        color: #7a6b6b;
-        border-color: #d9c4c4;
-        background-color: #fbf2f2;
-    }
-    .status-none {
-        color: #bbb;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-        color: #999;
-        font-size: 16px;
-    }
-
-    .footer-links {
-        text-align: center;
-        font-size: 14px;
-    }
-
-    .footer-links a {
-        color: #7a6b6b;
-        text-decoration: none;
-    }
-
-    .footer-links a:hover {
-        color: #e8b4b4;
-        text-decoration: underline;
-    }
-    
-	/*頁碼 */
-	.pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-	}
-	
-	.pagination a {
-	    display: inline-block;
-	    padding: 8px 14px;
-	    font-size: 14px;
-	    font-weight: 500;
-	    border-radius: 6px;
-	    border: 1px solid #f2dddd;
-	    background-color: #fbf2f2;
-	    color: #7a6b6b;
-	    text-decoration: none;
-	    transition: all 0.2s;
-	}
-	
-	.pagination a:hover {
-	    background-color: #e8b4b4;
-	    color: #fff;
-	    border-color: #e8b4b4;
-	}
-	
-	.pagination a.active {
-	    font-weight: bold;
-	    background-color: #e8b4b4;
-	    color: #fff;
-	    border-color: #e8b4b4;
-	}
-	
-	.activity-link {
-    color: #333;
-    text-decoration: none;
-	}
-	.activity-link:hover {
-	    color: #e8b4b4;
-	    text-decoration: underline;
-	}
-	
-	.text-left {
-    text-align: left;
-	}
-	
-	.no-wrap {
-    white-space: nowrap;
-	}
-    </style>
+@media (max-width: 1000px) {
+	.table-card { overflow-x: auto; }
+	table { min-width: 1100px; }
+}
+</style>
 </head>
 <body>
-<div class="container">
 
-    <div class="page-header">
-        <h1>我的活動報名清單</h1>
-    </div>
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
 
-    <p class="hello-text">Hello, <span sec:authentication="principal.member.name"></span>!</p>
+	<!-- ================= 頁首標題 ================= -->
+	<section class="act-head">
+		<div class="wrap">
+			<div class="crumb">
+				<a th:href="@{/}" href="/">首頁</a><span>/</span>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">揪團活動</a><span>/</span>
+				<span style="opacity:1;color:var(--ink)">我的報名紀錄</span>
+			</div>
+			<h1>我的報名紀錄</h1>
+			<p>看看有哪些活動在等你，管理報名狀態、留下評價，或回報問題。</p>
+		</div>
+	</section>
 
-    <p th:if="${errorMessage}" th:text="${errorMessage}" class="msg-error"></p>
-    <p th:if="${successMessage}" th:text="${successMessage}" class="msg-success"></p>
 
-    <!-- 分頁籤 -->
-    <div class="tab-nav">
-        <a th:href="@{/member/activity/registration/myRegistrations(tab='upcoming')}">
-            <button type="button" class="tab-btn" th:classappend="${currentTab == 'upcoming'} ? ' active' : ''">即將參加</button>
-        </a>
-        <a th:href="@{/member/activity/registration/myRegistrations(tab='pending')}">
-            <button type="button" class="tab-btn" th:classappend="${currentTab == 'pending'} ? ' active' : ''">待審核</button>
-        </a>
-        <a th:href="@{/member/activity/registration/myRegistrations(tab='history')}">
-            <button type="button" class="tab-btn" th:classappend="${currentTab == 'history'} ? ' active' : ''">歷史紀錄</button>
-        </a>
-    </div>
+	<!-- ================= 主體 ================= -->
+	<section class="act-page">
+		<div class="wrap act-wide">
 
-    <div class="table-card" th:if="${!#lists.isEmpty(regisListData)}">
-        <table>
-            <thead>
-                <tr>
-                    <th>活動名稱</th>
-                    <th>活動時間</th>
-                    <th>報名時間</th>
-                    <th>報名動機</th>
-                    <th>報名狀態</th>
-                    <th>活動狀態</th>
-                    <th>我的評價</th>
-                    <th>問題回報</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-			  <tr th:each="r : ${regisListData}">
-			        <td>
-					    <a class="activity-link" th:href="@{/member/activity/listOneActivity(activityId=${r.activity.activityId})}" th:text="${r.activity.activityName}"></a>
-					</td>
-			        <td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-			        <td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
-			        <td class="text-left" th:text="${r.motivation}"></td>
-			        <td class="no-wrap">
-			            <span th:text="${r.regisStatusText}"></span>
-			            <span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
-			                <br><small>（<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）</small>
-			            </span>
-			        </td>
-			        <td th:text="${r.activity.memberViewStatusText}"></td>
-                    <td>
-                        <span th:if="${r.reviewedAt != null}"
-                              th:text="'★' + ${r.rating}"
-                              th:title="${r.reviewContent}"></span>
-                        <span th:if="${r.reviewedAt == null}" class="status-none">—</span>
-                    </td>
-                    <td>
-                        <span th:if="${r.regisStatus == 1 && r.activity.ended && #maps.containsKey(reportedActivityMap, r.activity.activityId)}"
-                              th:title="${reportedActivityMap.get(r.activity.activityId)}"
-                              class="status-badge status-reported">已回報問題</span>
-                        <span th:unless="${r.regisStatus == 1 && r.activity.ended}" class="status-none">—</span>
-                    </td>
-                    <td>
-					    <div class="action-stack">
-					        <div th:if="${r.cancellable}">
-					            <button type="button" class="btn-action btn-cancel" th:id="'cancelBtn' + ${r.regisId}"
-					                    th:onclick="'toggleCancelForm(' + ${r.regisId} + ')'">取消報名</button>
-					
-					            <div class="inline-form" th:id="'cancelForm' + ${r.regisId}" style="display:none;">
-					                <form th:action="@{/member/activity/registration/cancel}" method="post"
-					                      onsubmit="return confirm('確定要取消報名嗎？')">
-					                    <input type="hidden" name="regisId" th:value="${r.regisId}">
-					                    <select name="cancelReason">
-					                        <option value="0">行程衝突</option>
-					                        <option value="1">身體不適</option>
-					                        <option value="2">其他</option>
-					                    </select>
-					                    <input type="text" name="cancelNote" placeholder="補充說明(選填)">
-					                    <br>
-					                    <button type="submit">確認取消</button>
-					                </form>
-					            </div>
-					        </div>
-					
-					        <div th:if="${r.regisStatus == 1 && r.activity.ended && r.reviewedAt == null}">
-					            <button type="button" class="btn-action btn-review" th:id="'reviewBtn' + ${r.regisId}"
-					                    th:onclick="'toggleReviewForm(' + ${r.regisId} + ')'">填寫評論</button>
-					
-					            <div class="inline-form" th:id="'reviewForm' + ${r.regisId}" style="display:none;">
-					                <form th:action="@{/member/activity/registration/review}" method="post"
-					                      onsubmit="return confirm('確定要送出評論嗎？')">
-					                    <input type="hidden" name="regisId" th:value="${r.regisId}">
-					
-					                    評分(滿分5分):
-					                    <select name="rating">
-					                        <option value="1">1</option>
-					                        <option value="2">2</option>
-					                        <option value="3">3</option>
-					                        <option value="4">4</option>
-					                        <option value="5">5</option>
-					                    </select>
-					                    <br>
-					                    <textarea name="reviewContent" rows="6" placeholder="分享活動心得" required></textarea>
-					                    <br>
-					                    <button type="submit">送出評論</button>
-					                </form>
-					            </div>
-					        </div>
-					
-					        <div th:if="${r.regisStatus == 1 && r.activity.ended && !#maps.containsKey(reportedActivityMap, r.activity.activityId)}">
-					            <button type="button" class="btn-action btn-report" th:id="'reportBtn' + ${r.regisId}"
-					                    th:onclick="'toggleReportForm(' + ${r.regisId} + ')'">回報問題</button>
-					
-					            <div class="inline-form" th:id="'reportForm' + ${r.regisId}" style="display:none;">
-					                <form th:action="@{/member/activity/report/submit}" method="post"
-					                      onsubmit="return confirm('確定要送出問題回報嗎？')">
-					                    <input type="hidden" name="activityId" th:value="${r.activity.activityId}">
-					                    <textarea name="reportContent" rows="4" placeholder="請描述遇到的問題" required></textarea>
-					                    <br>
-					                    <button type="submit">送出回報</button>
-					                </form>
-					            </div>
-					        </div>
-					    </div>
-					</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    
-    <!-- 分頁按鈕列 -->
-	<div th:if="${totalPages > 1}" class="pagination">
-	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/member/activity/registration/myRegistrations(tab=${currentTab}, currentPage=${i})}"
-	       th:text="${i}"
-	       th:classappend="${i == currentPage} ? ' active' : ''">
-	    </a>
-	</div>
+			<p th:if="${errorMessage}" th:text="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:text="${successMessage}" class="msg-success"></p>
 
-    <div class="empty-state" th:if="${#lists.isEmpty(regisListData)}">
-        <span th:if="${currentTab == 'upcoming'}">目前沒有即將參加的活動。</span>
-        <span th:if="${currentTab == 'pending'}">目前沒有待審核的報名。</span>
-        <span th:if="${currentTab == 'history'}">目前沒有歷史紀錄。</span>
-    </div>
+			<!-- 分頁籤 -->
+			<div class="tab-nav">
+				<a th:href="@{/member/activity/registration/myRegistrations(tab='upcoming')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'upcoming'} ? ' active' : ''">即將參加</button>
+				</a>
+				<a th:href="@{/member/activity/registration/myRegistrations(tab='pending')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'pending'} ? ' active' : ''">待審核</button>
+				</a>
+				<a th:href="@{/member/activity/registration/myRegistrations(tab='history')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'history'} ? ' active' : ''">歷史紀錄</button>
+				</a>
+			</div>
 
-    <div class="footer-links">
-        <a th:href="@{/}">回首頁</a>｜<a th:href="@{/member/dashboard}">我的療癒足跡</a>｜<a th:href="@{/member/activity/report/myReports}">我的問題回報</a>｜<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">查看全部活動列表</a>
-    </div>
+			<!-- 表格 -->
+			<div class="table-card" th:if="${!#lists.isEmpty(regisListData)}">
+				<table>
+					<thead>
+						<tr>
+							<th>活動名稱</th>
+							<th>活動時間</th>
+							<th>報名時間</th>
+							<th>報名動機</th>
+							<th>報名狀態</th>
+							<th>活動狀態</th>
+							<th>我的評價</th>
+							<th>問題回報</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="r : ${regisListData}">
+							<td>
+								<a class="activity-link" th:href="@{/member/activity/listOneActivity(activityId=${r.activity.activityId})}" th:text="${r.activity.activityName}"></a>
+							</td>
+							<td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+							<td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
+							<td class="text-left" th:text="${r.motivation}"></td>
+							<td class="no-wrap">
+								<span th:text="${r.regisStatusText}"></span>
+								<span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
+									<br><small>（<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）</small>
+								</span>
+							</td>
+							<td th:text="${r.activity.memberViewStatusText}"></td>
+							<td>
+								<span th:if="${r.reviewedAt != null}"
+									  th:text="'★' + ${r.rating}"
+									  th:title="${r.reviewContent}"></span>
+								<span th:if="${r.reviewedAt == null}" class="status-none">—</span>
+							</td>
+							<td>
+								<span th:if="${r.regisStatus == 1 && r.activity.ended && #maps.containsKey(reportedActivityMap, r.activity.activityId)}"
+									  th:title="${reportedActivityMap.get(r.activity.activityId)}"
+									  class="status-badge status-reported">已回報問題</span>
+								<span th:unless="${r.regisStatus == 1 && r.activity.ended}" class="status-none">—</span>
+							</td>
+							<td>
+								<div class="action-stack">
+									<button th:if="${r.cancellable}" type="button" class="btn-mini danger"
+											th:onclick="'openOpModal(\'cancelModal' + ${r.regisId} + '\')'">取消報名</button>
 
-</div>
+									<button th:if="${r.regisStatus == 1 && r.activity.ended && r.reviewedAt == null}"
+											type="button" class="btn-mini accent"
+											th:onclick="'openOpModal(\'reviewModal' + ${r.regisId} + '\')'">填寫評論</button>
 
-<script>
-function toggleCancelForm(regisId) {
-    const form = document.getElementById('cancelForm' + regisId);
-    const button = document.getElementById('cancelBtn' + regisId);
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.classList.add('is-open');
-    } else {
-        form.style.display = 'none';
-        button.classList.remove('is-open');
-    }
-}
+									<button th:if="${r.regisStatus == 1 && r.activity.ended && !#maps.containsKey(reportedActivityMap, r.activity.activityId)}"
+											type="button" class="btn-mini info"
+											th:onclick="'openOpModal(\'reportModal' + ${r.regisId} + '\')'">回報問題</button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-function toggleReviewForm(regisId) {
-    const form = document.getElementById('reviewForm' + regisId);
-    const button = document.getElementById('reviewBtn' + regisId);
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.classList.add('is-open');
-    } else {
-        form.style.display = 'none';
-        button.classList.remove('is-open');
-    }
-}
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${#lists.isEmpty(regisListData)}">
+				<b th:if="${currentTab == 'upcoming'}">目前沒有即將參加的活動</b>
+				<b th:if="${currentTab == 'pending'}">目前沒有待審核的報名</b>
+				<b th:if="${currentTab == 'history'}">目前沒有歷史紀錄</b>
+			</div>
 
-function toggleReportForm(regisId) {
-    const form = document.getElementById('reportForm' + regisId);
-    const button = document.getElementById('reportBtn' + regisId);
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.classList.add('is-open');
-    } else {
-        form.style.display = 'none';
-        button.classList.remove('is-open');
-    }
-}
-</script>
+			<!-- 分頁 -->
+			<div th:if="${!#lists.isEmpty(regisListData)}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/member/activity/registration/myRegistrations}, ${qs})}"></div>
+
+			<!-- 底部連結 -->
+			<div class="bottom-links">
+				<a th:href="@{/member/dashboard}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+					我的療癒足跡
+				</a>
+				<a th:href="@{/member/activity/report/myReports}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+					我的問題回報
+				</a>
+				<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">
+					<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 22V12h6v10M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+					查看全部活動列表
+				</a>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- ================= 操作彈窗（每筆報名各一組） ================= -->
+	<th:block th:each="r : ${regisListData}">
+		<!-- 取消報名彈窗 -->
+		<div class="op-modal-overlay" th:id="'cancelModal' + ${r.regisId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>取消報名</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'cancelModal' + ${r.regisId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/member/activity/registration/cancel}" method="post"
+					  onsubmit="return confirm('確定要取消報名嗎？')">
+					<input type="hidden" name="regisId" th:value="${r.regisId}">
+					<input type="hidden" name="tab" th:value="${currentTab}">
+					<input type="hidden" name="page" th:value="${currentPage}">
+					<p class="field-label">取消原因</p>
+					<select name="cancelReason">
+						<option value="0">行程衝突</option>
+						<option value="1">身體不適</option>
+						<option value="2">其他</option>
+					</select>
+					<p class="field-label">補充說明（選填）</p>
+					<input type="text" name="cancelNote" placeholder="補充說明">
+					<button type="submit" class="op-modal-submit" style="background:#c0392b;color:#fff;">確認取消</button>
+				</form>
+			</div>
+		</div>
+
+		<!-- 填寫評論彈窗 -->
+		<div class="op-modal-overlay" th:id="'reviewModal' + ${r.regisId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>填寫評論</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'reviewModal' + ${r.regisId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/member/activity/registration/review}" method="post"
+					  onsubmit="return confirm('確定要送出評論嗎？')">
+					<input type="hidden" name="regisId" th:value="${r.regisId}">
+					<input type="hidden" name="tab" th:value="${currentTab}">
+					<input type="hidden" name="page" th:value="${currentPage}">
+					<p class="field-label">評分（滿分 5 分）</p>
+					<select name="rating">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+					</select>
+					<p class="field-label">活動心得</p>
+					<textarea name="reviewContent" placeholder="分享活動心得" required></textarea>
+					<button type="submit" class="op-modal-submit" style="background:var(--orange);color:#fff;">送出評論</button>
+				</form>
+			</div>
+		</div>
+
+		<!-- 回報問題彈窗 -->
+		<div class="op-modal-overlay" th:id="'reportModal' + ${r.regisId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>回報問題</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'reportModal' + ${r.regisId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/member/activity/report/submit}" method="post"
+					  onsubmit="return confirm('確定要送出問題回報嗎？')">
+					<input type="hidden" name="activityId" th:value="${r.activity.activityId}">
+					<input type="hidden" name="tab" th:value="${currentTab}">
+					<input type="hidden" name="page" th:value="${currentPage}">
+					<p class="field-label">問題描述</p>
+					<textarea name="reportContent" placeholder="請描述遇到的問題" required></textarea>
+					<button type="submit" class="op-modal-submit" style="background:#4F7B96;color:#fff;">送出回報</button>
+				</form>
+			</div>
+		</div>
+	</th:block>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script src="/js/nav.js"></script>
+	<script>
+	function openOpModal(id) {
+		document.getElementById(id).classList.add('show');
+	}
+	function closeOpModal(id) {
+		document.getElementById(id).classList.remove('show');
+	}
+	function closeOpModalOutside(e, overlay) {
+		if (e.target === overlay) overlay.classList.remove('show');
+	}
+	</script>
 </body>
 </html>

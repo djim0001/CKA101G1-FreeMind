@@ -45,13 +45,15 @@ public class RegistrationController {
     // 一、我的報名清單
     @GetMapping("myRegistrations")
     public String myRegistrations(@RequestParam(value = "tab", defaultValue = "upcoming") String tab,
-    								@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage, 
+    								@RequestParam(value = "page", defaultValue = "1") Integer page,
     								@AuthenticationPrincipal MemberUserDetails userDetails,
                                   ModelMap model) {
         if (userDetails == null) {
             return "redirect:/front-end/login";
         }
     		
+        Integer currentPage = page;
+        
     		Member member = userDetails.getMember();
     		List<Registration> allList = regisSvc.getMyRegistrations(member);
     		
@@ -116,6 +118,8 @@ public class RegistrationController {
     	    model.addAttribute("currentPage", currentPage);
     	    model.addAttribute("totalPages", totalPages);
     	    model.addAttribute("currentTab", tab);
+    	    model.addAttribute("qs", "tab=" + tab);
+    	    
     		
     		
     		Map<Integer, String> reportedActivityMap = reportSvc.getReportedActivityMap(member);
@@ -167,6 +171,8 @@ public class RegistrationController {
     public String cancel(@RequestParam("regisId") Integer regisId,
                          @RequestParam("cancelReason") Integer cancelReason,
                          @RequestParam("cancelNote") String cancelNote,
+                         @RequestParam(value = "tab", required = false) String tab,
+                         @RequestParam(value = "page", required = false) Integer page,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
@@ -180,14 +186,16 @@ public class RegistrationController {
     		} catch (IllegalArgumentException | IllegalStateException e) {
     			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
     		}
-    		 return "redirect:/member/activity/registration/myRegistrations";
+    		String t = (tab != null) ? tab : "upcoming";
+    	    int p = (page != null) ? page : 1;
+    	    return "redirect:/member/activity/registration/myRegistrations?tab=" + t + "&page=" + p;
     }
     
     // 四、活動報名名單(給發起人檢視)
     @GetMapping("activityRegistrations")
     public String activityRegistrations(@RequestParam("activityId") Integer activityId,
     										@RequestParam(value = "tab", defaultValue = "pending") String tab,
-    										@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+    										@RequestParam(value = "page", defaultValue = "1") Integer page,
                                          @AuthenticationPrincipal MemberUserDetails userDetails,
                                          ModelMap model,
                                          RedirectAttributes redirectAttributes) {
@@ -220,7 +228,8 @@ public class RegistrationController {
 
     		
     		int totalPages = PageUtils.calculateTotalPages(filtered.size(), PAGE_SIZE);
-    	    if (currentPage < 1) {
+    		Integer currentPage = page;
+    		if (currentPage < 1) {
     	        currentPage = 1;
     	    } else if (currentPage > totalPages) {
     	        currentPage = totalPages;
@@ -237,6 +246,7 @@ public class RegistrationController {
     	    model.addAttribute("currentPage", currentPage);
     	    model.addAttribute("totalPages", totalPages);
     	    model.addAttribute("currentTab", tab);
+    	    model.addAttribute("qs", "activityId=" + activityId + "&tab=" + tab);
     		
         return "front-end/member/activity/registration/activityRegistrations";
     }
@@ -245,7 +255,9 @@ public class RegistrationController {
     @PostMapping("approve")
     public String approve(@RequestParam("regisId") Integer regisId,
     						  @RequestParam("activityId") Integer activityId, 
-                          @AuthenticationPrincipal MemberUserDetails userDetails,
+    						  @RequestParam(value = "tab", required = false) String tab,
+    						  @RequestParam(value = "page", required = false) Integer page,
+    						  @AuthenticationPrincipal MemberUserDetails userDetails,
                           RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "請先登入");
@@ -258,8 +270,10 @@ public class RegistrationController {
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
-    }
+		String t = (tab != null) ? tab : "pending";
+		int p = (page != null) ? page : 1;
+		return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId + "&tab=" + t + "&page=" + p;
+	}
     
     // 六、拒絕活動報名(發起人)
     @PostMapping("reject")
@@ -267,6 +281,8 @@ public class RegistrationController {
                           @RequestParam("activityId") Integer activityId,
                           @RequestParam("rejectReason") Integer rejectReason,
                           @RequestParam("rejectNote") String rejectNote,
+                          @RequestParam(value = "tab", required = false) String tab,
+                          @RequestParam(value = "page", required = false) Integer page,
                           @AuthenticationPrincipal MemberUserDetails userDetails,
                           RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
@@ -280,13 +296,17 @@ public class RegistrationController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
+        String t = (tab != null) ? tab : "pending";
+        int p = (page != null) ? page : 1;
+        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId + "&tab=" + t + "&page=" + p;
     }
     
     // 七、備取遞補為正取(發起人)
     @PostMapping("promote")
     public String promote(@RequestParam("regisId") Integer regisId,
                            @RequestParam("activityId") Integer activityId,
+                           @RequestParam(value = "tab", required = false) String tab,
+                           @RequestParam(value = "page", required = false) Integer page,
                            @AuthenticationPrincipal MemberUserDetails userDetails,
                            RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
@@ -300,7 +320,9 @@ public class RegistrationController {
         } catch (IllegalArgumentException | IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId;
+        String t = (tab != null) ? tab : "pending";
+        int p = (page != null) ? page : 1;
+        return "redirect:/member/activity/registration/activityRegistrations?activityId=" + activityId + "&tab=" + t + "&page=" + p;
     }
     
     
@@ -309,6 +331,8 @@ public class RegistrationController {
     public String review(@RequestParam("regisId") Integer regisId,
                          @RequestParam("rating") Integer rating,
                          @RequestParam("reviewContent") String reviewContent,
+                         @RequestParam(value = "tab", required = false) String tab,
+                         @RequestParam(value = "page", required = false) Integer page,
                          @AuthenticationPrincipal MemberUserDetails userDetails,
                          RedirectAttributes redirectAttributes) {
     		if (userDetails == null) {
@@ -322,6 +346,8 @@ public class RegistrationController {
     		} catch (IllegalArgumentException | IllegalStateException e) {
     			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
     		}
-    		 return "redirect:/member/activity/registration/myRegistrations";
+    		String t = (tab != null) ? tab : "upcoming";
+    		int p = (page != null) ? page : 1;
+    		return "redirect:/member/activity/registration/myRegistrations?tab=" + t + "&page=" + p;
     }
 }
