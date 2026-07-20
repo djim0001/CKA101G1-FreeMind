@@ -23,6 +23,15 @@
 .collect-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
 .collect-head .crumb a:hover { color: var(--orange); }
 .collect-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.collect-head .eyebrow {
+	display: inline-block;
+	margin: 0;
+	color: var(--orange);
+	font-size: .8rem;
+	font-weight: 500;
+	letter-spacing: .22em;
+	text-transform: uppercase;
+}
 .collect-head h1 {
 	font-family: var(--zen-maru); font-weight: 700;
 	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
@@ -159,6 +168,7 @@
 			<a th:href="@{/member/dashboard/myCollection}" href="#">我的收藏</a><span>/</span>
 			<span style="opacity:1;color:var(--ink)">收藏文章</span>
 		</div>
+		<p class="eyebrow">My collection</p>
 		<span class="script" style="font-size:1.3rem;">那些觸動你的文字</span>
 		<h1>收藏<em>文章</em></h1>
 		<p>你按過讚、收藏過、讀過的文章，都在這裡等你回來。</p>
@@ -204,11 +214,11 @@
 			<a class="art-card" th:each="article : ${articlePage.content}"
 			   th:href="@{/article/{id}(id=${article.articleId})}" target="_blank">
 
-				<div class="art-cover" th:if="${article.coverImage != null}">
+				<div class="art-cover" th:if="${article.coverImage != null and article.coverImage.length > 0}">
 					<img th:src="@{/article/{id}/cover(id=${article.articleId})}"
 						 th:alt="${article.title}" loading="lazy" />
 				</div>
-				<div class="art-cover photo-slot" th:if="${article.coverImage == null}">
+				<div class="art-cover photo-slot" th:if="${article.coverImage == null or article.coverImage.length == 0}">
 					<div class="ps-inner">
 						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
 							<rect x="3" y="6" width="18" height="14" rx="3" />

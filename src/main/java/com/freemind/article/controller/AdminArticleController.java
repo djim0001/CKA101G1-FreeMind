@@ -25,6 +25,7 @@ import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
+import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
 
@@ -40,6 +41,9 @@ public class AdminArticleController {
 	
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
+	
+	@Autowired
+	private NoticeService noticeService;
 	
 	@GetMapping
     public String articleAdmin(Model model,
@@ -134,6 +138,11 @@ public class AdminArticleController {
     
     @GetMapping("/categories/create")
     public String getCreateForm(Model model) {
+    	List<String> catNames = articleCatService.getAllCats()
+    											 .stream()
+								                 .map(ArticleCat::getArticleCatName)
+								                 .toList();
+        model.addAttribute("catNames", catNames);
     	return "back-end/article/createCatForm";
     }
     
@@ -217,10 +226,22 @@ public class AdminArticleController {
 		Integer adminId = prinAdminUser.getAdmin().getAdminId();
 		
 		try {
+			Article article = articleService.getArticleForReview(articleId);
+			Integer psychId = article.getPsychologist().getPsychId();
+			String title = article.getTitle();
+			
 			if ("approve".equals(action)) {
 				articleService.approveArticle(articleId, adminId);
+				noticeService.sendToPsych(psychId, adminId,
+						"您的文章「" + title + "」已審核通過並上架", (byte) 0);
+				
 			} else if ("reject".equals(action)) {
 				articleService.rejectArticle(articleId, adminId, rejectReason, rejectNote);
+				
+				String[] rejectReasons = {"內容品質", "違反專業法規", "版權問題", "違反平台規範", "其他"};
+				String reason = rejectReasons[rejectReason];
+				noticeService.sendToPsych(psychId, adminId,
+						"您的文章「" + title + "」已被退回，原因：" + reason, (byte) 0);
 			}
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
@@ -239,7 +260,13 @@ public class AdminArticleController {
 		Integer adminId = prinAdminUser.getAdmin().getAdminId();
 		
 		try {
+			Article article = articleService.getPublishedArticle(articleId);
+			Integer psychId = article.getPsychologist().getPsychId();
+			String title = article.getTitle();
+			
 			articleService.unPublishArticle(articleId, adminId);
+			noticeService.sendToPsych(psychId, adminId,
+					"您的文章「" + title + "」已被管理員下架", (byte) 0);
 		} catch (IllegalArgumentException | IllegalStateException e) {
 	        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
 		}
