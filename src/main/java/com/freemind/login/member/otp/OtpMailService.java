@@ -48,7 +48,7 @@ public class OtpMailService {
 	public void sendOtp(String to, String purposeText, String otp) {
 		if (!mailEnabled) {
 			// 開發模式：印在 console 就好
-			log.info("【開發模式-OTP】收件人={}, 用途={}, 驗證碼={}（5 分鐘內有效）", to, purposeText, otp);
+			log.info("【開發模式-OTP】收件人={}, 用途={}, 驗證碼={}（30 秒內有效）", to, purposeText, otp);
 			return;
 		}
 
@@ -81,7 +81,7 @@ public class OtpMailService {
 			message.setSubject("FreeMind " + purposeText + "驗證碼", "UTF-8");
 			
 			// 5. 設定內文 (Text)
-			message.setText("您的驗證碼為：" + otp + "\n\n驗證碼 5 分鐘內有效，請勿將驗證碼提供給他人。", "UTF-8");
+			message.setText("您的驗證碼為：" + otp + "\n\n驗證碼 30 秒內有效，請勿將驗證碼提供給他人。", "UTF-8");
 			Transport.send(message);
 			log.info("OTP 驗證信已寄出：{}", to);
 		} catch (Exception e) {

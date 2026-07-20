@@ -19,7 +19,7 @@
 		<div class="auth-card">
 			<div class="panel">
 				<p class="meta">
-					驗證碼已寄至：<b th:text="${email}"></b>（5 分鐘內有效）
+					驗證碼已寄至：<b th:text="${email}"></b>（30 秒內有效）
 				</p>
 
 				<div class="notice" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
@@ -40,7 +40,7 @@
 					</div>
 				</form>
 
-				<!-- 重寄驗證碼（60 秒冷卻） -->
+				<!-- 重寄驗證碼（30 秒冷卻） -->
 				<form th:action="@{/front-end/register/resend}" method="post" style="margin-top:14px;">
 					<input type="hidden" name="email" th:value="${email}">
 					<div class="section-head-actions">
