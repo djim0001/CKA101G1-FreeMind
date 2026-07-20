@@ -1,74 +1,127 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>心理師預約管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif;
-        background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 60px 20px;
-    }
-    .wrap { max-width: 720px; margin: 0 auto; }
+    .home-section { padding: 3.6rem 0 6rem; }
+    .home-head { text-align: center; margin-bottom: 2.6rem; }
+    .home-head .sprig { width: 34px; height: 48px; margin: 0 auto .6rem; display: block; }
+    .home-head h1 { font-family: var(--serif); font-weight: 700; font-size: clamp(1.9rem, 3.4vw, 2.4rem); color: var(--ink); margin: 0; }
+    .home-head p { color: var(--ink-soft); font-size: .92rem; margin-top: .5rem; }
 
-    .head { text-align: center; margin-bottom: 40px; }
-    .head h1 { font-size: 30px; font-weight: 700; }
-    .head p { color: #a99a95; font-size: 15px; margin-top: 6px; }
+    .tile-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+    .tile-card {
+        display: flex; flex-direction: column; align-items: flex-start;
+        background: #fff; border-radius: var(--radius-md);
+        padding: 2rem 1.6rem 1.8rem; box-shadow: var(--shadow-sm);
+        border: 1px solid var(--line); transition: transform .25s, box-shadow .25s;
+    }
+    .tile-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+    .tile-card .icon { width: 52px; height: 52px; margin-bottom: 1.1rem; }
+    .tile-card .icon svg { width: 100%; height: 100%; }
+    .tile-card h3 { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; margin: 0 0 .5rem; color: var(--ink); }
+    .tile-card p { font-size: .85rem; color: var(--ink-soft); margin: 0 0 1.2rem; flex: 1; }
+    .tile-card .go { font-size: .86rem; font-weight: 500; color: var(--orange); }
+    .tile-card:hover .go { text-decoration: underline; }
 
-    /* 固定兩欄 */
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .tile {
-        display: block; text-decoration: none; color: inherit;
-        background: #fff; border-radius: 16px; padding: 30px 26px;
-        box-shadow: 0 3px 16px rgba(160,120,120,0.08);
-        border: 1px solid #f2e9e5;
-        transition: transform 0.15s, box-shadow 0.2s;
-    }
-    .tile:hover { transform: translateY(-4px); box-shadow: 0 10px 26px rgba(232,180,180,0.28); }
-    .tile .icon {
-        width: 56px; height: 56px; border-radius: 14px;
-        background: #fbf2f2; display: flex; align-items: center; justify-content: center;
-        font-size: 26px; margin-bottom: 18px;
-    }
-    .tile h3 { font-size: 18px; margin-bottom: 6px; }
-    .tile p { font-size: 13px; color: #a99a95; }
-
-    /* 手機時改單欄 */
-    @media (max-width: 560px) {
-        .grid { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 940px) { .tile-cards { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 560px) { .tile-cards { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="home-section">
     <div class="wrap">
-        <div class="head">
+        <div class="home-head">
+            <svg class="sprig" viewBox="0 0 40 56" fill="none" stroke="#8C7E71" stroke-width="2" stroke-linecap="round">
+                <path d="M20 54 C20 36 20 24 20 12"/>
+                <path d="M20 16 C12 12 6 6 8 2 C14 4 19 9 20 16 Z"/>
+                <path d="M20 16 C28 12 34 6 32 2 C26 4 21 9 20 16 Z"/>
+                <path d="M20 30 C13 27 9 23 10 20 C15 22 19 25 20 30 Z"/>
+                <path d="M20 30 C27 27 31 23 30 20 C25 22 21 25 20 30 Z"/>
+            </svg>
             <h1>心理師預約管理</h1>
             <p>管理你的預約時段、確認訂單，並掌握諮商紀錄與評價</p>
         </div>
 
-        <div class="grid">
-            <a class="tile" th:href="@{/psych/slots/manageSlotsForm}">
-                <div class="icon">🗓️</div>
+        <div class="tile-cards">
+            <a class="tile-card" th:href="@{/psych/slots/manageSlotsForm}">
+                <span class="icon">
+                    <svg viewBox="0 0 58 58" fill="none">
+                        <path d="M29 54 C29 42 29 34 29 26" stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                        <path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#EFB65E"/>
+                        <path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#B8813A" stroke-width="1.4" stroke-linecap="round"/>
+                        <path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#B8813A" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <h3>預約時段調整</h3>
                 <p>設定或調整每一天開放的可預約時段</p>
+                <span class="go">立即調整 →</span>
             </a>
-            <a class="tile" th:href="@{/psych/orders/psychOrders}">
-                <div class="icon">📋</div>
+
+            <a class="tile-card" th:href="@{/psych/orders/psychOrders}">
+                <span class="icon">
+                    <svg viewBox="0 0 58 58" fill="none">
+                        <path d="M29 54 C29 42 29 34 29 26" stroke="#A85974" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                        <path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#DB93A9" stroke="#A85974" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#DB93A9" stroke="#A85974" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#E29276"/>
+                        <path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#A85974" stroke-width="1.4" stroke-linecap="round"/>
+                        <path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#A85974" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <h3>預約狀態</h3>
                 <p>查看待確認/已確認訂單，同意、拒絕與標記完成</p>
+                <span class="go">立即查看 →</span>
             </a>
-            <a class="tile" th:href="@{/psych/orders/psychHistoryForm}">
-                <div class="icon">📖</div>
+
+            <a class="tile-card" th:href="@{/psych/orders/psychHistoryForm}">
+                <span class="icon">
+                    <svg viewBox="0 0 58 58" fill="none">
+                        <path d="M29 54 C29 42 29 34 29 26" stroke="#4F7B96" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                        <path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#8FB2C9" stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#8FB2C9" stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#8FB2C9"/>
+                        <path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#4F7B96" stroke-width="1.4" stroke-linecap="round"/>
+                        <path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#4F7B96" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <h3>歷史諮商紀錄</h3>
                 <p>查詢已完成、未出席、已取消的諮商紀錄</p>
+                <span class="go">立即查詢 →</span>
             </a>
-            <a class="tile" th:href="@{/psych/orders/psychReviews}">
-                <div class="icon">⭐</div>
+
+            <a class="tile-card" th:href="@{/psych/orders/psychReviews}">
+                <span class="icon">
+                    <svg viewBox="0 0 58 58" fill="none">
+                        <path d="M29 54 C29 42 29 34 29 26" stroke="#5A7A57" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                        <path d="M29 40 C20 38 14 33 15 27 C22 28 27 33 29 40 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 44 C38 42 44 37 43 31 C36 32 31 37 29 44 Z" fill="#9BB893" stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M29 6 C22 6 18 12 18 19 C18 24 22 27 29 27 C36 27 40 24 40 19 C40 12 36 6 29 6 Z" fill="#93b094"/>
+                        <path d="M29 8 C25 8 22 12 22 17 C22 20 25 22 29 22" fill="none" stroke="#547055" stroke-width="1.4" stroke-linecap="round"/>
+                        <path d="M29 8 C33 8 36 12 36 17 C36 20 33 22 29 22" fill="none" stroke="#547055" stroke-width="1.4" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <h3>查看評價</h3>
                 <p>查看會員給你的評分與心得回饋</p>
+                <span class="go">立即查看 →</span>
             </a>
         </div>
     </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

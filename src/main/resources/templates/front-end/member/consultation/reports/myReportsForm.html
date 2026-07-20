@@ -1,103 +1,80 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>查看我的問題回報</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; }
+    .reports-section { padding: 3.2rem 0 6rem; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .reports-card {
+        max-width: 1000px; margin: 0 auto;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 2.4rem 2.2rem;
+    }
+    .reports-card h3 {
+        font-family: var(--serif); font-size: 1.5rem; color: var(--ink);
+        margin: 0 0 1.3rem; padding-bottom: 1rem; border-bottom: 2px solid var(--pink);
     }
 
-    .card {
-        max-width: 1000px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
-
-    h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0 0 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 12px 10px;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 14px;
-    }
-
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    tr:nth-child(even) td {
-        background-color: #fdfafa;
-    }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin-top: .6rem; }
+    th, td { border: 1px solid var(--line); padding: .75rem .6rem; text-align: center; vertical-align: middle; font-size: .85rem; }
+    th { background: var(--bg-warm); color: var(--ink-soft); font-weight: 600; white-space: nowrap; }
+    tr:nth-child(even) td { background: #fffdf8; }
 
     .nowrap { white-space: nowrap; }
+    .desc-cell { text-align: left; word-break: break-word; }
 
-    .desc-cell {
-        text-align: left;
-        word-break: break-word;
-    }
+    .status-pending { color: #B8860B; font-weight: 700; }
+    .status-processing { color: var(--ink); font-weight: 700; }
+    .status-resolved { color: #2E7D43; font-weight: 700; }
 
-    .status-pending { color: #b8860b; font-weight: bold; }
-    .status-processing { color: #1565c0; font-weight: bold; }
-    .status-resolved { color: #2e7d43; font-weight: bold; }
-
-    .empty-hint {
-        font-size: 14px;
-        color: #999;
-        margin-top: 12px;
-    }
+    .empty-hint { font-size: .9rem; color: var(--ink-soft); margin-top: .8rem; }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>查看我的問題回報處理進度</h3>
 
-		<p class="empty-hint" th:if="${#lists.isEmpty(reportsListData)}">目前沒有任何問題回報。</p>
+<div th:replace="~{fragments/header :: header}"></div>
 
-		<table th:unless="${#lists.isEmpty(reportsListData)}">
-			<tr>
-				<th>問題描述</th>
-				<th>回報日期</th>
-				<th>處理狀態</th>
-				<th>處理備註</th>
-			</tr>
-			<tr th:each="report : ${reportsListData}">
-				<td class="desc-cell" th:text="${report.issueDesc}"></td>
-				<td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
-				<td th:switch="${report.reportStatus}">
-					<span th:case="0" class="status-pending">待處理</span>
-					<span th:case="1" class="status-processing">處理中</span>
-					<span th:case="2" class="status-resolved">已解決</span>
-				</td>
-				<td class="desc-cell" th:text="${report.reportNote != null ? report.reportNote : '尚無回覆'}"></td>
-			</tr>
-		</table>
-	</div>
+<main class="reports-section">
+    <div class="wrap">
+        <div class="reports-card">
+            <h3>查看我的問題回報處理進度</h3>
+
+            <p class="empty-hint" th:if="${#lists.isEmpty(reportsListData)}">目前沒有任何問題回報。</p>
+
+            <div class="table-wrap">
+                <table th:unless="${#lists.isEmpty(reportsListData)}">
+                    <tr>
+                        <th>問題描述</th>
+                        <th>回報日期</th>
+                        <th>處理狀態</th>
+                        <th>處理備註</th>
+                    </tr>
+                    <tr th:each="report : ${reportsListData}">
+                        <td class="desc-cell" th:text="${report.issueDesc}"></td>
+                        <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:switch="${report.reportStatus}">
+                            <span th:case="0" class="status-pending">待處理</span>
+                            <span th:case="1" class="status-processing">處理中</span>
+                            <span th:case="2" class="status-resolved">已解決</span>
+                        </td>
+                        <td class="desc-cell" th:text="${report.reportNote != null ? report.reportNote : '尚無回覆'}"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

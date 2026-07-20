@@ -1,46 +1,93 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>待確認訂單列表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<style>
+    .list-section { padding: 3.2rem 0 6rem; }
+    .list-head { text-align: center; margin-bottom: 2rem; }
+    .list-head h1 { font-family: var(--serif); font-size: 1.7rem; color: var(--ink); margin: 0; }
+    .list-head h1 span { color: var(--orange-deep); }
+
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    table { width: 100%; border-collapse: collapse; background: var(--white); min-width: 760px; }
+    thead th { background: var(--ink); color: #fff; font-weight: 600; font-size: .85rem; padding: .85rem .9rem; text-align: left; white-space: nowrap; }
+    tbody td { padding: .9rem .9rem; font-size: .88rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .actions-cell { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .actions-cell form { margin: 0; }
+    .btn-approve, .btn-reject {
+        padding: .5rem 1.1rem; border-radius: var(--radius-md); font-size: .84rem;
+        font-family: inherit; font-weight: 500; cursor: pointer; transition: all .2s; border: none;
+    }
+    .btn-approve { background: var(--orange); color: #fff; }
+    .btn-approve:hover { background: var(--orange-deep); }
+    .btn-reject { background: #fff; color: var(--ink-soft); border: 1.5px solid var(--line); }
+    .btn-reject:hover { background: var(--pink-soft); color: var(--orange-deep); border-color: var(--pink); }
+
+    .back-link { display: inline-block; margin-top: 1.6rem; color: var(--ink-soft); font-size: .9rem; }
+    .back-link:hover { color: var(--orange-deep); }
+</style>
 </head>
 <body>
-	<h3>心理師編號 <span th:text="${psychId}"></span> 的待確認訂單</h3>
 
-	<table border="1">
-		<tr>
-			<th>訂單編號</th>
-			<th>會員編號</th>
-			<th>開始時間</th>
-			<th>結束時間</th>
-			<th>來訪目的</th>
-			<th>來訪目的備註</th>
-			<th>操作</th>
-		</tr>
-		<tr th:each="order : ${ordersListData}">
-			<td th:text="${order.orderId}"></td>
-			<td th:text="${order.member.memberId}"></td>
-			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:text="${order.visitPurpose}"></td>
-			<td th:text="${order.visitPurposeNote}"></td>
-			<td>
-				<form method="post" th:action="@{/psych/orders/approve}" style="display:inline;">
-					<input type="hidden" name="orderId" th:value="${order.orderId}">
-					<input type="hidden" name="psychId" th:value="${psychId}">
-					<input type="submit" value="同意">
-				</form>
-				<form method="post" th:action="@{/psych/orders/reject}" style="display:inline;">
-					<input type="hidden" name="orderId" th:value="${order.orderId}">
-					<input type="hidden" name="psychId" th:value="${psychId}">
-					<input type="submit" value="拒絕"
-						onclick="return confirm('確定要拒絕這筆訂單嗎？拒絕後時段將重新開放。')">
-				</form>
-			</td>
-		</tr>
-	</table>
+<div th:replace="~{fragments/header :: header}"></div>
 
-	<a th:href="@{/psych/orders/psychPendingForm}">重新查詢</a>
+<main class="list-section">
+    <div class="wrap">
+        <div class="list-head">
+            <h1>心理師編號 <span th:text="${psychId}"></span> 的待確認訂單</h1>
+        </div>
 
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>會員編號</th>
+                    <th>開始時間</th>
+                    <th>結束時間</th>
+                    <th>來訪目的</th>
+                    <th>來訪目的備註</th>
+                    <th>操作</th>
+                </tr>
+                <tr th:each="order : ${ordersListData}">
+                    <td th:text="${order.orderId}"></td>
+                    <td th:text="${order.member.memberId}"></td>
+                    <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${order.visitPurpose}"></td>
+                    <td th:text="${order.visitPurposeNote}"></td>
+                    <td>
+                        <div class="actions-cell">
+                            <form method="post" th:action="@{/psych/orders/approve}">
+                                <input type="hidden" name="orderId" th:value="${order.orderId}">
+                                <input type="hidden" name="psychId" th:value="${psychId}">
+                                <button type="submit" class="btn-approve">同意</button>
+                            </form>
+                            <form method="post" th:action="@{/psych/orders/reject}">
+                                <input type="hidden" name="orderId" th:value="${order.orderId}">
+                                <input type="hidden" name="psychId" th:value="${psychId}">
+                                <button type="submit" class="btn-reject"
+                                    onclick="return confirm('確定要拒絕這筆訂單嗎？拒絕後時段將重新開放。')">拒絕</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <a class="back-link" th:href="@{/psych/orders/psychPendingForm}">← 重新查詢</a>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

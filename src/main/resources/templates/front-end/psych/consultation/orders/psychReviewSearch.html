@@ -1,126 +1,337 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>查看我的評價</title>
-<style>
-    * { box-sizing: border-box; }
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>查看我的評價｜心理師中心｜諮由自在 Free Mind</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+		rel="stylesheet" />
+	<style>
+	@font-face {
+		font-family: 'OpenHuninn';
+		src:
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+	:root {
+		--bg-warm: #FFFAEE; --bg-soothing: #C2D9ED; --blue-soft: #DCEAF5;
+		--orange: #F58E6B; --orange-deep: #E5764F; --pink: #FBD0BE; --pink-soft: #FDE6DB;
+		--ink: #3A4B53; --ink-soft: #6b7981; --white: #FFFFFF; --line: #ecdfce;
+		--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07); --shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+		--radius-lg: 34px; --radius-md: 22px;
+		--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+		--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+		--sans: "Noto Sans TC", system-ui, sans-serif;
+		--script: "Caveat", "OpenHuninn", cursive;
+		--display-en: "Baloo 2", sans-serif;
+	}
+	* { box-sizing: border-box; }
+	html { scroll-behavior: smooth; }
+	body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--bg-warm); line-height: 1.78; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+	a { color: inherit; text-decoration: none; }
+	img, svg { display: block; max-width: 100%; }
+	button, input, select { font: inherit; }
+	button { cursor: pointer; border: none; background: none; color: inherit; }
+	.wrap { width: min(1160px, 92vw); margin-inline: auto; }
+	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
-    }
+	header.nav { position: sticky; top: 0; z-index: 100; background: rgba(253, 246, 237, .85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(236, 223, 206, .7); }
+	.nav-inner { display: flex; align-items: center; gap: 1.4rem; height: 74px; }
+	.brand { display: flex; align-items: center; gap: .8rem; }
+	.logo-mind { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-start; line-height: 1; user-select: none; }
+	.logo-mind .word { display: flex; align-items: flex-end; }
+	.logo-mind .word span { display: inline-block; font-family: var(--display-en); font-weight: 700; font-size: 1.5rem; letter-spacing: -.03em; text-align: center; }
+	.logo-mind .word .m { width: 24px; color: #EFB65E; } .logo-mind .word .i { width: 9px; color: #DB93A9; }
+	.logo-mind .word .n { width: 17px; color: #8FB2C9; } .logo-mind .word .d { width: 17px; color: #9BB893; }
+	.logo-mind .faces { display: flex; align-items: flex-start; margin-top: -1px; }
+	.logo-mind .faces svg { display: block; }
+	.logo-mind .faces .fm { width: 24px; height: 11px; } .logo-mind .faces .fi { width: 9px; height: 11px; }
+	.logo-mind .faces .fn { width: 17px; height: 11px; } .logo-mind .faces .fd { width: 17px; height: 11px; }
+	.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+	.brand-text .logo { font-family: var(--zen-maru); font-weight: 700; font-size: 1.18rem; color: var(--ink); letter-spacing: .02em; }
+	.brand-text .en { margin-top: .15em; font-family: var(--display-en); font-size: .85rem; font-weight: 700; color: var(--ink-soft); letter-spacing: .24em; text-transform: uppercase; }
+	.nav-menu { display: flex; gap: .25rem; margin-left: .5rem; }
+	.nav-menu a { padding: .5rem .95rem; border-radius: 999px; font-size: .96rem; font-weight: 500; color: var(--ink-soft); white-space: nowrap; transition: background .2s, color .2s; }
+	.nav-menu a:hover, .nav-menu a.active { background: rgba(194, 217, 237, .4); color: var(--ink); }
+	.nav-right { display: flex; align-items: center; gap: .55rem; margin-left: auto; }
+	.icon-btn { position: relative; display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform .2s; }
+	.icon-btn:hover { transform: translateY(-2px); }
+	.icon-btn svg { width: 20px; height: 20px; stroke: var(--ink); }
+	.avatar-btn { display: grid; width: 44px; height: 44px; place-items: center; overflow: hidden; border: 2px solid #fff; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--bg-soothing)); box-shadow: var(--shadow-sm); transition: transform .2s; }
+	.avatar-btn:hover { transform: translateY(-2px); }
+	.avatar-btn svg { width: 26px; height: 26px; }
+	.dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border: 2px solid #fff; border-radius: 50%; background: var(--orange); }
+	.pop-holder { position: relative; }
+	.pop { position: absolute; top: calc(100% + 12px); right: 0; width: 266px; padding: .6rem; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .22s ease; }
+	.pop.open { opacity: 1; visibility: visible; transform: translateY(0); }
+	.pop-head { padding: .85rem 1rem .4rem; }
+	.pop-head b { font-family: var(--serif); font-size: 1.02rem; }
+	.pop-head p { margin: .15rem 0 0; font-size: .82rem; color: var(--ink-soft); }
+	.pop-item { display: flex; align-items: center; gap: .7rem; padding: .7rem 1rem; border-radius: 13px; font-size: .93rem; color: var(--ink); transition: background .16s; }
+	.pop-item:hover, .pop-item.active { background: var(--bg-warm); }
+	.pop-item svg { flex: 0 0 auto; width: 18px; height: 18px; stroke: var(--orange); }
+	.pop-divider { height: 1px; margin: .4rem .6rem; background: var(--line); }
+	.pop-label { padding: .5rem 1rem .2rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+	.notice-summary { margin: .3rem 0; padding: .8rem 1rem; border-radius: 13px; background: var(--bg-warm); font-size: .9rem; color: var(--ink-soft); }
+	.notice-summary strong { color: var(--orange-deep); }
+	.hamburger { display: none; }
+	.mobile-menu { display: none; flex-direction: column; gap: .2rem; padding: .6rem 4vw 1.2rem; border-bottom: 1px solid var(--line); background: var(--bg-warm); }
+	.mobile-menu.open { display: flex; }
+	.mobile-menu a { padding: .7rem .4rem; border-radius: 10px; font-weight: 500; color: var(--ink); }
+	.mobile-menu a:hover, .mobile-menu a.active { background: rgba(194, 217, 237, .4); }
 
-    .card {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
+	.page-main { padding: 2.6rem 0 4.5rem; }
+	.page-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1.6rem; padding: 0 .3rem 1.5rem; border-bottom: 1px solid var(--line); }
+	.eyebrow { display: inline-block; margin-bottom: .35rem; font-size: .8rem; font-weight: 500; letter-spacing: .22em; color: var(--orange); }
+	.page-intro h1 { margin: 0; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.2; letter-spacing: .02em; }
+	.page-intro p { max-width: 42rem; margin: .55rem 0 0; color: var(--ink-soft); font-size: 1rem; }
+	.workspace { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--white); box-shadow: var(--shadow-md); padding: 1.5rem; }
+	.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; }
+	table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 900px; }
+	th, td { padding: 1rem 1.05rem; text-align: left; vertical-align: middle; word-wrap: break-word; }
+	th { border-bottom: 1px solid var(--line); background: var(--bg-warm); font-size: .84rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
+	td { border-bottom: 1px solid rgba(236, 223, 206, .72); font-size: .92rem; }
+	tbody tr:last-child td { border-bottom: 0; }
+	tbody tr:hover { background: rgba(220, 234, 245, .16); }
+	.review-content { text-align: left; }
+	.empty-state { padding: 3.4rem 1rem; text-align: center; color: var(--ink-soft); }
 
-    h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0 0 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
+	footer.ft { padding: 3.2rem 0 2rem; border-top: 1px solid var(--line); background: var(--white); }
+	.ft-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 2rem; }
+	.ft .brand { margin-bottom: 1rem; }
+	.ft-about { max-width: 22rem; color: var(--ink-soft); font-size: .9rem; }
+	.ft-col h4 { margin: .2rem 0 1rem; font-family: var(--serif); font-weight: 700; font-size: 1rem; }
+	.ft-col a { display: block; padding: .3rem 0; color: var(--ink-soft); font-size: .9rem; transition: color .16s; }
+	.ft-col a:hover { color: var(--orange); }
+	.ft-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem; margin-top: 2.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .82rem; }
+	#backToTop { position: fixed; right: 24px; bottom: 24px; z-index: 90; display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: var(--orange); color: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .25s, transform .25s, background .2s; }
+	#backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
+	#backToTop:hover { background: var(--orange-deep); }
+	#backToTop svg { width: 22px; height: 22px; }
+	:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
 
-    table {
-        border-collapse: collapse;
-        table-layout: fixed;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 12px 10px;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 14px;
-        word-wrap: break-word;
-    }
-
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    tr:nth-child(even) td {
-        background-color: #fdfafa;
-    }
-
-    .nowrap { white-space: nowrap; }
-
-    .review-content {
-        text-align: left;
-    }
-
-    .empty-hint {
-        font-size: 14px;
-        color: #999;
-        margin-top: 12px;
-    }
-</style>
+	@media (max-width: 940px) { .nav-menu { display: none; } .hamburger { display: grid; } .ft-grid { grid-template-columns: 1fr 1fr; } }
+	@media (max-width: 700px) { .page-main { padding-top: 1.8rem; } .page-intro { align-items: flex-start; flex-direction: column; gap: 1rem; } }
+	@media (max-width: 520px) { .ft-grid { grid-template-columns: 1fr; } #backToTop { right: 16px; bottom: 16px; width: 42px; height: 42px; } .pop { position: fixed; top: 82px; right: 4vw; left: 4vw; width: auto; } }
+	@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+	</style>
 </head>
-<body>
-	<div class="card">
-		<h3>查看會員評價</h3>
+<body th:with="activePage='reviews'">
+	<header class="nav">
+		<div class="wrap nav-inner">
+			<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
+				<span class="logo-mind" aria-hidden="true">
+					<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
+					<span class="faces">
+						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
+					</span>
+				</span>
+				<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+			</a>
 
-		<p class="empty-hint" th:if="${#lists.isEmpty(ordersListData)}">目前還沒有任何評價。</p>
+			<nav class="nav-menu" aria-label="心理師主選單">
+				<a th:class="${activePage == 'slots'} ? 'active' : null" th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+				<a th:class="${activePage == 'orders'} ? 'active' : null" th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders">預約狀態</a>
+				<a th:class="${activePage == 'history'} ? 'active' : null" th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+				<a th:class="${activePage == 'reviews'} ? 'active' : null" th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews" aria-current="page">查看評價</a>
+			</nav>
 
-		<table th:unless="${#lists.isEmpty(ordersListData)}">
-			<colgroup>
-				<col style="width:8%;">
-				<col style="width:8%;">
-				<col style="width:10%;">
-				<col style="width:12%;">
-				<col style="width:12%;">
-				<col style="width:6%;">
-				<col style="width:26%;">
-				<col style="width:18%;">
-			</colgroup>
-			<tr>
-				<th>訂單編號</th>
-				<th>會員編號</th>
-				<th>姓名</th>
-				<th>諮商日期</th>
-				<th>來訪目的</th>
-				<th>評分</th>
-				<th>心得內容</th>
-				<th>評論時間</th>
-			</tr>
-			<tr th:each="order : ${ordersListData}">
-				<td th:text="${order.orderId}"></td>
-				<td th:text="${order.member.memberId}"></td>
-				<td class="nowrap" th:text="${order.member.name}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd')}"></td>
-				<td th:switch="${order.visitPurpose}">
-					<span th:case="'emotion'">情緒困擾</span>
-					<span th:case="'stress'">壓力調適</span>
-					<span th:case="'relationship'">人際關係</span>
-					<span th:case="'family'">家庭問題</span>
-					<span th:case="'career'">職涯困惑</span>
-					<span th:case="'academic'">課業壓力</span>
-					<span th:case="'self_growth'">自我探索</span>
-					<span th:case="'sleep'">睡眠問題</span>
-					<span th:case="'anxiety'">焦慮傾向</span>
-					<span th:case="'other'">其他</span>
-					<span th:case="*" th:text="${order.visitPurpose}"></span>
-				</td>
-				<td th:text="${order.rating}"></td>
-				<td class="review-content" th:text="${order.reviewContent}"></td>
-				<td class="nowrap" th:text="${#temporals.format(order.reviewedAt, 'yyyy-MM-dd HH:mm')}"></td>
-			</tr>
-		</table>
-	</div>
+			<div class="nav-right">
+				<div class="pop-holder">
+					<button class="icon-btn" id="bellBtn" type="button" aria-label="心理師通知" aria-haspopup="true" aria-expanded="false" aria-controls="bellPop">
+						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+						<span class="dot" th:if="${countPsychUnread != null and countPsychUnread > 0}" aria-hidden="true"></span>
+					</button>
+					<div class="pop" id="bellPop" role="menu">
+						<div class="pop-head"><b>心理師通知</b><p>查看目前的未讀通知數量。</p></div>
+						<div class="pop-divider"></div>
+						<p class="notice-summary" th:if="${countPsychUnread != null and countPsychUnread > 0}">你有 <strong th:text="${countPsychUnread}">0</strong> 則未讀通知。</p>
+						<p class="notice-summary" th:unless="${countPsychUnread != null and countPsychUnread > 0}">目前沒有未讀通知。</p>
+					</div>
+				</div>
+
+				<div class="pop-holder">
+					<button class="avatar-btn" id="avatarBtn" type="button" aria-label="心理師功能選單" aria-haspopup="true" aria-expanded="false" aria-controls="avatarPop">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.4" fill="#3A4B53" /><path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19" stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
+					</button>
+					<div class="pop" id="avatarPop" role="menu">
+						<div class="pop-head"><b th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</b><p>心理師專區・管理預約、課程與個人資料。</p></div>
+						<div class="pop-divider"></div>
+						<div class="pop-label">功能選單</div>
+						<a class="pop-item active" th:href="@{/psych/orders/home}" href="/psych/orders/home" role="menuitem" aria-current="page">預約管理</a>
+						<a class="pop-item" th:href="@{/psych/course/select_course}" href="/psych/course/select_course" role="menuitem">課程商城（心理師）</a>
+						<a class="pop-item" th:href="@{/psych/profile/password}" href="/psych/profile/password" role="menuitem">修改密碼</a>
+						<a class="pop-item" th:href="@{/psych/profile/edit}" href="/psych/profile/edit" role="menuitem">編輯資料</a>
+					</div>
+				</div>
+
+				<button class="icon-btn hamburger" id="hambBtn" type="button" aria-label="開啟選單" aria-controls="mobileMenu" aria-expanded="false">
+					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+				</button>
+			</div>
+		</div>
+
+		<nav class="mobile-menu" id="mobileMenu" aria-label="心理師行動選單">
+			<a th:class="${activePage == 'slots'} ? 'active' : null" th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+			<a th:class="${activePage == 'orders'} ? 'active' : null" th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders">預約狀態</a>
+			<a th:class="${activePage == 'history'} ? 'active' : null" th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+			<a th:class="${activePage == 'reviews'} ? 'active' : null" th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews">查看評價</a>
+		</nav>
+	</header>
+
+	<main class="page-main">
+		<div class="wrap">
+			<section class="page-intro" aria-labelledby="pageTitle">
+				<div>
+					<span class="eyebrow">心理師中心</span>
+					<h1 id="pageTitle">查看會員評價</h1>
+					<p>查看會員給你的評分與心得回饋</p>
+				</div>
+			</section>
+
+			<section class="workspace" aria-label="評價列表">
+				<p class="empty-state" th:if="${#lists.isEmpty(ordersListData)}">目前還沒有任何評價。</p>
+
+				<div class="table-wrap" th:unless="${#lists.isEmpty(ordersListData)}">
+					<table>
+						<colgroup>
+							<col style="width:8%;"><col style="width:8%;"><col style="width:10%;">
+							<col style="width:12%;"><col style="width:12%;"><col style="width:6%;">
+							<col style="width:26%;"><col style="width:18%;">
+						</colgroup>
+						<thead>
+							<tr>
+								<th>訂單編號</th><th>會員編號</th><th>姓名</th><th>諮商日期</th>
+								<th>來訪目的</th><th>評分</th><th>心得內容</th><th>評論時間</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="order : ${ordersListData}">
+								<td th:text="${order.orderId}"></td>
+								<td th:text="${order.member.memberId}"></td>
+								<td th:text="${order.member.name}"></td>
+								<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd')}"></td>
+								<td th:switch="${order.visitPurpose}">
+									<span th:case="'emotion'">情緒困擾</span><span th:case="'stress'">壓力調適</span>
+									<span th:case="'relationship'">人際關係</span><span th:case="'family'">家庭問題</span>
+									<span th:case="'career'">職涯困惑</span><span th:case="'academic'">課業壓力</span>
+									<span th:case="'self_growth'">自我探索</span><span th:case="'sleep'">睡眠問題</span>
+									<span th:case="'anxiety'">焦慮傾向</span><span th:case="'other'">其他</span>
+									<span th:case="*" th:text="${order.visitPurpose}"></span>
+								</td>
+								<td th:text="${order.rating}"></td>
+								<td class="review-content" th:text="${order.reviewContent}"></td>
+								<td th:text="${#temporals.format(order.reviewedAt, 'yyyy-MM-dd HH:mm')}"></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+		</div>
+	</main>
+
+	<footer class="ft" id="siteFooter">
+		<div class="wrap">
+			<div class="ft-grid">
+				<div>
+					<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
+						<span class="logo-mind" aria-hidden="true">
+							<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
+							<span class="faces">
+								<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
+								<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
+								<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
+								<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
+							</span>
+						</span>
+						<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+					</a>
+					<p class="ft-about">一個把心理諮商、課程、專欄與陪伴社群整合在一起的地方。願你在這裡，能慢慢地、安心地，成為更自在的自己。</p>
+				</div>
+				<div class="ft-col">
+					<h4>預約管理</h4>
+					<a th:href="@{/psych/slots/manageSlotsForm}" href="/psych/slots/manageSlotsForm">預約時段調整</a>
+					<a th:href="@{/psych/orders/psychOrders}" href="/psych/orders/psychOrders">預約狀態</a>
+					<a th:href="@{/psych/orders/psychHistoryForm}" href="/psych/orders/psychHistoryForm">歷史諮商紀錄</a>
+					<a th:href="@{/psych/orders/psychReviews}" href="/psych/orders/psychReviews">查看評價</a>
+				</div>
+				<div class="ft-col">
+					<h4>心理師專區</h4>
+					<a th:href="@{/psych/course/select_course}" href="/psych/course/select_course">課程商城（心理師）</a>
+					<a th:href="@{/psych/profile/password}" href="/psych/profile/password">修改密碼</a>
+					<a th:href="@{/psych/profile/edit}" href="/psych/profile/edit">編輯資料</a>
+				</div>
+				<div class="ft-col">
+					<h4>帳號</h4>
+					<a th:href="@{/psych/psychologistLogin}" href="/psych/psychologistLogin">心理師登入</a>
+				</div>
+			</div>
+			<div class="ft-bottom">
+				<span>© 2026 諮由自在 FreeMind｜CKA101G1</span>
+				<span>本平台不提供緊急危機處理，若有立即危險請撥打 1995 安心專線。</span>
+			</div>
+		</div>
+	</footer>
+
+	<button id="backToTop" type="button" aria-label="回到頂部">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+	</button>
+
+	<script th:inline="none">
+	(() => {
+		const popupPairs = [['bellBtn', 'bellPop'], ['avatarBtn', 'avatarPop']];
+		const closePopups = except => {
+			popupPairs.forEach(([buttonId, popupId]) => {
+				const button = document.getElementById(buttonId);
+				const popup = document.getElementById(popupId);
+				if (!button || !popup || popup === except) return;
+				popup.classList.remove('open');
+				button.setAttribute('aria-expanded', 'false');
+			});
+		};
+		popupPairs.forEach(([buttonId, popupId]) => {
+			const button = document.getElementById(buttonId);
+			const popup = document.getElementById(popupId);
+			if (!button || !popup) return;
+			button.addEventListener('click', event => {
+				event.stopPropagation();
+				const shouldOpen = !popup.classList.contains('open');
+				closePopups(popup);
+				popup.classList.toggle('open', shouldOpen);
+				button.setAttribute('aria-expanded', String(shouldOpen));
+			});
+			popup.addEventListener('click', event => event.stopPropagation());
+		});
+		document.addEventListener('click', () => closePopups());
+
+		const hamburger = document.getElementById('hambBtn');
+		const mobileMenu = document.getElementById('mobileMenu');
+		if (hamburger && mobileMenu) {
+			hamburger.addEventListener('click', event => {
+				event.stopPropagation();
+				const shouldOpen = !mobileMenu.classList.contains('open');
+				mobileMenu.classList.toggle('open', shouldOpen);
+				hamburger.setAttribute('aria-expanded', String(shouldOpen));
+			});
+		}
+
+		const backToTop = document.getElementById('backToTop');
+		if (backToTop) {
+			const updateVisibility = () => backToTop.classList.toggle('show', window.scrollY > 480);
+			window.addEventListener('scroll', updateVisibility, { passive: true });
+			updateVisibility();
+			backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+		}
+	})();
+	</script>
 </body>
 </html>
