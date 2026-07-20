@@ -15,8 +15,10 @@
 @font-face {
 	font-family: 'OpenHuninn';
 	src:
-		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
-		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff')
+		format('woff'),
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf')
+		format('truetype');
 	font-weight: 400;
 	font-style: normal;
 	font-display: swap;
@@ -43,7 +45,6 @@
 	--sans: "OpenHuninn", sans-serif;
 	--script: "OpenHuninn", cursive;
 	--display-en: "OpenHuninn", sans-serif;
-
 	box-sizing: border-box;
 	min-height: 100vh;
 	margin: 0;
@@ -55,10 +56,14 @@
 	font-family: 'OpenHuninn', sans-serif;
 	color: var(--ink);
 }
+
 .pl-scope, .pl-scope * {
 	font-family: 'OpenHuninn', sans-serif !important;
 }
-.pl-scope *, .pl-scope *::before, .pl-scope *::after { box-sizing: border-box; }
+
+.pl-scope *, .pl-scope *::before, .pl-scope *::after {
+	box-sizing: border-box;
+}
 
 .pl-card {
 	width: min(920px, 100%);
@@ -73,7 +78,8 @@
 .pl-brand {
 	flex: 0 0 50%;
 	position: relative;
-	background: linear-gradient(160deg, var(--blue-soft) 0%, var(--pink-soft) 100%);
+	background: linear-gradient(160deg, var(--blue-soft) 0%,
+		var(--pink-soft) 100%);
 	padding: 3rem 2.4rem;
 	display: flex;
 	flex-direction: column;
@@ -81,56 +87,111 @@
 	gap: 2.2rem;
 	overflow: hidden;
 }
+
 .pl-brand::before {
 	content: "";
 	position: absolute;
-	width: 220px; height: 220px;
-	right: -70px; top: -70px;
+	width: 220px;
+	height: 220px;
+	right: -70px;
+	top: -70px;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, .4);
 }
+
 .pl-brand::after {
 	content: "";
 	position: absolute;
-	width: 160px; height: 160px;
-	left: -50px; bottom: -60px;
+	width: 160px;
+	height: 160px;
+	left: -50px;
+	bottom: -60px;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, .3);
 }
 
-.pl-mark { position: relative; z-index: 1; display: flex; flex-direction: column; gap: .3rem; }
-.pl-mark .en {
-	font-family: var(--display-en); font-size: .8rem; font-weight: 700;
-	letter-spacing: .26em; text-transform: uppercase; color: var(--ink-soft);
+.pl-mark {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: .3rem;
 }
-.pl-mark .tc { font-family: var(--zen-maru); font-weight: 700; font-size: 1.15rem; color: var(--ink); }
 
-.pl-intro { position: relative; z-index: 1; }
+.pl-mark .en {
+	font-family: var(--display-en);
+	font-size: .8rem;
+	font-weight: 700;
+	letter-spacing: .26em;
+	text-transform: uppercase;
+	color: var(--ink-soft);
+}
+
+.pl-mark .tc {
+	font-family: var(--zen-maru);
+	font-weight: 700;
+	font-size: 1.15rem;
+	color: var(--ink);
+}
+
+.pl-intro {
+	position: relative;
+	z-index: 1;
+}
+
 .pl-eyebrow {
-	display: inline-block; font-size: .78rem; font-weight: 700;
-	letter-spacing: .22em; text-transform: uppercase; color: var(--orange-deep);
+	display: inline-block;
+	font-size: .78rem;
+	font-weight: 700;
+	letter-spacing: .22em;
+	text-transform: uppercase;
+	color: var(--orange-deep);
 	margin-bottom: .7rem;
 }
+
 .pl-intro h1 {
-	font-family: var(--serif); font-weight: 700; color: var(--ink);
-	font-size: clamp(1.7rem, 3vw, 2.15rem); line-height: 1.4; margin: 0 0 .9rem;
+	font-family: var(--serif);
+	font-weight: 700;
+	color: var(--ink);
+	font-size: clamp(1.7rem, 3vw, 2.15rem);
+	line-height: 1.4;
+	margin: 0 0 .9rem;
 }
-.pl-intro h1 .script { font-family: var(--script); color: var(--orange); font-size: 1.03em; }
+
+.pl-intro h1 .script {
+	font-family: var(--script);
+	color: var(--orange);
+	font-size: 1.03em;
+}
+
 .pl-intro p {
-	font-size: .95rem; color: var(--ink-soft); line-height: 1.85; margin: 0; max-width: 22rem;
+	font-size: .95rem;
+	color: var(--ink-soft);
+	line-height: 1.85;
+	margin: 0;
+	max-width: 22rem;
 }
 
 .pl-quote {
-	position: relative; z-index: 1;
+	position: relative;
+	z-index: 1;
 	padding-left: 1rem;
 	border-left: 3px solid var(--orange);
 }
+
 .pl-quote p {
-	font-family: var(--script); font-size: 1.35rem; color: var(--ink);
-	line-height: 1.5; margin: 0;
+	font-family: var(--script);
+	font-size: 1.35rem;
+	color: var(--ink);
+	line-height: 1.5;
+	margin: 0;
 }
+
 .pl-quote span {
-	display: block; margin-top: .4rem; font-size: .78rem; color: var(--ink-soft);
+	display: block;
+	margin-top: .4rem;
+	font-size: .78rem;
+	color: var(--ink-soft);
 	letter-spacing: .08em;
 }
 
@@ -145,78 +206,244 @@
 }
 
 .pl-form-head h2 {
-	font-family: var(--serif); font-weight: 700; font-size: 1.55rem;
-	color: var(--ink); margin: 0 0 .35rem;
+	font-family: var(--serif);
+	font-weight: 700;
+	font-size: 1.55rem;
+	color: var(--ink);
+	margin: 0 0 .35rem;
 }
-.pl-form-head p { margin: 0; font-size: .9rem; color: var(--ink-soft); }
+
+.pl-form-head p {
+	margin: 0;
+	font-size: .9rem;
+	color: var(--ink-soft);
+}
 
 .pl-alert {
-	padding: .8rem 1rem; font-size: .86rem; border-radius: var(--radius-md);
-	display: flex; align-items: center; gap: .55rem;
+	padding: .8rem 1rem;
+	font-size: .86rem;
+	border-radius: var(--radius-md);
+	display: flex;
+	align-items: center;
+	gap: .55rem;
 }
-.pl-alert svg { width: 1.1rem; height: 1.1rem; flex-shrink: 0; fill: currentColor; }
-.pl-alert.err { color: #b7513a; background: #fdeae3; border: 1px solid var(--pink); }
-.pl-alert.ok { color: #3f7a5c; background: #e6f3ec; border: 1px solid #b6ddc7; }
 
-.pl-form { display: flex; flex-direction: column; gap: 1.15rem; }
+.pl-alert svg {
+	width: 1.1rem;
+	height: 1.1rem;
+	flex-shrink: 0;
+	fill: currentColor;
+}
+
+.pl-alert.err {
+	color: #b7513a;
+	background: #fdeae3;
+	border: 1px solid var(--pink);
+}
+
+.pl-alert.ok {
+	color: #3f7a5c;
+	background: #e6f3ec;
+	border: 1px solid #b6ddc7;
+}
+
+.pl-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.15rem;
+}
 
 .pl-field label {
-	display: block; margin-bottom: .4rem; font-size: .86rem; font-weight: 500; color: var(--ink);
+	display: block;
+	margin-bottom: .4rem;
+	font-size: .86rem;
+	font-weight: 500;
+	color: var(--ink);
 }
-.pl-input-wrap { position: relative; }
+
+.pl-input-wrap {
+	position: relative;
+}
+
 .pl-input-wrap .pl-ic {
-	position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
-	width: 1.05rem; height: 1.05rem; stroke: var(--ink-soft); fill: none;
-	stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; pointer-events: none;
+	position: absolute;
+	left: 1rem;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 1.05rem;
+	height: 1.05rem;
+	stroke: var(--ink-soft);
+	fill: none;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	pointer-events: none;
 }
+
 .pl-input {
-	width: 100%; padding: .85rem 1.1rem .85rem 2.6rem;
-	border: 1.4px solid var(--line); border-radius: 999px;
-	outline: none; font-size: .98rem; font-family: var(--sans);
-	color: var(--ink); background: var(--bg-warm);
+	width: 100%;
+	padding: .85rem 1.1rem .85rem 2.6rem;
+	border: 1.4px solid var(--line);
+	border-radius: 999px;
+	outline: none;
+	font-size: .98rem;
+	font-family: var(--sans);
+	color: var(--ink);
+	background: var(--bg-warm);
 	transition: border-color .2s, box-shadow .2s, background .2s;
 }
-.pl-input::placeholder { color: #aeb8bc; }
-.pl-input:focus { border-color: var(--orange); background: var(--white); box-shadow: 0 0 0 3px rgba(245, 142, 107, .16); }
-.pl-input-wrap.pw .pl-input { padding-right: 2.6rem; }
+
+.pl-input::placeholder {
+	color: #aeb8bc;
+}
+
+.pl-input:focus {
+	border-color: var(--orange);
+	background: var(--white);
+	box-shadow: 0 0 0 3px rgba(245, 142, 107, .16);
+}
+
+.pl-input-wrap.pw .pl-input {
+	padding-right: 2.6rem;
+}
 
 .pl-toggle {
-	position: absolute; right: .9rem; top: 50%; transform: translateY(-50%);
-	background: none; border: none; padding: .2rem; color: var(--ink-soft);
+	position: absolute;
+	right: .9rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	padding: .2rem;
+	color: var(--ink-soft);
 }
-.pl-toggle svg { width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.pl-toggle .off { display: none; }
 
-.pl-options { display: flex; align-items: center; justify-content: space-between; font-size: .85rem; }
-.pl-check { display: flex; align-items: center; gap: .45rem; color: var(--ink-soft); cursor: pointer; }
-.pl-check input { width: 1rem; height: 1rem; accent-color: var(--orange); }
-.pl-link { color: var(--orange-deep); text-decoration: none; }
-.pl-link:hover { text-decoration: underline; }
+.pl-toggle svg {
+	width: 1.15rem;
+	height: 1.15rem;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 1.8;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.pl-toggle .off {
+	display: none;
+}
+
+.pl-options {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: .85rem;
+}
+
+.pl-check {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	color: var(--ink-soft);
+	cursor: pointer;
+}
+
+.pl-check input {
+	width: 1rem;
+	height: 1rem;
+	accent-color: var(--orange);
+}
+
+.pl-link {
+	color: var(--orange-deep);
+	text-decoration: none;
+}
+
+.pl-link:hover {
+	text-decoration: underline;
+}
 
 .pl-submit {
-	width: 100%; padding: .9rem 0; border: none; border-radius: 999px;
-	background: var(--orange); color: #fff; font-weight: 700; font-size: 1rem;
-	font-family: var(--sans); cursor: pointer; letter-spacing: .02em;
+	width: 100%;
+	padding: .9rem 0;
+	border: none;
+	border-radius: 999px;
+	background: var(--orange);
+	color: #fff;
+	font-weight: 700;
+	font-size: 1rem;
+	font-family: var(--sans);
+	cursor: pointer;
+	letter-spacing: .02em;
 	box-shadow: 0 10px 24px rgba(245, 142, 107, .38);
 	transition: transform .18s, background .18s, box-shadow .18s;
 }
-.pl-submit:hover { transform: translateY(-2px); background: var(--orange-deep); box-shadow: 0 14px 30px rgba(245, 142, 107, .46); }
-.pl-submit:active { transform: translateY(0); }
 
-.pl-divider { display: flex; align-items: center; color: var(--ink-soft); font-size: .8rem; margin: .1rem 0; }
-.pl-divider::before, .pl-divider::after { content: ""; flex: 1; border-bottom: 1px solid var(--line); }
-.pl-divider span { padding: 0 .8rem; }
+.pl-submit:hover {
+	transform: translateY(-2px);
+	background: var(--orange-deep);
+	box-shadow: 0 14px 30px rgba(245, 142, 107, .46);
+}
 
-.pl-google { display: flex; justify-content: center; }
+.pl-submit:active {
+	transform: translateY(0);
+}
 
-.pl-foot { text-align: center; font-size: .86rem; color: var(--ink-soft); margin: 0; }
-.pl-foot .b { font-weight: 700; }
-.pl-foot + .pl-foot { margin-top: .35rem; }
+.pl-divider {
+	display: flex;
+	align-items: center;
+	color: var(--ink-soft);
+	font-size: .8rem;
+	margin: .1rem 0;
+}
 
-@media (max-width: 760px) {
-	.pl-card { flex-direction: column; }
-	.pl-brand { flex: none; padding: 2.4rem 1.8rem; }
-	.pl-form-side { padding: 2.2rem 1.8rem 2.6rem; }
+.pl-divider::before, .pl-divider::after {
+	content: "";
+	flex: 1;
+	border-bottom: 1px solid var(--line);
+}
+
+.pl-divider span {
+	padding: 0 .8rem;
+}
+
+.pl-google {
+	display: flex;
+	justify-content: center;
+}
+#googleBtn {
+	display: flex;
+	justify-content: center;
+}
+
+#googleBtn .S9gUrf-YoZ4jf {
+	margin: 0 auto;
+}
+.pl-foot {
+	text-align: center;
+	font-size: .86rem;
+	color: var(--ink-soft);
+	margin: 0;
+}
+
+.pl-foot .b {
+	font-weight: 700;
+}
+
+.pl-foot+.pl-foot {
+	margin-top: .35rem;
+}
+
+@media ( max-width : 760px) {
+	.pl-card {
+		flex-direction: column;
+	}
+	.pl-brand {
+		flex: none;
+		padding: 2.4rem 1.8rem;
+	}
+	.pl-form-side {
+		padding: 2.2rem 1.8rem 2.6rem;
+	}
 }
 </style>
 </head>
@@ -230,7 +457,9 @@
 
 			<div class="pl-intro">
 				<span class="pl-eyebrow">Psychologist</span>
-				<h1>歡迎回來，<span class="script">陪伴者</span></h1>
+				<h1>
+					歡迎回來，<span class="script">陪伴者</span>
+				</h1>
 				<p>登入你的心理師後台，繼續陪伴每一位個案，讓每一次對話都被好好接住。</p>
 			</div>
 
@@ -285,7 +514,8 @@
 			<div th:if="${param.verified}" class="pl-alert ok">✓ 驗證完成，帳號已啟用</div>
 
 			<!-- 登入表單 -->
-			<form th:action="@{/psych/psychologistLogin}" method="post" class="pl-form">
+			<form th:action="@{/psych/psychologistLogin}" method="post"
+				class="pl-form">
 				<input type="hidden" name="redirect" th:value="${param.redirect}">
 
 				<div class="pl-field">
@@ -307,15 +537,17 @@
 							<rect x="4" y="10.5" width="16" height="10" rx="2.2"></rect>
 							<path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path>
 						</svg>
-						<input type="password" id="psychPassword" name="psychPassword" required
-							class="pl-input" placeholder="••••••••">
+						<input type="password" id="psychPassword" name="psychPassword"
+							required class="pl-input" placeholder="••••••••">
 						<button type="button" class="pl-toggle" aria-label="顯示密碼">
 							<svg class="on" viewBox="0 0 24 24">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <path
+									d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
 							<svg class="off" viewBox="0 0 24 24">
-                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <path
+									d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                             <line x1="1" y1="1" x2="23" y2="23"></line>
                         </svg>
 						</button>
@@ -323,39 +555,87 @@
 				</div>
 
 				<div class="pl-options">
-					<label class="pl-check">
-						<input type="checkbox" name="remember-me" id="remember-me">
-						<span>記住我</span>
-					</label>
-					<a th:href="@{/psych/forgot}" class="pl-link">忘記密碼？</a>
+					<label class="pl-check"> <input type="checkbox"
+						name="remember-me" id="remember-me"> <span>記住我</span>
+					</label> <a th:href="@{/psych/forgot}" class="pl-link">忘記密碼？</a>
 				</div>
 
 				<button type="submit" class="pl-submit">立即登入</button>
 			</form>
 
-			<div class="pl-divider"><span>或</span></div>
+			<div class="pl-divider">
+				<span>或</span>
+			</div>
 
-<div id="googleBtn"><div class="S9gUrf-YoZ4jf" style="position: relative;"><div><div tabindex="0" role="button" aria-labelledby="button-label" class="nsm7Bb-HzV7m-LgbsSe  hJDwNd-SxQuSe i5vt6e-Ia7Qfc uaxL4e-RbRzK" style="width:320px; max-width:400px; min-width:min-content;"><div class="nsm7Bb-HzV7m-LgbsSe-MJoBVe"></div><div class="nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb "><div class="nsm7Bb-HzV7m-LgbsSe-Bz112c"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="LgbsSe-Bz112c"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg></div><span class="nsm7Bb-HzV7m-LgbsSe-BPrWId">使用 Google 帳戶登入</span><span class="L6cTce" id="button-label">使用 Google 帳戶登入。在新分頁中開啟</span></div></div></div><iframe src="https://accounts.google.com/gsi/button?theme=outline&amp;size=large&amp;width=320&amp;text=signin_with&amp;is_fedcm_supported=true&amp;client_id=null&amp;iframe_id=gsi_613216_115927&amp;cas=bR7lIIzc%2FkvEaLrKvqisZYTmUwT3WbyV9LXKfc5BapA" class="L5Fo6c-PQbLGe" allow="identity-credentials-get" id="gsi_613216_115927" title="「使用 Google 帳戶登入」按鈕" style="display: block; position: relative; top: 0px; left: 0px; height: 0px; width: 0px; border: 0px;"></iframe></div></div>
-			<p class="pl-foot">還沒有帳號？ <a th:href="@{/psych/register}" class="pl-link b">註冊一個</a></p>
-			<p class="pl-foot"><a th:href="@{/}" class="pl-link">← 回首頁</a></p>
+			<div id="googleBtn">
+				<div class="S9gUrf-YoZ4jf" style="position: relative;">
+					<div>
+						<div tabindex="0" role="button" aria-labelledby="button-label"
+							class="nsm7Bb-HzV7m-LgbsSe  hJDwNd-SxQuSe i5vt6e-Ia7Qfc uaxL4e-RbRzK"
+							style="width: 320px; max-width: 400px; min-width: min-content;">
+							<div class="nsm7Bb-HzV7m-LgbsSe-MJoBVe"></div>
+							<div class="nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb ">
+								<div class="nsm7Bb-HzV7m-LgbsSe-Bz112c">
+									<svg version="1.1" xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 48 48" class="LgbsSe-Bz112c">
+										<g>
+										<path fill="#EA4335"
+											d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path>
+										<path fill="#4285F4"
+											d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path>
+										<path fill="#FBBC05"
+											d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path>
+										<path fill="#34A853"
+											d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path>
+										<path fill="none" d="M0 0h48v48H0z"></path></g></svg>
+								</div>
+								<span class="nsm7Bb-HzV7m-LgbsSe-BPrWId">使用 Google 帳戶登入</span><span
+									class="L6cTce" id="button-label">使用 Google 帳戶登入。在新分頁中開啟</span>
+							</div>
+						</div>
+					</div>
+					<iframe
+						src="https://accounts.google.com/gsi/button?theme=outline&amp;size=large&amp;width=320&amp;text=signin_with&amp;is_fedcm_supported=true&amp;client_id=null&amp;iframe_id=gsi_613216_115927&amp;cas=bR7lIIzc%2FkvEaLrKvqisZYTmUwT3WbyV9LXKfc5BapA"
+						class="L5Fo6c-PQbLGe" allow="identity-credentials-get"
+						id="gsi_613216_115927" title="「使用 Google 帳戶登入」按鈕"
+						style="display: block; position: relative; top: 0px; left: 0px; height: 0px; width: 0px; border: 0px;"></iframe>
+				</div>
+			</div>
+			<p class="pl-foot">
+				還沒有帳號？ <a th:href="@{/psych/register}" class="pl-link b">註冊一個</a>
+			</p>
+			<p class="pl-foot">
+				<a th:href="@{/}" class="pl-link">← 回首頁</a>
+			</p>
 
 		</div>
 		<!-- /pl-form-side -->
 	</div>
 
 	<script>
-		document.addEventListener('DOMContentLoaded', function () {
-			var toggle = document.querySelector('.pl-toggle');
-			var pwInput = document.getElementById('psychPassword');
-			if (toggle && pwInput) {
-				toggle.addEventListener('click', function () {
-					var isPassword = pwInput.type === 'password';
-					pwInput.type = isPassword ? 'text' : 'password';
-					toggle.querySelector('.on').style.display = isPassword ? 'none' : '';
-					toggle.querySelector('.off').style.display = isPassword ? '' : 'none';
-				});
-			}
-		});
+		document
+				.addEventListener(
+						'DOMContentLoaded',
+						function() {
+							var toggle = document.querySelector('.pl-toggle');
+							var pwInput = document
+									.getElementById('psychPassword');
+							if (toggle && pwInput) {
+								toggle
+										.addEventListener(
+												'click',
+												function() {
+													var isPassword = pwInput.type === 'password';
+													pwInput.type = isPassword ? 'text'
+															: 'password';
+													toggle.querySelector('.on').style.display = isPassword ? 'none'
+															: '';
+													toggle
+															.querySelector('.off').style.display = isPassword ? ''
+															: 'none';
+												});
+							}
+						});
 	</script>
 
 	<script th:inline="javascript">
