@@ -192,6 +192,13 @@ public class CourseService {
 
 		return repository.countByCourseStatus(courseStatus);
 	}
+	public long countCoursesByStatusAndPsych(Integer psychId, Byte courseStatus) {
+		if (courseStatus == null) {
+			throw new IllegalArgumentException("課程狀態不能為空");
+		}
+		
+		return repository.countByPsychologist_PsychIdAndCourseStatus(psychId, courseStatus);
+	}
 
 	public Page<Course> searchListedCourses(String keyword, Integer page, String orderBy) {
 		if (page == null || page < 0) {

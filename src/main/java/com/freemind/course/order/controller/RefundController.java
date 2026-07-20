@@ -73,6 +73,7 @@ public class RefundController {
         addRefundStatusMap(member, model);
 
         return "front-end/member/course/Refund";
+//        return "/member/course/my_course_order?tab=refunds";
     }
 
     // 送出退款申請
