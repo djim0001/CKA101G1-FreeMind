@@ -1,102 +1,225 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>編輯會員資料｜諮由自在</title>
-<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>編輯會員資料｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<!-- ============================================================
+     本頁專屬樣式（非共用）
+     ============================================================ -->
+<style>
+/* ---------- 頁首標題區 ---------- */
+.up-head { background: var(--bg-warm); padding: 2.6rem 0 1.8rem; }
+.up-head-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.4rem; flex-wrap: wrap; }
+.up-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.up-head .crumb a:hover { color: var(--orange); }
+.up-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.up-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.up-head h1 em { font-style: normal; color: var(--orange); }
+.up-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
+
+/* ---------- 表單卡片 ---------- */
+.up-main { padding: 2.2rem 0 4.5rem; }
+.up-panel {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm); padding: 2.2rem 2.1rem;
+}
+.up-panel h2 { font-family: var(--serif); font-weight: 700; font-size: 1.24rem; margin: 0 0 1.4rem; }
+
+.up-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem 1.5rem; }
+.up-group { display: flex; flex-direction: column; gap: .45rem; }
+.up-group.full { grid-column: 1 / -1; }
+.up-group label { font-size: .9rem; font-weight: 500; color: var(--ink); }
+
+.up-field {
+	width: 100%; padding: .75rem 1rem;
+	font-family: inherit; font-size: .95rem; color: var(--ink);
+	background: var(--bg-warm); border: 1px solid var(--line);
+	border-radius: 14px; outline: none;
+	transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.up-field:focus { background: #fff; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(245, 142, 107, .18); }
+select.up-field { cursor: pointer; }
+input[type="file"].up-field { padding: .6rem .8rem; background: #fff; cursor: pointer; }
+input[type="file"].up-field::file-selector-button {
+	margin-right: .9rem; padding: .45rem 1rem;
+	font-family: inherit; font-size: .88rem; font-weight: 500; color: var(--ink);
+	background: var(--pink-soft); border: 1px solid var(--pink);
+	border-radius: 999px; cursor: pointer; transition: background .18s;
+}
+input[type="file"].up-field::file-selector-button:hover { background: var(--pink); }
+
+.up-error { font-size: .82rem; color: var(--orange-deep); }
+
+/* 頭像預覽 */
+.up-avatar-row { display: flex; align-items: center; gap: 1.3rem; flex-wrap: wrap; }
+.up-avatar-row .up-file { flex: 1; min-width: 240px; }
+.up-preview {
+	width: 108px; height: 108px; flex: 0 0 auto;
+	border-radius: 50%; object-fit: cover;
+	border: 4px solid #fff; box-shadow: var(--shadow-sm); background: var(--blue-soft);
+}
+
+/* 動作列 */
+.up-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .7rem; flex-wrap: wrap; margin-top: .6rem; }
+.up-actions .btn { border: none; }
+
+/* ---------- RWD ---------- */
+@media (max-width: 940px) { .up-head-inner { align-items: flex-start; } }
+@media (max-width: 640px) {
+	.up-form { grid-template-columns: 1fr; }
+	.up-panel { padding: 1.7rem 1.3rem; }
+	.up-actions { justify-content: stretch; }
+	.up-actions .btn { flex: 1; justify-content: center; }
+}
+</style>
 </head>
-<body class="thy2-member">
-	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
-	<main class="container">
-		<div class="section-head">
+
+<body>
+
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<!-- ================= 頁首標題 ================= -->
+	<section class="up-head">
+		<div class="wrap up-head-inner">
 			<div>
-				<p class="eyebrow">Edit profile</p>
-				<h2>編輯會員資料</h2>
+				<div class="crumb">
+					<a th:href="@{/}" href="/">首頁</a><span>/</span>
+					<a th:href="@{/member/profile}" href="#">會員資料</a><span>/</span>
+					<span style="opacity:1;color:var(--ink)">編輯資料</span>
+				</div>
+				<span class="script" style="font-size:1.3rem;">讓資料保持最新的樣子</span>
+				<h1>編輯<em>會員資料</em></h1>
+				<p>更新你的頭像與聯絡資訊，方便我們在需要時聯繫到你。</p>
 			</div>
-			<div class="section-head-actions">
-				<a class="btn ghost" th:href="@{/member/profile}">取消，回會員資料</a>
+			<div>
+				<a class="btn btn-ghost" th:href="@{/member/profile}" href="#">取消，回會員資料</a>
 			</div>
 		</div>
+	</section>
 
-		<div class="panel">
-			<form class="form-grid" th:action="@{/member/update}" th:object="${member}"
-				method="post" enctype="multipart/form-data">
+	<!-- ================= 編輯表單 ================= -->
+	<section class="up-main">
+		<div class="wrap">
+			<div class="up-panel">
+				<h2>基本資料</h2>
 
-				<div class="form-group full">
-					<label for="profilePicFile">頭像</label>
-					<input class="field" type="file" id="profilePicFile" name="profilePicFile"
-						accept="image/*" data-pic-preview="#picPreview">
-					<img class="avatar-photo" id="picPreview"
-						th:src="${member.profilePic != null} ? @{/member/profilePic} : ''"
-						th:hidden="${member.profilePic == null}" alt="頭像預覽">
-				</div>
+				<form class="up-form" th:action="@{/member/update}" th:object="${member}"
+					method="post" enctype="multipart/form-data">
 
-				<div class="form-group">
-					<label for="name">姓名</label>
-					<input class="field" type="text" th:field="*{name}">
-					<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-				</div>
+					<!-- 頭像 -->
+					<div class="up-group full">
+						<label for="profilePicFile">頭像</label>
+						<div class="up-avatar-row">
+							<div class="up-file">
+								<input class="up-field" type="file" id="profilePicFile" name="profilePicFile"
+									accept="image/*" data-pic-preview="#picPreview" />
+							</div>
+							<img class="up-preview" id="picPreview"
+								th:src="${member.profilePic != null} ? @{/member/profilePic} : ''"
+								th:hidden="${member.profilePic == null}" alt="頭像預覽" />
+						</div>
+					</div>
 
-				<div class="form-group">
-					<label for="nickname">暱稱</label>
-					<input class="field" type="text" th:field="*{nickname}">
-					<span class="error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
-				</div>
+					<div class="up-group">
+						<label for="name">姓名</label>
+						<input class="up-field" type="text" th:field="*{name}" />
+						<span class="up-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="gender">性別</label>
-					<select class="field" th:field="*{gender}">
-						<option value="男">男</option>
-						<option value="女">女</option>
-					</select>
-					<span class="error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
-				</div>
+					<div class="up-group">
+						<label for="nickname">暱稱</label>
+						<input class="up-field" type="text" th:field="*{nickname}" />
+						<span class="up-error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="birthday">生日</label>
-					<input class="field" type="date" th:field="*{birthday}">
-					<span class="error" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
-				</div>
+					<div class="up-group">
+						<label for="gender">性別</label>
+						<select class="up-field" th:field="*{gender}">
+							<option value="男">男</option>
+							<option value="女">女</option>
+						</select>
+						<span class="up-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="phoneNumber">手機號碼</label>
-					<input class="field" type="text" th:field="*{phoneNumber}">
-					<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
-				</div>
+					<div class="up-group">
+						<label for="birthday">生日</label>
+						<input class="up-field" type="date" th:field="*{birthday}" />
+						<span class="up-error" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="email">信箱</label>
-					<input class="field" type="text" th:field="*{email}">
-					<span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-				</div>
+					<div class="up-group">
+						<label for="phoneNumber">手機號碼</label>
+						<input class="up-field" type="text" th:field="*{phoneNumber}" />
+						<span class="up-error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="city">城市</label>
-					<input class="field" type="text" th:field="*{city}">
-					<span class="error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
-				</div>
+					<div class="up-group">
+						<label for="email">信箱</label>
+						<input class="up-field" type="text" th:field="*{email}" />
+						<span class="up-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+					</div>
 
-				<div class="form-group">
-					<label for="dist">地區</label>
-					<input class="field" type="text" th:field="*{dist}">
-					<span class="error" th:if="${#fields.hasErrors('dist')}" th:errors="*{dist}"></span>
-				</div>
+					<div class="up-group">
+						<label for="city">城市</label>
+						<input class="up-field" type="text" th:field="*{city}" />
+						<span class="up-error" th:if="${#fields.hasErrors('city')}" th:errors="*{city}"></span>
+					</div>
 
-				<div class="form-group full">
-					<label for="address">地址</label>
-					<input class="field" type="text" th:field="*{address}">
-					<span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
-				</div>
+					<div class="up-group">
+						<label for="dist">地區</label>
+						<input class="up-field" type="text" th:field="*{dist}" />
+						<span class="up-error" th:if="${#fields.hasErrors('dist')}" th:errors="*{dist}"></span>
+					</div>
 
-				<div class="form-group full section-head-actions">
-					<a class="btn ghost" th:href="@{/member/profile}">取消</a>
-					<button class="btn" type="submit">儲存</button>
-				</div>
-			</form>
+					<div class="up-group full">
+						<label for="address">地址</label>
+						<input class="up-field" type="text" th:field="*{address}" />
+						<span class="up-error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+					</div>
+
+					<div class="up-actions">
+						<a class="btn btn-ghost" th:href="@{/member/profile}" href="#">取消</a>
+						<button class="btn btn-primary" type="submit">儲存</button>
+					</div>
+				</form>
+			</div>
 		</div>
-	</main>
-	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+	</section>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
+
+	<!-- 頭像上傳即時預覽 -->
+	<script>
+	document.querySelectorAll('input[type="file"][data-pic-preview]').forEach(function (input) {
+		input.addEventListener('change', function () {
+			var img = document.querySelector(input.dataset.picPreview);
+			var file = input.files && input.files[0];
+			if (!img || !file) return;
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				img.src = e.target.result;
+				img.hidden = false;
+			};
+			reader.readAsDataURL(file);
+		});
+	});
+	</script>
 </body>
 </html>

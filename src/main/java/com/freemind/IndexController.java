@@ -48,11 +48,17 @@ public class IndexController {
         return "index";
     }
     
-    @GetMapping("/admin/home")   
-	public String adminHome(Model model) {
-//    		Admin admin = (Admin)model.getAttribute("admin");
-//    	model.addAttribute("admin", admin);
+
+    @GetMapping("/admin/home")
+	public String adminHome() {
+
 		return "back-end/adminHome";
 	}
+
+    // 聯繫客服（header / footer 的「聯繫客服」連結，未登入亦可瀏覽）
+    @GetMapping("/support")
+    public String support() {
+        return "front-end/member/memberpage/support";
+    }
   
 }
