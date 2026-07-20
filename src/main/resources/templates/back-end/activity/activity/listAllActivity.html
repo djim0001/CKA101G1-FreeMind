@@ -1,143 +1,369 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>後台活動列表</title>
-    <style>
-  /* =================================================================== */
-  /* 分配寬度比例 (100%) */
-  /* =================================================================== */
-  th:nth-child(1) { width: 10%; }  /* 圖片 */
-  th:nth-child(2) { width: 4%; }  /* 編號 */
-  th:nth-child(3) { width: 20%; } /* 活動名稱 */
-  th:nth-child(4) { width: 6%; } /* 縣市 */
-  th:nth-child(5) { width: 6%; } /* 區域 */
-  th:nth-child(6) { width: 13%; } /* 活動時間 */
-  th:nth-child(7) { width: 7%; }  /* 已報名/名額 */
-  th:nth-child(8) { width: 13%; } /* 報名時間 */
-  th:nth-child(9) { width: 7%; }  /* 報名狀態 */
-  th:nth-child(10) { width: 7%; } /* 活動狀態 */
-  th:nth-child(11) { width: 7%; } /* 查看詳情按鈕 */	
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>後台活動列表｜諮由自在 Free Mind</title>
 
-    </style>
+<style>
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--script: "Caveat", "OpenHuninn", cursive;
+	--display-en: "Baloo 2", sans-serif;
+}
+
+/* ---------- 分頁 ---------- */
+.pager {
+	display: flex; align-items: center; justify-content: center;
+	gap: .5rem; flex-wrap: wrap; margin: 2.8rem 0 .5rem;
+}
+.pager .pg-btn {
+	min-width: 42px; height: 42px; padding: 0 .7rem;
+	display: inline-flex; align-items: center; justify-content: center;
+	background: #fff; border: 1px solid var(--line); border-radius: 14px;
+	font-size: .95rem; font-weight: 500; color: var(--ink);
+	box-shadow: var(--shadow-sm);
+	transition: transform .18s, background .18s, color .18s, border-color .18s;
+	text-decoration: none;
+}
+.pager .pg-btn:hover { transform: translateY(-2px); border-color: var(--orange); color: var(--orange); }
+.pager .pg-btn.is-current {
+	background: var(--orange); border-color: var(--orange); color: #fff;
+	box-shadow: 0 8px 20px rgba(245, 142, 107, .4);
+}
+.pager .pg-btn.is-current:hover { color: #fff; }
+.pager .pg-arrow svg { width: 18px; height: 18px; }
+.pager .pg-btn.is-disabled {
+	opacity: .38; box-shadow: none; cursor: default; pointer-events: none;
+}
+.pager .pg-dots { color: var(--ink-soft); padding: 0 .1rem; letter-spacing: .1em; }
+
+@media (max-width: 520px) {
+	.pager { gap: .35rem; }
+	.pager .pg-btn { min-width: 36px; height: 36px; border-radius: 11px; font-size: .88rem; }
+}
+
+/* ---------- 版面 ---------- */
+.admin-wide { width: min(1160px, 92vw) !important; max-width: 1160px; margin-inline: auto; }
+
+/* ---------- 頁首 + 頂部 pill 導覽 ---------- */
+.page-head {
+	display: flex; align-items: flex-end; justify-content: space-between;
+	gap: 2rem; margin-bottom: 1.75rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line);
+	flex-wrap: wrap;
+}
+.page-kicker {
+	display: block; margin-bottom: .35rem; color: var(--orange);
+	font-size: .75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+}
+.page-head h1 {
+	margin: 0; color: var(--ink); font-family: var(--serif);
+	font-size: clamp(1.75rem, 3vw, 2.35rem); line-height: 1.3; letter-spacing: -.02em;
+}
+.page-head p { max-width: 31rem; margin: .3rem 0 0; color: var(--ink-soft); font-size: .92rem; }
+
+.page-function-nav {
+	display: flex; gap: .35rem; flex-wrap: wrap;
+}
+.page-function-nav a {
+	display: inline-flex; align-items: center; justify-content: center;
+	min-height: 44px; padding: .55rem 1.2rem;
+	border: 1px solid transparent; border-radius: 999px;
+	color: var(--ink-soft); background: transparent;
+	font-size: .88rem; font-weight: 500; white-space: nowrap;
+	transition: all .16s ease;
+}
+.page-function-nav a:hover { color: var(--ink); background: var(--bg-warm); }
+.page-function-nav a.active {
+	border-color: rgba(194, 217, 237, .9); color: var(--ink); background: var(--blue-soft); font-weight: 700;
+}
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+/* ---------- 統計卡片 ---------- */
+.stats {
+	display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 1rem; margin-bottom: 1.6rem;
+}
+.stat {
+	padding: 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: var(--radius-md);
+	background: var(--white); box-shadow: var(--shadow-sm);
+}
+.stat span { display: block; color: var(--ink-soft); font-size: .78rem; }
+.stat strong { display: block; margin-top: .2rem; font-family: var(--serif); font-size: 1.7rem; color: var(--ink); }
+.stat.report strong { color: var(--orange-deep); }
+
+/* ---------- 篩選卡 ---------- */
+.filter-card {
+	background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-md);
+	padding: 1.4rem 1.6rem; box-shadow: var(--shadow-sm); margin-bottom: 1.6rem;
+	display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap;
+}
+.filter-field { display: flex; flex-direction: column; gap: .35rem; font-size: .82rem; color: var(--ink-soft); min-width: 130px; }
+.filter-field.grow { flex: 1 1 200px; }
+.filter-field input, .filter-field select {
+	height: 42px; padding: 0 .8rem; border: 1px solid var(--line); border-radius: 10px;
+	background: var(--bg-warm); font-family: inherit; font-size: .88rem; color: var(--ink);
+}
+.filter-field input:focus, .filter-field select:focus { outline: none; border-color: var(--orange); background: #fff; }
+.filter-actions { display: flex; gap: .6rem; }
+.btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+	height: 42px; padding: 0 1.6rem; border-radius: 999px; font-weight: 500; font-size: .9rem;
+	transition: all .18s; border: none; cursor: pointer; font-family: inherit; text-decoration: none;
+}
+.btn-primary { background: var(--orange); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--orange-deep); }
+
+.list-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
+.list-count { font-size: .9rem; color: var(--ink-soft); }
+.list-count b { color: var(--ink); font-weight: 700; }
+
+/* ---------- 表格 ---------- */
+.table-card {
+	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
+}
+table { width: 100%; border-collapse: collapse; }
+th:nth-child(1) { width: 8%; }
+th:nth-child(2) { width: 3%; }
+th:nth-child(3) { width: 19%; }
+th:nth-child(4) { width: 6%; }
+th:nth-child(5) { width: 6%; }
+th:nth-child(6) { width: 11%; }
+th:nth-child(7) { width: 11%; }
+th:nth-child(8) { width: 11%; }
+th:nth-child(9) { width: 9%; }
+th:nth-child(10) { width: 9%; }
+th:nth-child(11) { width: 7%; }
+
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .98rem; font-weight: 700; padding: 1.1rem .6rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .85rem .6rem; font-size: .92rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+.table-card img { width: 80px; height: 56px; object-fit: cover; border-radius: 8px; display: block; margin: 0 auto; }
+td:nth-child(6), td:nth-child(8) { text-align: left; white-space: nowrap; }
+
+.activity-status {
+	display: inline-block; padding: .3rem .8rem; border-radius: 999px;
+	font-size: .84rem; font-weight: 500; background: var(--bg-warm); color: var(--ink-soft);
+}
+
+.btn-mini {
+	display: inline-block; padding: .4rem .9rem; border-radius: 999px; font-size: .84rem;
+	white-space: nowrap; cursor: pointer; transition: all .18s; font-family: var(--sans);
+	background: #fff; color: var(--ink-soft); border: 1px solid var(--line);
+}
+.btn-mini:hover { background-color: var(--ink); color: #fff; border-color: var(--ink); }
+
+.empty-state {
+	background: var(--white); border: 1px dashed var(--line);
+	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
+}
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; color: var(--ink); }
+
+@media (max-width: 1000px) {
+	.table-card { overflow-x: auto; }
+	table { min-width: 1100px; }
+}
+</style>
 </head>
 <body>
-    <h1>後台活動列表</h1>
-    
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
 
-    <form th:action="@{/admin/activity/listActivities_ByCompositeQuery}" method="post">
-        <p>
-            縣市：<input type="text" name="activityCity">
-        </p>
-        <p>
-            區域：<input type="text" name="activityDist">
-        </p>
-        <p>
-            活動名稱關鍵字：<input type="text" name="activityName">
-        </p>
-        <p>
-            活動狀態：
-            <select name="activityStatus">
-                <option value="">全部</option>
-                <option value="0">待審核</option>
-                <option value="1">已審核</option>
-                <option value="2">已發布</option>
-                <option value="3">已退回</option>
-                <option value="4">取消</option>
-                <option value="5">延期</option>
-            </select>
-        </p>
-        <button type="submit">查詢</button>
-    </form>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-    <table border="1">
-        <tr>
-            <th>圖片</th>
-            <th>編號</th>
-            <th>活動名稱</th>
-            <th>縣市</th>
-            <th>區域</th>
-		    <th>活動時間</th>
-		    <th>名額</th>
-		    <th>報名時間</th>
-		    <th>報名狀態</th>
-		    <th>活動狀態</th>
-		    <th></th>
-		</tr>
-		
-        <tr th:each="a : ${activityListData}">
-             <td>
-		        <img th:if="${a.picture != null}" 
-		             th:src="@{'/activity-images/' + ${a.picture}}"
-		             style="max-width: 100px;">
-		        <img th:unless="${a.picture != null}" 
-		             th:src="@{/images/no-image.jpg}" 
-		             style="max-width: 100px;">
-		    </td>
-		    <td th:text="${a.activityId}"></td>
-		    <td th:text="${a.activityName}"></td>
-		    <td th:text="${a.activityCity}"></td>
-		    <td th:text="${a.activityDist}"></td>
-		    <td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
-			    正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
-			    備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
-			    已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
-			</td>
-		    <td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
-		    <td th:text="${a.registrationStatusText}"></td>
-		    	<td th:text="${a.activityStatusText}"></td>
-		    <td>
-		        <form th:action="@{/admin/activity/listOneActivity}" method="get" style="display:inline;">
-		            <input type="hidden" name="activityId" th:value="${a.activityId}">
-		            <button type="submit">查看詳情</button>
-		        </form>
-		    </td>
-            
-        </tr>
-    </table>
-    <div>
-	    <form th:action="@{/admin/activity/listActivities_ByCompositeQuery}" method="post" th:each="i : ${#numbers.sequence(1, totalPages)}" style="display:inline;">
-	        <input type="hidden" name="currentPage" th:value="${i}">
-	        <input type="hidden" name="activityCity" th:value="${param.activityCity}">
-	        <input type="hidden" name="activityDist" th:value="${param.activityDist}">
-	        <input type="hidden" name="activityName" th:value="${param.activityName}">
-	        <input type="hidden" name="activityStatus" th:value="${param.activityStatus}">
-	        <button type="submit" th:text="${i}" 
-	                th:style="${i == currentPage} ? 'font-weight:bold;' : ''"></button>
-	    </form>
-	</div>
-	<br>
-	<a th:href="@{/admin/activity/activityAdminIndex}">回後台活動導覽頁</a>
+	<main id="main-content">
+		<div class="wrap admin-wide" style="padding-top: clamp(1.25rem, 2vw, 1.75rem); padding-bottom: 4rem;">
 
-<script>
-(function() {
-    var rows = document.querySelectorAll('[data-activity-id]');
-    rows.forEach(function(row) {
-        var activityId = row.getAttribute('data-activity-id');
-        var confirmedCap = row.getAttribute('data-capacity');
-        var waitlistCap = row.getAttribute('data-waitlist-capacity');
+			<div class="page-head">
+				<div>
+					<span class="page-kicker">Activity Management</span>
+					<h1>後台活動列表</h1>
+					<p>審核、搜尋與管理所有揪團活動。</p>
+				</div>
+				<nav class="page-function-nav" aria-label="活動管理">
+					<a class="active" th:href="@{/admin/activity/listActivities_ByCompositeQuery}">活動列表</a>
+					<a th:href="@{/admin/activityCat/listAllActivityCat}">活動分類</a>
+					<a th:href="@{/admin/activity/report/list}">問題回報</a>
+				</nav>
+			</div>
 
-        var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
-        var socket = new WebSocket(wsUrl);
+			<p th:if="${errorMessage}" th:utext="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:utext="${successMessage}" class="msg-success"></p>
 
-        socket.onmessage = function(event) {
-            var data = JSON.parse(event.data);
+			<!-- 統計卡片 -->
+			<section class="stats">
+				<div class="stat">
+					<span>活動待審核</span><strong th:text="${countPending != null ? countPending : 0}">0</strong>
+				</div>
+				<div class="stat">
+					<span>活動待發布</span><strong th:text="${countApproved != null ? countApproved : 0}">0</strong>
+				</div>
+				<div class="stat">
+					<span>已發布</span><strong th:text="${countPublished != null ? countPublished : 0}">0</strong>
+				</div>
+				<div class="stat report">
+					<span>問題待處理</span><strong th:text="${countReportPending != null ? countReportPending : 0}">0</strong>
+				</div>
+				<div class="stat report">
+					<span>問題處理中</span><strong th:text="${countReportProcessing != null ? countReportProcessing : 0}">0</strong>
+				</div>
+				<div class="stat report">
+					<span>問題已處理</span><strong th:text="${countReportDone != null ? countReportDone : 0}">0</strong>
+				</div>
+			</section>
 
-            document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
-            document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+			<!-- 篩選 -->
+			<form class="filter-card" th:action="@{/admin/activity/listActivities_ByCompositeQuery}" method="post">
+				<div class="filter-field">
+					<label>縣市</label>
+					<input type="text" name="activityCity" th:value="${param.activityCity}">
+				</div>
+				<div class="filter-field">
+					<label>區域</label>
+					<input type="text" name="activityDist" th:value="${param.activityDist}">
+				</div>
+				<div class="filter-field grow">
+					<label>活動名稱關鍵字</label>
+					<input type="text" name="activityName" th:value="${param.activityName}">
+				</div>
+				<div class="filter-field">
+					<label>活動狀態</label>
+					<select name="activityStatus">
+						<option value="">全部</option>
+						<option value="0" th:selected="${param.activityStatus != null and param.activityStatus[0] == '0'}">待審核</option>
+						<option value="1" th:selected="${param.activityStatus != null and param.activityStatus[0] == '1'}">已審核</option>
+						<option value="2" th:selected="${param.activityStatus != null and param.activityStatus[0] == '2'}">已發布</option>
+						<option value="3" th:selected="${param.activityStatus != null and param.activityStatus[0] == '3'}">已退回</option>
+						<option value="4" th:selected="${param.activityStatus != null and param.activityStatus[0] == '4'}">取消</option>
+						<option value="5" th:selected="${param.activityStatus != null and param.activityStatus[0] == '5'}">延期</option>
+					</select>
+				</div>
+				<div class="filter-actions">
+					<button type="submit" class="btn btn-primary">查詢</button>
+				</div>
+			</form>
 
-            var total = data['正取'] + data['備取'] + data['未審核'];
-            var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
-            document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
-        };
+			<!-- 標題 + 共N筆 -->
+			<div class="list-head">
+				<h2 style="font-family:var(--serif);font-size:1.2rem;color:var(--ink);margin:0;">活動列表</h2>
+				<div class="list-count">
+					共 <b th:text="${totalCount != null ? totalCount : 0}">0</b> 筆活動
+				</div>
+			</div>
 
-        socket.onerror = function(e) {
-            console.log('WebSocket錯誤(活動' + activityId + '):', e);
-        };
-    });
-})();
-</script>
+			<!-- 表格 -->
+			<div class="table-card" th:if="${activityListData != null and !activityListData.isEmpty()}">
+				<table>
+					<thead>
+						<tr>
+							<th>圖片</th>
+							<th>編號</th>
+							<th>活動名稱</th>
+							<th>縣市</th>
+							<th>區域</th>
+							<th>活動時間</th>
+							<th>名額</th>
+							<th>報名時間</th>
+							<th>報名狀態</th>
+							<th>活動狀態</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="a : ${activityListData}">
+							<td>
+								<img th:if="${a.picture != null}"
+									 th:src="@{'/activity-images/' + ${a.picture}}">
+								<img th:unless="${a.picture != null}"
+									 th:src="@{/images/no-image.jpg}">
+							</td>
+							<td th:text="${a.activityId}"></td>
+							<td th:text="${a.activityName}"></td>
+							<td th:text="${a.activityCity}"></td>
+							<td th:text="${a.activityDist}"></td>
+							<td th:text="${#temporals.format(a.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.activityEnd, 'MM/dd(E) HH:mm')}"></td>
+							<td th:attr="data-activity-id=${a.activityId},data-capacity=${a.capacity},data-waitlist-capacity=${a.waitlistCapacity}">
+								正取 <span th:id="'confirmed-' + ${a.activityId}" th:text="${a.regisCount} + '/' + ${a.capacity}"></span><br>
+								備取 <span th:id="'waitlist-' + ${a.activityId}" th:text="${a.waitlistCount} + '/' + ${a.waitlistCapacity}"></span><br>
+								已報名 <span th:id="'total-' + ${a.activityId}" th:text="${a.regisCount + a.waitlistCount + (pendingCountMap.get(a.activityId) ?: 0)} + '/' + ${a.capacity + a.waitlistCapacity}"></span>
+							</td>
+							<td th:text="${#temporals.format(a.regisStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(a.regisEnd, 'MM/dd(E) HH:mm')}"></td>
+							<td th:text="${a.registrationStatusText}"></td>
+							<td><span class="activity-status" th:text="${a.activityStatusText}"></span></td>
+							<td>
+								<form th:action="@{/admin/activity/listOneActivity}" method="get">
+									<input type="hidden" name="activityId" th:value="${a.activityId}">
+									<button type="submit" class="btn-mini">查看詳情</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${activityListData == null or activityListData.isEmpty()}">
+				<b>查無符合條件的活動</b>
+			</div>
+
+			<!-- 分頁 -->
+			<div th:if="${activityListData != null and !activityListData.isEmpty()}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/admin/activity/listActivities_ByCompositeQuery}, ${qs})}"></div>
+
+		</div>
+	</main>
+
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<script>
+	(function() {
+		var rows = document.querySelectorAll('[data-activity-id]');
+		rows.forEach(function(row) {
+			var activityId = row.getAttribute('data-activity-id');
+			var confirmedCap = row.getAttribute('data-capacity');
+			var waitlistCap = row.getAttribute('data-waitlist-capacity');
+
+			var wsUrl = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/activity/' + activityId;
+			var socket = new WebSocket(wsUrl);
+
+			socket.onmessage = function(event) {
+				var data = JSON.parse(event.data);
+				document.getElementById('confirmed-' + activityId).innerText = data['正取'] + '/' + confirmedCap;
+				document.getElementById('waitlist-' + activityId).innerText = data['備取'] + '/' + waitlistCap;
+				var total = data['正取'] + data['備取'] + data['未審核'];
+				var totalCap = parseInt(confirmedCap) + parseInt(waitlistCap);
+				document.getElementById('total-' + activityId).innerText = total + '/' + totalCap;
+			};
+			socket.onerror = function(e) {
+				console.log('WebSocket錯誤(活動' + activityId + '):', e);
+			};
+		});
+	})();
+	</script>
 </body>
 </html>

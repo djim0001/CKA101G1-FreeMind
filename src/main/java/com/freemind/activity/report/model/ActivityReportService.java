@@ -130,4 +130,9 @@ public class ActivityReportService {
 		}
 		return map;
 	}
+	
+	// 後台依狀態算總數(不分頁,給後台統計卡片用)
+	public long countByStatus(Integer status) {
+	    return reportRepo.countByReportStatus(status);
+	}
 }

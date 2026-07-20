@@ -179,32 +179,49 @@ public class ActivityService {
 	
 	// 發起者變更需延期活動的時間
 	public void confirmNewSchedule(Integer activityId, LocalDateTime activityStart, LocalDateTime activityEnd,
-            LocalDateTime regisStart, LocalDateTime regisEnd) {
+	        LocalDateTime regisStart, LocalDateTime regisEnd) {
+		
+		
 		Activity existing = repository.findById(activityId).orElse(null);
-		
+
 		if (existing == null || existing.getActivityStatus() != 5) {
-		throw new RuntimeException("此活動目前無法變更時間");
+			throw new RuntimeException("此活動目前無法變更時間");
 		}
+
+		// 選填欄位若未填，沿用資料庫原本的值，作為驗證比較基準
+		LocalDateTime finalRegisStart = (regisStart != null) ? regisStart : existing.getRegisStart();
+		LocalDateTime finalRegisEnd = (regisEnd != null) ? regisEnd : existing.getRegisEnd();
+
 		
+		// 時間先後順序驗證（比照新增活動的驗證邏輯）
+		if (!finalRegisEnd.isAfter(finalRegisStart)) {
+			throw new IllegalArgumentException("報名截止時間，必須晚於報名開始時間");
+		}
+		if (!activityStart.isAfter(finalRegisEnd)) {
+			throw new IllegalArgumentException("活動開始時間，必須晚於報名截止時間");
+		}
+		if (!activityEnd.isAfter(activityStart)) {
+			throw new IllegalArgumentException("活動結束時間，必須晚於活動開始時間");
+		}
 		existing.setActivityStart(activityStart);
 		existing.setActivityEnd(activityEnd);
-		
+
 		if (regisStart != null) {
-		existing.setRegisStart(regisStart);
+			existing.setRegisStart(regisStart);
 		}
 		if (regisEnd != null) {
-		existing.setRegisEnd(regisEnd);
+			existing.setRegisEnd(regisEnd);
 		}
-		
+
 		existing.setActivityStatus(2);
 		existing.setUpdatedAt(LocalDateTime.now());
 		repository.save(existing);
-		
+
 		List<Registration> confirmedRegis = regisRepo.findByActivityAndRegisStatusIn(existing, List.of(0, 1, 4));
 		for (Registration r : confirmedRegis) {
-		    noticeService.sendToMember(r.getMember().getMemberId(), null,
-		        "您報名的活動「" + existing.getActivityName() + "」新時間已確定為 "
-		        + existing.getActivityStart().toLocalDate() + " " + existing.getActivityStart().toLocalTime() + "，請留意。", (byte) 2);
+			noticeService.sendToMember(r.getMember().getMemberId(), null,
+				"您報名的活動「" + existing.getActivityName() + "」新時間已確定為 "
+				+ existing.getActivityStart().toLocalDate() + " " + existing.getActivityStart().toLocalTime() + "，請留意。", (byte) 2);
 		}
 	}
 	
@@ -338,5 +355,10 @@ public class ActivityService {
 	        result.add(notFull.get(i));
 	    }
 	    return result;
+	}
+	
+	// 依活動狀態算總數(不分頁,給後台統計卡片用)
+	public long countByStatus(Integer status) {
+	    return repository.countByActivityStatus(status);
 	}
 }
