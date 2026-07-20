@@ -6,11 +6,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberRepository;
 import com.freemind.login.notice.dto.PersonOption;
@@ -25,19 +28,25 @@ public class AdminNoticeController {
 	private final NoticeService noticeService;
 	private final MemberRepository memberRepository;
 	private final PsychologistRepository psychologistRepository;
-
+	private final AdminService adminSvc;
 	public AdminNoticeController(NoticeService noticeService,
-			MemberRepository memberRepository,
+			MemberRepository memberRepository, AdminService adminSvc,
 			PsychologistRepository psychologistRepository) {
 		this.noticeService = noticeService;
 		this.memberRepository = memberRepository;
+		this.adminSvc = adminSvc;
 		this.psychologistRepository = psychologistRepository;
 	}
+	@ModelAttribute("admin")
+    public Admin currentAdmin(Authentication authentication) {
+        return adminSvc.findByAccount(authentication.getName());
+    }
 
 	@GetMapping
 	public String managePage(
 			@RequestParam(name = "role", defaultValue = "member") String role,
 			@RequestParam(name = "keyword", required = false) String keyword,
+			@ModelAttribute("admin") Admin admin,
 			Model model) {
 
 		boolean blank = (keyword == null || keyword.isBlank());

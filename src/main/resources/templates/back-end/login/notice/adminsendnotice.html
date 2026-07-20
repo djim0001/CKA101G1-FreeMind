@@ -1,123 +1,432 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>發送通知</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>諮由自在｜發送通知</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-	font-family: "Microsoft JhengHei", "Noto Sans TC", "PingFang TC", sans-serif;
-	background-color: #f5f5f5; color: #333; line-height: 1.6; padding: 40px 20px;
-}
-h1 {
-	max-width: 720px; margin: 0 auto 28px; font-size: 28px; font-weight: 700;
-	color: #4a3e3e; padding-bottom: 16px; border-bottom: 2px solid #e8b4b4;
-}
-.alert {
-	max-width: 720px; margin: 0 auto 16px; padding: 12px 16px;
-	background-color: #eaf6ec; color: #2e7d43; border: 1px solid #cdead4;
-	border-radius: 6px; font-size: 14px;
-}
-form {
-	max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07); padding: 40px;
-}
-form > div { margin-bottom: 24px; }
-label.field-label {
-	display: block; margin-bottom: 8px; font-size: 15px; font-weight: 600; color: #7a6b6b;
-}
-.role-choices, .inline { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.role-choices label, .all-row label {
-	display: inline-flex; gap: 6px; align-items: center; font-size: 15px; cursor: pointer;
-}
-select, textarea {
-	width: 100%; padding: 10px 14px; border: 1px solid #f2dddd; border-radius: 6px;
-	font-size: 15px; color: #444; outline: none;
-}
-select:focus, textarea:focus {
-	border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232, 180, 180, 0.2);
-}
-textarea { resize: vertical; min-height: 120px; }
-.people-box {
-	max-height: 220px; overflow-y: auto; border: 1px solid #f2dddd;
-	border-radius: 8px; padding: 12px 14px; margin-top: 10px;
-	display: flex; flex-wrap: wrap; gap: 8px;
-}
-.people-box label {
-	display: inline-flex; gap: 5px; align-items: center; padding: 5px 12px;
-	background: #fbf2f2; border: 1px solid #f2dddd; border-radius: 999px;
-	font-size: 14px; color: #7a6b6b; cursor: pointer;
-}
-.people-box label:has(input:checked) { background: #e8b4b4; color: #fff; border-color: #e8b4b4; }
-.hint { font-size: 13px; color: #999; margin-top: 6px; }
-button[type="submit"] {
-	padding: 10px 28px; font-size: 15px; border: none; border-radius: 6px;
-	cursor: pointer; background-color: #e8b4b4; color: #fff;
-}
-button[type="submit"]:hover { background-color: #d39393; }
-.panel[hidden] { display: none; }
+	@font-face {
+		font-family: 'OpenHuninn';
+		src:
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+		font-weight: 400;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	:root {
+		--bg-warm: #FFFAEE;
+		--bg-soothing: #C2D9ED;
+		--blue-soft: #DCEAF5;
+		--orange: #F58E6B;
+		--orange-deep: #E5764F;
+		--pink: #FBD0BE;
+		--pink-soft: #FDE6DB;
+		--ink: #3A4B53;
+		--ink-soft: #6b7981;
+		--white: #FFFFFF;
+		--line: #ecdfce;
+		--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+		--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+		--radius-lg: 34px;
+		--radius-md: 22px;
+		--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+		--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+		--sans: "Noto Sans TC", system-ui, sans-serif;
+		--script: "Caveat", "OpenHuninn", cursive;
+		--display-en: "Baloo 2", sans-serif;
+	}
+
+	* { box-sizing: border-box; }
+	html { min-width: 320px; }
+
+	body {
+		display: flex;
+		min-width: 320px;
+		min-height: 100vh;
+		flex-direction: column;
+		margin: 0;
+		color: var(--ink);
+		background: var(--bg-warm);
+		font-family: var(--sans);
+		line-height: 1.78;
+		-webkit-font-smoothing: antialiased;
+		overflow-x: hidden;
+	}
+
+	a { color: inherit; text-decoration: none; }
+	button { border: 0; background: none; font-family: inherit; cursor: pointer; }
+	img, svg { display: block; max-width: 100%; }
+
+	.wrap { width: min(740px, 92vw); margin-inline: auto; }
+
+	main {
+		width: 100%;
+		flex: 1;
+		padding: clamp(1.25rem, 2vw, 1.75rem) 0 4rem;
+	}
+
+	.page-header {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1.5rem;
+		margin-bottom: 1.75rem;
+		padding-bottom: 1.4rem;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.page-kicker {
+		display: block;
+		margin-bottom: .35rem;
+		color: var(--orange);
+		font-size: .75rem;
+		font-weight: 700;
+		letter-spacing: .16em;
+		text-transform: uppercase;
+	}
+
+	h1 {
+		margin: 0;
+		color: var(--ink);
+		font-family: var(--serif);
+		font-size: clamp(1.6rem, 3vw, 2.15rem);
+		line-height: 1.3;
+		letter-spacing: -.02em;
+	}
+
+	.header-action {
+		flex: 0 0 auto;
+		padding: .55rem 1.3rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--white);
+		color: var(--ink);
+		font-size: .85rem;
+		font-weight: 700;
+		box-shadow: var(--shadow-sm);
+		transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+	}
+
+	.header-action:hover {
+		border-color: var(--orange);
+		background: var(--orange-deep);
+		color: var(--white);
+		transform: translateY(-2px);
+	}
+
+	.alert {
+		margin: 0 0 1.25rem;
+		padding: .85rem 1.15rem;
+		border: 1px solid #cfe6d3;
+		border-radius: 14px;
+		background: #eef8f0;
+		color: #2e7d43;
+		font-size: .9rem;
+	}
+
+	/* ---- 卡片化欄位區塊,呼應「通知管理」頁的 .card ---- */
+	form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+	.card {
+		padding: 1.5rem;
+		border: 1px solid var(--line);
+		border-radius: var(--radius-md);
+		background: var(--white);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.card.step-content { box-shadow: var(--shadow-md); }
+
+	.step-head {
+		display: flex;
+		align-items: center;
+		gap: .6rem;
+		margin-bottom: 1rem;
+	}
+
+	.step-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.75rem;
+		height: 1.75rem;
+		border-radius: 50%;
+		background: var(--pink-soft);
+		color: var(--orange-deep);
+		font-size: .82rem;
+		font-weight: 800;
+		font-family: var(--display-en);
+		flex-shrink: 0;
+	}
+
+	.field-label {
+		margin: 0;
+		font-size: .95rem;
+		font-weight: 700;
+		color: var(--ink);
+	}
+
+	/* 收件身分 / 全部發送:呼應通知歷史頁的 toolbar 藥丸連結樣式 */
+	.role-choices { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+	.role-choices input,
+	.all-row input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+	.role-choices label,
+	.all-row label {
+		display: inline-flex;
+		align-items: center;
+		gap: .4rem;
+		padding: .5rem 1.15rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--bg-warm);
+		color: var(--ink-soft);
+		font-size: .88rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition: background .16s ease, color .16s ease, border-color .16s ease, transform .16s ease;
+	}
+
+	.role-choices label:hover,
+	.all-row label:hover { border-color: var(--orange); transform: translateY(-1px); }
+
+	.role-choices label:has(input:checked),
+	.all-row label:has(input:checked) {
+		background: var(--orange);
+		border-color: var(--orange);
+		color: var(--white);
+	}
+
+	.all-row { margin-top: .85rem; }
+
+	select, textarea {
+		width: 100%;
+		padding: .65rem .9rem;
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		background: var(--bg-warm);
+		font-size: .92rem;
+		font-family: inherit;
+		color: var(--ink);
+		outline: none;
+		transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+	}
+
+	select:focus, textarea:focus {
+		border-color: var(--orange);
+		background: var(--white);
+		box-shadow: 0 0 0 3px rgba(245, 142, 107, .18);
+	}
+
+	textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
+
+	.char-count {
+		display: block;
+		margin-top: .4rem;
+		text-align: right;
+		font-size: .78rem;
+		color: var(--ink-soft);
+	}
+
+	.people-box {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .5rem;
+		max-height: 220px;
+		overflow-y: auto;
+		margin-top: .9rem;
+		padding: .9rem 1rem;
+		border: 1px solid var(--line);
+		border-radius: 14px;
+		background: var(--bg-warm);
+	}
+
+	.people-box label {
+		display: inline-flex;
+		gap: .35rem;
+		align-items: center;
+		padding: .3rem .8rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--white);
+		font-size: .85rem;
+		color: var(--ink-soft);
+		cursor: pointer;
+		transition: background .14s ease, color .14s ease, border-color .14s ease;
+	}
+
+	.people-box label:has(input:checked) {
+		background: var(--orange);
+		color: var(--white);
+		border-color: var(--orange);
+	}
+
+	.people-box input[type="checkbox"] { accent-color: var(--white); }
+
+	.hint {
+		display: flex;
+		align-items: center;
+		gap: .4rem;
+		margin-top: .65rem;
+		font-size: .8rem;
+		color: var(--ink-soft);
+	}
+
+	.hint::before { content: "💡"; font-size: .85rem; }
+
+	.panel[hidden] { display: none; }
+
+	/* 送出區:貼齊 通知管理/通知歷史 頁的按鈕語彙 */
+	.submit-row {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: .75rem;
+	}
+
+	.btn-ghost {
+		padding: .65rem 1.5rem;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--white);
+		color: var(--ink-soft);
+		font-size: .9rem;
+		font-weight: 700;
+		transition: border-color .16s ease, color .16s ease, transform .16s ease;
+	}
+
+	.btn-ghost:hover { border-color: var(--orange); color: var(--orange-deep); transform: translateY(-1px); }
+
+	button[type="submit"] {
+		padding: .75rem 2.2rem;
+		border-radius: 999px;
+		background: var(--orange);
+		color: var(--white);
+		font-size: .95rem;
+		font-weight: 700;
+		font-family: inherit;
+		cursor: pointer;
+		box-shadow: var(--shadow-sm);
+		transition: background .16s ease, transform .16s ease;
+	}
+
+	button[type="submit"]:hover { background: var(--orange-deep); transform: translateY(-2px); }
+
+	:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+	@media (max-width: 640px) {
+		.page-header { display: block; }
+		.header-action { display: inline-block; margin-top: .8rem; }
+		.card { padding: 1.25rem; }
+		.submit-row { flex-direction: column-reverse; align-items: stretch; }
+		.submit-row .btn-ghost, .submit-row button[type="submit"] { text-align: center; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		* { transition: none !important; }
+	}
 </style>
 </head>
 <body>
-	<h1>發送通知</h1>
+	<!-- ================= 導覽列 放在 body 內的最上方 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-	<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
-
-	<form th:action="@{/admin/notice/send}" method="post" id="sendForm">
-
-		<!-- 1. 收件身分 -->
-		<div>
-			<label class="field-label">收件身分</label>
-			<div class="role-choices">
-				<label><input type="radio" name="targetRole" value="member" checked /> 會員</label>
-				<label><input type="radio" name="targetRole" value="psych" /> 心理師</label>
-			</div>
-		</div>
-
-		<!-- 2. 收件對象:全選 or 勾特定人(依身分切換面板) -->
-		<div>
-			<label class="field-label">收件對象</label>
-			<div class="all-row">
-				<label><input type="checkbox" name="sendAll" value="true" id="sendAll" /> 全部發送(勾了就不用選特定對象)</label>
-			</div>
-
-			<div class="panel" id="memberPanel">
-				<div class="people-box">
-					<!-- TODO: 顯示欄位依你們 Member entity 的 getter 調整(這裡用帳號) -->
-					<label th:each="m : ${memberOptions}">
-						<input type="checkbox" name="targetIds" th:value="${m.memberId}" />
-						<span th:text="${m.memberAccount}">member01</span>
-					</label>
+	<main id="main-content">
+		<div class="wrap">
+			<section class="page-header">
+				<div>
+					<span class="page-kicker">Send Notification</span>
+					<h1>發送通知</h1>
 				</div>
-			</div>
+				<a class="header-action" th:href="@{/admin/notice}">通知管理</a>
+			</section>
 
-			<div class="panel" id="psychPanel" hidden>
-				<div class="people-box">
-					<label th:each="p : ${psychOptions}">
-						<input type="checkbox" name="targetIds" th:value="${p.psychId}" />
-						<span th:text="${p.name} + '(' + ${p.psychAccount} + ')'">王小明(psych01)</span>
-					</label>
+			<p class="alert" th:if="${alertMessage}" th:text="${alertMessage}"></p>
+
+			<form th:action="@{/admin/notice/send}" method="post" id="sendForm">
+
+				<!-- 1. 收件身分 -->
+				<div class="card step-content">
+					<div class="step-head">
+						<span class="step-num">1</span>
+						<p class="field-label">收件身分</p>
+					</div>
+					<div class="role-choices">
+						<label><input type="radio" name="targetRole" value="member" checked /> 會員</label>
+						<label><input type="radio" name="targetRole" value="psych" /> 心理師</label>
+					</div>
 				</div>
-			</div>
-			<p class="hint">切換身分會清空已勾選的對象,避免把會員的勾選誤送成心理師編號</p>
-		</div>
 
-		<!-- 3. 通知種類(兩種身分的字典不同,跟著切換) -->
-		<div>
-			<label class="field-label">通知種類</label>
-			<select name="noticeType" id="typeSelect"></select>
-		</div>
+				<!-- 2. 收件對象:全選 or 勾特定人(依身分切換面板) -->
+				<div class="card step-content">
+					<div class="step-head">
+						<span class="step-num">2</span>
+						<p class="field-label">收件對象</p>
+					</div>
 
-		<!-- 4. 內容 -->
-		<div>
-			<label class="field-label">通知內容</label>
-			<textarea name="content" maxlength="1000" placeholder="最多1000字"></textarea>
-		</div>
+					<div class="all-row">
+						<label><input type="checkbox" name="sendAll" value="true" id="sendAll" /> 全部發送(勾了就不用選特定對象)</label>
+					</div>
 
-		<div>
-			<button type="submit">發送</button>
+					<div class="panel" id="memberPanel">
+						<div class="people-box">
+							<!-- TODO: 顯示欄位依你們 Member entity 的 getter 調整(這裡用帳號) -->
+							<label th:each="m : ${memberOptions}">
+								<input type="checkbox" name="targetIds" th:value="${m.memberId}" />
+								<span th:text="${m.memberAccount}">member01</span>
+							</label>
+						</div>
+					</div>
+
+					<div class="panel" id="psychPanel" hidden>
+						<div class="people-box">
+							<label th:each="p : ${psychOptions}">
+								<input type="checkbox" name="targetIds" th:value="${p.psychId}" />
+								<span th:text="${p.name} + '(' + ${p.psychAccount} + ')'">王小明(psych01)</span>
+							</label>
+						</div>
+					</div>
+					<p class="hint">切換身分會清空已勾選的對象,避免把會員的勾選誤送成心理師編號</p>
+				</div>
+
+				<!-- 3. 通知種類(兩種身分的字典不同,跟著切換) -->
+				<div class="card step-content">
+					<div class="step-head">
+						<span class="step-num">3</span>
+						<p class="field-label">通知種類</p>
+					</div>
+					<select name="noticeType" id="typeSelect"></select>
+				</div>
+
+				<!-- 4. 內容 -->
+				<div class="card step-content">
+					<div class="step-head">
+						<span class="step-num">4</span>
+						<p class="field-label">通知內容</p>
+					</div>
+					<textarea name="content" maxlength="1000" placeholder="最多1000字" id="contentInput"></textarea>
+					<span class="char-count"><span id="charNow">0</span> / 1000</span>
+				</div>
+
+				<div class="submit-row">
+					<a class="btn-ghost" th:href="@{/admin/notice}">取消</a>
+					<button type="submit">發送</button>
+				</div>
+			</form>
 		</div>
-	</form>
+	</main>
+
+	<!-- ================= Footer 放在 body 結束前 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 
 	<script th:inline="none">
 	// 兩張表的種類字典不同:會員 0預約/1課程/2活動;心理師 0文章審核/1預約/2課程
@@ -152,6 +461,13 @@ button[type="submit"]:hover { background-color: #d39393; }
 		r.addEventListener('change', e => switchRole(e.target.value)));
 
 	switchRole('member'); // 初始
+
+	// 字數即時計數
+	const contentInput = document.getElementById('contentInput');
+	const charNow = document.getElementById('charNow');
+	contentInput.addEventListener('input', () => {
+		charNow.textContent = contentInput.value.length;
+	});
 	</script>
 </body>
 </html>
