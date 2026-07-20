@@ -1,69 +1,569 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>我的療癒足跡｜諮由自在</title>
-<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>我的療癒足跡｜諮由自在 Free Mind</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Caveat:wght@500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700;900&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+	<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+	<style>
+		.member-dashboard {
+			position: relative;
+			min-height: 70vh;
+			padding: clamp(2.25rem, 6vw, 5rem) 0 clamp(3.5rem, 7vw, 6rem);
+			overflow: hidden;
+			background:
+				radial-gradient(circle at 8% 9%, rgba(251, 208, 190, .48) 0 92px, transparent 93px),
+				radial-gradient(circle at 93% 25%, rgba(194, 217, 237, .5) 0 128px, transparent 129px),
+				var(--bg-warm);
+		}
+
+		.member-dashboard::before,
+		.member-dashboard::after {
+			position: absolute;
+			z-index: 0;
+			width: 190px;
+			height: 190px;
+			border: 1px solid rgba(58, 75, 83, .08);
+			border-radius: 50%;
+			content: "";
+			pointer-events: none;
+		}
+
+		.member-dashboard::before {
+			top: 10rem;
+			left: -118px;
+		}
+
+		.member-dashboard::after {
+			right: -96px;
+			bottom: 4rem;
+		}
+
+		.member-page-wrap {
+			position: relative;
+			z-index: 1;
+			width: min(1160px, 92vw);
+			margin-inline: auto;
+		}
+
+		.dashboard-hero {
+			position: relative;
+			display: grid;
+			grid-template-columns: minmax(0, 1.35fr) minmax(250px, .65fr);
+			gap: clamp(1.5rem, 4vw, 3.5rem);
+			align-items: center;
+			margin-bottom: clamp(2.2rem, 5vw, 4rem);
+			padding: clamp(2rem, 5vw, 4.4rem);
+			overflow: hidden;
+			border: 1px solid rgba(58, 75, 83, .08);
+			border-radius: var(--radius-lg);
+			/* memberpage 共用 Hero 色調：溫柔米白 #FFFAEE */
+			background: var(--bg-warm);
+			box-shadow: var(--shadow-md);
+		}
+
+		.dashboard-hero::after {
+			position: absolute;
+			top: -92px;
+			right: -66px;
+			width: 290px;
+			height: 290px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, .45);
+			content: "";
+		}
+
+		.hero-copy,
+		.hero-art {
+			position: relative;
+			z-index: 1;
+		}
+
+		.dashboard-eyebrow {
+			margin: 0 0 .7rem;
+			color: var(--orange-deep);
+			font-family: var(--script);
+			font-size: clamp(1.15rem, 2vw, 1.4rem);
+			font-weight: 600;
+			letter-spacing: .04em;
+		}
+
+		.dashboard-hero h1 {
+			max-width: 12em;
+			margin: 0 0 1rem;
+			color: var(--ink);
+			font-family: var(--zen-maru);
+			font-size: clamp(2rem, 4.5vw, 3.35rem);
+			font-weight: 700;
+			line-height: 1.28;
+			letter-spacing: .02em;
+		}
+
+		.dashboard-hero h1 em {
+			color: var(--orange-deep);
+			font-style: normal;
+		}
+
+		.dashboard-hero .hero-description {
+			max-width: 36rem;
+			margin: 0 0 1.6rem;
+			color: var(--ink);
+			font-size: 1rem;
+			line-height: 1.85;
+		}
+
+		.dashboard-primary-action {
+			display: inline-flex;
+			align-items: center;
+			gap: .55rem;
+			min-height: 48px;
+			padding: .78rem 1.45rem;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			box-shadow: 0 9px 22px rgba(245, 142, 107, .34);
+			font-weight: 700;
+			transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+		}
+
+		.dashboard-primary-action:hover {
+			color: var(--white);
+			background: var(--orange-deep);
+			box-shadow: 0 13px 28px rgba(229, 118, 79, .38);
+			transform: translateY(-2px);
+		}
+
+		.dashboard-primary-action svg {
+			width: 18px;
+			height: 18px;
+		}
+
+		.hero-art {
+			display: grid;
+			place-items: center;
+			min-height: 230px;
+		}
+
+		/* 外部會員樣式會以偽元素產生說明卡片，此頁不顯示該文字。 */
+		.dashboard-hero .hero-art::after {
+			display: none !important;
+			content: none !important;
+		}
+
+		.healing-orbit {
+			position: relative;
+			display: grid;
+			place-items: center;
+			width: min(230px, 100%);
+			aspect-ratio: 1;
+			border: 1px dashed rgba(58, 75, 83, .24);
+			border-radius: 50%;
+		}
+
+		.healing-orbit::before,
+		.healing-orbit::after {
+			position: absolute;
+			border-radius: 50%;
+			content: "";
+		}
+
+		.healing-orbit::before {
+			inset: 26px;
+			background: rgba(255, 255, 255, .55);
+			box-shadow: 0 18px 42px rgba(58, 75, 83, .09);
+		}
+
+		.healing-orbit::after {
+			top: 10px;
+			right: 20px;
+			width: 36px;
+			height: 36px;
+			background: var(--pink);
+		}
+
+		.healing-orbit svg {
+			position: relative;
+			z-index: 1;
+			width: 112px;
+			height: 112px;
+		}
+
+		.dashboard-section-head {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 1.5rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.dashboard-section-head .section-label {
+			margin: 0 0 .25rem;
+			color: var(--orange);
+			font-size: .78rem;
+			font-weight: 700;
+			letter-spacing: .2em;
+			text-transform: uppercase;
+		}
+
+		.dashboard-section-head h2 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: clamp(1.6rem, 3vw, 2.3rem);
+			font-weight: 700;
+		}
+
+		.dashboard-section-head > p {
+			max-width: 30rem;
+			margin: 0;
+			color: var(--ink-soft);
+			text-align: right;
+		}
+
+		.journey-grid {
+			display: grid;
+			grid-template-columns: repeat(6, minmax(0, 1fr));
+			gap: 1.25rem;
+		}
+
+		.journey-card {
+			position: relative;
+			display: flex;
+			flex-direction: column;
+			min-height: 250px;
+			padding: 1.65rem;
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: rgba(255, 255, 255, .94);
+			box-shadow: var(--shadow-sm);
+			transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+		}
+
+		.journey-card:nth-child(1),
+		.journey-card:nth-child(2),
+		.journey-card:nth-child(3) {
+			grid-column: span 2;
+		}
+
+		.journey-card:nth-child(4),
+		.journey-card:nth-child(5) {
+			grid-column: span 3;
+		}
+
+		.journey-card::after {
+			position: absolute;
+			right: -34px;
+			bottom: -42px;
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			background: var(--card-accent, var(--blue-soft));
+			content: "";
+			opacity: .68;
+			transition: transform .3s ease;
+		}
+
+		.journey-card:hover {
+			border-color: rgba(245, 142, 107, .45);
+			box-shadow: var(--shadow-md);
+			transform: translateY(-6px);
+		}
+
+		.journey-card:hover::after {
+			transform: scale(1.18);
+		}
+
+		.journey-card:nth-child(1) {
+			--card-accent: var(--pink-soft);
+		}
+
+		.journey-card:nth-child(2) {
+			--card-accent: var(--blue-soft);
+		}
+
+		.journey-card:nth-child(3) {
+			--card-accent: rgba(194, 217, 237, .7);
+		}
+
+		.journey-card:nth-child(4) {
+			--card-accent: rgba(251, 208, 190, .65);
+		}
+
+		.journey-card:nth-child(5) {
+			--card-accent: rgba(220, 234, 245, .86);
+		}
+
+		.card-icon {
+			display: grid;
+			place-items: center;
+			width: 54px;
+			height: 54px;
+			margin-bottom: 1.2rem;
+			border-radius: 17px;
+			color: var(--ink);
+			background: var(--card-accent, var(--blue-soft));
+		}
+
+		.card-icon svg {
+			width: 27px;
+			height: 27px;
+		}
+
+		.journey-card h3 {
+			margin: 0 0 .55rem;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: 1.2rem;
+			font-weight: 700;
+		}
+
+		.journey-card p {
+			margin: 0 0 1.4rem;
+			color: var(--ink-soft);
+			font-size: .92rem;
+			line-height: 1.75;
+		}
+
+		.card-link-label {
+			position: relative;
+			z-index: 1;
+			display: inline-flex;
+			align-items: center;
+			gap: .45rem;
+			margin-top: auto;
+			color: var(--orange-deep);
+			font-size: .88rem;
+			font-weight: 700;
+		}
+
+		.card-link-label svg {
+			width: 17px;
+			height: 17px;
+			transition: transform .2s ease;
+		}
+
+		.journey-card:hover .card-link-label svg {
+			transform: translateX(4px);
+		}
+
+		.journey-card:focus-visible,
+		.dashboard-primary-action:focus-visible {
+			outline: 3px solid var(--orange);
+			outline-offset: 4px;
+		}
+
+		@media (max-width: 900px) {
+			.dashboard-hero {
+				grid-template-columns: 1fr;
+			}
+
+			.hero-art {
+				display: none;
+			}
+
+			.journey-card:nth-child(n) {
+				grid-column: span 3;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.member-dashboard {
+				padding-top: 1.4rem;
+			}
+
+			.dashboard-hero {
+				padding: 1.7rem;
+				border-radius: var(--radius-md);
+			}
+
+			.dashboard-section-head {
+				display: block;
+			}
+
+			.dashboard-section-head > p {
+				margin-top: .55rem;
+				text-align: left;
+			}
+
+			.journey-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.journey-card:nth-child(n) {
+				grid-column: auto;
+				min-height: 220px;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.journey-card,
+			.journey-card::after,
+			.card-link-label svg,
+			.dashboard-primary-action {
+				transition: none;
+			}
+		}
+	</style>
 </head>
 <body class="thy2-member">
-	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
-	<main class="container">
-		<div class="section-head">
-			<div>
-				<p class="eyebrow">My Healing Journey</p>
-				<h2>我的療癒足跡</h2>
-				<p class="meta">管理你的預約、學習、活動與收藏，一站掌握專屬的療癒歷程。</p>
-			</div>
-			<div class="section-head-actions">
-				<a class="btn" th:href="@{/member/profile}">會員資料</a>
-			</div>
-		</div>
+	<div th:replace="~{fragments/header :: header}"></div>
 
-		<div class="card-grid">
-			<a class="content-card dash-card" th:href="@{/member/dashboard/myAppointment}">
-				<div class="card-body">
-					<div class="dash-icon">📅</div>
-					<h3>我的預約</h3>
-					<p>查看諮商預約紀錄與即將到來的會談時段。</p>
-					<span class="dash-go">前往查看 →</span>
+	<main class="member-dashboard">
+		<div class="member-page-wrap">
+			<section class="dashboard-hero" aria-labelledby="dashboard-title">
+				<div class="hero-copy">
+					<p class="dashboard-eyebrow">My Healing Journey</p>
+					<h1 id="dashboard-title">我的<em>療癒足跡</em></h1>
+					<a class="dashboard-primary-action" th:href="@{/member/profile}">
+						<span>管理會員資料</span>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							aria-hidden="true">
+							<path d="M5 12h14"></path>
+							<path d="m13 6 6 6-6 6"></path>
+						</svg>
+					</a>
 				</div>
-			</a>
-			<a class="content-card dash-card" th:href="@{/member/dashboard/myLearning}">
-				<div class="card-body">
-					<div class="dash-icon">📚</div>
-					<h3>個人學習空間</h3>
-					<p>進入已購買的課程，隨時繼續你的學習進度。</p>
-					<span class="dash-go">開始學習 →</span>
+				<div class="hero-art" aria-hidden="true">
+					<div class="healing-orbit">
+						<svg viewBox="0 0 120 120" fill="none">
+							<path d="M60 101V49" stroke="#5A7A57" stroke-width="3"
+								stroke-linecap="round"></path>
+							<path d="M60 73C43 70 33 60 35 48C48 51 57 60 60 73Z"
+								fill="#9BB893" stroke="#5A7A57" stroke-width="2"></path>
+							<path d="M60 84C76 80 87 69 85 57C72 60 63 69 60 84Z"
+								fill="#C2D9ED" stroke="#4F7B96" stroke-width="2"></path>
+							<path d="M60 18C48 18 41 28 41 39C41 48 48 53 60 53C72 53 79 48 79 39C79 28 72 18 60 18Z"
+								fill="#F58E6B"></path>
+							<path d="M60 22C53 22 48 29 48 36C48 42 53 46 60 46"
+								stroke="#A85974" stroke-width="2" stroke-linecap="round"></path>
+							<path d="M60 22C67 22 72 29 72 36C72 42 67 46 60 46"
+								stroke="#A85974" stroke-width="2" stroke-linecap="round"></path>
+						</svg>
+					</div>
 				</div>
-			</a>
-			<a class="content-card dash-card" th:href="@{/member/dashboard/myActivityRegistration}">
-				<div class="card-body">
-					<div class="dash-icon">🤝</div>
-					<h3>我的活動</h3>
-					<p>管理你報名的揪團活動與參與紀錄。</p>
-					<span class="dash-go">查看活動 →</span>
+			</section>
+
+			<section aria-labelledby="journey-title">
+				<div class="dashboard-section-head">
+					<div>
+						<p class="section-label">Member Space</p>
+						<h2 id="journey-title">你的專屬空間</h2>
+					</div>
+					<p>從這裡繼續每一段療癒與學習旅程。</p>
 				</div>
-			</a>
-			<a class="content-card dash-card" th:href="@{/member/dashboard/myCollection}">
-				<div class="card-body">
-					<div class="dash-icon">🔖</div>
-					<h3>我的收藏</h3>
-					<p>回顧收藏的課程與文章，隨時再次探索。</p>
-					<span class="dash-go">瀏覽收藏 →</span>
+
+				<div class="journey-grid">
+					<a class="journey-card" th:href="@{/member/dashboard/myAppointment}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+								<rect x="3" y="5" width="18" height="16" rx="3"></rect>
+								<path d="M8 3v4M16 3v4M3 10h18"></path>
+								<path d="m9 15 2 2 4-4"></path>
+							</svg>
+						</span>
+						<h3>我的預約</h3>
+						<p>查看諮商預約紀錄與即將到來的會談時段。</p>
+						<span class="card-link-label">
+							前往查看
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6"></path>
+							</svg>
+						</span>
+					</a>
+
+					<a class="journey-card" th:href="@{/member/dashboard/myLearning}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"></path>
+								<path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17h4.5A2.5 2.5 0 0 1 20 22V5.5Z"></path>
+							</svg>
+						</span>
+						<h3>個人學習空間</h3>
+						<p>進入已購買的課程，隨時繼續你的學習進度。</p>
+						<span class="card-link-label">
+							開始學習
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6"></path>
+							</svg>
+						</span>
+					</a>
+
+					<a class="journey-card" th:href="@{/member/dashboard/myActivityRegistration}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+								<circle cx="9" cy="7" r="4"></circle>
+								<path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+							</svg>
+						</span>
+						<h3>我的活動</h3>
+						<p>管理你報名的揪團活動與參與紀錄。</p>
+						<span class="card-link-label">
+							查看活動
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6"></path>
+							</svg>
+						</span>
+					</a>
+
+					<a class="journey-card" th:href="@{/member/dashboard/myCollection}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+								<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"></path>
+							</svg>
+						</span>
+						<h3>我的收藏</h3>
+						<p>回顧收藏的課程、文章與關注的活動，讓喜歡的內容陪你久一點。</p>
+						<span class="card-link-label">
+							瀏覽收藏
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6"></path>
+							</svg>
+						</span>
+					</a>
+
+					<a class="journey-card" th:href="@{/member/profile}">
+						<span class="card-icon" aria-hidden="true">
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="8" r="4"></circle>
+								<path d="M4 21a8 8 0 0 1 16 0"></path>
+							</svg>
+						</span>
+						<h3>會員資料</h3>
+						<p>檢視與編輯個人資料，維護你的帳號資訊。</p>
+						<span class="card-link-label">
+							前往管理
+							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" aria-hidden="true">
+								<path d="M5 12h14M13 6l6 6-6 6"></path>
+							</svg>
+						</span>
+					</a>
 				</div>
-			</a>
-			<a class="content-card dash-card" th:href="@{/member/profile}">
-				<div class="card-body">
-					<div class="dash-icon">👤</div>
-					<h3>會員資料</h3>
-					<p>檢視與編輯個人資料，維護帳號資訊。</p>
-					<span class="dash-go">前往管理 →</span>
-				</div>
-			</a>
+			</section>
 		</div>
 	</main>
-	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+	<script src="/js/nav.js"></script>
 	<script th:src="@{/js/login/common/ui.js}"></script>
 </body>
 </html>

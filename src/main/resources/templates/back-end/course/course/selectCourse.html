@@ -325,14 +325,22 @@
 			border: 1px solid transparent;
 			border-radius: 999px;
 			color: var(--ink-soft);
+			background: transparent;
+			box-shadow: none;
 			font-size: .84rem;
 			font-weight: 500;
 			white-space: nowrap;
-			transition: border-color .16s ease, color .16s ease, background .16s ease;
+			transition: color .16s ease;
 		}
 
-		body.admin-course-page .course-nav a:hover,
-		body.admin-course-page .course-nav a.active {
+		body.admin-course-page .course-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .course-nav a.active,
+		body.admin-course-page .course-nav a[aria-current="page"] {
 			border-color: rgba(194, 217, 237, .9);
 			color: var(--ink);
 			background: var(--blue-soft);
@@ -380,10 +388,34 @@
 
 		body.admin-course-page .page-head-actions {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
 			justify-content: flex-end;
 			gap: 1rem;
 			margin-left: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: .25rem;
+			width: max-content;
+			max-width: 100%;
+			margin-left: 0;
+			padding: 0;
+			overflow-x: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: .5rem .8rem;
+			font-size: .84rem;
+			line-height: 1.2;
 		}
 
 		body.admin-course-page .page-head-actions p {
@@ -1136,11 +1168,7 @@
 		}
 
 		body.admin-course-page .nav-inner > .header-course-nav {
-			flex: 1 1 auto;
-			min-width: 0;
-			min-height: 0;
-			padding: 0;
-			background: transparent;
+			display: none !important;
 		}
 
 		body.admin-course-page .site-footer {
@@ -1204,7 +1232,9 @@
 			}
 
 			body.admin-course-page .page-head-actions {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
 				margin-left: 0;
 			}
 
@@ -1258,6 +1288,132 @@
 			}
 		}
 
+		/* 所有課程後台頁面共用：固定功能導覽的尺寸、色調與位置。 */
+		body.admin-course-page .page-head-actions,
+		body.admin-course-page .page-head-actions .page-function-nav,
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			box-sizing: border-box;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			min-height: 48px;
+			border-color: transparent;
+			color: var(--ink-soft);
+			background: transparent;
+			font-size: .84rem;
+			font-weight: 500;
+			line-height: 1.2;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a.active,
+		body.admin-course-page .page-head-actions .page-function-nav a[aria-current="page"] {
+			border-color: var(--bg-soothing);
+			color: var(--ink);
+			background: var(--blue-soft);
+		}
+
+		@media (min-width: 1281px) {
+			body.admin-course-page .page-head {
+				display: grid;
+				grid-template-columns: minmax(16rem, 1fr) 55rem;
+				align-items: end;
+				gap: 1.5rem;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: 44rem 10rem;
+				align-items: center;
+				justify-content: end;
+				gap: 1rem;
+				width: 55rem;
+				margin-left: 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: .25rem;
+				width: 44rem;
+				max-width: none;
+				margin: 0;
+				overflow: visible;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 1280px) {
+			body.admin-course-page .page-head {
+				display: block;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 10rem;
+				width: 100%;
+				align-items: center;
+				gap: 1rem;
+				margin: 1rem 0 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(8.25rem, 1fr));
+				gap: .25rem;
+				width: 100%;
+				max-width: none;
+				margin: 0;
+				overflow-x: auto;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				align-self: center;
+				justify-self: end;
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 760px) {
+			body.admin-course-page .page-head-actions {
+				grid-template-columns: minmax(0, 1fr);
+				gap: .75rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				justify-self: stretch;
+				width: 100%;
+				min-width: 0;
+				max-width: none;
+			}
+		}
+
 	</style>
 </head>
 <body class="thy2-page admin-course-page">
@@ -1270,7 +1426,13 @@
 						<h1>課程發布管理</h1>
 					</div>
 					<div class="page-head-actions">
-						<p>審核上架申請，並由管理員決定課程下架。</p>
+						<nav class="course-nav page-function-nav" aria-label="課程商城管理" data-admin-course-nav>
+							<a data-admin-nav="courses" th:href="@{/admin/course/select_course}">課程發布管理</a>
+							<a data-admin-nav="orders" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
+							<a data-admin-nav="payout" th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
+							<a data-admin-nav="coupon" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+							<a data-admin-nav="categories" th:href="@{/admin/course/select_course_categories}">課程分類</a>
+						</nav>
 						<button class="btn ghost" type="button" data-toast="審核紀錄已匯出">匯出紀錄</button>
 					</div>
 				</div>

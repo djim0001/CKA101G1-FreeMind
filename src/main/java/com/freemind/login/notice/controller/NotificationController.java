@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.freemind.login.admin.model.Admin;
 import com.freemind.login.notice.entity.Notification;
 import com.freemind.login.notice.service.NotificationService;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
@@ -28,6 +29,19 @@ public class NotificationController {
 
 	@Autowired
 	private NotificationService notificationSvc;
+
+	/*
+	 * 供 adminHeader fragment 顯示登入中的管理員（帳號／姓名）。
+	 * 直接取登入時載入的 principal，不需再查 DB；非管理員回 null。
+	 */
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+		if (authentication == null
+				|| !(authentication.getPrincipal() instanceof AdminUserDetails ud)) {
+			return null;
+		}
+		return ud.getAdmin();
+	}
 
 	/*
 	 * 顯示系統公告列表頁

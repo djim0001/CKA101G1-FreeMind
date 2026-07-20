@@ -622,6 +622,55 @@ body.thy2-member .summary-row.total {
 	font-size: 1.15rem;
 	font-weight: 700;
 }
+body.thy2-member .course-list-price-block {
+	display: grid;
+	gap: .4rem;
+	width: 100%;
+}
+body.thy2-member .course-list-price-block p {
+	margin: 0;
+}
+body.thy2-member .course-list-discount {
+	display: grid;
+	gap: .4rem;
+}
+body.thy2-member .original-price {
+	color: var(--ink-soft);
+	font-size: .82rem;
+}
+body.thy2-member .original-price del {
+	text-decoration-color: var(--orange-deep);
+	text-decoration-thickness: 2px;
+}
+body.thy2-member .discount-price {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	flex-wrap: wrap;
+}
+body.thy2-member .discount-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: .2rem .58rem;
+	border-radius: 999px;
+	color: var(--orange-deep);
+	background: var(--pink-soft);
+	font-size: .72rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+}
+body.thy2-member .discount-period {
+	color: var(--ink-soft);
+	font-size: .76rem;
+	line-height: 1.65;
+}
+body.thy2-member .discount-date-range {
+	display: flex;
+	gap: .25rem;
+	flex-wrap: wrap;
+	color: var(--ink);
+	font-weight: 500;
+}
 body.thy2-member .inline-actions,
 body.thy2-member .course-actions {
 	display: flex;
@@ -1269,9 +1318,9 @@ body.thy2-member :focus-visible {
 					th:action="@{/member/course/select_course}" aria-label="課程分類">
 					<a th:href="@{/member/course/select_course}"
 						th:classappend="${param.courseCatId == null or #strings.isEmpty(param.courseCatId[0])} ? 'active' : ''">全部課程</a>
-					<button type="submit" name="courseCatId"
+					<button type="submit" name="keyword"
 						th:each="courseCategories : ${courseCategoriesListAll}"
-						th:value="${courseCategories.courseCatId}"
+						th:value="${courseCategories.courseCatName}"
 						th:text="${courseCategories.courseCatName}"
 						th:classappend="${param.courseCatId != null and param.courseCatId[0] == #strings.toString(courseCategories.courseCatId)} ? 'active' : ''">課程分類</button>
 				</form>
@@ -1314,7 +1363,33 @@ body.thy2-member :focus-visible {
 						</span><span>提問 <b th:text="${course.commentCount}">0</b></span>
 					</div>
 					<div class="price-row">
-						<span class="price">NT$ <span th:text="${course.price}">0</span></span>
+						<div class="course-list-price-block">
+							<div class="course-list-discount"
+								th:if="${course.isDiscountValid() == true}">
+								<p class="original-price">
+									原價
+									<del>NT$ <span th:text="${course.price}">0</span></del>
+								</p>
+								<p class="price discount-price">
+									<span class="discount-badge">限時優惠</span>
+									<span>NT$ <span
+										th:text="${course.price * course.psychDiscount}">0</span></span>
+								</p>
+								<p class="discount-period">
+									<span>優惠期間</span>
+									<span class="discount-date-range">
+										<time th:datetime="${course.discountStart}"
+											th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日 HH:mm')}">開始時間</time>
+										<span aria-hidden="true">－</span>
+										<time th:datetime="${course.discountEnd}"
+											th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日 HH:mm')}">結束時間</time>
+									</span>
+								</p>
+							</div>
+							<span class="price"
+								th:unless="${course.isDiscountValid() == true}">NT$ <span
+								th:text="${course.price}">0</span></span>
+						</div>
 					</div>
 					<div class="inline-actions">
 						<form class="inline-form" method="post"

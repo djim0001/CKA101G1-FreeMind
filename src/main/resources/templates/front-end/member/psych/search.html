@@ -125,7 +125,7 @@
 <div class="psych-grid">
     <div class="psych-card" th:each="p : ${psychList}">
         <img th:src="${p.profilePic != null && !p.profilePic.isEmpty()}? 
-				@{'/psych-images/' + ${p.profilePic}} : @{/images/noPsychPic.png}" alt="大頭照">
+				@{'/psych-images/' + ${p.profilePic}} :  @{/psych-images/noPsychPic.png}" alt="大頭照">
         <h3 th:text="${p.name} + ' 心理師'"></h3>
         <p>
             性別：<span th:text="${p.gender}"></span>

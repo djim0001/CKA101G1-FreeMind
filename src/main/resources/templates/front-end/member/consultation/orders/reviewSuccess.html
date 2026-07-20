@@ -1,76 +1,47 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>評論送出成功</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; }
-
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .success-section { padding: 5rem 0 7rem; display: flex; justify-content: center; }
+    .success-card {
+        max-width: 480px; width: 100%;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 3.2rem 2.6rem; text-align: center;
     }
-
-    .card {
-        max-width: 480px;
-        margin: 60px auto 0;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 48px 40px;
-        text-align: center;
+    .success-check {
+        width: 68px; height: 68px; margin: 0 auto 1.4rem;
+        border-radius: 50%; background: var(--bg-soothing); color: var(--ink);
+        font-size: 2.1rem; line-height: 68px;
     }
-
-    .check {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 20px;
-        border-radius: 50%;
-        background: #eaf6ec;
-        color: #2e7d43;
-        font-size: 34px;
-        line-height: 64px;
-    }
-
-    h3 {
-        font-size: 20px;
-        color: #4a3e3e;
-        margin: 0 0 28px;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .btn {
-        display: inline-block;
-        padding: 11px 26px;
-        border-radius: 6px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .btn-solid { background-color: #e8b4b4; color: #fff; }
-    .btn-solid:hover { background-color: #d39393; }
-    .btn-outline { border: 1.5px solid #e8b4b4; color: #c07d7d; background: #fff; }
-    .btn-outline:hover { background: #fbf2f2; }
+    .success-card h3 { font-family: var(--serif); font-size: 1.3rem; color: var(--ink); margin: 0 0 1.8rem; }
+    .btn-group { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
 </style>
 </head>
 <body>
-    <div class="card">
-        <div class="check">✓</div>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="success-section">
+    <div class="success-card">
+        <div class="success-check">✓</div>
         <h3 th:text="${success}">感謝您的評價！</h3>
         <div class="btn-group">
             <a class="btn btn-outline" th:href="@{/member/orders/myOrders}">查看我的預約紀錄</a>
-            <a class="btn btn-solid" th:href="@{/}">回首頁</a>
+            <a class="btn btn-primary" th:href="@{/}">回首頁</a>
         </div>
     </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

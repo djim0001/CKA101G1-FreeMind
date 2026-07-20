@@ -1,11 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>設定成功</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<style>
+    .success-section { padding: 5rem 0 7rem; display: flex; justify-content: center; }
+    .success-card {
+        max-width: 480px; width: 100%;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 3.2rem 2.6rem; text-align: center;
+    }
+    .success-check {
+        width: 68px; height: 68px; margin: 0 auto 1.4rem;
+        border-radius: 50%; background: var(--bg-soothing); color: var(--ink);
+        font-size: 2.1rem; line-height: 68px;
+    }
+    .success-card h3 { font-family: var(--serif); font-size: 1.3rem; color: var(--ink); margin: 0 0 1.8rem; }
+    .success-home { display: inline-flex; }
+    .success-back {
+        display: block; margin-top: 1.1rem;
+        font-size: .88rem; color: var(--ink-soft); text-decoration: none;
+    }
+    .success-back:hover { color: var(--orange); text-decoration: underline; }
+</style>
 </head>
 <body>
-	<h3 th:text="${success}"></h3>
-	<a th:href="@{/psych/slots/manageSlotsForm}">繼續調整其他日期</a>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="success-section">
+    <div class="success-card">
+        <div class="success-check">✓</div>
+        <h3 th:text="${success}"></h3>
+        <a class="btn btn-primary success-home" th:href="@{/psych/slots/manageSlotsForm}">繼續調整其他日期</a>
+        <a th:href="@{/psych/orders/home}" class="success-back">← 回上頁</a>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

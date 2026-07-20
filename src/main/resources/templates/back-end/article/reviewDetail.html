@@ -1,104 +1,541 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>待審核文章</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="諮由自在 Free Mind 文章審核詳情" />
+	<title>審核文章詳情｜諮由自在後台</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Caveat:wght@500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700;900&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" href="/css/index.css" />
 <style>
-    .btn-action {
-        display: inline-block;
-        padding: 6px 12px;
-        background-color: #f0f0f0;
-        color: #000000;
-        text-decoration: none;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        cursor: pointer;
-    }
-
-    .btn-action:hover {
-        background-color: #e0e0e0;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .button-group {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-</style>
-</head>
-<body>
-    <h1>審核文章詳情</h1>
-    <a th:href="@{/admin/article/pending}" class="btn-action">返回待審核列表</a>
-	<br>
- 	<p>送審時間：<span th:text="${article.submittedAt}"></span></p>
-    <h2 th:text="${article.title}"></h2>
-    <p>文章分類：<span th:text="${article.articleCat.articleCatName}"></span></p>
-    
-    <div th:if="${article.coverImage != null}">
-    	<p>首圖：</p>
-        <img th:src="@{/article/{id}/cover(id=${article.articleId})}"
-             style="max-width: 300px; border-radius: 6px;" />
-    </div>
-
-    <p>內文：</p>
-    <div th:utext="${article.content}"></div>
-
-    <hr/>
-
-    <form th:action="@{/admin/article/{id}/review(id=${article.articleId})}" method="post"
-    	  onsubmit="return validateForm(event)">
-        <div>
-            <label>退回原因</label>
-            <select name="rejectReason">
-                <option value="" disabled selected>請選擇</option>
-                <option value="0">內容品質</option>
-                <option value="1">違反專業法規</option>
-                <option value="2">版權問題</option>
-                <option value="3">違反平台規範</option>
-                <option value="4">其他</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>退回說明（選擇「其他」時必填）</label>
-            <textarea name="rejectNote" rows="3" maxlength="200"
-                      oninput="updateCount(this)"></textarea>
-            <span id="charCount">0 / 200</span> 
-        </div>
-        
-        <div class="button-group">
-            <button type="submit" name="action" value="approve">審核通過</button>
-            <button type="submit" name="action" value="reject">退回審核</button>
-        </div>
-    </form>
-    
-    <script>
-		function validateForm(event) {
-		    const action = event.submitter.value;
-		    if (action === 'reject') {
-		        const reason = document.querySelector('select[name="rejectReason"]');
-		        const note = document.querySelector('textarea[name="rejectNote"]');
-		        if (!reason.value) {
-		            alert('請選擇退回原因');
-		            return false;
-		        }
-		        if (reason.value === '4' && !note.value.trim()) {
-		            alert('選擇「其他」時退回說明必填');
-		            return false;
-		        }
-		    }
-		    return true;
+		html { min-width: 320px; }
+		body.admin-article-page {
+			display: flex;
+			min-width: 320px;
+			min-height: 100vh;
+			flex-direction: column;
+			background: var(--bg-warm);
 		}
-		
+		.skip-link {
+			position: fixed;
+			top: .75rem;
+			left: .75rem;
+			z-index: 999;
+			padding: .65rem 1rem;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			transform: translateY(-160%);
+		}
+		.skip-link:focus { transform: translateY(0); }
+		.site-header {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			border-bottom: 1px solid rgba(236, 223, 206, .7);
+			color: var(--ink);
+			background: rgba(253, 246, 237, .85);
+			backdrop-filter: blur(12px);
+		}
+		.nav-inner {
+			display: flex;
+			align-items: center;
+			gap: 1.4rem;
+			height: 74px;
+		}
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: .8rem;
+			flex: 0 0 auto;
+		}
+		.nav-actions {
+			display: flex;
+			align-items: center;
+			gap: .55rem;
+			margin-left: auto;
+		}
+		.profile-entry {
+			display: flex;
+			align-items: center;
+			gap: .65rem;
+			min-height: 46px;
+			padding: .3rem .75rem .3rem .35rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			transition: border-color .16s ease, background .16s ease, transform .16s ease;
+		}
+		.profile-entry:hover {
+			border-color: var(--bg-soothing);
+			background: var(--blue-soft);
+			transform: translateY(-2px);
+		}
+		.profile-photo {
+			display: grid;
+			place-items: center;
+			width: 36px;
+			height: 36px;
+			flex: 0 0 auto;
+			border-radius: 50%;
+			color: var(--ink);
+			background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+		}
+		.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+		.profile-photo svg { width: 21px; height: 21px; stroke: currentColor; }
+		.profile-copy { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
+		.profile-copy small { color: var(--ink-soft); font-size: .68rem; }
+		.profile-copy strong {
+			max-width: 9.5rem;
+			overflow: hidden;
+			color: var(--ink);
+			font-size: .82rem;
+			font-weight: 500;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.logout-form { margin: 0; }
+		.logout-button {
+			display: inline-flex;
+			align-items: center;
+			gap: .4rem;
+			min-height: 46px;
+			padding: .6rem .8rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			cursor: pointer;
+			transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+		}
+		.logout-button:hover {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange-deep);
+			transform: translateY(-2px);
+		}
+		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.admin-main {
+			width: 100%;
+			flex: 1;
+			padding: clamp(1.5rem, 3vw, 2.5rem) 0 clamp(3.5rem, 6vw, 5rem);
+		}
+		.admin-wrap { width: min(1160px, 92vw); margin-inline: auto; }
+		.admin-page-header {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 2rem;
+			margin-bottom: 1.35rem;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--line);
+		}
+		.admin-kicker {
+			display: block;
+			margin-bottom: .3rem;
+			color: var(--orange);
+			font-size: .75rem;
+			font-weight: 700;
+			letter-spacing: .16em;
+			text-transform: uppercase;
+		}
+		.admin-page-header h1 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: clamp(1.75rem, 3vw, 2.35rem);
+			line-height: 1.3;
+		}
+		.admin-page-header p {
+			max-width: 32rem;
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .92rem;
+			text-align: right;
+		}
+		.article-admin-nav {
+			display: flex;
+			gap: .55rem;
+			margin-bottom: 1.35rem;
+			overflow-x: auto;
+			padding: .2rem .1rem .45rem;
+			scrollbar-width: thin;
+		}
+		.article-admin-nav a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 42px;
+			flex: 0 0 auto;
+			padding: .55rem 1rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .88rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+		}
+		.article-admin-nav a:hover,
+		.article-admin-nav a.active {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange);
+		}
+		.admin-panel {
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: var(--white);
+			box-shadow: var(--shadow-md);
+		}
+		.admin-panel-heading {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			min-height: 64px;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--line);
+			background: linear-gradient(90deg, var(--pink-soft), var(--white) 48%, var(--blue-soft));
+		}
+		.admin-panel-heading h2 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: 1.08rem;
+		}
+		.admin-panel-heading p { margin: 0; color: var(--ink-soft); font-size: .82rem; }
+		.admin-panel-body { padding: 1.25rem; }
+		.admin-toolbar {
+			display: grid;
+			grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(130px, 170px)) auto;
+			gap: .75rem;
+			align-items: end;
+			margin-bottom: 1.25rem;
+		}
+		.admin-field {
+			width: 100%;
+			min-height: 44px;
+			padding: .7rem .85rem;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			color: var(--ink);
+			background: var(--white);
+			font: inherit;
+			font-size: .9rem;
+		}
+		.admin-field:focus { border-color: var(--orange); outline: 0; box-shadow: 0 0 0 3px rgba(245, 142, 107, .14); }
+		.admin-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: .4rem;
+			min-height: 42px;
+			padding: .58rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			font-size: .86rem;
+			font-weight: 700;
+			line-height: 1;
+			white-space: nowrap;
+			transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+		}
+		.admin-btn:hover { color: var(--white); background: var(--orange-deep); transform: translateY(-2px); }
+		.admin-btn.secondary { border-color: var(--bg-soothing); color: var(--ink); background: var(--blue-soft); }
+		.admin-btn.secondary:hover { color: var(--ink); background: var(--bg-soothing); }
+		.admin-btn.danger { border-color: rgba(229, 118, 79, .28); color: var(--orange-deep); background: var(--pink-soft); }
+		.admin-btn.danger:hover { color: var(--white); background: var(--orange-deep); }
+		.table-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+		.admin-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+		.admin-table th,
+		.admin-table td { padding: .9rem 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+		.admin-table th {
+			color: var(--ink);
+			background: rgba(220, 234, 245, .62);
+			font-size: .8rem;
+			font-weight: 700;
+			letter-spacing: .04em;
+		}
+		.admin-table td { color: var(--ink-soft); font-size: .88rem; }
+		.admin-table tbody tr:last-child td { border-bottom: 0; }
+		.admin-table tbody tr:hover td { background: rgba(255, 250, 238, .72); }
+		.article-summary strong { display: block; color: var(--ink); font-family: var(--serif); font-size: .98rem; }
+		.article-summary span { font-size: .8rem; }
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			min-height: 30px;
+			padding: .25rem .7rem;
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--blue-soft);
+			font-size: .78rem;
+			font-weight: 700;
+		}
+		.inline-actions { display: flex; align-items: center; gap: .5rem; }
+		.inline-form { margin: 0; }
+		.empty-state { padding: 2.4rem 1rem !important; color: var(--ink-soft); text-align: center !important; }
+		.site-footer {
+			margin-top: 0;
+			padding: 1.35rem 0;
+			border-top: 1px solid var(--line);
+			color: var(--ink-soft);
+			background: var(--white);
+			font-size: .78rem;
+		}
+		.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+		.footer-inner strong { color: var(--ink); font-weight: 700; }
+		:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+		@media (max-width: 940px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+		}
+		@media (max-width: 980px) {
+			.admin-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.admin-toolbar > :first-child { grid-column: 1 / -1; }
+		}
+		@media (max-width: 700px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+			.admin-page-header { display: block; }
+			.admin-page-header p { margin-top: .5rem; text-align: left; }
+			.admin-panel-heading { display: block; }
+			.admin-panel-heading p { margin-top: .25rem; }
+		}
+		@media (max-width: 640px) {
+			.nav-inner {
+				gap: .55rem;
+				height: 64px;
+			}
+			.logout-button span { display: none; }
+			.logout-button {
+				display: grid;
+				place-items: center;
+				width: 42px;
+				min-height: 42px;
+				padding: 0;
+			}
+			.profile-photo {
+				width: 34px;
+				height: 34px;
+			}
+		}
+		@media (max-width: 540px) {
+			.logout-button { display: grid; place-items: center; width: 42px; min-height: 42px; padding: 0; }
+			.logout-button span { display: none; }
+			.admin-panel-body { padding: .85rem; }
+			.admin-toolbar { grid-template-columns: 1fr; }
+			.admin-toolbar > :first-child { grid-column: auto; }
+		}
+		@media (max-width: 430px) {
+			.profile-entry { display: none; }
+			.nav-actions { gap: .35rem; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* { transition: none !important; scroll-behavior: auto !important; }
+		}
+	</style>
+	<style>
+		.review-layout {
+			display: grid;
+			grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr);
+			gap: 1.25rem;
+			align-items: start;
+		}
+		.article-meta {
+			display: flex;
+			gap: .55rem 1.2rem;
+			flex-wrap: wrap;
+			margin-bottom: 1.1rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid var(--line);
+			color: var(--ink-soft);
+			font-size: .84rem;
+		}
+		.article-title {
+			margin: 0 0 1rem;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: clamp(1.45rem, 3vw, 2rem);
+			line-height: 1.45;
+		}
+		.cover-block { margin: 0 0 1.25rem; }
+		.cover-block figcaption {
+			margin-bottom: .45rem;
+			color: var(--ink-soft);
+			font-size: .82rem;
+		}
+		.cover-block img {
+			width: min(100%, 680px);
+			max-height: 420px;
+			object-fit: cover;
+			border-radius: 18px;
+			box-shadow: var(--shadow-sm);
+		}
+		.article-content {
+			color: var(--ink);
+			font-size: .96rem;
+			line-height: 1.9;
+			overflow-wrap: anywhere;
+		}
+		.article-content img { height: auto; margin: 1rem auto; border-radius: 14px; }
+		.review-form { display: grid; gap: 1rem; }
+		.form-group label {
+			display: block;
+			margin-bottom: .45rem;
+			color: var(--ink);
+			font-size: .86rem;
+			font-weight: 700;
+		}
+		.admin-textarea { min-height: 110px; resize: vertical; }
+		.char-count {
+			display: block;
+			margin-top: .35rem;
+			color: var(--ink-soft);
+			font-size: .76rem;
+			text-align: right;
+		}
+		.review-actions {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: .65rem;
+			padding-top: .25rem;
+		}
+		.review-note {
+			margin: 0;
+			padding: .85rem 1rem;
+			border-radius: 14px;
+			color: var(--ink-soft);
+			background: var(--blue-soft);
+			font-size: .8rem;
+		}
+		@media (max-width: 900px) {
+			.review-layout { grid-template-columns: 1fr; }
+		}
+		@media (max-width: 480px) {
+			.review-actions { grid-template-columns: 1fr; }
+		}
+	</style>
+</head>
+<body class="admin-article-page">
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<main id="main-content" class="admin-main">
+		<div class="admin-wrap">
+			<section class="admin-page-header" aria-labelledby="page-title">
+				<div>
+					<span class="admin-kicker">Article Review</span>
+					<h1 id="page-title">審核文章詳情</h1>
+				</div>
+				<p>閱讀完整文章內容後，選擇審核通過或填寫退回原因。</p>
+			</section>
+
+			<div class="review-layout">
+				<article class="admin-panel" aria-labelledby="review-article-title">
+					<div class="admin-panel-heading">
+						<h2>送審內容</h2>
+						<a class="admin-btn secondary"
+							th:href="@{/admin/article/pending}">返回待審核列表</a>
+					</div>
+					<div class="admin-panel-body">
+						<div class="article-meta">
+							<span>送審時間：<strong th:text="${article.submittedAt}">送審時間</strong></span>
+							<span>文章分類：<strong th:text="${article.articleCat.articleCatName}">文章分類</strong></span>
+						</div>
+						<h2 id="review-article-title" class="article-title"
+							th:text="${article.title}">文章標題</h2>
+
+						<figure class="cover-block" th:if="${article.coverImage != null}">
+							<figcaption>文章首圖</figcaption>
+							<img th:src="@{/article/{id}/cover(id=${article.articleId})}"
+								alt="文章首圖" />
+						</figure>
+
+						<div class="article-content" th:utext="${article.content}">
+							文章內文
+						</div>
+					</div>
+				</article>
+
+				<section class="admin-panel" aria-labelledby="review-form-title">
+					<div class="admin-panel-heading">
+						<h2 id="review-form-title">審核決定</h2>
+					</div>
+					<div class="admin-panel-body">
+						<form class="review-form"
+							th:action="@{/admin/article/{id}/review(id=${article.articleId})}"
+							method="post" onsubmit="return validateForm(event)">
+							<div class="form-group">
+								<label for="rejectReason">退回原因</label>
+								<select class="admin-field" id="rejectReason"
+									name="rejectReason">
+									<option value="" disabled selected>請選擇</option>
+									<option value="0">內容品質</option>
+									<option value="1">違反專業法規</option>
+									<option value="2">版權問題</option>
+									<option value="3">違反平台規範</option>
+									<option value="4">其他</option>
+								</select>
+							</div>
+
+							<div class="form-group">
+								<label for="rejectNote">退回說明（選擇「其他」時必填）</label>
+								<textarea class="admin-field admin-textarea"
+									id="rejectNote" name="rejectNote"
+									rows="3" maxlength="200"
+									oninput="updateCount(this)"></textarea>
+								<span id="charCount" class="char-count">0 / 200</span>
+							</div>
+
+							<p class="review-note">通過時不需選擇退回原因；退回時請先選擇原因，選擇「其他」則必須填寫說明。</p>
+
+							<div class="review-actions">
+								<button class="admin-btn" type="submit"
+									name="action" value="approve">審核通過</button>
+								<button class="admin-btn danger" type="submit"
+									name="action" value="reject">退回審核</button>
+							</div>
+						</form>
+					</div>
+				</section>
+			</div>
+		</div>
+	</main>
+
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<script>
+		function validateForm(event) {
+			const action = event.submitter.value;
+			if (action === 'reject') {
+				const reason = document.querySelector('select[name="rejectReason"]');
+				const note = document.querySelector('textarea[name="rejectNote"]');
+				if (!reason.value) {
+					alert('請選擇退回原因');
+					return false;
+				}
+				if (reason.value === '4' && !note.value.trim()) {
+					alert('選擇「其他」時退回說明必填');
+					return false;
+				}
+			}
+			return true;
+		}
+
 		function updateCount(textarea) {
-		    document.getElementById('charCount').textContent = textarea.value.length + ' / 200';
+			document.getElementById('charCount').textContent =
+				textarea.value.length + ' / 200';
 		}
 	</script>
-
 </body>
 </html>

@@ -1,67 +1,57 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>諮商服務反饋</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; }
+    .feedback-section { padding: 3.5rem 0 6rem; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .feedback-card {
+        max-width: 480px; margin: 0 auto;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 2.6rem 2.4rem;
+    }
+    .feedback-card h3 {
+        font-family: var(--serif); font-size: 1.5rem; color: var(--ink);
+        margin: 0 0 1.4rem; padding-bottom: 1rem; border-bottom: 2px solid var(--pink);
     }
 
-    .card {
-        max-width: 480px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
-
-    h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0 0 24px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
-
-    .menu {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
+    .menu { display: flex; flex-direction: column; gap: .8rem; }
     .menu a {
-        display: block;
-        padding: 16px 20px;
-        background-color: #fbf2f2;
-        border: 1px solid #f2dddd;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #4a3e3e;
-        font-size: 15px;
-        transition: background-color 0.2s, color 0.2s;
+        display: block; padding: 1rem 1.2rem;
+        background: var(--bg-warm); border: 1.5px solid var(--line); border-radius: var(--radius-md);
+        color: var(--ink); font-size: .95rem; font-weight: 500;
+        transition: background .2s, color .2s, border-color .2s;
     }
-    .menu a:hover {
-        background-color: #e8b4b4;
-        color: #fff;
-    }
+    .menu a:hover { background: var(--orange); border-color: var(--orange); color: #fff; }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>諮商服務反饋</h3>
 
-		<div class="menu">
-			<a th:href="@{/member/orders/reviewForm}">心得評論</a>
-			<a th:href="@{/member/reports/reportLookupForm}">問題回報</a>
-			<a th:href="@{/member/reports/myReportsForm}">查看問題回報處理進度</a>
-		</div>
-	</div>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="feedback-section">
+    <div class="wrap">
+        <div class="feedback-card">
+            <h3>諮商服務反饋</h3>
+
+            <div class="menu">
+                <a th:href="@{/member/orders/reviewForm}">心得評論</a>
+                <a th:href="@{/member/reports/reportLookupForm}">問題回報</a>
+                <a th:href="@{/member/reports/myReportsForm}">查看問題回報處理進度</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

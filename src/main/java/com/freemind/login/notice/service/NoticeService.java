@@ -59,7 +59,7 @@ public class NoticeService {
 	@Transactional
 	public void sendToPsychs(List<Integer> psychIds , Integer adminId , String content , byte noticeType) {
 		for(Integer id : psychIds) {
-			sendToMember(id , adminId , content , noticeType);
+			sendToPsych(id , adminId , content , noticeType);
 		}
 	}
 	

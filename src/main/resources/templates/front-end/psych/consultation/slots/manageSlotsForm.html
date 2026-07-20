@@ -1,90 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>調整可預約時段</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 <style>
-    * { box-sizing: border-box; }
+    .slots-section { padding: 3.5rem 0 6rem; }
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
+    .slots-card {
+        max-width: 480px; margin: 0 auto;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 2.6rem 2.4rem;
     }
-
-    .card {
-        max-width: 480px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
+    .slots-card h3 {
+        font-family: var(--serif); font-size: 1.5rem; color: var(--ink);
+        margin: 0 0 1.4rem; padding-bottom: 1rem; border-bottom: 2px solid var(--pink);
     }
 
-    h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0 0 24px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
+    .slots-error { color: var(--orange-deep); font-size: .88rem; margin-bottom: 1rem; }
 
-    label {
-        font-size: 14px;
-        color: #7a6b6b;
-        margin-right: 8px;
+    .slots-field { margin-bottom: 1.4rem; }
+    .slots-field label {
+        display: block; font-size: .85rem; font-weight: 500;
+        color: var(--ink-soft); margin-bottom: .5rem;
     }
+    .slots-field input[type="date"] {
+        width: 100%; padding: .8rem 1rem;
+        border: 1.6px solid var(--line); border-radius: var(--radius-md);
+        font-family: var(--sans); font-size: .95rem; color: var(--ink);
+        background: var(--bg-warm);
+    }
+    .slots-field input[type="date"]:focus { outline: none; border-color: var(--orange); }
 
-    input[type="date"] {
-        padding: 8px 10px;
-        border: 1px solid #e0d5d5;
-        border-radius: 6px;
-        font-family: inherit;
-        font-size: 14px;
-    }
-    input[type="date"]:focus {
-        outline: none;
-        border-color: #e8b4b4;
-    }
-
-    input[type="submit"] {
-        display: block;
-        width: 100%;
-        margin-top: 24px;
-        padding: 12px 0;
-        background-color: #e8b4b4;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    input[type="submit"]:hover {
-        background-color: #d39393;
-    }
-
-    .error {
-        color: #c62828;
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
+    .slots-submit { width: 100%; justify-content: center; border: none; margin-top: .4rem; }
 </style>
 </head>
 <body>
-	<div class="card">
-		<h3>調整可預約時段</h3>
 
-		<p class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
+<div th:replace="~{fragments/header :: header}"></div>
 
-		<form method="post" th:action="@{/psych/slots/manageLookup}">
-			<label>選擇日期：</label>
-			<input type="date" name="slotDate" th:min="${todayDate}">
-			<input type="submit" value="查詢／調整這天的時段">
-		</form>
-	</div>
+<main class="slots-section">
+    <div class="wrap">
+        <div class="slots-card">
+            <h3>調整可預約時段</h3>
+
+            <p class="slots-error" th:if="${errorMessage != null}" th:text="${errorMessage}"></p>
+
+            <form method="post" th:action="@{/psych/slots/manageLookup}">
+                <div class="slots-field">
+                    <label>選擇日期</label>
+                    <input type="date" name="slotDate" th:min="${todayDate}">
+                </div>
+                <button type="submit" class="btn btn-primary slots-submit">查詢／調整這天的時段</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

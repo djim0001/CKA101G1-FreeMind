@@ -11,17 +11,17 @@ import org.springframework.stereotype.Service;
  *
  *   key = otp:<purpose>:<email>        （例：otp:register:xxx@gmail.com）
  *   value = 6 位數驗證碼
- *   TTL = 5 分鐘，時間到 Redis 自動刪除（不用自己寫排程清理）
+ *   TTL = 30 秒，時間到 Redis 自動刪除（不用自己寫排程清理）
  *
- * 另外用 otp:cooldown:<purpose>:<email>（TTL 60 秒）做重寄冷卻，防止狂按重寄灌爆信箱。
+ * 另外用 otp:cooldown:<purpose>:<email>（TTL 30 秒）做重寄冷卻，防止狂按重寄灌爆信箱。
  */
 @Service
 public class OtpService {
 
 	/** 驗證碼有效時間 */
-	private static final Duration OTP_TTL = Duration.ofMinutes(5);
+	private static final Duration OTP_TTL = Duration.ofSeconds(30);
 	/** 重寄冷卻時間 */
-	private static final Duration RESEND_COOLDOWN = Duration.ofSeconds(60);
+	private static final Duration RESEND_COOLDOWN = Duration.ofSeconds(30);
 
 	private final StringRedisTemplate stringRedisTemplate;
 	private final SecureRandom random = new SecureRandom();
@@ -31,14 +31,14 @@ public class OtpService {
 	}
 
 	/**
-	 * 產生 6 位數驗證碼並存入 Redis（5 分鐘有效）。
+	 * 產生 6 位數驗證碼並存入 Redis（30 秒有效）。
 	 *
 	 * @param purpose 用途，例如 "register"（註冊）、"reset"（重設密碼），不同用途的驗證碼互不通用
-	 * @return 驗證碼；若仍在冷卻時間內（60 秒內已寄過）回傳 null
+	 * @return 驗證碼；若仍在冷卻時間內（30 秒內已寄過）回傳 null
 	 */
 	public String generateOtp(String purpose, String email) {
 		String cooldownKey = "otp:cooldown:" + purpose + ":" + email;
-		// setIfAbsent = Redis 的 SETNX：key 不存在才寫入成功。寫入失敗代表 60 秒內已產生過
+		// setIfAbsent = Redis 的 SETNX：key 不存在才寫入成功。寫入失敗代表 30 秒內已產生過
 		Boolean firstTime = stringRedisTemplate.opsForValue().setIfAbsent(cooldownKey, "1", RESEND_COOLDOWN);
 		if (!Boolean.TRUE.equals(firstTime)) {
 			return null; // 冷卻中

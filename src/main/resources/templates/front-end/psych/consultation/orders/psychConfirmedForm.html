@@ -1,18 +1,71 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>查看已確認訂單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<style>
+    .lookup-section { padding: 3.5rem 0 6rem; }
+    .lookup-head { text-align: center; margin-bottom: 2.2rem; }
+    .lookup-head h1 { font-family: var(--serif); font-size: 1.9rem; color: var(--ink); margin: 0; }
+
+    .lookup-card {
+        max-width: 480px; margin: 0 auto;
+        background: var(--white); border: 1px solid var(--line);
+        border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+        padding: 2.6rem 2.4rem;
+    }
+    .lookup-error {
+        background: var(--pink-soft); color: var(--orange-deep);
+        font-size: .88rem; padding: .75rem 1.1rem; border-radius: var(--radius-md);
+        margin-bottom: 1.2rem;
+    }
+    .lookup-field { margin-bottom: 1.4rem; }
+    .lookup-field label {
+        display: block; font-size: .85rem; font-weight: 500;
+        color: var(--ink-soft); margin-bottom: .5rem;
+    }
+    .lookup-field input[type="text"] {
+        width: 100%; padding: .8rem 1rem;
+        border: 1.6px solid var(--line); border-radius: var(--radius-md);
+        font-family: var(--sans); font-size: .95rem; color: var(--ink);
+        background: var(--bg-warm);
+    }
+    .lookup-field input[type="text"]:focus { outline: none; border-color: var(--orange); }
+    .lookup-submit { width: 100%; justify-content: center; border: none; }
+</style>
 </head>
 <body>
-	<h3>查看我的已確認訂單</h3>
 
-	<span style="color:red;" th:if="${errorMessage != null}" th:text="${errorMessage}"></span><br>
+<div th:replace="~{fragments/header :: header}"></div>
 
-	<form method="post" th:action="@{/psych/orders/psychConfirmed}">
-		心理師編號：<input type="text" name="psychId">
-		<input type="submit" value="查詢">
-	</form>
+<main class="lookup-section">
+    <div class="wrap">
+        <div class="lookup-head">
+            <span class="eyebrow">Confirmed Orders</span>
+            <h1>查看我的已確認訂單</h1>
+        </div>
 
+        <div class="lookup-card">
+            <div class="lookup-error" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+            <form method="post" th:action="@{/psych/orders/psychConfirmed}">
+                <div class="lookup-field">
+                    <label>心理師編號</label>
+                    <input type="text" name="psychId">
+                </div>
+                <button type="submit" class="btn btn-primary lookup-submit">查詢</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

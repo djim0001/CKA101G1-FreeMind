@@ -1,88 +1,125 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>新增管理員｜諮由自在後台</title>
-<link rel="stylesheet" th:href="@{/css/login/common/admin-base.css}" />
-<link rel="stylesheet" th:href="@{/css/login/common/admin-profile-theme.css}" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
 </head>
-<body class="thy2-page thy2-profile">
-	<div class="layout">
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
 		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('admin-add')}"></aside>
-		<div class="main">
-			<div th:replace="~{fragments/admin/adminTopbar :: topbar('帳號與權限')}"></div>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>新增管理員</h1>
-						<p>建立新的後台管理員帳號並設定基本資料。</p>
-					</div>
-					<div class="page-actions">
-						<a class="btn ghost" th:href="@{/admin/listAllAdmin}">回管理員列表</a>
-					</div>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<a th:href="@{/admin/listAllAdmin}" href="#">管理員列表</a><span>/</span>
+				<span class="current">新增管理員</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>新增<em>管理員</em></h1>
+					<p>建立新的後台管理員帳號並設定基本資料。</p>
 				</div>
-
-				<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
-
-				<div class="panel">
-					<form class="form-grid" method="post" th:action="@{/admin/insert}"
-						th:object="${adminVO}" enctype="multipart/form-data">
-
-						<div class="form-group">
-							<label for="adminAccount">帳號 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{adminAccount}">
-							<span class="error" th:if="${#fields.hasErrors('adminAccount')}" th:errors="*{adminAccount}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="adminPassword">密碼 <span class="required">*</span></label>
-							<input class="field" type="password" th:field="*{adminPassword}">
-							<span class="error" th:if="${#fields.hasErrors('adminPassword')}" th:errors="*{adminPassword}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="name">姓名 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{name}">
-							<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="phoneNumber">手機號碼 <span class="required">*</span></label>
-							<input class="field" type="text" th:field="*{phoneNumber}">
-							<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="accountStatus">帳號狀態</label>
-							<select class="field" th:field="*{accountStatus}">
-								<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
-							</select>
-							<span class="error" th:if="${#fields.hasErrors('accountStatus')}" th:errors="*{accountStatus}"></span>
-						</div>
-
-						<div class="form-group">
-							<label for="hiredate">入職日期</label>
-							<input class="field" type="datetime-local" th:field="*{hiredate}">
-							<span class="error" th:if="${#fields.hasErrors('hiredate')}" th:errors="*{hiredate}"></span>
-						</div>
-
-						<div class="form-group full">
-							<label for="profilePic">照片</label>
-							<input class="field" type="file" id="profilePic" name="profilePic" accept="image/*" data-pic-preview="#picPreview">
-							<span class="form-note">選擇照片後會立即在下方預覽（送出前不會上傳）。</span>
-							<img class="photo-preview" id="picPreview" hidden alt="照片預覽">
-						</div>
-
-						<div class="form-group full page-actions">
-							<a class="btn ghost" th:href="@{/admin/listAllAdmin}">取消</a>
-							<button class="btn" type="submit">新增管理員</button>
-						</div>
-					</form>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/listAllAdmin}" href="#">回管理員列表</a>
 				</div>
-			</main>
-		</div>
+			</div>
+
+			<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
+
+			<div class="panel">
+				<form class="form-grid" method="post" th:action="@{/admin/insert}"
+					th:object="${adminVO}" enctype="multipart/form-data">
+
+					<div class="form-group">
+						<label class="required" for="adminAccount">帳號</label>
+						<input class="field" type="text" th:field="*{adminAccount}">
+						<span class="error" th:if="${#fields.hasErrors('adminAccount')}" th:errors="*{adminAccount}"></span>
+					</div>
+
+					<div class="form-group">
+						<label class="required" for="adminPassword">密碼</label>
+						<input class="field" type="password" th:field="*{adminPassword}">
+						<span class="error" th:if="${#fields.hasErrors('adminPassword')}" th:errors="*{adminPassword}"></span>
+					</div>
+
+					<div class="form-group">
+						<label class="required" for="name">姓名</label>
+						<input class="field" type="text" th:field="*{name}">
+						<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+					</div>
+
+					<div class="form-group">
+						<label class="required" for="phoneNumber">手機號碼</label>
+						<input class="field" type="text" th:field="*{phoneNumber}">
+						<span class="error" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="accountStatus">帳號狀態</label>
+						<select class="field" th:field="*{accountStatus}">
+							<option th:each="entry : ${accountStatusMap}" th:value="${entry.key}" th:text="${entry.value}"></option>
+						</select>
+						<span class="error" th:if="${#fields.hasErrors('accountStatus')}" th:errors="*{accountStatus}"></span>
+					</div>
+
+					<div class="form-group">
+						<label for="hiredate">入職日期</label>
+						<input class="field" type="datetime-local" th:field="*{hiredate}">
+						<span class="error" th:if="${#fields.hasErrors('hiredate')}" th:errors="*{hiredate}"></span>
+					</div>
+
+					<div class="form-group full">
+						<label for="profilePic">照片</label>
+						<input class="field" type="file" id="profilePic" name="profilePic" accept="image/*" data-pic-preview="#picPreview">
+						<span class="form-note">選擇照片後會立即在下方預覽（送出前不會上傳）。</span>
+						<img class="photo-preview" id="picPreview" hidden alt="照片預覽">
+					</div>
+
+					<div class="form-group full page-actions">
+						<a class="btn btn-ghost" th:href="@{/admin/listAllAdmin}" href="#">取消</a>
+						<button class="btn btn-primary" type="submit">新增管理員</button>
+					</div>
+				</form>
+			</div>
+
+		</main>
 	</div>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<!-- 照片上傳即時預覽 -->
+	<script>
+	document.querySelectorAll('input[type="file"][data-pic-preview]').forEach(function (input) {
+		input.addEventListener('change', function () {
+			var img = document.querySelector(input.dataset.picPreview);
+			var file = input.files && input.files[0];
+			if (!img || !file) return;
+			var reader = new FileReader();
+			reader.onload = function (e) { img.src = e.target.result; img.hidden = false; };
+			reader.readAsDataURL(file);
+		});
+	});
+	</script>
 </body>
 </html>

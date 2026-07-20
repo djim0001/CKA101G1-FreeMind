@@ -51,17 +51,22 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
 	int countByCourseStatus(Byte courseStatus);
 
 	@Query("""
-			SELECT c
-			FROM Course c
-			JOIN c.psychologist p
-			WHERE c.courseStatus = :courseStatus
-			  AND (
-			        LOWER(c.courseName) LIKE LOWER(CONCAT('%', :keyword, '%'))
-			        OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-			      )
-			""")
-	Page<Course> searchByCourseOrPsychologist(@Param("keyword") String keyword,
-			@Param("courseStatus") Byte courseStatus, Pageable pageable);
+		    SELECT c
+		    FROM Course c
+		    JOIN c.psychologist p
+		    JOIN c.courseCategories cct
+		    WHERE c.courseStatus = :courseStatus
+		      AND (
+		            LOWER(c.courseName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		            OR LOWER(cct.courseCatName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		            OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		          )
+		    """)
+		Page<Course> searchByCourseOrPsychologist(
+		        @Param("keyword") String keyword,
+		        @Param("courseStatus") Byte courseStatus,
+		        Pageable pageable
+		);
 
 	// member_function
 	@Query("""

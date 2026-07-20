@@ -1322,7 +1322,8 @@ body.thy2-member .profile-entry-avatar {
 /* ========== End shared member-course shell ========== */
 </style>
 </head>
-<body class="thy2-member coupon-tone-page">
+<body class="thy2-member coupon-tone-page"
+	th:attr="data-member-unread-count=${countMemberUnread != null ? countMemberUnread : ''}">
 	<div th:replace="~{fragments/header :: header}"></div>
 
 <main class="container">
@@ -1409,8 +1410,6 @@ body.thy2-member .profile-entry-avatar {
 				</article>
 			</div>
 		</section>
-		<div
-			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon')}"></div>
 	</main>
 
 	<a class="floating-cart" th:href="@{/member/course/shopping_cart}"

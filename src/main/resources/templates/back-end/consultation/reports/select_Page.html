@@ -1,198 +1,713 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>查詢諮商問題回報</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>查詢諮商問題回報｜諮由自在後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
 <style>
-    * { box-sizing: border-box; }
+@font-face {
+	font-family: 'OpenHuninn';
+	src:
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff')
+		format('woff'),
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf')
+		format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
 
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
-    }
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--display-en: "Baloo 2", sans-serif;
+}
 
-    .card {
-        max-width: 900px;
-        margin: 0 auto 24px;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 36px 40px;
-    }
+* {
+	box-sizing: border-box;
+}
 
-    .card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-        padding-bottom: 14px;
-        border-bottom: 2px solid #e8b4b4;
-    }
-    .card-header h3 {
-        font-size: 22px;
-        color: #4a3e3e;
-        margin: 0;
-    }
-    .back-link {
-        display: inline-block;
-        padding: 8px 18px;
-        background-color: #e8b4b4;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-size: 14px;
-        transition: background-color 0.2s;
-    }
-    .back-link:hover { background-color: #d39393; }
+html {
+	min-width: 320px;
+}
 
-    h4 { font-size: 16px; color: #4a3e3e; margin: 0 0 12px; }
+body {
+	display: flex;
+	min-width: 320px;
+	min-height: 100vh;
+	flex-direction: column;
+	margin: 0;
+	color: var(--ink);
+	background: var(--bg-warm);
+	font-family: var(--sans);
+	line-height: 1.78;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
 
-    .error { color: #c62828; font-size: 14px; margin-bottom: 12px; }
+a {
+	color: inherit;
+	text-decoration: none;
+}
 
-    .search-form-wrap {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px 24px;
-        margin-bottom: 18px;
-    }
-    .search-field {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: #7a6b6b;
-    }
-    .search-field input[type="text"],
-    .search-field select {
-        padding: 7px 10px;
-        border: 1px solid #e0d5d5;
-        border-radius: 6px;
-        font-family: inherit;
-        font-size: 14px;
-    }
-    .search-field input:focus, .search-field select:focus {
-        outline: none;
-        border-color: #e8b4b4;
-    }
+button, input, select {
+	font: inherit;
+}
 
-    .search-btn {
-        padding: 9px 26px;
-        background-color: #e8b4b4;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .search-btn:hover { background-color: #d39393; }
+button {
+	border: 0;
+	background: none;
+	cursor: pointer;
+}
 
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-top: 6px;
-    }
-    th, td {
-        border: 1px solid #f2dddd;
-        padding: 10px 12px;
-        font-size: 14px;
-        vertical-align: middle;
-    }
-    th {
-        background-color: #fbf2f2;
-        color: #7a6b6b;
-        font-weight: 600;
-        white-space: nowrap;
-        text-align: center;
-    }
-    td { text-align: center; }
+img, svg {
+	display: block;
+	max-width: 100%;
+}
 
-    .detail-table th { text-align: left; width: 35%; }
-    .detail-table td { text-align: left; }
+.wrap {
+	width: min(1000px, 94vw);
+	margin-inline: auto;
+}
 
-    .nowrap { white-space: nowrap; }
-    .desc-cell { text-align: left; word-break: break-word; }
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	border-bottom: 1px solid rgba(236, 223, 206, .7);
+	color: var(--ink);
+	background: rgba(253, 246, 237, .85);
+	backdrop-filter: blur(12px);
+}
 
-    .status-pending { color: #b8860b; font-weight: bold; }
-    .status-processing { color: #1565c0; font-weight: bold; }
-    .status-resolved { color: #2e7d43; font-weight: bold; }
+.nav-inner {
+	width: min(1240px, 94vw);
+	margin-inline: auto;
+	display: flex;
+	align-items: center;
+	gap: 1.4rem;
+	height: 74px;
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: .8rem;
+	flex: 0 0 auto;
+}
+
+.logo-mind {
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	line-height: 1;
+	user-select: none;
+}
+
+.logo-mind .word {
+	display: flex;
+	align-items: flex-end;
+}
+
+.logo-mind .word span {
+	display: inline-block;
+	font-family: var(--display-en);
+	font-size: 1.5rem;
+	font-weight: 700;
+	letter-spacing: -.03em;
+	text-align: center;
+}
+
+.logo-mind .word .m {
+	width: 24px;
+	color: #EFB65E;
+}
+
+.logo-mind .word .i {
+	width: 9px;
+	color: #DB93A9;
+}
+
+.logo-mind .word .n {
+	width: 17px;
+	color: #8FB2C9;
+}
+
+.logo-mind .word .d {
+	width: 17px;
+	color: #9BB893;
+}
+
+.logo-mind .faces {
+	display: flex;
+	align-items: flex-start;
+	margin-top: -1px;
+}
+
+.logo-mind .faces svg {
+	display: block;
+}
+
+.logo-mind .faces .fm {
+	width: 24px;
+	height: 11px;
+}
+
+.logo-mind .faces .fi {
+	width: 9px;
+	height: 11px;
+}
+
+.logo-mind .faces .fn {
+	width: 17px;
+	height: 11px;
+}
+
+.logo-mind .faces .fd {
+	width: 17px;
+	height: 11px;
+}
+
+.brand-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.brand-text .logo {
+	color: var(--ink);
+	font-family: var(--zen-maru);
+	font-size: 1.18rem;
+	font-weight: 700;
+	letter-spacing: .02em;
+}
+
+.brand-text .en {
+	margin-top: .15em;
+	color: var(--ink-soft);
+	font-family: var(--display-en);
+	font-size: .85rem;
+	font-weight: 700;
+	letter-spacing: .24em;
+	text-transform: uppercase;
+}
+
+.admin-badge {
+	padding-left: 1.05rem;
+	border-left: 1px solid var(--line);
+	color: var(--ink-soft);
+	font-size: .84rem;
+	font-weight: 700;
+	letter-spacing: .08em;
+}
+
+.nav-actions {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	margin-left: auto;
+}
+
+.profile-entry {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	min-height: 46px;
+	padding: .3rem .75rem .3rem .35rem;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+}
+
+.profile-photo {
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	flex: 0 0 auto;
+	border-radius: 50%;
+	color: var(--ink);
+	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+}
+
+.profile-photo svg {
+	width: 21px;
+	height: 21px;
+	stroke: currentColor;
+}
+
+.profile-copy {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	line-height: 1.25;
+}
+
+.profile-copy small {
+	color: var(--ink-soft);
+	font-size: .68rem;
+}
+
+.profile-copy strong {
+	max-width: 9.5rem;
+	overflow: hidden;
+	color: var(--ink);
+	font-size: .82rem;
+	font-weight: 500;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.logout-form {
+	margin: 0;
+}
+
+.logout-button {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	min-height: 46px;
+	padding: .6rem .8rem;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	color: var(--ink);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+}
+
+.logout-button:hover {
+	border-color: var(--orange);
+	color: var(--white);
+	background: var(--orange-deep);
+}
+
+.logout-button svg {
+	width: 17px;
+	height: 17px;
+	stroke: currentColor;
+}
+
+main {
+	width: 100%;
+	flex: 1;
+	padding: clamp(1.5rem, 3vw, 2.5rem) 0 4rem;
+}
+
+.panel {
+	border: 1px solid var(--line);
+	border-radius: var(--radius-md);
+	background: var(--white);
+	box-shadow: var(--shadow-md);
+	overflow: hidden;
+	margin-bottom: 1.4rem;
+}
+
+.panel-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.1rem 1.5rem;
+	border-bottom: 1px solid var(--line);
+	background: linear-gradient(90deg, var(--pink-soft), var(--white) 52%,
+		var(--blue-soft));
+}
+
+.panel-heading h1 {
+	margin: 0;
+	color: var(--ink);
+	font-family: var(--serif);
+	font-size: 1.2rem;
+	letter-spacing: .02em;
+}
+
+.back-link {
+	color: var(--ink-soft);
+	font-size: .84rem;
+}
+
+.back-link:hover {
+	color: var(--orange-deep);
+}
+
+.panel-body {
+	padding: 1.5rem;
+}
+
+h2 {
+	margin: 0 0 .8rem;
+	color: var(--ink);
+	font-family: var(--serif);
+	font-size: 1.05rem;
+}
+
+.error {
+	color: var(--orange-deep);
+	font-size: .85rem;
+	margin-bottom: 1rem;
+}
+
+.form-grid {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 1rem;
+}
+
+.form-group {
+	min-width: 150px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: .35rem;
+	color: var(--ink);
+	font-size: .8rem;
+	font-weight: 700;
+}
+
+.field {
+	width: 100%;
+	min-height: 42px;
+	padding: .6rem .78rem;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	color: var(--ink);
+	background: var(--white);
+	outline: none;
+}
+
+.field:focus {
+	border-color: var(--orange);
+	box-shadow: 0 0 0 3px rgba(245, 142, 107, .14);
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	padding: .55rem 1.2rem;
+	border: 1px solid var(--orange);
+	border-radius: 999px;
+	color: var(--white);
+	background: var(--orange);
+	font-size: .85rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.btn:hover {
+	background: var(--orange-deep);
+}
+
+.table-wrap {
+	width: 100%;
+	overflow-x: auto;
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	background: var(--white);
+	margin-top: .5rem;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: .84rem;
+}
+
+th, td {
+	padding: .78rem .85rem;
+	border-bottom: 1px solid var(--line);
+	text-align: left;
+	vertical-align: middle;
+}
+
+th {
+	color: var(--ink);
+	background: var(--bg-warm);
+	font-size: .76rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.detail-table th {
+	width: 35%;
+}
+
+tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.desc-cell {
+	word-break: break-word;
+}
+
+.status {
+	display: inline-flex;
+	padding: .22rem .7rem;
+	border-radius: 999px;
+	font-size: .76rem;
+	font-weight: 700;
+}
+
+.status.pending {
+	background: #fdf3e2;
+	color: #b8860b;
+}
+
+.status.processing {
+	background: var(--blue-soft);
+	color: var(--ink);
+}
+
+.status.resolved {
+	background: #e7f4e9;
+	color: #1a7a1a;
+}
+
+.site-footer {
+	padding: 1.35rem 0;
+	border-top: 1px solid var(--line);
+	color: var(--ink-soft);
+	background: var(--white);
+	font-size: .78rem;
+}
+
+.footer-inner {
+	width: min(1240px, 94vw);
+	margin-inline: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.footer-inner strong {
+	color: var(--ink);
+	font-weight: 700;
+}
+
+@media ( max-width : 940px) {
+	.profile-copy, .admin-badge {
+		display: none;
+	}
+}
+
+@media ( max-width : 640px) {
+	.form-grid {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.form-group {
+		min-width: 0;
+	}
+}
 </style>
 </head>
 <body>
-    <div class="card">
-        <div class="card-header">
-            <h3>查詢諮商問題回報</h3>
-            <a class="back-link" th:href="@{/admin/reports/listAllReports}">回列表</a>
-        </div>
+	<header class="nav site-header">
+		<div class="nav-inner">
+			<a class="brand" th:href="@{/admin/home}" aria-label="諮由自在後台管理首頁">
+				<span class="logo-mind" aria-hidden="true"> <span
+					class="word"><span class="m">m</span><span class="i">i</span><span
+						class="n">n</span><span class="d">d</span></span> <span class="faces">
+						<svg class="fm" viewBox="0 0 24 11">
+							<g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<path d="M8 7 c2.4 2.4 5.6 2.4 8 0" /></g></svg> <svg class="fi"
+							viewBox="0 0 9 11">
+							<g stroke="#A85974" stroke-width="1.5" stroke-linecap="round"
+								fill="none">
+							<circle cx="4.5" cy="8" r="1.6" /></g></svg> <svg class="fn"
+							viewBox="0 0 17 11">
+							<g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M5.5 7.5 l6 0" /></g></svg> <svg class="fd" viewBox="0 0 17 11">
+							<g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0" />
+							<path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0" /></g></svg>
+				</span>
+			</span> <span class="brand-text"><span class="logo">諮由自在</span><span
+					class="en">Free&nbsp;Mind</span></span>
+			</a> <span class="admin-badge">系統管理後台</span>
+			<div class="nav-actions">
+				<a class="profile-entry" th:href="@{/admin/select_page}"
+					aria-label="前往管理員檔案"> <span class="profile-photo"
+					aria-hidden="true"> <img th:if="${admin != null}"
+						th:src="@{/admin/DBGifReader(adminId=${admin.adminId})}"
+						alt="管理員照片" /> <svg th:if="${admin == null}" viewBox="0 0 24 24"
+							fill="none">
+							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8"
+								stroke-linecap="round" />
+							<circle cx="12" cy="7" r="4" stroke-width="1.8" /></svg>
+				</span> <span class="profile-copy"> <small
+						th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
+						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
+				</span>
+				</a>
+				<form class="logout-form" th:action="@{/back-end/logout}"
+					method="post">
+					<button class="logout-button" type="submit" aria-label="登出後台">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+							<path
+								d="M14 8l4 4-4 4M18 12H8M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"
+								stroke-width="1.8" stroke-linecap="round"
+								stroke-linejoin="round" /></svg>
+						<span>登出</span>
+					</button>
+				</form>
+			</div>
+		</div>
+	</header>
 
-        <span class="error" th:if="${errorMessage != null}" th:text="${errorMessage}"></span>
+	<main>
+		<div class="wrap">
+			<div class="panel">
+				<div class="panel-heading">
+					<h1>查詢諮商問題回報</h1>
+					<a class="back-link" th:href="@{/admin/reports/listAllReports}">回列表</a>
+				</div>
+				<div class="panel-body">
+					<span class="error" th:if="${errorMessage != null}"
+						th:text="${errorMessage}"></span>
 
-        <form method="post" th:action="@{/admin/reports/search}">
-            <div class="search-form-wrap">
-                <span class="search-field">諮商問題編號：<input type="text" name="reportId"></span>
-                <span class="search-field">會員編號：<input type="text" name="memberId"></span>
-                <span class="search-field">
-                    處理狀態：
-                    <select name="reportStatus">
-                        <option value="">請選擇</option>
-                        <option value="0">待處理</option>
-                        <option value="1">處理中</option>
-                        <option value="2">已解決</option>
-                    </select>
-                </span>
-            </div>
-            <input type="submit" class="search-btn" value="查詢">
-        </form>
-    </div>
+					<form method="post" th:action="@{/admin/reports/search}">
+						<div class="form-grid">
+							<div class="form-group">
+								<label>諮商問題編號</label> <input class="field" type="text"
+									name="reportId">
+							</div>
+							<div class="form-group">
+								<label>會員編號</label> <input class="field" type="text"
+									name="memberId">
+							</div>
+							<div class="form-group">
+								<label>處理狀態</label> <select class="field" name="reportStatus">
+									<option value="">請選擇</option>
+									<option value="0">待處理</option>
+									<option value="1">處理中</option>
+									<option value="2">已解決</option>
+								</select>
+							</div>
+							<button type="submit" class="btn">查詢</button>
+						</div>
+					</form>
+				</div>
+			</div>
 
-    <!-- 單筆查詢結果 -->
-    <div class="card" th:if="${reports != null}">
-        <h4>查詢結果（單筆）</h4>
-        <table class="detail-table">
-            <tr><th>編號</th><td th:text="${reports.reportId}"></td></tr>
-            <tr><th>會員編號</th><td th:text="${reports.member.memberId}"></td></tr>
-            <tr><th>會員姓名</th><td th:text="${reports.member.name}"></td></tr>
-            <tr><th>問題描述</th><td th:text="${reports.issueDesc}"></td></tr>
-            <tr><th>回報日期</th><td th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm')}"></td></tr>
-            <tr><th>處理狀態</th>
-                <td th:switch="${reports.reportStatus}">
-                    <span th:case="0" class="status-pending">待處理</span>
-                    <span th:case="1" class="status-processing">處理中</span>
-                    <span th:case="2" class="status-resolved">已解決</span>
-                </td>
-            </tr>
-            <tr><th>處理備註</th><td th:text="${reports.reportNote}"></td></tr>
-        </table>
-    </div>
+			<!-- 單筆查詢結果 -->
+			<div class="panel" th:if="${reports != null}">
+				<div class="panel-body">
+					<h2>查詢結果（單筆）</h2>
+					<div class="table-wrap">
+						<table class="detail-table">
+							<tr>
+								<th>編號</th>
+								<td th:text="${reports.reportId}"></td>
+							</tr>
+							<tr>
+								<th>會員編號</th>
+								<td th:text="${reports.member.memberId}"></td>
+							</tr>
+							<tr>
+								<th>會員姓名</th>
+								<td th:text="${reports.member.name}"></td>
+							</tr>
+							<tr>
+								<th>問題描述</th>
+								<td th:text="${reports.issueDesc}"></td>
+							</tr>
+							<tr>
+								<th>回報日期</th>
+								<td
+									th:text="${#temporals.format(reports.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+							</tr>
+							<tr>
+								<th>處理狀態</th>
+								<td th:switch="${reports.reportStatus}"><span th:case="0"
+									class="status pending">待處理</span> <span th:case="1"
+									class="status processing">處理中</span> <span th:case="2"
+									class="status resolved">已解決</span></td>
+							</tr>
+							<tr>
+								<th>處理備註</th>
+								<td th:text="${reports.reportNote}"></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
 
-    <!-- 多筆查詢結果 -->
-    <div class="card" th:if="${reportsListData != null}">
-        <h4>查詢結果（多筆）</h4>
-        <table>
-            <tr>
-                <th>編號</th>
-                <th>會員編號</th>
-                <th>會員姓名</th>
-                <th>問題描述</th>
-                <th>回報日期</th>
-                <th>處理狀態</th>
-            </tr>
-            <tr th:each="report : ${reportsListData}">
-                <td th:text="${report.reportId}"></td>
-                <td th:text="${report.member.memberId}"></td>
-                <td class="nowrap" th:text="${report.member.name}"></td>
-                <td class="desc-cell" th:text="${report.issueDesc}"></td>
-                <td class="nowrap" th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
-                <td th:switch="${report.reportStatus}">
-                    <span th:case="0" class="status-pending">待處理</span>
-                    <span th:case="1" class="status-processing">處理中</span>
-                    <span th:case="2" class="status-resolved">已解決</span>
-                </td>
-            </tr>
-        </table>
-    </div>
+			<!-- 多筆查詢結果 -->
+			<div class="panel" th:if="${reportsListData != null}">
+				<div class="panel-body">
+					<h2>查詢結果（多筆）</h2>
+					<div class="table-wrap">
+						<table>
+							<tr>
+								<th>編號</th>
+								<th>會員編號</th>
+								<th>會員姓名</th>
+								<th>問題描述</th>
+								<th>回報日期</th>
+								<th>處理狀態</th>
+							</tr>
+							<tr th:each="report : ${reportsListData}">
+								<td th:text="${report.reportId}"></td>
+								<td th:text="${report.member.memberId}"></td>
+								<td class="nowrap" th:text="${report.member.name}"></td>
+								<td class="desc-cell" th:text="${report.issueDesc}"></td>
+								<td class="nowrap"
+									th:text="${#temporals.format(report.reportDate, 'yyyy-MM-dd HH:mm')}"></td>
+								<td th:switch="${report.reportStatus}"><span th:case="0"
+									class="status pending">待處理</span> <span th:case="1"
+									class="status processing">處理中</span> <span th:case="2"
+									class="status resolved">已解決</span></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<footer class="site-footer">
+		<div class="footer-inner">
+			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span> <span>請妥善保管管理員帳號資訊</span>
+		</div>
+	</footer>
 </body>
 </html>

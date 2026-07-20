@@ -35,6 +35,13 @@ public class PsychSecurityConfig {
 
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/psych/psychologistLogin").permitAll()
+
+            	// Google 登入
+//				.requestMatchers("/front-end/login/google").permitAll()
+
+            	// 註冊與忘記密碼（含 OTP 驗證）給未登入的訪客
+				.requestMatchers("/psych/register/**","/psych/forgot/**").permitAll()
+           
 				.anyRequest().hasRole("PSYCH")
 			)
 

@@ -1,8 +1,10 @@
 package com.freemind.course.coupon.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -22,6 +24,7 @@ import com.freemind.course.dto.CouponClaimResult;
 import com.freemind.course.order.model.ShoppingCartRedisService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
+import com.freemind.login.notice.service.NoticeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -32,23 +35,61 @@ public class MemberCouponController {
 private final MemberCouponService memCouponSvc;
 private final CouponService couponSvc;
 private final MemberService memberSvc;
+private final NoticeService noticeSvc;
 private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	
 	public MemberCouponController(
 			ShoppingCartRedisService ShoppingCartRedisSvc,
 			MemberService memberSvc,
 			CouponService couponSvc,
+			NoticeService noticeSvc,
 			MemberCouponService memCouponSvc) {
 		this.ShoppingCartRedisSvc = ShoppingCartRedisSvc;
 		this.memCouponSvc = memCouponSvc;
 		this.memberSvc = memberSvc;
 		this.couponSvc = couponSvc;
+		this.noticeSvc = noticeSvc;
 	}
 
-	@ModelAttribute("member")
-    public Member currentMember(Authentication authentication) {
-        return memberSvc.findByAccount(authentication.getName());
-    }
+	@ModelAttribute
+	public void addMemberAttributes(
+	        Authentication authentication,
+	        ModelMap model) {
+
+	    // 訪客的預設資料
+	    model.addAttribute("member", null);
+	    model.addAttribute("countMemberUnread", 0L);
+	    model.addAttribute("countMemberCartCount", 0L);
+
+	    // 未登入或匿名使用者
+	    if (authentication == null
+	            || authentication instanceof AnonymousAuthenticationToken
+	            || !authentication.isAuthenticated()) {
+	        return;
+	    }
+	    Member member =
+	            memberSvc.findByAccount(authentication.getName());
+	    if (member == null) {
+	        System.out.println("找不到對應會員資料");
+	        return;
+	    }
+	    Long unreadCount =
+	            noticeSvc.countMemberUnread(member.getMemberId());
+	    Long cartCount =
+	    		ShoppingCartRedisSvc.getCourseCount(member.getMemberId());
+	    model.addAttribute("member", member);
+	    model.addAttribute(
+	            "countMemberUnread",
+	            unreadCount != null ? unreadCount : 0L
+	    );
+	    model.addAttribute(
+	            "countMemberCartCount",
+	            cartCount != null ? cartCount : 0L
+	    );
+
+//	    System.out.println("會員名稱：" + member.getName());
+//	    System.out.println("購物車數量：" + cartCount);
+	}
 	
 	@GetMapping("/my_coupon")
 	public String myCoupon(
@@ -144,19 +185,34 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        RedirectAttributes redirectAttributes) {
 	    MemberCoupon memberCoupon =
 	            memCouponSvc.getOneByPK(couponSerialNo);
+	    List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
+	    Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 
 	    if (memberCoupon == null) {
 	        redirectAttributes.addFlashAttribute("couponError", "找不到此優惠券");
-	        return "redirect:/member/course/goto_checkout";
+	        return "redirect:/member/coupon/goto_checkout";
 	    }
 	    if (!(memberCoupon.getMember().getMemberId() == member.getMemberId())) {
 	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
-	        return "redirect:/member/course/goto_checkout";
+	        return "redirect:/member/coupon/goto_checkout";
 	    }
+	    if (memberCoupon.getCoupon().getTriggerThreshold() > cartTotal ) {
+	    		redirectAttributes.addFlashAttribute("couponError", "此次消費未達優惠券使用門檻");
+	        return "redirect:/member/coupon/goto_checkout";
+	    }
+	    Integer total = BigDecimal.valueOf(cartTotal)
+				.multiply(memberCoupon.getCoupon().getDiscount())
+				.intValue();
+	    Integer discountLimit = memberCoupon.getCoupon().getDiscountLimit();
+	    if (discountLimit < (cartTotal - total)) {
+		    	redirectAttributes.addFlashAttribute("couponError", 
+		    						"此次消費已達折扣上限，最多折扣:" + discountLimit );
+		    	session.setAttribute("discountLimitTotal", (cartTotal-discountLimit));
+	    }else
+	    		session.setAttribute("discountLimitTotal", (cartTotal - total));
+	    	
 
 	    session.setAttribute("orderCoupon", memberCoupon);
-
-	    redirectAttributes.addFlashAttribute("successMsg", "已選擇優惠券");
 
 	    return "redirect:/member/course/goto_checkout";
 	}

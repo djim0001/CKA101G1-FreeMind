@@ -10,6 +10,7 @@
 	<link
 		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
 		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 	<style>
 
 		@font-face {
@@ -324,14 +325,22 @@
 			border: 1px solid transparent;
 			border-radius: 999px;
 			color: var(--ink-soft);
+			background: transparent;
+			box-shadow: none;
 			font-size: .84rem;
 			font-weight: 500;
 			white-space: nowrap;
-			transition: border-color .16s ease, color .16s ease, background .16s ease;
+			transition: color .16s ease;
 		}
 
-		body.admin-course-page .course-nav a:hover,
-		body.admin-course-page .course-nav a.active {
+		body.admin-course-page .course-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .course-nav a.active,
+		body.admin-course-page .course-nav a[aria-current="page"] {
 			border-color: rgba(194, 217, 237, .9);
 			color: var(--ink);
 			background: var(--blue-soft);
@@ -379,10 +388,34 @@
 
 		body.admin-course-page .page-head-actions {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
 			justify-content: flex-end;
 			gap: 1rem;
 			margin-left: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav {
+			display: flex;
+			flex-flow: row nowrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: .25rem;
+			width: max-content;
+			max-width: 100%;
+			margin-left: 0;
+			padding: 0;
+			overflow-x: auto;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 42px;
+			padding: .5rem .8rem;
+			font-size: .84rem;
+			line-height: 1.2;
 		}
 
 		body.admin-course-page .page-head-actions p {
@@ -1135,11 +1168,7 @@
 		}
 
 		body.admin-course-page .nav-inner > .header-course-nav {
-			flex: 1 1 auto;
-			min-width: 0;
-			min-height: 0;
-			padding: 0;
-			background: transparent;
+			display: none !important;
 		}
 
 		body.admin-course-page .site-footer {
@@ -1203,7 +1232,9 @@
 			}
 
 			body.admin-course-page .page-head-actions {
-				display: block;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
 				margin-left: 0;
 			}
 
@@ -1257,67 +1288,136 @@
 			}
 		}
 
+		/* 所有課程後台頁面共用：固定功能導覽的尺寸、色調與位置。 */
+		body.admin-course-page .page-head-actions,
+		body.admin-course-page .page-head-actions .page-function-nav,
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			box-sizing: border-box;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a {
+			min-height: 48px;
+			border-color: transparent;
+			color: var(--ink-soft);
+			background: transparent;
+			font-size: .84rem;
+			font-weight: 500;
+			line-height: 1.2;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a:hover {
+			border-color: transparent;
+			color: var(--ink);
+			background: transparent;
+		}
+
+		body.admin-course-page .page-head-actions .page-function-nav a.active,
+		body.admin-course-page .page-head-actions .page-function-nav a[aria-current="page"] {
+			border-color: var(--bg-soothing);
+			color: var(--ink);
+			background: var(--blue-soft);
+		}
+
+		@media (min-width: 1281px) {
+			body.admin-course-page .page-head {
+				display: grid;
+				grid-template-columns: minmax(16rem, 1fr) 55rem;
+				align-items: end;
+				gap: 1.5rem;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: 44rem 10rem;
+				align-items: center;
+				justify-content: end;
+				gap: 1rem;
+				width: 55rem;
+				margin-left: 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(0, 1fr));
+				gap: .25rem;
+				width: 44rem;
+				max-width: none;
+				margin: 0;
+				overflow: visible;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 1280px) {
+			body.admin-course-page .page-head {
+				display: block;
+			}
+
+			body.admin-course-page .page-head-actions {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 10rem;
+				width: 100%;
+				align-items: center;
+				gap: 1rem;
+				margin: 1rem 0 0;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav {
+				display: grid;
+				grid-template-columns: repeat(5, minmax(8.25rem, 1fr));
+				gap: .25rem;
+				width: 100%;
+				max-width: none;
+				margin: 0;
+				overflow-x: auto;
+			}
+
+			body.admin-course-page .page-head-actions .page-function-nav a {
+				width: 100%;
+				min-width: 0;
+				padding: .65rem .5rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				align-self: center;
+				justify-self: end;
+				width: 10rem;
+				min-width: 10rem;
+				max-width: 10rem;
+				min-height: 48px;
+			}
+		}
+
+		@media (max-width: 760px) {
+			body.admin-course-page .page-head-actions {
+				grid-template-columns: minmax(0, 1fr);
+				gap: .75rem;
+			}
+
+			body.admin-course-page .page-head-actions > :not(.page-function-nav) {
+				justify-self: stretch;
+				width: 100%;
+				min-width: 0;
+				max-width: none;
+			}
+		}
+
 	</style>
 </head>
 <body class="thy2-page admin-course-page">
-	<a class="skip-link" href="#main-content">跳至主要內容</a>
-	<header class="nav site-header">
-		<div class="wrap nav-inner">
-			<a class="brand" href="/admin/home" th:href="@{/admin/home}" aria-label="諮由自在後台管理首頁">
-				<span class="logo-mind" aria-hidden="true">
-					<span class="word">
-						<span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span>
-					</span>
-					<span class="faces">
-						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-					</span>
-				</span>
-				<span class="brand-text">
-					<span class="logo">諮由自在</span>
-					<span class="en">Free&nbsp;Mind</span>
-				</span>
-			</a>
-			<nav class="course-nav header-course-nav" aria-label="課程商城管理">
-				<a th:href="@{/admin/course/select_course}">課程發布管理</a>
-				<a class="active" aria-current="page" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
-				<a th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
-				<a th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
-				<a th:href="@{/admin/course/select_course_categories}">課程分類</a>
-			</nav>
-			<div class="nav-actions">
-				<a class="profile-entry" th:href="@{/admin/select_page}" aria-label="前往管理員檔案">
-					<span class="profile-photo" aria-hidden="true">
-						<img
-							th:if="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
-							th:src="${admin.profilePic}"
-							alt="" />
-						<svg
-							th:unless="${admin != null and admin.profilePic != null and !#strings.isEmpty(admin.profilePic)}"
-							viewBox="0 0 24 24"
-							fill="none">
-							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8" stroke-linecap="round" />
-							<circle cx="12" cy="7" r="4" stroke-width="1.8" />
-						</svg>
-					</span>
-					<span class="profile-copy">
-						<small th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
-						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
-					</span>
-				</a>
-				<form class="logout-form" th:action="@{/back-end/logout}" method="post">
-					<button class="logout-button" type="submit" aria-label="登出後台">
-						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-							<path d="M14 8l4 4-4 4M18 12H8M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-						</svg>
-						<span>登出</span>
-					</button>
-				</form>
-			</div>
-		</div>
-	</header>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 	<main id="main-content" class="admin-main">
 		<div class="wrap">
 <div class="page-head">
@@ -1326,18 +1426,19 @@
 						<h1>退款詳細資料</h1>
 					</div>
 					<div class="page-head-actions">
-						<p>檢查退款原因、課程明細與會員課程權限。</p>
+						<nav class="course-nav page-function-nav" aria-label="課程商城管理" data-admin-course-nav>
+							<a data-admin-nav="courses" th:href="@{/admin/course/select_course}">課程發布管理</a>
+							<a data-admin-nav="orders" th:href="@{/admin/course/select_course_order}">訂單與退款</a>
+							<a data-admin-nav="payout" th:href="@{/admin/adminPayout/listAll}">營運與撥款</a>
+							<a data-admin-nav="coupon" th:href="@{/admin/coupon/select_coupon}">優惠券管理</a>
+							<a data-admin-nav="categories" th:href="@{/admin/course/select_course_categories}">課程分類</a>
+						</nav>
 						<a class="btn ghost" th:href="@{/admin/course/select_course_order(tab='refunds')}">返回退款列表</a>
 					</div>
 				</div><div class="grid-2"><section class="panel"><h2>退款申請資訊</h2><dl class="summary-list"><div><dt>訂單編號</dt><dd th:text="${refund.courseOrder.courseOrderId}">—</dd></div><div><dt>會員</dt><dd th:text="${refund.member.name}">—</dd></div><div><dt>退款金額</dt><dd>NT$ <span th:text="${refund.refundAmount}">0</span></dd></div><div><dt>申請時間</dt><dd th:text="${#temporals.format(refund.createdAt,'yyyy-MM-dd HH:mm:ss')}">—</dd></div><div><dt>退款時間</dt><dd th:text="${refund.refundedAt == null ? '--' : #temporals.format(refund.refundedAt,'yyyy-MM-dd HH:mm:ss')}">—</dd></div><div><dt>目前狀態</dt><dd th:text="${refund.refundStatus == 0 ? '待審核' : refund.refundStatus == 1 ? '審核成功' : refund.refundStatus == 2 ? '審核失敗' : refund.refundStatus == 3 ? '已退款' : '退款異常'}">狀態</dd></div></dl></section><section class="panel"><h2>退款原因</h2><textarea class="field" rows="8" readonly th:text="${refund.refundReason}">退款原因</textarea><div class="notice" style="margin-top:16px">審核前請確認退款資格、付款狀態及課程觀看權限。</div></section></div><section class="panel" style="margin-top:20px"><h2>退款課程明細</h2><div class="table-wrap"><table><thead><tr><th>課程編號</th><th>課程名稱</th><th>課程原價</th><th>折扣後價格</th><th>課程權限</th></tr></thead><tbody><tr th:if="${orderDetails == null || orderDetails.isEmpty()}"><td class="empty-state" colspan="5">查無課程明細</td></tr><tr th:each="detail : ${orderDetails}"><td th:text="${detail.course.courseId}">—</td><td th:text="${detail.course.courseName}">—</td><td th:text="${detail.price}">—</td><td th:text="${detail.discountedPrice == null ? '--' : detail.discountedPrice}">—</td><td th:text="${detail.coursePermissionText}">—</td></tr></tbody></table></div></section><div class="page-actions" style="margin-top:20px" th:if="${refund != null and refund.refundStatus == 0}"><form method="post" th:action="@{/admin/refund/approve/{orderId}/{memberId}(orderId=${refund.courseOrder.courseOrderId},memberId=${refund.member.memberId})}" data-confirm-form="確定核准此退款？"><button class="btn" type="submit">核准退款</button></form><form method="post" th:action="@{/admin/refund/reject/{orderId}/{memberId}(orderId=${refund.courseOrder.courseOrderId},memberId=${refund.member.memberId})}" data-confirm-form="確定退回此退款？"><button class="btn danger" type="submit">退回申請</button></form></div>
 		</div>
 	</main>
-	<footer class="site-footer">
-		<div class="wrap footer-inner">
-			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span>
-			<span>請妥善保管管理員帳號資訊</span>
-		</div>
-	</footer>
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 	<script th:src="@{/js/course/admin-js.js}"></script>
 </body>
 </html>

@@ -22,13 +22,28 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.*;
 import com.freemind.login.admin.model.Admin;
 import com.freemind.login.admin.model.AdminService;
+import com.freemind.login.security.adminsecurity.AdminUserDetails;
+import org.springframework.security.core.Authentication;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminIdController {
-	
+
 	@Autowired
 	private AdminService adminSvc;
+
+	/*
+	 * 供 adminHeader fragment 顯示登入中的管理員（帳號／姓名）。
+	 * 直接取登入時載入的 principal，不需再查 DB；非管理員回 null。
+	 */
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+		if (authentication == null
+				|| !(authentication.getPrincipal() instanceof AdminUserDetails ud)) {
+			return null;
+		}
+		return ud.getAdmin();
+	}
 
 	/*
 	 * 【下拉選單 / 共用資料準備】

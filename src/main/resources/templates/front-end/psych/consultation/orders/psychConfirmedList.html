@@ -1,43 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>已確認訂單列表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<style>
+    .list-section { padding: 3.2rem 0 6rem; }
+    .list-head { text-align: center; margin-bottom: 2rem; }
+    .list-head h1 { font-family: var(--serif); font-size: 1.7rem; color: var(--ink); margin: 0; }
+    .list-head h1 span { color: var(--orange-deep); }
+
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+    table { width: 100%; border-collapse: collapse; background: var(--white); min-width: 780px; }
+    thead th { background: var(--ink); color: #fff; font-weight: 600; font-size: .85rem; padding: .85rem .9rem; text-align: left; white-space: nowrap; }
+    tbody td { padding: .9rem .9rem; font-size: .88rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .complete-form textarea {
+        width: 100%; min-width: 200px; height: 70px; resize: none;
+        padding: .55rem .7rem; border: 1.6px solid var(--line); border-radius: var(--radius-md);
+        font-family: var(--sans); font-size: .85rem; color: var(--ink); background: var(--bg-warm);
+        margin: .4rem 0 .6rem;
+    }
+    .complete-form textarea:focus { outline: none; border-color: var(--orange); }
+    .complete-form .note-label { font-size: .8rem; color: var(--ink-soft); }
+    .complete-form button {
+        padding: .5rem 1.1rem; border-radius: var(--radius-md); font-size: .84rem;
+        font-family: inherit; font-weight: 500; cursor: pointer; border: none;
+        background: var(--orange); color: #fff; transition: background .2s;
+    }
+    .complete-form button:hover { background: var(--orange-deep); }
+
+    .back-link { display: inline-block; margin-top: 1.6rem; color: var(--ink-soft); font-size: .9rem; }
+    .back-link:hover { color: var(--orange-deep); }
+</style>
 </head>
 <body>
-	<h3>心理師編號 <span th:text="${psychId}"></span> 的已確認訂單</h3>
 
-	<table border="1">
-		<tr>
-			<th>訂單編號</th>
-			<th>會員編號</th>
-			<th>開始時間</th>
-			<th>結束時間</th>
-			<th>來訪目的</th>
-			<th>來訪目的備註</th>
-			<th>操作</th>
-		</tr>
-		<tr th:each="order : ${ordersListData}">
-			<td th:text="${order.orderId}"></td>
-			<td th:text="${order.member.memberId}"></td>
-			<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
-			<td th:text="${order.visitPurpose}"></td>
-			<td th:text="${order.visitPurposeNote}"></td>
-			<td>
-				<form method="post" th:action="@{/psych/orders/complete}">
-					<input type="hidden" name="orderId" th:value="${order.orderId}">
-					<input type="hidden" name="psychId" th:value="${psychId}">
-					晤談筆記：<br>
-					<textarea name="psychNote" rows="3" cols="30" style="resize:none;" placeholder="這次諮商的重點記錄，會員將能看到"></textarea><br>
-					<input type="submit" value="送出"
-						onclick="return confirm('確定這次諮商已經結束了嗎？')">
-				</form>
-			</td>
-		</tr>
-	</table>
+<div th:replace="~{fragments/header :: header}"></div>
 
-	<a th:href="@{/psych/orders/psychConfirmedForm}">重新查詢</a>
+<main class="list-section">
+    <div class="wrap">
+        <div class="list-head">
+            <h1>心理師編號 <span th:text="${psychId}"></span> 的已確認訂單</h1>
+        </div>
 
+        <div class="table-wrap">
+            <table>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>會員編號</th>
+                    <th>開始時間</th>
+                    <th>結束時間</th>
+                    <th>來訪目的</th>
+                    <th>來訪目的備註</th>
+                    <th>操作</th>
+                </tr>
+                <tr th:each="order : ${ordersListData}">
+                    <td th:text="${order.orderId}"></td>
+                    <td th:text="${order.member.memberId}"></td>
+                    <td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(order.consEnd, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${order.visitPurpose}"></td>
+                    <td th:text="${order.visitPurposeNote}"></td>
+                    <td>
+                        <form method="post" th:action="@{/psych/orders/complete}" class="complete-form">
+                            <input type="hidden" name="orderId" th:value="${order.orderId}">
+                            <input type="hidden" name="psychId" th:value="${psychId}">
+                            <div class="note-label">晤談筆記：</div>
+                            <textarea name="psychNote" rows="3" placeholder="這次諮商的重點記錄，會員將能看到"></textarea>
+                            <button type="submit" onclick="return confirm('確定這次諮商已經結束了嗎？')">送出</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <a class="back-link" th:href="@{/psych/orders/psychConfirmedForm}">← 重新查詢</a>
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/footer :: backToTop}"></div>
+<script src="/js/nav.js"></script>
 </body>
 </html>

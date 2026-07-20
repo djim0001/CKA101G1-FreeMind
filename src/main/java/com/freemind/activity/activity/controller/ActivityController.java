@@ -2,7 +2,8 @@ package com.freemind.activity.activity.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ import com.freemind.login.security.membersecurity.MemberUserDetails;
 import com.freemind.util.ImageUploadValidator;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
@@ -61,46 +61,48 @@ public class ActivityController {
     @Value("${app.activity.image.max-size}")
     private DataSize maxImageSize;
 
-    @GetMapping("listAllActivity")
-    public String listAllActivity(@AuthenticationPrincipal MemberUserDetails userDetails,
-    								 ModelMap model) {
-        Map<String, String[]> emptyMap = new HashMap<>();
-        Integer currentPage = 1;
-
-        List<Activity> list = activitySvc.getAllForMember(emptyMap, currentPage);
-        model.addAttribute("activityListData", list);
-        model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
-        model.addAttribute("currentPage", currentPage);
-
-        long total = activitySvc.getTotalCountForMember(emptyMap);
-        model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
-        model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));
-        return "front-end/member/activity/listAllActivity";
-    }
     
-    @PostMapping("listActivities_ByCompositeQuery")  // 這次使用者送出的整個HTTP請求
-    public String listActivities_ByCompositeQuery(HttpServletRequest req,
-    						@RequestParam(value = "currentPage", required = false) Integer currentPage,
-    						@AuthenticationPrincipal MemberUserDetails userDetails,
-    						ModelMap model) {
-        if (currentPage == null) {
-            currentPage = 1;
+ // 查詢表單送出：只負責把條件組成query string，轉址到下面的GET方法
+    @PostMapping("listActivities_ByCompositeQuery")
+    public String searchActivities(HttpServletRequest req) {
+        String qs = buildQueryString(req.getParameterMap(), "currentPage", "page");
+        String redirectUrl = "redirect:/member/activity/listActivities_ByCompositeQuery?page=1";
+        if (!qs.isEmpty()) {
+            redirectUrl += "&" + qs;
         }
-        
-        // 把使用者這次送出的所有表單欄位，全部轉換成一個Map<String, String[]>
-    		Map<String, String[]> map = req.getParameterMap();
+        return redirectUrl;
+    }
+
+    // 活動列表(唯一入口)：無參數=顯示全部, 有查詢字串=依條件篩選
+    @GetMapping("listActivities_ByCompositeQuery")
+    public String listActivities_ByCompositeQuery(HttpServletRequest req,
+                            @RequestParam(value = "page", required = false) Integer page,
+                            @AuthenticationPrincipal MemberUserDetails userDetails,
+                            ModelMap model) {
+        Integer currentPage = (page == null) ? 1 : page;
+
+        Map<String, String[]> map = req.getParameterMap();
         List<Activity> list = activitySvc.getAllForMember(map, currentPage);
         model.addAttribute("activityListData", list);
         model.addAttribute("pendingCountMap", regisSvc.getPendingCountMap(list));
         model.addAttribute("currentPage", currentPage);
-        
+
         long total = activitySvc.getTotalCountForMember(map);
         model.addAttribute("totalPages", PageUtils.calculateTotalPages(total, PAGE_SIZE));
+        model.addAttribute("totalCount", total);
         
         if (list.isEmpty()) {
             model.addAttribute("errorMessage", "查無符合條件的活動");
         }
         model.addAttribute("myRegisMap", buildMyRegistrationMap(userDetails));
+        model.addAttribute("qs", buildQueryString(map, "page"));
+
+        // 精選活動：沒有其他查詢條件時顯示
+        boolean hasFilter = !map.isEmpty() && !(map.size() == 1 && map.containsKey("page"));
+        if (!hasFilter) {
+            model.addAttribute("featuredActivities", activitySvc.getFeaturedActivities(3));
+        }
+        
         return "front-end/member/activity/listAllActivity";
     }
     
@@ -466,4 +468,35 @@ public class ActivityController {
             oldFile.delete();
         }
     }
+    
+    // 把Map<String, String[]>轉成query string，可指定要排除的欄位(例如page/currentPage)
+    private String buildQueryString(Map<String, String[]> params, String... excludeKeys) {
+        StringBuilder qs = new StringBuilder();
+        for (Map.Entry<String, String[]> entry : params.entrySet()) {
+            String key = entry.getKey();
+            boolean excluded = false;
+            for (String ex : excludeKeys) {
+                if (key.equals(ex)) {
+                    excluded = true;
+                    break;
+                }
+            }
+            if (excluded) {
+                continue;
+            }
+            for (String value : entry.getValue()) {
+                if (value == null || value.isEmpty()) {
+                    continue;
+                }
+                if (qs.length() > 0) {
+                    qs.append("&");
+                }
+                qs.append(URLEncoder.encode(key, StandardCharsets.UTF_8))
+                  .append("=")
+                  .append(URLEncoder.encode(value, StandardCharsets.UTF_8));
+            }
+        }
+        return qs.toString();
+    }
+    
 }

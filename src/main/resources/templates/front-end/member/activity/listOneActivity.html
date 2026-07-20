@@ -163,7 +163,7 @@
 	<p th:if="${#lists.isEmpty(reviewListData)}">尚無評價。</p>
 	<br>
 	<br>
- 	<a th:href="@{/member/activity/listAllActivity}">返回活動列表</a>｜<a th:href="@{/member/activity/follow/myFollows}">我的關注</a>｜	<a th:href="@{/member/activity/registration/myRegistrations}">我的報名</a>
+ 	<a th:href="@{/member/activity/listActivities_ByCompositeQuery}">返回活動列表</a>｜<a th:href="@{/member/activity/follow/myFollows}">我的關注</a>｜	<a th:href="@{/member/activity/registration/myRegistrations}">我的報名</a>
 
 <div id="activityData" 
      th:data-activity-id="${activity.activityId}"

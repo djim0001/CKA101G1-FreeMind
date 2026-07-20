@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const adminCourseNavs = document.querySelectorAll('[data-admin-course-nav]');
+  if (adminCourseNavs.length > 0) {
+    const currentPath = window.location.pathname;
+    let activeSection = 'courses';
+
+    if (
+      currentPath.includes('/admin/course/select_course_order')
+      || currentPath.includes('/admin/course/order')
+      || currentPath.includes('/admin/refund/')
+    ) {
+      activeSection = 'orders';
+    } else if (currentPath.includes('/admin/adminPayout/')) {
+      activeSection = 'payout';
+    } else if (currentPath.includes('/admin/coupon/')) {
+      activeSection = 'coupon';
+    } else if (currentPath.includes('/admin/course/select_course_categories')) {
+      activeSection = 'categories';
+    }
+
+    adminCourseNavs.forEach(adminCourseNav => {
+      adminCourseNav.querySelectorAll('[data-admin-nav]').forEach(link => {
+        const isCurrent = link.dataset.adminNav === activeSection;
+        link.classList.toggle('active', isCurrent);
+        if (isCurrent) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    });
+  }
+
   const toast = document.querySelector('.toast') || Object.assign(document.body.appendChild(document.createElement('div')), { className: 'toast' });
   let toastTimer;
   const notify = message => {
@@ -74,18 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     input?.addEventListener('input', updateCouponExample);
   });
   updateCouponExample();
-
-  const audienceSelect = document.querySelector('[data-audience-select]');
-  const audienceThreshold = document.querySelector('[data-audience-threshold]');
-  const audienceThresholdInput = document.querySelector('[data-audience-threshold-input]');
-  const updateAudienceThreshold = () => {
-    if (!audienceThreshold) return;
-    const needsThreshold = audienceSelect?.value === 'spending';
-    audienceThreshold.hidden = !needsThreshold;
-    if (audienceThresholdInput) audienceThresholdInput.required = needsThreshold;
-  };
-  audienceSelect?.addEventListener('change', updateAudienceThreshold);
-  updateAudienceThreshold();
 
   document.querySelectorAll('[data-new-coupon]').forEach(link => {
     link.addEventListener('click', () => {

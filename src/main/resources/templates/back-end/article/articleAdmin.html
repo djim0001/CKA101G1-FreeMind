@@ -1,108 +1,428 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>專欄文章管理｜管理後台</title>
-<link rel="stylesheet" th:href="@{/css/course/admin-style.css}" />
-<style>
-.tab-panel .toolbar {
-	display: flex;
-	align-items: center;
-	flex-wrap: nowrap;
-	gap: 12px;
-	width: 100%;
-}
-.tab-panel .toolbar input.field,
-.tab-panel .toolbar select.field {
-	width: auto !important;
-}
-.tab-panel .toolbar input[type="search"] {
-	flex: 1 1 auto;
-	min-width: 0;
-}
-.tab-panel .toolbar select.field {
-	flex: 0 0 150px;
-}
-.tab-panel .toolbar button {
-	flex: 0 0 auto;
-	white-space: nowrap;
-}
-</style>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="諮由自在 Free Mind 專欄文章管理總覽" />
+	<title>專欄文章管理｜諮由自在後台</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Caveat:wght@500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700;900&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" href="/css/index.css" />
+	<style>
+		html { min-width: 320px; }
+		body.admin-article-page {
+			display: flex;
+			min-width: 320px;
+			min-height: 100vh;
+			flex-direction: column;
+			background: var(--bg-warm);
+		}
+		.skip-link {
+			position: fixed;
+			top: .75rem;
+			left: .75rem;
+			z-index: 999;
+			padding: .65rem 1rem;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			transform: translateY(-160%);
+		}
+		.skip-link:focus { transform: translateY(0); }
+		.site-header {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			border-bottom: 1px solid rgba(236, 223, 206, .7);
+			color: var(--ink);
+			background: rgba(253, 246, 237, .85);
+			backdrop-filter: blur(12px);
+		}
+		.nav-inner {
+			display: flex;
+			align-items: center;
+			gap: 1.4rem;
+			height: 74px;
+		}
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: .8rem;
+			flex: 0 0 auto;
+		}
+		.nav-actions {
+			display: flex;
+			align-items: center;
+			gap: .55rem;
+			margin-left: auto;
+		}
+		.profile-entry {
+			display: flex;
+			align-items: center;
+			gap: .65rem;
+			min-height: 46px;
+			padding: .3rem .75rem .3rem .35rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			transition: border-color .16s ease, background .16s ease, transform .16s ease;
+		}
+		.profile-entry:hover {
+			border-color: var(--bg-soothing);
+			background: var(--blue-soft);
+			transform: translateY(-2px);
+		}
+		.profile-photo {
+			display: grid;
+			place-items: center;
+			width: 36px;
+			height: 36px;
+			flex: 0 0 auto;
+			border-radius: 50%;
+			color: var(--ink);
+			background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+		}
+		.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+		.profile-photo svg { width: 21px; height: 21px; stroke: currentColor; }
+		.profile-copy { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
+		.profile-copy small { color: var(--ink-soft); font-size: .68rem; }
+		.profile-copy strong {
+			max-width: 9.5rem;
+			overflow: hidden;
+			color: var(--ink);
+			font-size: .82rem;
+			font-weight: 500;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.logout-form { margin: 0; }
+		.logout-button {
+			display: inline-flex;
+			align-items: center;
+			gap: .4rem;
+			min-height: 46px;
+			padding: .6rem .8rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			cursor: pointer;
+			transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+		}
+		.logout-button:hover {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange-deep);
+			transform: translateY(-2px);
+		}
+		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.admin-main {
+			width: 100%;
+			flex: 1;
+			padding: clamp(1.5rem, 3vw, 2.5rem) 0 clamp(3.5rem, 6vw, 5rem);
+		}
+		.admin-wrap { width: min(1160px, 92vw); margin-inline: auto; }
+		.admin-page-header {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 2rem;
+			margin-bottom: 1.35rem;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--line);
+		}
+		.admin-kicker {
+			display: block;
+			margin-bottom: .3rem;
+			color: var(--orange);
+			font-size: .75rem;
+			font-weight: 700;
+			letter-spacing: .16em;
+			text-transform: uppercase;
+		}
+		.admin-page-header h1 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: clamp(1.75rem, 3vw, 2.35rem);
+			line-height: 1.3;
+		}
+		.admin-page-header p {
+			max-width: 32rem;
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .92rem;
+			text-align: right;
+		}
+		.article-admin-nav {
+			display: flex;
+			gap: .55rem;
+			margin-bottom: 1.35rem;
+			overflow-x: auto;
+			padding: .2rem .1rem .45rem;
+			scrollbar-width: thin;
+		}
+		.article-admin-nav a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 42px;
+			flex: 0 0 auto;
+			padding: .55rem 1rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .88rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+		}
+		.article-admin-nav a:hover,
+		.article-admin-nav a.active {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange);
+		}
+		.admin-panel {
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: var(--white);
+			box-shadow: var(--shadow-md);
+		}
+		.admin-panel-heading {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			min-height: 64px;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--line);
+			background: linear-gradient(90deg, var(--pink-soft), var(--white) 48%, var(--blue-soft));
+		}
+		.admin-panel-heading h2 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: 1.08rem;
+		}
+		.admin-panel-heading p { margin: 0; color: var(--ink-soft); font-size: .82rem; }
+		.admin-panel-body { padding: 1.25rem; }
+		.admin-toolbar {
+			display: grid;
+			grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(130px, 170px)) auto;
+			gap: .75rem;
+			align-items: end;
+			margin-bottom: 1.25rem;
+		}
+		.admin-field {
+			width: 100%;
+			min-height: 44px;
+			padding: .7rem .85rem;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			color: var(--ink);
+			background: var(--white);
+			font: inherit;
+			font-size: .9rem;
+		}
+		.admin-field:focus { border-color: var(--orange); outline: 0; box-shadow: 0 0 0 3px rgba(245, 142, 107, .14); }
+		.admin-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: .4rem;
+			min-height: 42px;
+			padding: .58rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			font-size: .86rem;
+			font-weight: 700;
+			line-height: 1;
+			white-space: nowrap;
+			transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+		}
+		.admin-btn:hover { color: var(--white); background: var(--orange-deep); transform: translateY(-2px); }
+		.admin-btn.secondary { border-color: var(--bg-soothing); color: var(--ink); background: var(--blue-soft); }
+		.admin-btn.secondary:hover { color: var(--ink); background: var(--bg-soothing); }
+		.admin-btn.danger { border-color: rgba(229, 118, 79, .28); color: var(--orange-deep); background: var(--pink-soft); }
+		.admin-btn.danger:hover { color: var(--white); background: var(--orange-deep); }
+		.table-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+		.admin-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+		.admin-table th,
+		.admin-table td { padding: .9rem 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+		.admin-table th {
+			color: var(--ink);
+			background: rgba(220, 234, 245, .62);
+			font-size: .8rem;
+			font-weight: 700;
+			letter-spacing: .04em;
+		}
+		.admin-table td { color: var(--ink-soft); font-size: .88rem; }
+		.admin-table tbody tr:last-child td { border-bottom: 0; }
+		.admin-table tbody tr:hover td { background: rgba(255, 250, 238, .72); }
+		.article-summary strong { display: block; color: var(--ink); font-family: var(--serif); font-size: .98rem; }
+		.article-summary span { font-size: .8rem; }
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			min-height: 30px;
+			padding: .25rem .7rem;
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--blue-soft);
+			font-size: .78rem;
+			font-weight: 700;
+		}
+		.inline-actions { display: flex; align-items: center; gap: .5rem; }
+		.inline-form { margin: 0; }
+		.empty-state { padding: 2.4rem 1rem !important; color: var(--ink-soft); text-align: center !important; }
+		.site-footer {
+			margin-top: 0;
+			padding: 1.35rem 0;
+			border-top: 1px solid var(--line);
+			color: var(--ink-soft);
+			background: var(--white);
+			font-size: .78rem;
+		}
+		.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+		.footer-inner strong { color: var(--ink); font-weight: 700; }
+		:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+		@media (max-width: 940px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+		}
+		@media (max-width: 980px) {
+			.admin-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.admin-toolbar > :first-child { grid-column: 1 / -1; }
+		}
+		@media (max-width: 700px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+			.admin-page-header { display: block; }
+			.admin-page-header p { margin-top: .5rem; text-align: left; }
+			.admin-panel-heading { display: block; }
+			.admin-panel-heading p { margin-top: .25rem; }
+		}
+		@media (max-width: 640px) {
+			.nav-inner {
+				gap: .55rem;
+				height: 64px;
+			}
+			.logout-button span { display: none; }
+			.logout-button {
+				display: grid;
+				place-items: center;
+				width: 42px;
+				min-height: 42px;
+				padding: 0;
+			}
+			.profile-photo {
+				width: 34px;
+				height: 34px;
+			}
+		}
+		@media (max-width: 540px) {
+			.logout-button { display: grid; place-items: center; width: 42px; min-height: 42px; padding: 0; }
+			.logout-button span { display: none; }
+			.admin-panel-body { padding: .85rem; }
+			.admin-toolbar { grid-template-columns: 1fr; }
+			.admin-toolbar > :first-child { grid-column: auto; }
+		}
+		@media (max-width: 430px) {
+			.profile-entry { display: none; }
+			.nav-actions { gap: .35rem; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* { transition: none !important; scroll-behavior: auto !important; }
+		}
+	</style>
 </head>
-<body class="thy2-page">
-	<div class="layout">
-		<aside class="sidebar">
-			<a class="brand" th:href="@{/}">諮由自在 Free Mind<small>ADMIN
-					CONSOLE</small></a>
-			<p class="nav-label">專欄文章管理</p>
-			<nav class="nav">
+<body class="admin-article-page">
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<main id="main-content" class="admin-main">
+		<div class="admin-wrap">
+			<section class="admin-page-header" aria-labelledby="page-title">
+				<div>
+					<span class="admin-kicker">Article Administration</span>
+					<h1 id="page-title">專欄文章管理</h1>
+				</div>
+				<p>集中查看文章送審狀態、心理師資料與目前可執行的審核操作。</p>
+			</section>
+
+			<nav class="article-admin-nav" aria-label="專欄文章管理功能">
 				<a class="active" th:href="@{/admin/article}">文章總覽</a>
 				<a th:href="@{/admin/article/pending}">待審核文章</a>
 				<a th:href="@{/admin/article/reviewed}">已審核文章</a>
 				<a th:href="@{/admin/article/categories}">文章分類管理</a>
-				<a th:href="@{/}">返回後台管理</a>
+				<a th:href="@{/admin/home}">返回後台管理</a>
 			</nav>
-		</aside>
-		<div class="main">
-			<header class="topbar">
-				<span>後台管理／專欄文章</span>
-				<div class="admin-id">
-					<span class="avatar">管</span><b
-						th:text="${admin != null ? admin.name : '系統管理員'}">系統管理員</b>
+
+			<section class="admin-panel" aria-labelledby="article-list-title">
+				<div class="admin-panel-heading">
+					<h2 id="article-list-title">文章資料一覽</h2>
+					<p>審核與上下架操作依文章目前狀態顯示。</p>
 				</div>
-			</header>
-			<main class="content">
-				<div class="page-head">
-					<div>
-						<h1>專欄文章管理</h1>
-					</div>
-				</div>
-				<section class="tab-panel">
-					<div class="toolbar">
-						<input class="field" type="search" placeholder="搜尋文章或心理師……">
-						<select class="field">
+				<div class="admin-panel-body">
+					<div class="admin-toolbar" aria-label="文章篩選工具">
+						<input class="admin-field" type="search" placeholder="搜尋文章或心理師……" aria-label="搜尋文章或心理師" />
+						<select class="admin-field" aria-label="依文章分類篩選">
 							<option>全部分類</option>
 							<option th:each="cat : ${articleCats}"
-								th:value="${cat.articleCatId}" th:text="${cat.articleCatName}"></option>
+								th:value="${cat.articleCatId}"
+								th:text="${cat.articleCatName}">分類名稱</option>
 						</select>
-						<select class="field">
+						<select class="admin-field" aria-label="依文章狀態篩選">
 							<option>全部狀態</option>
 							<option th:each="entry : ${articleStatuses}"
-								th:value="${entry.key}" th:text="${entry.value}"></option>
+								th:value="${entry.key}"
+								th:text="${entry.value}">文章狀態</option>
 						</select>
-						<select class="field">
+						<select class="admin-field" aria-label="文章排序">
 							<option>申請時間新至舊</option>
 							<option>申請時間舊至新</option>
 						</select>
-						<button class="btn secondary" type="button" data-toast="篩選功能開發中">篩選</button>
+						<button class="admin-btn secondary" type="button"
+							data-toast="篩選功能開發中">篩選</button>
 					</div>
-					<div class="table-wrap">
-						<table class="compact-table">
+
+					<div class="table-scroll">
+						<table class="admin-table">
 							<thead>
 								<tr>
-									<th>文章標題／心理師</th>
-									<th>申請時間</th>
-									<th>狀態</th>
-									<th>審核操作</th>
+									<th scope="col">文章標題／心理師</th>
+									<th scope="col">申請時間</th>
+									<th scope="col">狀態</th>
+									<th scope="col">審核操作</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr
-									th:if="${articlePage == null || articlePage.content.isEmpty()}">
+								<tr th:if="${articlePage == null || articlePage.content.isEmpty()}">
 									<td class="empty-state" colspan="4">目前沒有文章資料</td>
 								</tr>
 								<tr th:each="article : ${articlePage.content}">
-									<td><div class="course-summary">
-											<strong th:text="${article.title}">文章標題</strong><span
-												class="meta"> / <span
-												th:text="${article.psychologist.name}">心理師</span></span>
-										</div></td>
-									<td><span th:if="${article.submittedAt != null}"
-										th:text="${#temporals.format(article.submittedAt,'yyyy/MM/dd HH:mm')}">申請時間</span><span
-										th:unless="${article.submittedAt != null}">—</span></td>
 									<td>
-										<span class="status" th:switch="${article.articleStatus}">
+										<div class="article-summary">
+											<strong th:text="${article.title}">文章標題</strong>
+											<span>心理師：<span th:text="${article.psychologist.name}">心理師姓名</span></span>
+										</div>
+									</td>
+									<td>
+										<span th:if="${article.submittedAt != null}"
+											th:text="${#temporals.format(article.submittedAt,'yyyy/MM/dd HH:mm')}">申請時間</span>
+										<span th:unless="${article.submittedAt != null}">—</span>
+									</td>
+									<td>
+										<span class="status-pill" th:switch="${article.articleStatus}">
 											<span th:case="1">待審核</span>
 											<span th:case="2">已上架</span>
 											<span th:case="3">已退回</span>
@@ -114,12 +434,12 @@
 										<div class="inline-actions" th:switch="${article.articleStatus}">
 											<form th:case="1" class="inline-form" method="get"
 												th:action="@{/admin/article/{id}/review(id=${article.articleId})}">
-												<button class="btn secondary" type="submit">審核</button>
+												<button class="admin-btn secondary" type="submit">審核</button>
 											</form>
 											<form th:case="2" class="inline-form" method="post"
 												th:action="@{/admin/article/{id}/unpublish(id=${article.articleId})}"
-												data-confirm-form="確定下架此文章？">
-												<button class="btn danger" type="submit">下架</button>
+												onsubmit="return confirm('確定下架此文章？');">
+												<button class="admin-btn danger" type="submit">下架</button>
 											</form>
 											<span th:case="*">—</span>
 										</div>
@@ -128,11 +448,14 @@
 							</tbody>
 						</table>
 					</div>
+
 					<div
 						th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, '/admin/article', '')}"></div>
-				</section>
-			</main>
+				</div>
+			</section>
 		</div>
-	</div>
+	</main>
+
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 </body>
 </html>

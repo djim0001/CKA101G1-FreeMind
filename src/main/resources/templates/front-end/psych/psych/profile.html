@@ -171,8 +171,7 @@ h1 {
 	<h1>
 		<span>我的資料</span>
 		<span class="header-links">
-			<a class="secondary" th:href="@{/psych/orders/home}">預約管理</a>
-			<a th:href="@{/psych/course/select_course}">課程商城(心理師)</a>
+			
 			<a class="secondary" th:href="@{/psych/profile/password}">修改密碼</a>
     		<a th:href="@{/psych/profile/edit}">編輯資料</a>
 		</span>
@@ -245,6 +244,7 @@ h1 {
 		</div>
 
 		<p class="section-title">每週可預約時段</p>
+		
 		<div id="weekGrid" class="week-grid" th:attr="data-avail=${psych.weeklyAvailability}"></div>
 		<p class="empty-hint" id="noAvailHint" style="display:none; margin-top:8px;">尚未設定時段</p>
 	</div>

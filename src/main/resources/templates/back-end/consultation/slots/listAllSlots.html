@@ -1,195 +1,926 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>心理師預約行事曆</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>心理師預約行事曆｜諮由自在後台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Microsoft JhengHei","Noto Sans TC",sans-serif; background: #faf6f4; color: #4a3e3e; line-height: 1.7; padding: 44px 20px; }
-    .wrap { max-width: 1000px; margin: 0 auto; }
-    .top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 10px;
-    }
-    .back-btn {
-        flex-shrink: 0;
-        display: inline-block;
-        padding: 9px 20px;
-        background: #fff;
-        color: #c07d7d;
-        border: 1.5px solid #e8b4b4;
-        border-radius: 8px;
-        font-size: 14px;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .back-btn:hover { background: #e8b4b4; color: #fff; }
-    .top h1 { font-size: 26px; font-weight: 700; }
-    .top p { color: #a99a95; font-size: 14px; }
+@font-face {
+	font-family: 'OpenHuninn';
+	src:
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff')
+		format('woff'),
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf')
+		format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
 
-    .search-card { background: #fff; border-radius: 14px; box-shadow: 0 3px 16px rgba(160,120,120,0.08); padding: 20px 24px; margin: 18px 0 22px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .search-card label { font-size: 14px; color: #7a6b6b; }
-    .search-card select { padding: 8px 12px; border: 1px solid #e0d5d5; border-radius: 7px; font-family: inherit; font-size: 14px; color: #4a3e3e; }
-    .search-card select:focus { outline: none; border-color: #e8b4b4; box-shadow: 0 0 0 3px rgba(232,180,180,0.18); }
-    .btn-search { padding: 9px 24px; background: #e8b4b4; color: #fff; border: none; border-radius: 7px; font-size: 14px; cursor: pointer; }
-    .btn-search:hover { background: #d39393; }
-    .btn-reset { padding: 9px 20px; background: #fff; color: #c07d7d; border: 1.5px solid #e8b4b4; border-radius: 7px; font-size: 14px; text-decoration: none; }
-    .btn-reset:hover { background: #fbf2f2; }
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--display-en: "Baloo 2", sans-serif;
+}
 
-    .card { background: #fff; border-radius: 16px; box-shadow: 0 3px 16px rgba(160,120,120,0.08); padding: 26px 28px; }
-    .card-title { font-size: 17px; font-weight: 700; color: #5a4a45; margin-bottom: 6px; }
-    .card-title span { color: #a99a95; font-weight: 400; font-size: 14px; }
-    .legend { display: flex; gap: 20px; margin: 12px 0 18px; font-size: 13px; color: #7a6b6b; }
-    .legend .item { display: flex; align-items: center; gap: 7px; }
-    .legend .box { width: 16px; height: 16px; border-radius: 4px; }
-    .box.has { background: #cfe8d4; border: 1px solid #7cc98d; }
-    .box.none { background: #f2ece9; border: 1px solid #e5d9d4; }
+* {
+	box-sizing: border-box;
+}
 
-    .cal-head, .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-    .cal-head { margin-bottom: 8px; }
-    .cal-head div { text-align: center; font-size: 13px; font-weight: 600; color: #b3a5a0; }
+html {
+	min-width: 320px;
+}
 
-    .cal-day {
-        min-height: 74px; border-radius: 10px; padding: 8px;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        font-size: 13px;
-    }
-    .cal-day.blank { background: transparent; }
-    .cal-day.none { background: #f2ece9; color: #c4b8b3; }
-    .cal-day.has {
-        background: #cfe8d4; border: 1px solid #7cc98d; color: #2e6b45;
-        cursor: pointer; transition: background 0.15s, transform 0.1s;
-    }
-    .cal-day.has:hover { background: #b6e0c1; transform: translateY(-2px); }
-    .cal-day .dnum { font-weight: 700; }
-    .cal-day .dcount { font-size: 11px; margin-top: 3px; }
+body {
+	display: flex;
+	min-width: 320px;
+	min-height: 100vh;
+	flex-direction: column;
+	margin: 0;
+	color: var(--ink);
+	background: var(--bg-warm);
+	font-family: var(--sans);
+	line-height: 1.78;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
 
-    /* 彈窗 */
-    .modal-overlay {
-        display: none; position: fixed; inset: 0;
-        background: rgba(74,62,62,0.35); z-index: 100;
-        align-items: center; justify-content: center;
-    }
-    .modal { background: #fff; border-radius: 14px; width: 90%; max-width: 420px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-    .modal-head { background: #5a4a45; color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
-    .modal-head .x { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
-    .modal-body { padding: 16px 20px; max-height: 60vh; overflow-y: auto; }
-    .mo { margin: 0 0 10px; }
-    .mo-btn {
-        width: 100%; text-align: left; background: #faf6f4; border: 1px solid #f2dddd;
-        border-radius: 8px; padding: 12px 14px; cursor: pointer; font-family: inherit;
-        display: flex; align-items: center; gap: 12px; transition: background 0.15s;
-    }
-    .mo-btn:hover { background: #fbeeee; }
-    .mo-id { font-weight: 700; color: #c07d7d; }
-    .mo-time { color: #7a6b6b; font-size: 13px; }
-    .mo-status { margin-left: auto; font-size: 12.5px; font-weight: 600; }
-    .s0 { color: #b8860b; } .s1 { color: #1a7a1a; } .s2 { color: #c62828; } .s3 { color: #ef6c00; } .s4 { color: #1565c0; }
+a {
+	color: inherit;
+	text-decoration: none;
+}
 
-    .empty { color: #b3a5a0; font-size: 15px; padding: 60px; text-align: center; background: #fff; border-radius: 16px; }
+button, input, select {
+	font: inherit;
+}
+
+button {
+	border: 0;
+	background: none;
+	cursor: pointer;
+}
+
+img, svg {
+	display: block;
+	max-width: 100%;
+}
+
+.wrap {
+	width: min(1080px, 94vw);
+	margin-inline: auto;
+}
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	border-bottom: 1px solid rgba(236, 223, 206, .7);
+	color: var(--ink);
+	background: rgba(253, 246, 237, .85);
+	backdrop-filter: blur(12px);
+}
+
+.nav-inner {
+	width: min(1240px, 94vw);
+	margin-inline: auto;
+	display: flex;
+	align-items: center;
+	gap: 1.4rem;
+	height: 74px;
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: .8rem;
+	flex: 0 0 auto;
+}
+
+.logo-mind {
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	line-height: 1;
+	user-select: none;
+}
+
+.logo-mind .word {
+	display: flex;
+	align-items: flex-end;
+}
+
+.logo-mind .word span {
+	display: inline-block;
+	font-family: var(--display-en);
+	font-size: 1.5rem;
+	font-weight: 700;
+	letter-spacing: -.03em;
+	text-align: center;
+}
+
+.logo-mind .word .m {
+	width: 24px;
+	color: #EFB65E;
+}
+
+.logo-mind .word .i {
+	width: 9px;
+	color: #DB93A9;
+}
+
+.logo-mind .word .n {
+	width: 17px;
+	color: #8FB2C9;
+}
+
+.logo-mind .word .d {
+	width: 17px;
+	color: #9BB893;
+}
+
+.logo-mind .faces {
+	display: flex;
+	align-items: flex-start;
+	margin-top: -1px;
+}
+
+.logo-mind .faces svg {
+	display: block;
+}
+
+.logo-mind .faces .fm {
+	width: 24px;
+	height: 11px;
+}
+
+.logo-mind .faces .fi {
+	width: 9px;
+	height: 11px;
+}
+
+.logo-mind .faces .fn {
+	width: 17px;
+	height: 11px;
+}
+
+.logo-mind .faces .fd {
+	width: 17px;
+	height: 11px;
+}
+
+.brand-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.brand-text .logo {
+	color: var(--ink);
+	font-family: var(--zen-maru);
+	font-size: 1.18rem;
+	font-weight: 700;
+	letter-spacing: .02em;
+}
+
+.brand-text .en {
+	margin-top: .15em;
+	color: var(--ink-soft);
+	font-family: var(--display-en);
+	font-size: .85rem;
+	font-weight: 700;
+	letter-spacing: .24em;
+	text-transform: uppercase;
+}
+
+.admin-badge {
+	padding-left: 1.05rem;
+	border-left: 1px solid var(--line);
+	color: var(--ink-soft);
+	font-size: .84rem;
+	font-weight: 700;
+	letter-spacing: .08em;
+}
+
+.nav-actions {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	margin-left: auto;
+}
+
+.profile-entry {
+	display: flex;
+	align-items: center;
+	gap: .65rem;
+	min-height: 46px;
+	padding: .3rem .75rem .3rem .35rem;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+}
+
+.profile-photo {
+	display: grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	flex: 0 0 auto;
+	border-radius: 50%;
+	color: var(--ink);
+	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+}
+
+.profile-photo svg {
+	width: 21px;
+	height: 21px;
+	stroke: currentColor;
+}
+
+.profile-copy {
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	line-height: 1.25;
+}
+
+.profile-copy small {
+	color: var(--ink-soft);
+	font-size: .68rem;
+}
+
+.profile-copy strong {
+	max-width: 9.5rem;
+	overflow: hidden;
+	color: var(--ink);
+	font-size: .82rem;
+	font-weight: 500;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.logout-form {
+	margin: 0;
+}
+
+.logout-button {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	min-height: 46px;
+	padding: .6rem .8rem;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	color: var(--ink);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+}
+
+.logout-button:hover {
+	border-color: var(--orange);
+	color: var(--white);
+	background: var(--orange-deep);
+}
+
+.logout-button svg {
+	width: 17px;
+	height: 17px;
+	stroke: currentColor;
+}
+
+main {
+	width: 100%;
+	flex: 1;
+	padding: clamp(1.25rem, 2vw, 1.75rem) 0 4rem;
+}
+
+.page-header {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 2rem;
+	margin-bottom: 1.4rem;
+	padding-bottom: 1.4rem;
+	border-bottom: 1px solid var(--line);
+}
+
+.page-kicker {
+	display: block;
+	margin-bottom: .35rem;
+	color: var(--orange);
+	font-size: .75rem;
+	font-weight: 700;
+	letter-spacing: .16em;
+	text-transform: uppercase;
+}
+
+h1 {
+	margin: 0;
+	color: var(--ink);
+	font-family: var(--serif);
+	font-size: clamp(1.6rem, 3vw, 2.1rem);
+	line-height: 1.3;
+	letter-spacing: -.02em;
+}
+
+.page-header p {
+	max-width: 30rem;
+	margin: .4rem 0 0;
+	color: var(--ink-soft);
+	font-size: .86rem;
+}
+
+.back-link {
+	display: inline-flex;
+	align-items: center;
+	gap: .4rem;
+	color: var(--ink-soft);
+	font-size: .88rem;
+}
+
+.back-link:hover {
+	color: var(--orange-deep);
+}
+
+.stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(140px, 220px));
+	gap: 1rem;
+	margin-bottom: 1.4rem;
+}
+
+.stat {
+	padding: 1.1rem 1.2rem;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-md);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+}
+
+.stat span {
+	display: block;
+	color: var(--ink-soft);
+	font-size: .78rem;
+}
+
+.stat strong {
+	display: block;
+	margin-top: .2rem;
+	font-family: var(--serif);
+	font-size: 1.7rem;
+}
+
+.toolbar {
+	margin-bottom: 1.4rem;
+	padding: 1.2rem;
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+	display: flex;
+	align-items: flex-end;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.form-group {
+	min-width: 160px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: .35rem;
+	color: var(--ink);
+	font-size: .8rem;
+	font-weight: 700;
+}
+
+.field {
+	width: 100%;
+	min-height: 42px;
+	padding: .6rem .78rem;
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	color: var(--ink);
+	background: var(--white);
+	outline: none;
+}
+
+.field:focus {
+	border-color: var(--orange);
+	box-shadow: 0 0 0 3px rgba(245, 142, 107, .14);
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	padding: .55rem 1.2rem;
+	border: 1px solid var(--orange);
+	border-radius: 999px;
+	color: var(--white);
+	background: var(--orange);
+	font-size: .85rem;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.btn:hover {
+	background: var(--orange-deep);
+}
+
+.btn.secondary {
+	border-color: var(--line);
+	color: var(--ink);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+}
+
+.btn.secondary:hover {
+	border-color: var(--bg-soothing);
+	background: var(--blue-soft);
+}
+
+.panel {
+	border: 1px solid var(--line);
+	border-radius: var(--radius-md);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+	padding: 1.5rem;
+}
+
+.panel-title {
+	font-size: 1rem;
+	font-weight: 700;
+	color: var(--ink);
+	margin-bottom: .3rem;
+}
+
+.panel-title span {
+	color: var(--ink-soft);
+	font-weight: 400;
+	font-size: .84rem;
+}
+
+.legend {
+	display: flex;
+	gap: 1.2rem;
+	margin: .7rem 0 1.1rem;
+	font-size: .8rem;
+	color: var(--ink-soft);
+}
+
+.legend .item {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+}
+
+.legend .box {
+	width: 15px;
+	height: 15px;
+	border-radius: 4px;
+}
+
+.box.has {
+	background: #cfe8d4;
+	border: 1px solid #7cc98d;
+}
+
+.box.none {
+	background: var(--bg-warm);
+	border: 1px solid var(--line);
+}
+
+.cal-head, .cal {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: .5rem;
+}
+
+.cal-head {
+	margin-bottom: .5rem;
+}
+
+.cal-head div {
+	text-align: center;
+	font-size: .78rem;
+	font-weight: 700;
+	color: var(--ink-soft);
+}
+
+.cal-day {
+	min-height: 68px;
+	border-radius: 12px;
+	padding: .5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: .8rem;
+}
+
+.cal-day.blank {
+	background: transparent;
+}
+
+.cal-day.none {
+	background: var(--bg-warm);
+	color: #c4b8b3;
+	border: 1px solid var(--line);
+}
+
+.cal-day.has {
+	background: #cfe8d4;
+	border: 1px solid #7cc98d;
+	color: #2e6b45;
+	cursor: pointer;
+	transition: transform .1s;
+}
+
+.cal-day.has:hover {
+	transform: translateY(-2px);
+}
+
+.cal-day .dnum {
+	font-weight: 700;
+}
+
+.cal-day .dcount {
+	font-size: .68rem;
+	margin-top: .15rem;
+}
+
+.modal-overlay {
+	display: none;
+	position: fixed;
+	inset: 0;
+	background: rgba(58, 75, 83, .42);
+	z-index: 200;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal {
+	background: var(--white);
+	border-radius: var(--radius-md);
+	width: 90%;
+	max-width: 420px;
+	overflow: hidden;
+	box-shadow: var(--shadow-md);
+}
+
+.modal-head {
+	background: var(--ink);
+	color: #fff;
+	padding: 1rem 1.2rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-weight: 700;
+}
+
+.modal-head .x {
+	background: none;
+	border: none;
+	color: #fff;
+	font-size: 1.1rem;
+	cursor: pointer;
+}
+
+.modal-body {
+	padding: 1rem 1.2rem;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.mo {
+	margin: 0 0 .6rem;
+}
+
+.mo-btn {
+	width: 100%;
+	text-align: left;
+	background: var(--bg-warm);
+	border: 1px solid var(--line);
+	border-radius: 12px;
+	padding: .75rem .85rem;
+	cursor: pointer;
+	font-family: inherit;
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	transition: background .15s;
+}
+
+.mo-btn:hover {
+	background: var(--blue-soft);
+}
+
+.mo-id {
+	font-weight: 700;
+	color: var(--orange-deep);
+}
+
+.mo-time {
+	color: var(--ink-soft);
+	font-size: .8rem;
+}
+
+.mo-status {
+	margin-left: auto;
+	font-size: .76rem;
+	font-weight: 700;
+}
+
+.s0 {
+	color: #b8860b;
+}
+
+.s1 {
+	color: #1a7a1a;
+}
+
+.s2 {
+	color: var(--orange-deep);
+}
+
+.s3 {
+	color: var(--orange-deep);
+}
+
+.s4 {
+	color: var(--ink);
+}
+
+.empty-state {
+	padding: 3.6rem 1rem;
+	color: var(--ink-soft);
+	text-align: center;
+	background: var(--white);
+	border-radius: 16px;
+	border: 1px solid var(--line);
+}
+
+.site-footer {
+	padding: 1.35rem 0;
+	border-top: 1px solid var(--line);
+	color: var(--ink-soft);
+	background: var(--white);
+	font-size: .78rem;
+}
+
+.footer-inner {
+	width: min(1240px, 94vw);
+	margin-inline: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.footer-inner strong {
+	color: var(--ink);
+	font-weight: 700;
+}
+
+@media ( max-width : 940px) {
+	.profile-copy, .admin-badge {
+		display: none;
+	}
+}
+
+@media ( max-width : 640px) {
+	.page-header {
+		display: block;
+	}
+	.back-link {
+		margin-top: .4rem;
+	}
+	.cal-day {
+		min-height: 54px;
+	}
+	.stats {
+		grid-template-columns: 1fr;
+	}
+}
 </style>
 </head>
 <body>
-    <div class="wrap">
-        <div class="top">
-            <div>
-                <h1>心理師預約行事曆</h1>
-                <p>依月份檢視心理師的預約情況，點有訂單的日期可查看當日訂單（僅供查看）</p>
-            </div>
-            <a class="back-btn" th:href="@{/admin/orders/home}">← 回諮商預約管理</a>
-        </div>
+	<header class="nav site-header">
+		<div class="nav-inner">
+			<a class="brand" th:href="@{/admin/home}" aria-label="諮由自在後台管理首頁">
+				<span class="logo-mind" aria-hidden="true"> <span
+					class="word"><span class="m">m</span><span class="i">i</span><span
+						class="n">n</span><span class="d">d</span></span> <span class="faces">
+						<svg class="fm" viewBox="0 0 24 11">
+							<g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<path d="M8 7 c2.4 2.4 5.6 2.4 8 0" /></g></svg> <svg class="fi"
+							viewBox="0 0 9 11">
+							<g stroke="#A85974" stroke-width="1.5" stroke-linecap="round"
+								fill="none">
+							<circle cx="4.5" cy="8" r="1.6" /></g></svg> <svg class="fn"
+							viewBox="0 0 17 11">
+							<g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M5.5 7.5 l6 0" /></g></svg> <svg class="fd" viewBox="0 0 17 11">
+							<g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0" />
+							<path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0" /></g></svg>
+				</span>
+			</span> <span class="brand-text"><span class="logo">諮由自在</span><span
+					class="en">Free&nbsp;Mind</span></span>
+			</a> <span class="admin-badge">系統管理後台</span>
+			<div class="nav-actions">
+				<a class="profile-entry" th:href="@{/admin/select_page}"
+					aria-label="前往管理員檔案"> <span class="profile-photo"
+					aria-hidden="true"> <img th:if="${admin != null}"
+						th:src="@{/admin/DBGifReader(adminId=${admin.adminId})}"
+						alt="管理員照片" /> <svg th:if="${admin == null}" viewBox="0 0 24 24"
+							fill="none">
+							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8"
+								stroke-linecap="round" />
+							<circle cx="12" cy="7" r="4" stroke-width="1.8" /></svg>
+				</span> <span class="profile-copy"> <small
+						th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
+						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
+				</span>
+				</a>
+				<form class="logout-form" th:action="@{/back-end/logout}"
+					method="post">
+					<button class="logout-button" type="submit" aria-label="登出後台">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+							<path
+								d="M14 8l4 4-4 4M18 12H8M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"
+								stroke-width="1.8" stroke-linecap="round"
+								stroke-linejoin="round" /></svg>
+						<span>登出</span>
+					</button>
+				</form>
+			</div>
+		</div>
+	</header>
 
-        <form class="search-card" method="get" th:action="@{/admin/slots/listAllSlots}">
-            <label>選擇心理師：</label>
-            <select name="psychId">
-                <option value="">請選擇心理師</option>
-                <option th:each="p : ${psychologistsList}" th:value="${p.psychId}"
-                        th:text="${p.psychId} + ' - ' + ${p.name}"
-                        th:selected="${selectedPsychId != null and selectedPsychId == #strings.toString(p.psychId)}"></option>
-            </select>
-            <label>月份：</label>
-            <select name="month">
-                <option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}"
-                        th:text="${m} + ' 月'" th:selected="${selectedMonth == m}"></option>
-            </select>
-            <button type="submit" class="btn-search">查詢</button>
-            <a class="btn-reset" th:href="@{/admin/slots/listAllSlots}">重設</a>
-        </form>
+	<main>
+		<div class="wrap">
+			<section class="page-header">
+				<div>
+					<span class="page-kicker">Availability Calendar</span>
+					<h1>心理師預約行事曆</h1>
+					<p>依月份檢視心理師的預約情況，點有訂單的日期可查看當日訂單（僅供查看）</p>
+				</div>
+				<a class="back-link" th:href="@{/admin/orders/home}">← 回諮商預約管理</a>
+			</section>
 
-        <div class="empty" th:if="${selectedPsychId == null or selectedPsychId == ''}">
-            請先從上方選擇一位心理師與月份。
-        </div>
+			<section class="stats" aria-label="本月統計"
+				th:if="${selectedPsychId != null and selectedPsychId != '' and ordersByDate != null}">
+				<article class="stat">
+					<span>本月有訂單天數</span> <strong th:text="${ordersByDate.size()}">0</strong>
+				</article>
+				<article class="stat">
+					<span>本月訂單總數</span> <strong
+						th:text="${#aggregates.sum(ordersByDate.![value.size()])}">0</strong>
+				</article>
+			</section>
 
-        <div class="card" th:if="${selectedPsychId != null and selectedPsychId != '' and psychologist != null}">
-            <div class="card-title">
-                <span th:text="'心理師 ' + ${psychologist.psychId} + '　' + ${psychologist.name}"></span>
-                <span th:text="'　' + ${selectedMonth} + ' 月預約行事曆'"></span>
-            </div>
-            <div class="legend">
-                <span class="item"><span class="box has"></span>有訂單（可點擊）</span>
-                <span class="item"><span class="box none"></span>無訂單</span>
-            </div>
+			<form class="toolbar" method="get"
+				th:action="@{/admin/slots/listAllSlots}">
+				<div class="form-group">
+					<label>選擇心理師</label> <select class="field" name="psychId">
+						<option value="">請選擇心理師</option>
+						<option th:each="p : ${psychologistsList}" th:value="${p.psychId}"
+							th:text="${p.psychId} + ' - ' + ${p.name}"
+							th:selected="${selectedPsychId != null and selectedPsychId == #strings.toString(p.psychId)}"></option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>月份</label> <select class="field" name="month">
+						<option th:each="m : ${#numbers.sequence(1, 12)}" th:value="${m}"
+							th:text="${m} + ' 月'" th:selected="${selectedMonth == m}"></option>
+					</select>
+				</div>
+				<button type="submit" class="btn">查詢</button>
+				<a class="btn secondary" th:href="@{/admin/slots/listAllSlots}">重設</a>
+			</form>
 
-            <div class="cal-head">
-                <div>週一</div><div>週二</div><div>週三</div><div>週四</div><div>週五</div><div>週六</div><div>週日</div>
-            </div>
-            <div class="cal">
-                <div class="cal-day blank" th:each="b : ${blanks}"></div>
-                <div class="cal-day" th:each="d : ${dateList}"
-                     th:classappend="${ordersByDate.containsKey(d.toString())} ? 'has clickable' : 'none'"
-                     th:attr="data-date=${d.toString()}">
-                    <div class="dnum" th:text="${d.dayOfMonth}"></div>
-                    <div class="dcount" th:if="${ordersByDate.containsKey(d.toString())}"
-                         th:text="${ordersByDate.get(d.toString()).size()} + ' 筆訂單'"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="empty-state"
+				th:if="${selectedPsychId == null or selectedPsychId == ''}">請先從上方選擇一位心理師與月份。</div>
 
-    <!-- 每個有訂單的日期各一個彈窗 -->
-    <div th:if="${ordersByDate != null}">
-        <div class="modal-overlay" th:each="entry : ${ordersByDate}" th:id="'modal-' + ${entry.key}"
-             onclick="closeModal()">
-            <div class="modal" onclick="event.stopPropagation()">
-                <div class="modal-head">
-                    <span th:text="${entry.key} + ' 的訂單'"></span>
-                    <button type="button" class="x" onclick="closeModal()">✕</button>
-                </div>
-                <div class="modal-body">
-                    <form th:each="o : ${entry.value}" method="post" th:action="@{/admin/orders/viewDetail}" class="mo">
-                        <input type="hidden" name="orderId" th:value="${o.orderId}">
-                        <button type="submit" class="mo-btn">
-                            <span class="mo-id">#<span th:text="${o.orderId}"></span></span>
-                            <span class="mo-time"
-                                  th:text="${#temporals.format(o.consStart,'HH:mm')} + ' - ' + ${#temporals.format(o.consEnd,'HH:mm')}"></span>
-                            <span class="mo-status" th:switch="${o.orderStatus}">
-                                <span th:case="0" class="s0">待確認</span>
-                                <span th:case="1" class="s1">已確認</span>
-                                <span th:case="2" class="s2">已取消</span>
-                                <span th:case="3" class="s3">未出席</span>
-                                <span th:case="4" class="s4">已完成</span>
-                            </span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+			<div class="panel"
+				th:if="${selectedPsychId != null and selectedPsychId != '' and psychologist != null}">
+				<div class="panel-title">
+					<span
+						th:text="'心理師 ' + ${psychologist.psychId} + '　' + ${psychologist.name}"></span>
+					<span th:text="'　' + ${selectedMonth} + ' 月預約行事曆'"></span>
+				</div>
+				<div class="legend">
+					<span class="item"><span class="box has"></span>有訂單（可點擊）</span> <span
+						class="item"><span class="box none"></span>無訂單</span>
+				</div>
 
-    <script>
-        document.querySelectorAll('.clickable').forEach(function (el) {
-            el.addEventListener('click', function () {
-                var m = document.getElementById('modal-' + el.getAttribute('data-date'));
-                if (m) m.style.display = 'flex';
-            });
-        });
-        function closeModal() {
-            document.querySelectorAll('.modal-overlay').forEach(function (m) { m.style.display = 'none'; });
-        }
-    </script>
+				<div class="cal-head">
+					<div>週一</div>
+					<div>週二</div>
+					<div>週三</div>
+					<div>週四</div>
+					<div>週五</div>
+					<div>週六</div>
+					<div>週日</div>
+				</div>
+				<div class="cal">
+					<div class="cal-day blank" th:each="b : ${blanks}"></div>
+					<div class="cal-day" th:each="d : ${dateList}"
+						th:classappend="${ordersByDate.containsKey(d.toString())} ? 'has clickable' : 'none'"
+						th:attr="data-date=${d.toString()}">
+						<div class="dnum" th:text="${d.dayOfMonth}"></div>
+						<div class="dcount"
+							th:if="${ordersByDate.containsKey(d.toString())}"
+							th:text="${ordersByDate.get(d.toString()).size()} + ' 筆訂單'"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<!-- 每個有訂單的日期各一個彈窗 -->
+	<div th:if="${ordersByDate != null}">
+		<div class="modal-overlay" th:each="entry : ${ordersByDate}"
+			th:id="'modal-' + ${entry.key}" onclick="closeModal()">
+			<div class="modal" onclick="event.stopPropagation()">
+				<div class="modal-head">
+					<span th:text="${entry.key} + ' 的訂單'"></span>
+					<button type="button" class="x" onclick="closeModal()">✕</button>
+				</div>
+				<div class="modal-body">
+					<form th:each="o : ${entry.value}" method="post"
+						th:action="@{/admin/orders/viewDetail}" class="mo">
+						<input type="hidden" name="orderId" th:value="${o.orderId}">
+						<button type="submit" class="mo-btn">
+							<span class="mo-id">#<span th:text="${o.orderId}"></span></span>
+							<span class="mo-time"
+								th:text="${#temporals.format(o.consStart,'HH:mm')} + ' - ' + ${#temporals.format(o.consEnd,'HH:mm')}"></span>
+							<span class="mo-status" th:switch="${o.orderStatus}"> <span
+								th:case="0" class="s0">待確認</span> <span th:case="1" class="s1">已確認</span>
+								<span th:case="2" class="s2">已取消</span> <span th:case="3"
+								class="s3">未出席</span> <span th:case="4" class="s4">已完成</span>
+							</span>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer class="site-footer">
+		<div class="footer-inner">
+			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span> <span>請妥善保管管理員帳號資訊</span>
+		</div>
+	</footer>
+
+	<script>
+		document.querySelectorAll('.clickable').forEach(
+				function(el) {
+					el.addEventListener('click', function() {
+						var m = document.getElementById('modal-'
+								+ el.getAttribute('data-date'));
+						if (m)
+							m.style.display = 'flex';
+					});
+				});
+		function closeModal() {
+			document.querySelectorAll('.modal-overlay').forEach(function(m) {
+				m.style.display = 'none';
+			});
+		}
+	</script>
 </body>
 </html>

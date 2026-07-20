@@ -1,74 +1,194 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>會員資料｜諮由自在</title>
-<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>會員資料｜諮由自在 Free Mind</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+
+<!-- ============================================================
+     本頁專屬樣式（非共用）
+     ============================================================ -->
+<style>
+/* ---------- 頁首標題區 ---------- */
+.pf-head { background: var(--bg-warm); padding: 2.6rem 0 1.8rem; }
+.pf-head-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.4rem; flex-wrap: wrap; }
+.pf-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
+.pf-head .crumb a:hover { color: var(--orange); }
+.pf-head .crumb span { margin: 0 .45rem; opacity: .5; }
+.pf-head h1 {
+	font-family: var(--zen-maru); font-weight: 700;
+	font-size: clamp(2rem, 3.6vw, 2.8rem); margin: .5rem 0 .4rem; line-height: 1.3;
+}
+.pf-head h1 em { font-style: normal; color: var(--orange); }
+.pf-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
+.pf-actions { display: flex; gap: .7rem; flex-wrap: wrap; }
+
+/* ---------- 主內容 ---------- */
+.pf-main { padding: 2.2rem 0 4.5rem; }
+
+/* 成功訊息 */
+.pf-flash {
+	margin-bottom: 1.6rem; padding: .9rem 1.3rem;
+	background: var(--pink-soft); border: 1px solid var(--pink);
+	border-radius: 14px; color: var(--ink); font-size: .93rem;
+}
+
+.pf-grid { display: grid; grid-template-columns: 300px 1fr; gap: 1.6rem; align-items: start; }
+
+/* 左：頭像卡 */
+.pf-side {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm); padding: 2.2rem 1.6rem; text-align: center;
+}
+.pf-avatar {
+	width: 132px; height: 132px; margin: 0 auto 1.1rem;
+	border-radius: 50%; object-fit: cover; border: 4px solid #fff;
+	box-shadow: var(--shadow-sm); background: var(--blue-soft);
+}
+.pf-avatar-empty {
+	width: 132px; height: 132px; margin: 0 auto 1.1rem;
+	border-radius: 50%; display: grid; place-items: center;
+	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+	border: 4px solid #fff; box-shadow: var(--shadow-sm);
+}
+.pf-avatar-empty svg { width: 60px; height: 60px; }
+.pf-side .pf-name { font-family: var(--serif); font-weight: 700; font-size: 1.24rem; display: block; }
+.pf-side .pf-account { font-size: .86rem; color: var(--ink-soft); display: block; margin-top: .15rem; }
+.pf-hint { margin: 1rem 0 0; font-size: .84rem; color: var(--ink-soft); line-height: 1.7; }
+
+/* 右：資料清單 */
+.pf-panel {
+	background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm); padding: 2rem 2.1rem;
+}
+.pf-panel h2 { font-family: var(--serif); font-weight: 700; font-size: 1.24rem; margin: 0 0 1.3rem; }
+.pf-list { margin: 0; }
+.pf-list > div {
+	display: grid; grid-template-columns: 8.5rem 1fr; gap: 1rem;
+	padding: .9rem 0; border-bottom: 1px solid var(--line);
+}
+.pf-list > div:last-child { border-bottom: none; padding-bottom: 0; }
+.pf-list dt { color: var(--ink-soft); font-size: .9rem; }
+.pf-list dd { margin: 0; color: var(--ink); font-weight: 500; word-break: break-all; }
+
+/* ---------- RWD ---------- */
+@media (max-width: 940px) {
+	.pf-grid { grid-template-columns: 1fr; }
+	.pf-head-inner { align-items: flex-start; }
+}
+@media (max-width: 560px) {
+	.pf-list > div { grid-template-columns: 1fr; gap: .2rem; }
+	.pf-panel { padding: 1.6rem 1.3rem; }
+}
+</style>
 </head>
-<body class="thy2-member">
-	<header th:replace="~{fragments/member/memberHeader :: siteHeader('dashboard')}"></header>
-	<main class="container">
-		<div class="section-head">
+
+<body>
+
+	<!-- ================= 導覽列 ================= -->
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<!-- ================= 頁首標題 ================= -->
+	<section class="pf-head">
+		<div class="wrap pf-head-inner">
 			<div>
-				<p class="eyebrow">My profile</p>
-				<h2>會員資料</h2>
+				<div class="crumb">
+					<a th:href="@{/}" href="/">首頁</a><span>/</span><span style="opacity:1;color:var(--ink)">會員資料</span>
+				</div>
+				<span class="script" style="font-size:1.3rem;">這是屬於你的空間</span>
+				<h1>會員<em>資料</em></h1>
+				<p>檢視你的個人資訊，隨時保持聯絡方式與帳號資料的正確。</p>
 			</div>
-			<div class="section-head-actions">
-				<a class="btn ghost" th:href="@{/member/dashboard}">我的療癒足跡</a>
-				<a class="btn" th:href="@{/member/update}">編輯資料</a>
+			<div class="pf-actions">
+				<a class="btn btn-ghost" th:href="@{/member/dashboard}" href="#">我的療癒足跡</a>
+				<a class="btn btn-primary" th:href="@{/member/update}" href="#">編輯資料</a>
 			</div>
 		</div>
+	</section>
 
-		<div class="notice member-message" th:if="${success}" th:text="${success}" data-flash-message></div>
+	<!-- ================= 會員資料 ================= -->
+	<section class="pf-main">
+		<div class="wrap">
 
-		<div class="panel">
-			<h2>會員資料</h2>
-			<img class="avatar-photo" th:if="${member.profilePic != null}" th:src="@{/member/profilePic}" alt="會員頭像">
-			<p class="meta" th:if="${member.profilePic == null}">尚未設定頭像，到「編輯資料」上傳一張吧。</p>
-			<dl class="summary-list">
-					<div>
-						<dt>會員帳號</dt>
-						<dd th:text="${member.memberAccount}"></dd>
+			<div class="pf-flash" th:if="${success}" th:text="${success}"></div>
+
+			<div class="pf-grid">
+
+				<!-- 左：頭像 -->
+				<aside class="pf-side">
+					<img class="pf-avatar" th:if="${member.profilePic != null}"
+						th:src="@{/member/profilePic}" alt="會員頭像" />
+					<div class="pf-avatar-empty" th:if="${member.profilePic == null}" aria-hidden="true">
+						<svg viewBox="0 0 24 24" fill="none">
+							<circle cx="12" cy="9" r="3.4" fill="#3A4B53" />
+							<path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19"
+								stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
 					</div>
-					<div>
-						<dt>姓名</dt>
-						<dd th:text="${member.name}"></dd>
-					</div>
-					<div>
-						<dt>暱稱</dt>
-						<dd th:text="${member.nickname}"></dd>
-					</div>
-					<div>
-						<dt>性別</dt>
-						<dd th:text="${member.gender}"></dd>
-					</div>
-					<div>
-						<dt>生日</dt>
-						<dd th:text="${member.birthday}"></dd>
-					</div>
-					<div>
-						<dt>手機號碼</dt>
-						<dd th:text="${member.phoneNumber}"></dd>
-					</div>
-					<div>
-						<dt>信箱</dt>
-						<dd th:text="${member.email}"></dd>
-					</div>
-					<div>
-						<dt>地址</dt>
-						<dd>
-							<span th:text="${member.city}"></span><span th:text="${member.dist}"></span><span th:text="${member.address}"></span>
-						</dd>
-					</div>
-					<div>
-						<dt>註冊時間</dt>
-						<dd th:text="${#temporals.format(member.regisAt, 'yyyy-MM-dd HH:mm')}"></dd>
-					</div>
-			</dl>
+					<span class="pf-name" th:text="${member.name}">會員姓名</span>
+					<span class="pf-account" th:text="${member.memberAccount}">member_account</span>
+					<p class="pf-hint" th:if="${member.profilePic == null}">尚未設定頭像，到「編輯資料」上傳一張吧。</p>
+				</aside>
+
+				<!-- 右：詳細資料 -->
+				<div class="pf-panel">
+					<h2>基本資料</h2>
+					<dl class="pf-list">
+						<div>
+							<dt>會員帳號</dt>
+							<dd th:text="${member.memberAccount}"></dd>
+						</div>
+						<div>
+							<dt>姓名</dt>
+							<dd th:text="${member.name}"></dd>
+						</div>
+						<div>
+							<dt>暱稱</dt>
+							<dd th:text="${member.nickname}"></dd>
+						</div>
+						<div>
+							<dt>性別</dt>
+							<dd th:text="${member.gender}"></dd>
+						</div>
+						<div>
+							<dt>生日</dt>
+							<dd th:text="${member.birthday}"></dd>
+						</div>
+						<div>
+							<dt>手機號碼</dt>
+							<dd th:text="${member.phoneNumber}"></dd>
+						</div>
+						<div>
+							<dt>信箱</dt>
+							<dd th:text="${member.email}"></dd>
+						</div>
+						<div>
+							<dt>地址</dt>
+							<dd>
+								<span th:text="${member.city}"></span><span th:text="${member.dist}"></span><span th:text="${member.address}"></span>
+							</dd>
+						</div>
+						<div>
+							<dt>註冊時間</dt>
+							<dd th:text="${#temporals.format(member.regisAt, 'yyyy-MM-dd HH:mm')}"></dd>
+						</div>
+					</dl>
+				</div>
+
+			</div>
 		</div>
-	</main>
-	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
-	<script th:src="@{/js/login/common/ui.js}"></script>
+	</section>
+
+	<!-- ================= Footer ================= -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+	<div th:replace="~{fragments/footer :: backToTop}"></div>
+
+	<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
 </body>
 </html>

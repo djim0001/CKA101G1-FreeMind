@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>信箱驗證｜諮由自在</title>
+<link rel="stylesheet" th:href="@{/css/login/common/member-base.css}" />
+</head>
+<body class="thy2-member">
+	<header th:replace="~{fragments/member/memberHeader :: authHeader}"></header>
+	<main class="container">
+		<div class="section-head">
+			<div>
+				<p class="eyebrow">Verify email</p>
+				<h2>信箱驗證</h2>
+			</div>
+		</div>
+
+		<div class="auth-card">
+			<div class="panel">
+				<p class="meta">
+					驗證碼已寄至：<b th:text="${email}"></b>（5 分鐘內有效）
+				</p>
+
+				<div class="notice" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+				<div class="notice" th:if="${successMessage != null}" th:text="${successMessage}"
+					style="color:#3d6b4f;background:#e4f1e6;border-color:#b7ddbf;"></div>
+
+				<form th:action="@{/psych/register/verify}" method="post">
+					<input type="hidden" name="email" th:value="${email}">
+					<div class="form-grid">
+						<div class="form-group full">
+							<label>驗證碼</label>
+							<input type="text" name="otp" class="field" maxlength="8"
+								autocomplete="one-time-code" autofocus>
+						</div>
+					</div>
+					<div class="section-head-actions" style="margin-top:20px;">
+						<button type="submit" class="btn">驗證</button>
+					</div>
+				</form>
+
+				<!-- 重寄驗證碼（60 秒冷卻） -->
+				<form th:action="@{/psych/register/resend}" method="post" style="margin-top:14px;">
+					<input type="hidden" name="email" th:value="${email}">
+					<div class="section-head-actions">
+						<a class="btn ghost" th:href="@{psych/login}">回登入頁</a>
+						<button type="submit" class="btn secondary">重寄驗證碼</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	<footer th:replace="~{fragments/member/memberFooter :: siteFooter}"></footer>
+	<script th:src="@{/js/login/common/ui.js}"></script>
+</body>
+</html>

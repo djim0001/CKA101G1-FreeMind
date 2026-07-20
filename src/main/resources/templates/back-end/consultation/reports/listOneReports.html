@@ -1,81 +1,39 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>處理完成</title>
-<style>
-    * { box-sizing: border-box; }
-
-    body {
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        padding: 40px 20px;
-        color: #333;
-    }
-
-    .card {
-        max-width: 480px;
-        margin: 60px auto 0;
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-        padding: 48px 40px;
-        text-align: center;
-    }
-
-    .check {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 20px;
-        border-radius: 50%;
-        background: #eaf6ec;
-        color: #2e7d43;
-        font-size: 34px;
-        line-height: 64px;
-    }
-
-    h3 {
-        font-size: 20px;
-        color: #4a3e3e;
-        margin: 0 0 10px;
-    }
-    .sub {
-        font-size: 14px;
-        color: #a99a95;
-        margin-bottom: 28px;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .btn {
-        display: inline-block;
-        padding: 11px 26px;
-        border-radius: 6px;
-        font-size: 15px;
-        font-weight: 600;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .btn-solid { background-color: #e8b4b4; color: #fff; }
-    .btn-solid:hover { background-color: #d39393; }
-    .btn-outline { border: 1.5px solid #e8b4b4; color: #c07d7d; background: #fff; }
-    .btn-outline:hover { background: #fbf2f2; }
-</style>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>回覆已送出｜諮由自在後台</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet" />
+	<style>
+		@font-face { font-family: 'OpenHuninn'; src: url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'), url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+		:root { --bg-warm: #FFFAEE; --bg-soothing: #C2D9ED; --blue-soft: #DCEAF5; --orange: #F58E6B; --orange-deep: #E5764F; --pink: #FBD0BE; --pink-soft: #FDE6DB; --ink: #3A4B53; --ink-soft: #6b7981; --white: #FFFFFF; --line: #ecdfce; --shadow-sm: 0 4px 18px rgba(58, 75, 83, .07); --shadow-md: 0 16px 44px rgba(58, 75, 83, .13); --radius-lg: 34px; --radius-md: 22px; --serif: "OpenHuninn", "Noto Sans TC", sans-serif; --zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif; --sans: "Noto Sans TC", system-ui, sans-serif; --display-en: "Baloo 2", sans-serif; }
+		* { box-sizing: border-box; }
+		body { display: flex; min-height: 100vh; align-items: center; justify-content: center; margin: 0; color: var(--ink); background: var(--bg-warm); font-family: var(--sans); line-height: 1.78; -webkit-font-smoothing: antialiased; }
+		a { color: inherit; text-decoration: none; }
+		.panel { max-width: 420px; width: 92vw; padding: 2.8rem 2.4rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); box-shadow: var(--shadow-md); text-align: center; }
+		.check { width: 62px; height: 62px; margin: 0 auto 1.2rem; border-radius: 50%; background: #e7f4e9; color: #1a7a1a; font-size: 2rem; line-height: 62px; }
+		h1 { margin: 0 0 .4rem; color: var(--ink); font-family: var(--serif); font-size: 1.25rem; }
+		.sub { margin: 0 0 1.6rem; color: var(--ink-soft); font-size: .88rem; }
+		.btn-group { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+		.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: .65rem 1.4rem; border-radius: 999px; font-size: .88rem; font-weight: 700; }
+		.btn.solid { color: #fff; background: var(--orange); box-shadow: 0 6px 16px rgba(245, 142, 107, .22); }
+		.btn.solid:hover { background: var(--orange-deep); }
+		.btn.outline { border: 1px solid var(--line); color: var(--ink); background: var(--white); }
+		.btn.outline:hover { border-color: var(--bg-soothing); background: var(--blue-soft); }
+	</style>
 </head>
 <body>
-    <div class="card">
-        <div class="check">✓</div>
-        <h3>回覆已送出！</h3>
-        <p class="sub">會員將能看到最新的處理狀態與備註。</p>
-        <div class="btn-group">
-            <a class="btn btn-outline" th:href="@{/admin/reports/listAllReports}">回問題回報列表</a>
-            <a class="btn btn-solid" th:href="@{/admin/home}">回後台首頁</a>
-        </div>
-    </div>
+	<div class="panel">
+		<div class="check">✓</div>
+		<h1>回覆已送出！</h1>
+		<p class="sub">會員將能看到最新的處理狀態與備註。</p>
+		<div class="btn-group">
+			<a class="btn outline" th:href="@{/admin/reports/listAllReports}">回問題回報列表</a>
+			<a class="btn solid" th:href="@{/admin/home}">回後台首頁</a>
+		</div>
+	</div>
 </body>
 </html>
