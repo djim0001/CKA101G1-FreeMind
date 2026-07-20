@@ -94,6 +94,7 @@ public class PsychologistMemberController {
 	public String detailPage(@PathVariable Integer id, Model model) {
 	    try {
 	        PsychologistProfileRes psych = psychologistService.getProfile(id);
+	        System.out.println("1111111"+psych.getAvailableDates());
 	        model.addAttribute("psych", psych);
 	    } catch (IllegalArgumentException e) {
 	        model.addAttribute("errorMessage", e.getMessage());
