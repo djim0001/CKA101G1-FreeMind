@@ -409,6 +409,11 @@
 		white-space: nowrap;
 	}
 	td { border-bottom: 1px solid rgba(236, 223, 206, .72); font-size: .92rem; }
+	.qa-time {
+		min-width: 9.8rem;
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+	}
 	tbody tr:last-child td { border-bottom: 0; }
 	tbody tr:hover { background: rgba(220, 234, 245, .16); }
 	.course-summary { display: flex; flex-direction: column; gap: .12rem; min-width: 175px; }
@@ -1174,9 +1179,15 @@
 									<strong th:text="${courseQa.course.courseName}">課程</strong><br />
 									<span class="meta" th:text="${courseQa.member.name}">會員</span>
 								</td>
-								<td th:text="${courseQa.askedAt}">—</td>
+								<td class="qa-time"
+									th:text="${courseQa.askedAt == null ? '—' : #temporals.format(courseQa.askedAt, 'yyyy-MM-dd HH:mm')}">
+									—
+								</td>
 								<td th:text="${courseQa.courseQuestion}">問題</td>
-								<td th:text="${courseQa.answeredAt}">—</td>
+								<td class="qa-time"
+									th:text="${courseQa.answeredAt == null ? '尚未回覆' : #temporals.format(courseQa.answeredAt, 'yyyy-MM-dd HH:mm')}">
+									尚未回覆
+								</td>
 								<td
 									th:text="${courseQa.courseAnswer == null ? '尚未回覆' : courseQa.courseAnswer}">
 									尚未回覆

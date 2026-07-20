@@ -357,6 +357,39 @@ body.thy2-member .eyebrow {
 	text-transform: uppercase;
 }
 body.thy2-member .meta { color: var(--ink-soft); }
+body.thy2-member .member-breadcrumb {
+	margin: 0 0 1rem;
+	color: var(--ink-soft);
+	font-size: .84rem;
+}
+body.thy2-member .member-breadcrumb ol {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: .25rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+body.thy2-member .member-breadcrumb li {
+	display: inline-flex;
+	align-items: center;
+}
+body.thy2-member .member-breadcrumb li + li::before {
+	margin: 0 .45rem 0 .2rem;
+	color: var(--line);
+	content: "／";
+}
+body.thy2-member .member-breadcrumb a {
+	color: var(--ink-soft);
+	transition: color .18s ease;
+}
+body.thy2-member .member-breadcrumb a:hover {
+	color: var(--orange-deep);
+}
+body.thy2-member .member-breadcrumb [aria-current="page"] {
+	color: var(--ink);
+}
 body.thy2-member .section-head,
 body.thy2-member .healing-header {
 	display: flex;
@@ -1349,10 +1382,19 @@ body.thy2-member .profile-entry-avatar {
 	<div th:replace="~{fragments/header :: header}"></div>
 
 <main class="container healing-shell">
+  <nav class="member-breadcrumb" aria-label="麵包屑">
+    <ol>
+      <li><a th:href="@{/}" href="/">首頁</a></li>
+      <li><a th:href="@{/member/dashboard}" href="/member/dashboard">我的療癒足跡</a></li>
+      <li><a th:href="@{/member/dashboard/myCollection}"
+          href="/member/dashboard/myCollection">我的收藏</a></li>
+      <li><span aria-current="page">收藏課程</span></li>
+    </ol>
+  </nav>
   <div class="healing-header">
     <div>
       <p class="eyebrow">My collection</p>
-      <h1>我的學習空間／收藏課程</h1>
+      <h1>收藏課程</h1>
     </div>
     <a class="btn" th:href="@{/member/dashboard/myLearning}">返回我的學習空間</a>
   </div>

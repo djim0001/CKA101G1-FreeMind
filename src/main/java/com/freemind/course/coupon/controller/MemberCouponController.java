@@ -162,9 +162,9 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 		List<MemberCoupon> memCoupons = memCouponSvc.getAllMyValidCoupon(member);
 		MemberCoupon orderCoupon = (MemberCoupon) session.getAttribute("orderCoupon");
 		List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
-		Integer cartTotal = null;
-		if(!cartList.isEmpty())
-			cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
+//		Integer cartTotal = null;
+//		if(!cartList.isEmpty())
+//			cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 	    
 		redirectAttributes.addFlashAttribute("memCoupons", memCoupons);
 		redirectAttributes.addFlashAttribute("chooseCouponMsg", "show");
@@ -172,7 +172,7 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 //		model.addAttribute("chooseCouponMsg", "show");
 		model.addAttribute("orderCoupon", orderCoupon);
 		model.addAttribute("cartList", cartList);
-		model.addAttribute("cartTotal", cartTotal);
+//		model.addAttribute("cartTotal", cartTotal);
 //		return "front-end/member/course/shoppingCartCheckOut";
 		return "redirect:" + returnUrl;
 	}
@@ -185,20 +185,20 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        RedirectAttributes redirectAttributes) {
 	    MemberCoupon memberCoupon =
 	            memCouponSvc.getOneByPK(couponSerialNo);
-	    List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
-	    Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 
 	    if (memberCoupon == null) {
 	        redirectAttributes.addFlashAttribute("couponError", "找不到此優惠券");
-	        return "redirect:/member/coupon/goto_checkout";
+	        return "redirect:/member/course/goto_checkout";
 	    }
 	    if (!(memberCoupon.getMember().getMemberId() == member.getMemberId())) {
 	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
-	        return "redirect:/member/coupon/goto_checkout";
+	        return "redirect:/member/course/goto_checkout";
 	    }
+	    List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
+	    Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 	    if (memberCoupon.getCoupon().getTriggerThreshold() > cartTotal ) {
 	    		redirectAttributes.addFlashAttribute("couponError", "此次消費未達優惠券使用門檻");
-	        return "redirect:/member/coupon/goto_checkout";
+	        return "redirect:/member/course/goto_checkout";
 	    }
 	    Integer total = BigDecimal.valueOf(cartTotal)
 				.multiply(memberCoupon.getCoupon().getDiscount())
@@ -206,7 +206,7 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	    Integer discountLimit = memberCoupon.getCoupon().getDiscountLimit();
 	    if (discountLimit < (cartTotal - total)) {
 		    	redirectAttributes.addFlashAttribute("couponError", 
-		    						"此次消費已達折扣上限，最多折扣:" + discountLimit );
+		    						"此次消費已達折扣上限，最多折扣:" + discountLimit + "元");
 		    	session.setAttribute("discountLimitTotal", (cartTotal-discountLimit));
 	    }else
 	    		session.setAttribute("discountLimitTotal", (cartTotal - total));

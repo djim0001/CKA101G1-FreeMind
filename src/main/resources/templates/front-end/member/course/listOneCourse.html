@@ -649,8 +649,8 @@ body.thy2-member .tabs .active {
 	background: var(--blue-soft);
 }
 body.thy2-member .toast {
-	position: fixed; top: 94px; right: max(16px, calc((100vw - min(1160px, 92vw)) / 2)); z-index: 190;
-	width: min(390px, calc(100vw - 32px)); margin: 0; padding: 1rem 1.2rem 1rem 3.4rem;
+	position: fixed; top: 94px; right: max(100px, calc((100vw - min(1160px, 92vw)) / 2)); z-index: 190;
+	width: min(390px, calc(100vw - 116px)); margin: 0; padding: 1rem 1.2rem 1rem 3.4rem;
 	border: 1px solid var(--line); border-left: 5px solid var(--orange); border-radius: 18px;
 	color: var(--ink); background: var(--white); box-shadow: var(--shadow-md);
 	font-size: .95rem; font-weight: 500; line-height: 1.6;
@@ -1036,7 +1036,11 @@ body.thy2-member :focus-visible {
 	}
 }
 @media (max-width: 560px) {
-	body.thy2-member .toast { top: 84px; right: 16px; }
+	body.thy2-member .toast {
+		top: 84px;
+		right: 82px;
+		width: min(390px, calc(100vw - 98px));
+	}
 	body.thy2-member #backToTop {
 		top: 148px;
 		right: 16px;

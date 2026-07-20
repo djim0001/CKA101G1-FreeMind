@@ -789,6 +789,13 @@ body.thy2-member .answer-box {
 }
 body.thy2-member .error,
 body.thy2-member .required { color: var(--orange-deep); }
+body.thy2-member .coupon-error-message {
+	max-width: 100%;
+	margin: .75rem 0 0;
+	font-size: .88rem;
+	line-height: 1.5;
+	white-space: nowrap;
+}
 body.thy2-member footer.ft {
 	display: block;
 	padding: 3.2rem 0 2rem;
@@ -1336,11 +1343,12 @@ body.thy2-member .profile-entry-avatar {
 					<input type="hidden" name="returnUrl">
 					<button class="btn secondary" type="submit">選擇優惠券</button>
 				</form>
+				<p class="error coupon-error-message" role="alert" th:if="${couponError != null}"
+					th:text="${couponError}"></p>
 				<div class="selected-coupon-box" th:if="${orderCoupon != null}"
 					style="margin-top: 14px">
 					<div>
-						<span class="meta">已選擇優惠券</span><strong th:text="${couponName}">優惠券</strong><small
-							class="error" th:text="${couponError}"></small>
+						<span class="meta">已選擇優惠券</span><strong th:text="${couponName}">優惠券</strong>
 					</div>
 					<form method="post" th:action="@{/member/coupon/remove_coupon}">
 						<input type="hidden" name="returnUrl">
