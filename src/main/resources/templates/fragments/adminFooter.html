@@ -4,14 +4,77 @@
 
 	<!--
 		管理員共用頁尾。
-		用法：<div th:replace="~{fragments/admin/footer :: footer}"></div>
+		用法：<div th:replace="~{fragments/adminFooter :: footer}"></div>
 	-->
-	<footer class="site-footer" th:fragment="footer">
-		<div class="wrap footer-inner">
-			<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span>
-			<span>請妥善保管管理員帳號資訊</span>
-		</div>
-	</footer>
+	<th:block th:fragment="footer">
+		<style data-admin-fragment-styles="footer">
+			@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+
+			@font-face {
+				font-family: 'OpenHuninn';
+				src:
+					url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
+					url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
+				font-weight: 400;
+				font-style: normal;
+				font-display: swap;
+			}
+
+			footer.admin-site-footer,
+			footer.admin-site-footer *,
+			footer.admin-site-footer *::before,
+			footer.admin-site-footer *::after {
+				box-sizing: border-box;
+			}
+
+			footer.admin-site-footer {
+				--admin-footer-ink: #3A4B53;
+				--admin-footer-ink-soft: #6b7981;
+				--admin-footer-white: #FFFFFF;
+				--admin-footer-line: #ecdfce;
+				width: 100%;
+				margin: 0;
+				padding: 1.35rem 0;
+				border-top: 1px solid var(--admin-footer-line);
+				color: var(--admin-footer-ink-soft);
+				background: var(--admin-footer-white);
+				font-family: "Noto Sans TC", system-ui, sans-serif;
+				font-size: .78rem;
+				line-height: 1.78;
+				-webkit-font-smoothing: antialiased;
+			}
+
+			footer.admin-site-footer .admin-footer-inner {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 1rem;
+				width: min(1160px, 92vw);
+				margin-inline: auto;
+				padding: 0;
+				flex-wrap: wrap;
+			}
+
+			footer.admin-site-footer .admin-footer-inner strong {
+				color: var(--admin-footer-ink);
+				font-weight: 700;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				footer.admin-site-footer,
+				footer.admin-site-footer * {
+					transition: none !important;
+				}
+			}
+		</style>
+
+		<footer class="site-footer admin-site-footer">
+			<div class="wrap footer-inner admin-footer-inner">
+				<span><strong>諮由自在 Free Mind</strong>｜後台管理系統</span>
+				<span>請妥善保管管理員帳號資訊</span>
+			</div>
+		</footer>
+	</th:block>
 
 </body>
 </html>

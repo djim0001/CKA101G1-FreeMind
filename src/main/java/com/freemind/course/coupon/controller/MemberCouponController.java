@@ -1,5 +1,6 @@
 package com.freemind.course.coupon.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -184,19 +185,34 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	        RedirectAttributes redirectAttributes) {
 	    MemberCoupon memberCoupon =
 	            memCouponSvc.getOneByPK(couponSerialNo);
+	    List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
+	    Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
 
 	    if (memberCoupon == null) {
 	        redirectAttributes.addFlashAttribute("couponError", "找不到此優惠券");
-	        return "redirect:/member/course/goto_checkout";
+	        return "redirect:/member/coupon/goto_checkout";
 	    }
 	    if (!(memberCoupon.getMember().getMemberId() == member.getMemberId())) {
 	        redirectAttributes.addFlashAttribute("couponError", "此優惠券不屬於目前會員");
-	        return "redirect:/member/course/goto_checkout";
+	        return "redirect:/member/coupon/goto_checkout";
 	    }
+	    if (memberCoupon.getCoupon().getTriggerThreshold() > cartTotal ) {
+	    		redirectAttributes.addFlashAttribute("couponError", "此次消費未達優惠券使用門檻");
+	        return "redirect:/member/coupon/goto_checkout";
+	    }
+	    Integer total = BigDecimal.valueOf(cartTotal)
+				.multiply(memberCoupon.getCoupon().getDiscount())
+				.intValue();
+	    Integer discountLimit = memberCoupon.getCoupon().getDiscountLimit();
+	    if (discountLimit < (cartTotal - total)) {
+		    	redirectAttributes.addFlashAttribute("couponError", 
+		    						"此次消費已達折扣上限，最多折扣:" + discountLimit );
+		    	session.setAttribute("discountLimitTotal", (cartTotal-discountLimit));
+	    }else
+	    		session.setAttribute("discountLimitTotal", (cartTotal - total));
+	    	
 
 	    session.setAttribute("orderCoupon", memberCoupon);
-
-	    redirectAttributes.addFlashAttribute("successMsg", "已選擇優惠券");
 
 	    return "redirect:/member/course/goto_checkout";
 	}

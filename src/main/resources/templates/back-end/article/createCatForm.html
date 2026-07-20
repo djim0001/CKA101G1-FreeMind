@@ -1,175 +1,524 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>新增文章分類</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="諮由自在 Free Mind 新增文章分類" />
+	<title>新增文章分類｜諮由自在後台</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Caveat:wght@500;600;700&amp;family=Noto+Sans+TC:wght@300;400;500;700;900&amp;family=Zen+Maru+Gothic:wght@500;700;900&amp;display=swap"
+		rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" href="/css/index.css" />
 <style>
-.btn-action {
-    display: inline-block;
-    padding: 6px 12px;
-    background-color: #f0f0f0;
-    color: #000000;
-    text-decoration: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.btn-action:hover {
-    background-color: #e0e0e0;
-}
-
-.btn-action:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: bold;
-}
-
-.form-group input {
-    padding: 8px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 300px;
-}
-
-.error-text {
-    color: #d9534f;
-    font-size: 13px;
-    margin-top: 4px;
-}
-
-.similar-list {
-    color: #d9534f;
-    font-size: 13px;
-    margin-top: 2px;
-    padding-left: 16px;
-}
-
-.success-msg {
-    padding: 4px 10px;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-}
-
-.error-msg {
-    padding: 4px 10px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-}
-
-</style>
+		html { min-width: 320px; }
+		body.admin-article-page {
+			display: flex;
+			min-width: 320px;
+			min-height: 100vh;
+			flex-direction: column;
+			background: var(--bg-warm);
+		}
+		.skip-link {
+			position: fixed;
+			top: .75rem;
+			left: .75rem;
+			z-index: 999;
+			padding: .65rem 1rem;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			transform: translateY(-160%);
+		}
+		.skip-link:focus { transform: translateY(0); }
+		.site-header {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			border-bottom: 1px solid rgba(236, 223, 206, .7);
+			color: var(--ink);
+			background: rgba(253, 246, 237, .85);
+			backdrop-filter: blur(12px);
+		}
+		.nav-inner {
+			display: flex;
+			align-items: center;
+			gap: 1.4rem;
+			height: 74px;
+		}
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: .8rem;
+			flex: 0 0 auto;
+		}
+		.nav-actions {
+			display: flex;
+			align-items: center;
+			gap: .55rem;
+			margin-left: auto;
+		}
+		.profile-entry {
+			display: flex;
+			align-items: center;
+			gap: .65rem;
+			min-height: 46px;
+			padding: .3rem .75rem .3rem .35rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			transition: border-color .16s ease, background .16s ease, transform .16s ease;
+		}
+		.profile-entry:hover {
+			border-color: var(--bg-soothing);
+			background: var(--blue-soft);
+			transform: translateY(-2px);
+		}
+		.profile-photo {
+			display: grid;
+			place-items: center;
+			width: 36px;
+			height: 36px;
+			flex: 0 0 auto;
+			border-radius: 50%;
+			color: var(--ink);
+			background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+		}
+		.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+		.profile-photo svg { width: 21px; height: 21px; stroke: currentColor; }
+		.profile-copy { display: flex; min-width: 0; flex-direction: column; line-height: 1.25; }
+		.profile-copy small { color: var(--ink-soft); font-size: .68rem; }
+		.profile-copy strong {
+			max-width: 9.5rem;
+			overflow: hidden;
+			color: var(--ink);
+			font-size: .82rem;
+			font-weight: 500;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+		.logout-form { margin: 0; }
+		.logout-button {
+			display: inline-flex;
+			align-items: center;
+			gap: .4rem;
+			min-height: 46px;
+			padding: .6rem .8rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			cursor: pointer;
+			transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+		}
+		.logout-button:hover {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange-deep);
+			transform: translateY(-2px);
+		}
+		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.admin-main {
+			width: 100%;
+			flex: 1;
+			padding: clamp(1.5rem, 3vw, 2.5rem) 0 clamp(3.5rem, 6vw, 5rem);
+		}
+		.admin-wrap { width: min(1160px, 92vw); margin-inline: auto; }
+		.admin-page-header {
+			display: flex;
+			align-items: flex-end;
+			justify-content: space-between;
+			gap: 2rem;
+			margin-bottom: 1.35rem;
+			padding-bottom: 1.25rem;
+			border-bottom: 1px solid var(--line);
+		}
+		.admin-kicker {
+			display: block;
+			margin-bottom: .3rem;
+			color: var(--orange);
+			font-size: .75rem;
+			font-weight: 700;
+			letter-spacing: .16em;
+			text-transform: uppercase;
+		}
+		.admin-page-header h1 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: clamp(1.75rem, 3vw, 2.35rem);
+			line-height: 1.3;
+		}
+		.admin-page-header p {
+			max-width: 32rem;
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .92rem;
+			text-align: right;
+		}
+		.article-admin-nav {
+			display: flex;
+			gap: .55rem;
+			margin-bottom: 1.35rem;
+			overflow-x: auto;
+			padding: .2rem .1rem .45rem;
+			scrollbar-width: thin;
+		}
+		.article-admin-nav a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 42px;
+			flex: 0 0 auto;
+			padding: .55rem 1rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .88rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+		}
+		.article-admin-nav a:hover,
+		.article-admin-nav a.active {
+			border-color: var(--orange);
+			color: var(--white);
+			background: var(--orange);
+		}
+		.admin-panel {
+			overflow: hidden;
+			border: 1px solid var(--line);
+			border-radius: var(--radius-md);
+			background: var(--white);
+			box-shadow: var(--shadow-md);
+		}
+		.admin-panel-heading {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 1rem;
+			min-height: 64px;
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--line);
+			background: linear-gradient(90deg, var(--pink-soft), var(--white) 48%, var(--blue-soft));
+		}
+		.admin-panel-heading h2 {
+			margin: 0;
+			color: var(--ink);
+			font-family: var(--serif);
+			font-size: 1.08rem;
+		}
+		.admin-panel-heading p { margin: 0; color: var(--ink-soft); font-size: .82rem; }
+		.admin-panel-body { padding: 1.25rem; }
+		.admin-toolbar {
+			display: grid;
+			grid-template-columns: minmax(220px, 1fr) repeat(3, minmax(130px, 170px)) auto;
+			gap: .75rem;
+			align-items: end;
+			margin-bottom: 1.25rem;
+		}
+		.admin-field {
+			width: 100%;
+			min-height: 44px;
+			padding: .7rem .85rem;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			color: var(--ink);
+			background: var(--white);
+			font: inherit;
+			font-size: .9rem;
+		}
+		.admin-field:focus { border-color: var(--orange); outline: 0; box-shadow: 0 0 0 3px rgba(245, 142, 107, .14); }
+		.admin-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: .4rem;
+			min-height: 42px;
+			padding: .58rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 999px;
+			color: var(--white);
+			background: var(--orange);
+			font-size: .86rem;
+			font-weight: 700;
+			line-height: 1;
+			white-space: nowrap;
+			transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+		}
+		.admin-btn:hover { color: var(--white); background: var(--orange-deep); transform: translateY(-2px); }
+		.admin-btn.secondary { border-color: var(--bg-soothing); color: var(--ink); background: var(--blue-soft); }
+		.admin-btn.secondary:hover { color: var(--ink); background: var(--bg-soothing); }
+		.admin-btn.danger { border-color: rgba(229, 118, 79, .28); color: var(--orange-deep); background: var(--pink-soft); }
+		.admin-btn.danger:hover { color: var(--white); background: var(--orange-deep); }
+		.table-scroll { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+		.admin-table { width: 100%; min-width: 760px; border-collapse: collapse; }
+		.admin-table th,
+		.admin-table td { padding: .9rem 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+		.admin-table th {
+			color: var(--ink);
+			background: rgba(220, 234, 245, .62);
+			font-size: .8rem;
+			font-weight: 700;
+			letter-spacing: .04em;
+		}
+		.admin-table td { color: var(--ink-soft); font-size: .88rem; }
+		.admin-table tbody tr:last-child td { border-bottom: 0; }
+		.admin-table tbody tr:hover td { background: rgba(255, 250, 238, .72); }
+		.article-summary strong { display: block; color: var(--ink); font-family: var(--serif); font-size: .98rem; }
+		.article-summary span { font-size: .8rem; }
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			min-height: 30px;
+			padding: .25rem .7rem;
+			border-radius: 999px;
+			color: var(--ink);
+			background: var(--blue-soft);
+			font-size: .78rem;
+			font-weight: 700;
+		}
+		.inline-actions { display: flex; align-items: center; gap: .5rem; }
+		.inline-form { margin: 0; }
+		.empty-state { padding: 2.4rem 1rem !important; color: var(--ink-soft); text-align: center !important; }
+		.site-footer {
+			margin-top: 0;
+			padding: 1.35rem 0;
+			border-top: 1px solid var(--line);
+			color: var(--ink-soft);
+			background: var(--white);
+			font-size: .78rem;
+		}
+		.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+		.footer-inner strong { color: var(--ink); font-weight: 700; }
+		:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+		@media (max-width: 940px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+		}
+		@media (max-width: 980px) {
+			.admin-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.admin-toolbar > :first-child { grid-column: 1 / -1; }
+		}
+		@media (max-width: 700px) {
+			.profile-copy { display: none; }
+			.profile-entry { padding: .28rem; }
+			.admin-page-header { display: block; }
+			.admin-page-header p { margin-top: .5rem; text-align: left; }
+			.admin-panel-heading { display: block; }
+			.admin-panel-heading p { margin-top: .25rem; }
+		}
+		@media (max-width: 640px) {
+			.nav-inner {
+				gap: .55rem;
+				height: 64px;
+			}
+			.logout-button span { display: none; }
+			.logout-button {
+				display: grid;
+				place-items: center;
+				width: 42px;
+				min-height: 42px;
+				padding: 0;
+			}
+			.profile-photo {
+				width: 34px;
+				height: 34px;
+			}
+		}
+		@media (max-width: 540px) {
+			.logout-button { display: grid; place-items: center; width: 42px; min-height: 42px; padding: 0; }
+			.logout-button span { display: none; }
+			.admin-panel-body { padding: .85rem; }
+			.admin-toolbar { grid-template-columns: 1fr; }
+			.admin-toolbar > :first-child { grid-column: auto; }
+		}
+		@media (max-width: 430px) {
+			.profile-entry { display: none; }
+			.nav-actions { gap: .35rem; }
+		}
+		@media (prefers-reduced-motion: reduce) {
+			* { transition: none !important; scroll-behavior: auto !important; }
+		}
+	</style>
+	<style>
+		.create-panel { max-width: 760px; margin-inline: auto; }
+		.create-form { display: grid; gap: 1rem; }
+		.form-group label {
+			display: block;
+			margin-bottom: .45rem;
+			color: var(--ink);
+			font-size: .88rem;
+			font-weight: 700;
+		}
+		.input-action-row {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) auto;
+			gap: .7rem;
+			align-items: start;
+		}
+		.error-text {
+			display: none;
+			margin-top: .45rem;
+			color: var(--orange-deep);
+			font-size: .82rem;
+			font-weight: 700;
+		}
+		.similar-list {
+			display: none;
+			margin: .35rem 0 0;
+			padding-left: 1.2rem;
+			color: var(--orange-deep);
+			font-size: .82rem;
+		}
+		.alert-message {
+			display: block;
+			padding: .9rem 1rem;
+			border: 1px solid transparent;
+			border-radius: 14px;
+			opacity: 1;
+			transition: opacity .5s ease;
+		}
+		.success-msg {
+			border-color: var(--bg-soothing);
+			color: var(--ink);
+			background: var(--blue-soft);
+		}
+		.error-msg {
+			border-color: var(--pink);
+			color: var(--orange-deep);
+			background: var(--pink-soft);
+		}
+		.form-hint {
+			margin: 0;
+			color: var(--ink-soft);
+			font-size: .82rem;
+		}
+		.admin-btn:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+		@media (max-width: 560px) {
+			.input-action-row { grid-template-columns: 1fr; }
+			.input-action-row .admin-btn { width: 100%; }
+		}
+	</style>
 </head>
-<body>
-    <h1>新增文章分類</h1>
-    <a th:href="@{/admin/article/categories}" class="btn-action">返回分類搜尋</a>
-    <br><br>
+<body class="admin-article-page">
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-    <form th:action="@{/admin/article/categories/create}" method="post" id="createForm">
-        <div class="form-group">
-		    <label for="catName">分類名稱：</label>
-		    <div style="display: flex; align-items: center; gap: 10px;">
-		        <input type="text" id="catName" name="catName" required maxlength="50"
-		               placeholder="請輸入分類名稱" autocomplete="off" />
-		        <button type="submit" id="submitBtn" class="btn-action">新增</button>
-		    </div>
-		    <div id="errorText" class="error-text" style="display: none;"></div>
-		    <ul id="similarList" class="similar-list" style="display: none;"></ul>
+	<main id="main-content" class="admin-main">
+		<div class="admin-wrap">
+			<section class="admin-page-header" aria-labelledby="page-title">
+				<div>
+					<span class="admin-kicker">Create Category</span>
+					<h1 id="page-title">新增文章分類</h1>
+				</div>
+				<p>建立清楚且不重複的分類名稱，讓文章更容易被管理與查找。</p>
+			</section>
+
+			<section class="admin-panel create-panel" aria-labelledby="create-category-title">
+				<div class="admin-panel-heading">
+					<h2 id="create-category-title">分類資料</h2>
+					<a class="admin-btn secondary"
+						th:href="@{/admin/article/categories}">返回分類搜尋</a>
+				</div>
+				<div class="admin-panel-body">
+					<form class="create-form"
+						th:action="@{/admin/article/categories/create}"
+						method="post" id="createForm">
+						<div class="form-group">
+							<label for="catName">分類名稱</label>
+							<div class="input-action-row">
+								<input class="admin-field" type="text"
+									id="catName" name="catName" required maxlength="50"
+									placeholder="請輸入分類名稱" autocomplete="off" />
+								<button type="submit" id="submitBtn"
+									class="admin-btn">新增分類</button>
+							</div>
+							<div id="errorText" class="error-text"></div>
+							<ul id="similarList" class="similar-list"></ul>
+						</div>
+
+						<p class="form-hint">分類名稱最多 50 個字；輸入時會自動檢查完全相同或相似的既有名稱。</p>
+
+						<span id="alertMsg" class="alert-message"
+							th:if="${alertMessage}"
+							th:classappend="${alertType == 'error'} ? 'error-msg' : 'success-msg'"
+							th:text="${alertMessage}">操作結果</span>
+					</form>
+				</div>
+			</section>
 		</div>
+	</main>
 
-        <span id="alertMsg" th:if="${alertMessage}" 
-         	  th:classappend="${alertType == 'error'} ? 'error-msg' : 'success-msg'"
-              th:text="${alertMessage}" style="margin-left: 10px;">
-        </span>
-    </form>
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 
-    <script th:inline="javascript">
-        const allCatNames = /*[[${catNames}]]*/ [];
-    </script>
+	<script th:inline="javascript">
+		const allCatNames = /*[[${catNames}]]*/ [];
+	</script>
+	<script>
+		const catNameInput = document.getElementById('catName');
+		const errorText = document.getElementById('errorText');
+		const similarList = document.getElementById('similarList');
+		const submitBtn = document.getElementById('submitBtn');
+		const createForm = document.getElementById('createForm');
 
-    <script>
-        const catNameInput = document.getElementById('catName');
-        const errorText = document.getElementById('errorText');
-        const similarList = document.getElementById('similarList');
-        const submitBtn = document.getElementById('submitBtn');
-        const createForm = document.getElementById('createForm');
+		catNameInput.addEventListener('input', function () {
+			const keyword = this.value.trim().toLowerCase();
+			errorText.style.display = 'none';
+			similarList.style.display = 'none';
+			similarList.innerHTML = '';
+			submitBtn.disabled = false;
 
-        catNameInput.addEventListener('input', function() {
-            const keyword = this.value.trim().toLowerCase();
-            errorText.style.display = 'none';
-            similarList.style.display = 'none';
-            similarList.innerHTML = '';
-            submitBtn.disabled = false;
+			if (keyword === '') return;
 
-            if (keyword === '') return;
+			const exactMatch = allCatNames.find(name =>
+				name.toLowerCase() === keyword
+			);
 
-            // 完全一致
-            const exactMatch = allCatNames.find(name =>
-                name.toLowerCase() === keyword
-            );
+			if (exactMatch) {
+				errorText.textContent = '此分類名稱已存在';
+				errorText.style.display = 'block';
+				submitBtn.disabled = true;
+				return;
+			}
 
-            if (exactMatch) {
-                errorText.textContent = '此分類名稱已存在';
-                errorText.style.display = 'block';
-                submitBtn.disabled = true;
-                return;
-            }
+			const similarMatches = allCatNames.filter(name =>
+				name.toLowerCase().includes(keyword) ||
+				keyword.includes(name.toLowerCase())
+			);
 
-            // 模糊比對：輸入包含在既有名稱中，或既有名稱包含在輸入中
-            const similarMatches = allCatNames.filter(name =>
-                name.toLowerCase().includes(keyword) ||
-                keyword.includes(name.toLowerCase())
-            );
+			if (similarMatches.length > 0) {
+				errorText.textContent = '已有相似的分類名稱：';
+				errorText.style.display = 'block';
+				similarMatches.forEach(name => {
+					const listItem = document.createElement('li');
+					listItem.textContent = name;
+					similarList.appendChild(listItem);
+				});
+				similarList.style.display = 'block';
+				submitBtn.disabled = true;
+			}
+		});
 
-            if (similarMatches.length > 0) {
-                errorText.textContent = '已有相似的分類名稱：';
-                errorText.style.display = 'block';
-                similarMatches.forEach(name => {
-                    const li = document.createElement('li');
-                    li.textContent = name;
-                    similarList.appendChild(li);
-                });
-                similarList.style.display = 'block';
-                submitBtn.disabled = true;
-            }
-        });
-
-        // 表單送出前再檢查一次
-        createForm.addEventListener('submit', function(e) {
-            if (submitBtn.disabled) {
-                e.preventDefault();
-            }
-        });
-    </script>
-
-    <script th:if="${alertMessage}">
-        setTimeout(function() {
-            const msg = document.getElementById('alertMsg');
-            if (msg) {
-                msg.style.opacity = '0';
-                setTimeout(function() {
-                    msg.style.display = 'none';
-                }, 500);
-            }
-        }, 1500);
-    </script>
+		createForm.addEventListener('submit', function (event) {
+			if (submitBtn.disabled) {
+				event.preventDefault();
+			}
+		});
+	</script>
+	<script th:if="${alertMessage}">
+		setTimeout(function () {
+			const message = document.getElementById('alertMsg');
+			if (message) {
+				message.style.opacity = '0';
+				setTimeout(function () {
+					message.style.display = 'none';
+				}, 500);
+			}
+		}, 1500);
+	</script>
 </body>
 </html>

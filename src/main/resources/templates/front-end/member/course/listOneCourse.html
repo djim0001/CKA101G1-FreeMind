@@ -488,6 +488,61 @@ body.thy2-member .summary-row.total {
 	font-size: 1.15rem;
 	font-weight: 700;
 }
+body.thy2-member .course-price-block {
+	display: grid;
+	gap: .55rem;
+	margin: 1.2rem 0;
+	padding: 1rem 1.1rem;
+	border: 1px solid var(--line);
+	border-radius: 16px;
+	background: var(--bg-warm);
+}
+body.thy2-member .course-price-block > .price,
+body.thy2-member .discount-price-panel p {
+	margin: 0;
+}
+body.thy2-member .discount-price-panel {
+	display: grid;
+	gap: .45rem;
+}
+body.thy2-member .original-price {
+	color: var(--ink-soft);
+	font-size: .88rem;
+}
+body.thy2-member .original-price del {
+	text-decoration-color: var(--orange-deep);
+	text-decoration-thickness: 2px;
+}
+body.thy2-member .discount-price {
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	flex-wrap: wrap;
+}
+body.thy2-member .discount-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: .24rem .65rem;
+	border-radius: 999px;
+	color: var(--orange-deep);
+	background: var(--pink-soft);
+	font-size: .76rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+}
+body.thy2-member .discount-period {
+	display: flex;
+	align-items: center;
+	gap: .25rem;
+	flex-wrap: wrap;
+	color: var(--ink-soft);
+	font-size: .8rem;
+	line-height: 1.65;
+}
+body.thy2-member .discount-period time {
+	color: var(--ink);
+	font-weight: 500;
+}
 body.thy2-member .inline-actions,
 body.thy2-member .course-actions {
 	display: flex;
@@ -1401,9 +1456,31 @@ body.thy2-member .profile-entry-avatar {
 						<b th:text="${course.reviewCount}">0</b>
 					</span><span>提問 <b th:text="${course.commentCount}">0</b></span>
 				</div>
-				<p class="price" th:if="${!coursePermission}">
-					NT$ <span th:text="${course.price}">0</span>
-				</p>
+				<div class="course-price-block" th:if="${!coursePermission}">
+					<div class="discount-price-panel"
+						th:if="${course.isDiscountValid() == true}">
+						<p class="original-price">
+							原價
+							<del>NT$ <span th:text="${course.price}">0</span></del>
+						</p>
+						<p class="price discount-price">
+							<span class="discount-badge">限時優惠</span>
+							<span>NT$ <span
+								th:text="${course.price * course.psychDiscount}">0</span></span>
+						</p>
+						<p class="discount-period">
+							<span>優惠期間：</span>
+							<time th:datetime="${course.discountStart}"
+								th:text="${#temporals.format(course.discountStart, 'yyyy年MM月dd日 HH:mm')}">開始時間</time>
+							<span aria-hidden="true">－</span>
+							<time th:datetime="${course.discountEnd}"
+								th:text="${#temporals.format(course.discountEnd, 'yyyy年MM月dd日 HH:mm')}">結束時間</time>
+						</p>
+					</div>
+					<p class="price" th:unless="${course.isDiscountValid() == true}">
+						NT$ <span th:text="${course.price}">0</span>
+					</p>
+				</div>
 				<div class="stack">
 					<form method="post" th:action="@{/member/course/add_cart}"
 						th:if="${!coursePermission}">
