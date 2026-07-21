@@ -267,7 +267,10 @@
 
 				<section class="workspace" aria-label="預約紀錄工作區">
 					<div class="tabs" data-tabs role="tablist" aria-label="預約分類">
-						<button class="active" type="button" data-tab="pending" role="tab" aria-selected="true">
+						<button class="active" type="button" data-tab="all" role="tab" aria-selected="true">
+							全部 <span class="count" th:text="${#lists.size(ordersListData)}"></span>
+						</button>
+						<button type="button" data-tab="pending" role="tab" aria-selected="false">
 							待確認 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 0])}"></span>
 						</button>
 						<button type="button" data-tab="confirmed" role="tab" aria-selected="false">
@@ -281,8 +284,32 @@
 						</button>
 					</div>
 
+					<!-- 全部 -->
+					<section class="tab-panel" data-panel="all">
+						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData)}">
+							<table>
+								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>狀態</th></tr></thead>
+								<tbody>
+									<tr th:each="order : ${ordersListData}">
+										<td th:text="${order.orderId}"></td>
+										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td th:text="${order.psychologist.name}"></td>
+										<td th:switch="${order.orderStatus}">
+											<span th:case="0" class="status pending">待確認</span>
+											<span th:case="1" class="status">已確認</span>
+											<span th:case="4" class="status success">已完成</span>
+											<span th:case="2" class="status danger">已取消</span>
+											<span th:case="3" class="status danger">未出席</span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<p class="empty-state" th:if="${#lists.isEmpty(ordersListData)}">此分類目前沒有紀錄。</p>
+					</section>
+
 					<!-- 待確認 -->
-					<section class="tab-panel" data-panel="pending">
+					<section class="tab-panel" data-panel="pending" hidden>
 						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 0])}">
 							<table>
 								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>狀態</th></tr></thead>

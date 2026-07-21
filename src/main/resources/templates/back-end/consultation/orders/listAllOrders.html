@@ -100,6 +100,12 @@
 
 		.empty-state { padding: 3rem 1rem; color: var(--ink-soft); text-align: center; }
 
+		.pager { display: flex; justify-content: center; flex-wrap: wrap; gap: .4rem; margin-top: 1rem; }
+		.pager button { min-width: 36px; padding: .4rem .7rem; border: 1px solid var(--line); border-radius: 999px; background: var(--white); color: var(--ink-soft); font-size: .82rem; cursor: pointer; }
+		.pager button:hover:not(:disabled) { border-color: var(--bg-soothing); background: var(--blue-soft); color: var(--ink); }
+		.pager button.active { border-color: var(--orange); background: var(--orange); color: #fff; font-weight: 700; }
+		.pager button:disabled { opacity: .4; cursor: default; }
+
 		.site-footer { padding: 1.35rem 0; border-top: 1px solid var(--line); color: var(--ink-soft); background: var(--white); font-size: .78rem; }
 		.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 		.footer-inner strong { color: var(--ink); font-weight: 700; }
@@ -462,6 +468,45 @@
 			document.getElementById(id).classList.add('active');
 			btn.classList.add('active');
 		}
+
+		// 每個表格 5 筆一頁
+		(function () {
+			var PER = 5;
+			document.querySelectorAll('.tab-content .table-wrap table').forEach(function (table) {
+				if (!table.tBodies[0]) return;
+				var rows = Array.prototype.slice.call(table.tBodies[0].rows);
+				if (rows.length <= PER) return;
+				var pages = Math.ceil(rows.length / PER);
+				var cur = 1;
+				var wrap = table.closest('.table-wrap');
+				var pager = document.createElement('div');
+				pager.className = 'pager';
+				wrap.parentNode.insertBefore(pager, wrap.nextSibling);
+
+				function render() {
+					rows.forEach(function (r, i) {
+						r.style.display = (Math.floor(i / PER) + 1 === cur) ? '' : 'none';
+					});
+					pager.innerHTML = '';
+					var prev = document.createElement('button');
+					prev.textContent = '上一頁'; prev.disabled = cur === 1;
+					prev.onclick = function () { if (cur > 1) { cur--; render(); } };
+					pager.appendChild(prev);
+					for (var p = 1; p <= pages; p++) {
+						var b = document.createElement('button');
+						b.textContent = p;
+						if (p === cur) b.className = 'active';
+						b.onclick = (function (pp) { return function () { cur = pp; render(); }; })(p);
+						pager.appendChild(b);
+					}
+					var next = document.createElement('button');
+					next.textContent = '下一頁'; next.disabled = cur === pages;
+					next.onclick = function () { if (cur < pages) { cur++; render(); } };
+					pager.appendChild(next);
+				}
+				render();
+			});
+		})();
 	</script>
 </body>
 </html>

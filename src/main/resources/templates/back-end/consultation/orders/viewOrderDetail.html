@@ -248,6 +248,13 @@ img, svg {
 	border-radius: 50%;
 	color: var(--ink);
 	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+	overflow: hidden;
+}
+
+.profile-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }
 
 .profile-photo svg {
@@ -445,63 +452,7 @@ main {
 </style>
 </head>
 <body>
-	<header class="nav site-header">
-		<div class="nav-inner">
-			<a class="brand" th:href="@{/admin/home}" aria-label="諮由自在後台管理首頁">
-				<span class="logo-mind" aria-hidden="true"> <span
-					class="word"><span class="m">m</span><span class="i">i</span><span
-						class="n">n</span><span class="d">d</span></span> <span class="faces">
-						<svg class="fm" viewBox="0 0 24 11">
-							<g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round"
-								fill="none">
-							<circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none" />
-							<circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none" />
-							<path d="M8 7 c2.4 2.4 5.6 2.4 8 0" /></g></svg> <svg class="fi"
-							viewBox="0 0 9 11">
-							<g stroke="#A85974" stroke-width="1.5" stroke-linecap="round"
-								fill="none">
-							<circle cx="4.5" cy="8" r="1.6" /></g></svg> <svg class="fn"
-							viewBox="0 0 17 11">
-							<g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round"
-								fill="none">
-							<path d="M5.5 7.5 l6 0" /></g></svg> <svg class="fd" viewBox="0 0 17 11">
-							<g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round"
-								fill="none">
-							<path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0" />
-							<path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0" /></g></svg>
-				</span>
-			</span> <span class="brand-text"><span class="logo">諮由自在</span><span
-					class="en">Free&nbsp;Mind</span></span>
-			</a> <span class="admin-badge">系統管理後台</span>
-			<div class="nav-actions">
-				<a class="profile-entry" th:href="@{/admin/select_page}"
-					aria-label="前往管理員檔案"> <span class="profile-photo"
-					aria-hidden="true"> <img th:if="${admin != null}"
-						th:src="@{/admin/DBGifReader(adminId=${admin.adminId})}"
-						alt="管理員照片" /> <svg th:if="${admin == null}" viewBox="0 0 24 24"
-							fill="none">
-							<path d="M20 21a8 8 0 0 0-16 0" stroke-width="1.8"
-								stroke-linecap="round" />
-							<circle cx="12" cy="7" r="4" stroke-width="1.8" /></svg>
-				</span> <span class="profile-copy"> <small
-						th:text="${admin != null ? admin.adminAccount : '管理員帳號'}"></small>
-						<strong th:text="${admin!=null?admin.name:'尚未登入'}"></strong>
-				</span>
-				</a>
-				<form class="logout-form" th:action="@{/back-end/logout}"
-					method="post">
-					<button class="logout-button" type="submit" aria-label="登出後台">
-						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-							<path
-								d="M14 8l4 4-4 4M18 12H8M10 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5"
-								stroke-width="1.8" stroke-linecap="round"
-								stroke-linejoin="round" /></svg>
-						<span>登出</span>
-					</button>
-				</form>
-			</div>
-		</div>
-	</header>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
 	<main>
 		<div class="wrap">
