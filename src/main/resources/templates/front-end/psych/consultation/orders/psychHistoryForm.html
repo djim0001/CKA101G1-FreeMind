@@ -182,7 +182,7 @@
 						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.4" fill="#3A4B53" /><path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19" stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
 					</button>
 					<div class="pop" id="avatarPop" role="menu">
-						<div class="pop-head"><b th:text="${psychologist != null ? psychologist.name : '心理師'}">心理師</b><p>心理師專區・管理預約、課程與個人資料。</p></div>
+						<div class="pop-head"><b th:text="${psych != null ? psych.name + ' 歡迎回來！' : '心理師'}">心理師</b><p>心理師專區・管理預約、課程與個人資料。</p></div>
 						<div class="pop-divider"></div>
 						<div class="pop-label">功能選單</div>
 						<a class="pop-item active" th:href="@{/psych/orders/home}" href="/psych/orders/home" role="menuitem" aria-current="page">預約管理</a>
