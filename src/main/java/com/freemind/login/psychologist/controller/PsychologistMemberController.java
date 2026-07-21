@@ -3,9 +3,8 @@ package com.freemind.login.psychologist.controller;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.bind.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.login.psychologist.dto.PsychologistProfileRes;
 import com.freemind.login.psychologist.service.ExpertiseService;
 import com.freemind.login.psychologist.service.PsychologistService;
+import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 
 @Controller
@@ -48,7 +48,7 @@ public class PsychologistMemberController {
 	        @RequestParam(required = false)
 	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate slotDate,
 	        @RequestParam(required = false) String orderBy,
-	        
+	        @AuthenticationPrincipal MemberUserDetails memberDetails,
 	        Model model) {
 		
 		name = blankToNull(name);
@@ -84,7 +84,9 @@ public class PsychologistMemberController {
 	    model.addAttribute("slotDate", slotDate);
 	    model.addAttribute("orderBy", orderBy);
 	    model.addAttribute("expertiseOptions", expertiseService.getAllExpertiseNames());
-
+	    if (memberDetails != null) {
+	        model.addAttribute("member", memberDetails.getMember());
+	    }
 	    
 
 	    return "front-end/member/psych/search";
