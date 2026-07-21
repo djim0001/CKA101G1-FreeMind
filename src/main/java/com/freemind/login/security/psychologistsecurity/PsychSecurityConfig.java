@@ -71,7 +71,7 @@ public class PsychSecurityConfig {
 
 			.logout(logout -> logout
 				.logoutUrl("/psych/logout")
-				.logoutSuccessUrl("/psych/psychologistLogin?logout")
+				.logoutSuccessUrl("/")
 				.invalidateHttpSession(true)
 				// cookie名絕不能跟member共用,否則同瀏覽器登兩種身分會互蓋
 				.deleteCookies("JSESSIONID", "remember-me-psych")
