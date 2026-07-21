@@ -6,6 +6,10 @@
 <title>活動分類管理｜諮由自在 Free Mind</title>
 
 <style>
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
 :root {
 	--bg-warm: #FFFAEE;
 	--bg-soothing: #C2D9ED;
@@ -29,7 +33,7 @@
 	--display-en: "Baloo 2", sans-serif;
 }
 
-.admin-wide { width: min(1160px, 92vw) !important; max-width: 1160px; margin-inline: auto; }
+.admin-wide { width: min(1080px, 90vw) !important; max-width: 1080px; margin-inline: auto; }
 
 .page-head {
 	display: flex; align-items: flex-end; justify-content: space-between;
@@ -50,6 +54,7 @@
 	color: var(--ink-soft); background: transparent;
 	font-size: .88rem; font-weight: 500; white-space: nowrap;
 	transition: all .16s ease;
+	text-decoration: none;
 }
 .page-function-nav a:hover { color: var(--ink); background: var(--bg-warm); }
 .page-function-nav a.active {
@@ -59,7 +64,7 @@
 .msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
 .msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
 
-.two-col-layout { display: grid; grid-template-columns: 40fr 60fr; gap: 1.6rem; align-items: start; }
+.two-col-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2.2rem; align-items: start; }
 .left-col { display: flex; flex-direction: column; gap: 1.6rem; }
 
 .section-eyebrow {
@@ -110,11 +115,16 @@
 	background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
 	border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem;
 }
+
+.table-card .list-head {
+    padding: 1.4rem 1.5rem 1rem 1.5rem;
+    margin-bottom: 0;
+}
 table { width: 100%; border-collapse: collapse; }
-th:nth-child(1) { width: 12%; }
-th:nth-child(2) { width: 58%; }
-th:nth-child(3) { width: 15%; }
-th:nth-child(4) { width: 15%; }
+th:nth-child(1) { width: 14%; }
+th:nth-child(2) { width: 45%; }
+th:nth-child(3) { width: 20%; }
+th:nth-child(4) { width: 20%; }
 
 thead th {
 	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
@@ -126,7 +136,6 @@ tbody td {
 	border-bottom: 1px solid var(--line); vertical-align: middle; text-align: center;
 }
 tbody tr:hover { background-color: var(--bg-warm); }
-td:nth-child(2) { text-align: left; }
 
 .btn-mini {
 	display: inline-block; padding: .4rem .9rem; border-radius: 999px; font-size: .84rem;
@@ -229,21 +238,22 @@ td:nth-child(2) { text-align: left; }
 							<button type="submit" class="btn btn-primary" style="width:100%;">＋ 新增分類</button>
 						</form>
 					</div>
-				</div>
-			
+					</div>
+				
 				<!-- 右欄：分類列表 -->
 				<div class="right-col">
-					<div class="list-head">
-						<div class="section-block-head" style="margin-bottom:0;">
-							<span class="section-eyebrow">All Categories</span>
-							<h2 class="section-title">分類列表</h2>
-						</div>
-						<div class="list-count">
-							共 <b th:text="${activityCatListData != null ? #lists.size(activityCatListData) : 0}">0</b> 筆分類
-						</div>
-					</div>
-			
 					<div class="table-card" th:if="${activityCatListData != null and !activityCatListData.isEmpty()}">
+					
+						<div class="list-head">
+							<div class="section-block-head" style="margin-bottom:0;">
+								<span class="section-eyebrow">All Categories</span>
+								<h2 class="section-title">分類列表</h2>
+							</div>
+							<div class="list-count">
+								共 <b th:text="${activityCatListData != null ? #lists.size(activityCatListData) : 0}">0</b> 筆分類
+							</div>
+						</div>
+			
 						<table>
 							<thead>
 								<tr>
@@ -278,7 +288,28 @@ td:nth-child(2) { text-align: left; }
 					</div>
 				</div>
 			</div>
+		</div>
+		
+	</main>
 
+	<!-- 修改分類彈窗（每筆各一組） -->
+	<th:block th:each="cat : ${activityCatListData}">
+		<div class="op-modal-overlay" th:id="'editModal' + ${cat.activityCatId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>修改分類</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'editModal' + ${cat.activityCatId} + '\')'">&times;</button>
+				</div>
+				<form th:action="@{/admin/activityCat/update}" method="post">
+					<input type="hidden" name="activityCatId" th:value="${cat.activityCatId}">
+					<p class="field-label">分類名稱</p>
+					<input type="text" name="activityCatName" th:value="${cat.activityCatName}" required maxlength="20">
+					<button type="submit" class="op-modal-submit" style="background:var(--orange);color:#fff; ">確認修改</button>
+				</form>
+			</div>
+		</div>
+	</th:block>	
+	
 	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 
 	<script>
