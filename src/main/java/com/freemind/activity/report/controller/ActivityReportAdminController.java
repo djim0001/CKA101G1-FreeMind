@@ -30,7 +30,7 @@ public class ActivityReportAdminController {
 	// 回報列表
 	@GetMapping("list")
 	public String list(@RequestParam(value = "tab", defaultValue = "pending") String tab,
-						@RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
+						@RequestParam(value = "page", defaultValue = "1") Integer page,
 						@AuthenticationPrincipal AdminUserDetails userDetails,
 						ModelMap model) {
 		Integer status;
@@ -47,6 +47,7 @@ public class ActivityReportAdminController {
 
 		
 		int totalPages = PageUtils.calculateTotalPages(allList.size(), PAGE_SIZE);
+		Integer currentPage = page;
 		if (currentPage < 1) {
 			currentPage = 1;
 		} else if (currentPage > totalPages) {
@@ -64,13 +65,22 @@ public class ActivityReportAdminController {
 		model.addAttribute("totalPages", totalPages);
 		model.addAttribute("currentTab", tab);
 		model.addAttribute("currentAdminId", userDetails.getAdmin().getAdminId());
+		model.addAttribute("qs", "tab=" + tab);
+		
+		// 後台統計卡片數字
+		model.addAttribute("countPending", reportSvc.countByStatus(0));
+		model.addAttribute("countProcessing", reportSvc.countByStatus(1));
+		model.addAttribute("countDone", reportSvc.countByStatus(2));
+		
 		return "back-end/activity/report/reportList";
 	}
 
 	// 後台人員受理問題
 	@PostMapping("takeOver")
 	public String takeOver(@RequestParam("reportId") Integer reportId,
-	                       @AuthenticationPrincipal AdminUserDetails userDetails,  
+							@RequestParam(value = "tab", required = false) String tab,
+							@RequestParam(value = "page", required = false) Integer page,
+							@AuthenticationPrincipal AdminUserDetails userDetails,  
 	                       RedirectAttributes redirectAttributes) {
 		try {
 			reportSvc.takeOverReport(reportId, userDetails.getAdmin());  
@@ -78,13 +88,17 @@ public class ActivityReportAdminController {
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		return "redirect:/admin/activity/report/list";
+		String t = (tab != null) ? tab : "pending";
+		int p = (page != null) ? page : 1;
+		return "redirect:/admin/activity/report/list?tab=" + t + "&page=" + p;
 	}
 
 	// 後台人員回覆問題
 	@PostMapping("reply")
 	public String reply(@RequestParam("reportId") Integer reportId,
 	                    @RequestParam("replyContent") String replyContent,
+	                    @RequestParam(value = "tab", required = false) String tab,
+	                    @RequestParam(value = "page", required = false) Integer page,
 	                    @AuthenticationPrincipal AdminUserDetails userDetails,
 	                    RedirectAttributes redirectAttributes) {
 		try {
@@ -93,6 +107,8 @@ public class ActivityReportAdminController {
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		return "redirect:/admin/activity/report/list";
+		String t = (tab != null) ? tab : "pending";
+		int p = (page != null) ? page : 1;
+		return "redirect:/admin/activity/report/list?tab=" + t + "&page=" + p;
 	}
 }

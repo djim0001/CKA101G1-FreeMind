@@ -1,130 +1,339 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>問題回報管理</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>問題回報管理｜諮由自在 Free Mind</title>
 
 <style>
-	th:nth-child(1) { width: 8%;  }  /* 回報人 */
-	th:nth-child(2) { width: 10%; }  /* 活動名稱 */
-	th:nth-child(3) { width: 24%; }  /* 回報內容 */
-	th:nth-child(4) { width: 6%;  }  /* 狀態 */
-	th:nth-child(5) { width: 10%; }  /* 回報時間 */
-	th:nth-child(6) { width: 8%;  }  /* 處理人 */
-	th:nth-child(7) { width: 22%; }  /* 回覆內容 */
-	th:nth-child(8) { width: 12%; }  /* 操作 */
+*, *::before, *::after {
+	box-sizing: border-box;
+}
 
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--script: "Caveat", "OpenHuninn", cursive;
+	--display-en: "Baloo 2", sans-serif;
+}
+
+/* ---------- 分頁 ---------- */
+.pager { display: flex; align-items: center; justify-content: center; gap: .5rem; flex-wrap: wrap; margin: 2.8rem 0 .5rem; }
+.pager .pg-btn {
+	min-width: 42px; height: 42px; padding: 0 .7rem;
+	display: inline-flex; align-items: center; justify-content: center;
+	background: #fff; border: 1px solid var(--line); border-radius: 14px;
+	font-size: .95rem; font-weight: 500; color: var(--ink);
+	box-shadow: var(--shadow-sm);
+	transition: transform .18s, background .18s, color .18s, border-color .18s;
+	text-decoration: none;
+}
+.pager .pg-btn:hover { transform: translateY(-2px); border-color: var(--orange); color: var(--orange); }
+.pager .pg-btn.is-current { background: var(--orange); border-color: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245, 142, 107, .4); }
+.pager .pg-btn.is-current:hover { color: #fff; }
+.pager .pg-arrow svg { width: 18px; height: 18px; }
+.pager .pg-btn.is-disabled { opacity: .38; box-shadow: none; cursor: default; pointer-events: none; }
+.pager .pg-dots { color: var(--ink-soft); padding: 0 .1rem; letter-spacing: .1em; }
+
+@media (max-width: 520px) {
+	.pager { gap: .35rem; }
+	.pager .pg-btn { min-width: 36px; height: 36px; border-radius: 11px; font-size: .88rem; }
+}
+
+/* ---------- 版面 ---------- */
+.admin-wide { width: min(1160px, 92vw) !important; max-width: 1160px; margin-inline: auto; }
+
+.page-head {
+	display: flex; align-items: flex-end; justify-content: space-between;
+	gap: 2rem; margin-bottom: 1.75rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line);
+	flex-wrap: wrap;
+}
+.page-kicker {
+	display: block; margin-bottom: .35rem; color: var(--orange);
+	font-size: .75rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+}
+.page-head h1 {
+	margin: 0; color: var(--ink); font-family: var(--serif);
+	font-size: clamp(1.75rem, 3vw, 2.35rem); line-height: 1.3; letter-spacing: -.02em;
+}
+.page-head p { max-width: 31rem; margin: .3rem 0 0; color: var(--ink-soft); font-size: .92rem; }
+
+.page-function-nav { display: flex; gap: .35rem; flex-wrap: wrap; }
+.page-function-nav a {
+	display: inline-flex; align-items: center; justify-content: center;
+	min-height: 44px; padding: .55rem 1.2rem;
+	border: 1px solid transparent; border-radius: 999px;
+	color: var(--ink-soft); background: transparent;
+	font-size: .88rem; font-weight: 500; white-space: nowrap;
+	transition: all .16s ease;
+	text-decoration: none;
+}
+.page-function-nav a:hover { color: var(--ink); background: var(--bg-warm); }
+.page-function-nav a.active { border-color: rgba(194, 217, 237, .9); color: var(--ink); background: var(--blue-soft); font-weight: 700; }
+
+.msg-error { color: #c0392b; background-color: #fdecea; padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+.msg-success { color: #4F7B96; background-color: var(--blue-soft); padding: .7rem 1.3rem; border-radius: 10px; margin-bottom: 1.2rem; font-size: .92rem; display: inline-block; }
+
+/* ---------- 統計卡片 ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.6rem; }
+.stat { padding: 1.1rem 1.2rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); box-shadow: var(--shadow-sm); }
+.stat span { display: block; color: var(--ink-soft); font-size: .78rem; }
+.stat strong { display: block; margin-top: .2rem; font-family: var(--serif); font-size: 1.7rem; color: var(--ink); }
+.stat.pending strong { color: #b8860b; }
+.stat.processing strong { color: #4F7B96; }
+.stat.done strong { color: #5A7A57; }
+
+/* ---------- 分頁籤 ---------- */
+.tab-nav { display: flex; gap: .6rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.tab-nav a { text-decoration: none; }
+.tab-btn {
+	display: inline-flex; align-items: center; padding: .6rem 1.5rem;
+	background-color: #fff; color: var(--ink-soft); border: 1px solid var(--line);
+	border-radius: 999px; font-size: .9rem; font-weight: 500; cursor: pointer;
+	transition: all .18s; box-shadow: var(--shadow-sm);
+}
+.tab-btn:hover { border-color: var(--orange); color: var(--orange-deep); }
+.tab-btn.active { background-color: var(--orange); color: #fff; border-color: var(--orange); font-weight: 700; }
+
+.list-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
+
+
+/* ---------- 表格 ---------- */
+.table-card { background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--line); overflow: hidden; margin-bottom: 1.6rem; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+th:nth-child(1) { width: 10%; }  /* 活動名稱 */
+th:nth-child(2) { width: 9%; }   /* 回報者 */
+th:nth-child(3) { width: 20%; }  /* 回報內容 */
+th:nth-child(4) { width: 9%; }   /* 回報時間 */
+th:nth-child(5) { width: 9%; }   /* 處理管理員 */
+th:nth-child(6) { width: 22%; }  /* 管理員回覆 */
+th:nth-child(7) { width: 9%; }   /* 操作 */
+
+thead th {
+	background-color: var(--bg-warm); color: var(--ink); font-family: var(--serif);
+	font-size: .92rem; font-weight: 700; padding: 1rem .5rem; text-align: center;
+	white-space: nowrap; border-bottom: 2px solid var(--line);
+}
+tbody td {
+	padding: .8rem .5rem; font-size: .88rem; color: var(--ink);
+	border-bottom: 1px solid var(--line); vertical-align: top; text-align: center;
+	word-break: break-word;
+}
+tbody tr:hover { background-color: var(--bg-warm); }
+.text-left { text-align: left; }
+
+.reply-box .reply-time { display: block; font-size: .76rem; color: var(--ink-soft); margin-top: .3rem; }
+.reply-empty { color: var(--ink-soft); opacity: .5; }
+
+.action-stack { display: flex; flex-direction: column; align-items: stretch; gap: .4rem; }
+.btn-mini {
+	display: block; width: 100%; padding: .45rem .6rem; border-radius: 8px; font-size: .78rem;
+	white-space: nowrap; cursor: pointer; transition: all .18s; font-family: var(--sans);
+	background: #fff; color: var(--ink-soft); border: 1px solid var(--line); text-align: center;
+}
+.btn-mini:hover { background-color: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-mini.info:hover { background-color: #4F7B96; border-color: #4F7B96; }
+.btn-mini.accent:hover { background-color: var(--orange); border-color: var(--orange); }
+
+.empty-state { background: var(--white); border: 1px dashed var(--line); border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center; }
+.empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; color: var(--ink); }
+
+/* ---------- 彈窗 ---------- */
+.op-modal-overlay {
+	display: none; position: fixed; inset: 0;
+	background: rgba(58,75,83,.35); backdrop-filter: blur(6px);
+	z-index: 500; align-items: center; justify-content: center;
+	opacity: 0; transition: opacity .2s;
+}
+.op-modal-overlay.show { display: flex; opacity: 1; }
+.op-modal-panel {
+	background: #fff; border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md); width: 90%; max-width: 460px; padding: 1.8rem;
+	transform: translateY(10px); transition: transform .2s;
+	text-align: left; font-family: var(--sans);
+}
+.op-modal-overlay.show .op-modal-panel { transform: translateY(0); }
+.op-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
+.op-modal-header span { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.op-modal-close { background: none; border: none; font-size: 22px; color: var(--ink-soft); cursor: pointer; line-height: 1; }
+.op-modal-close:hover { color: var(--ink); }
+.op-modal-panel .report-quote {
+	background: var(--bg-warm); border-radius: 12px; padding: .8rem 1rem;
+	font-size: .84rem; color: var(--ink-soft); margin-bottom: 1rem; line-height: 1.7;
+}
+.op-modal-panel textarea {
+	width: 100%; padding: .7rem 1rem; border: 1px solid var(--line); border-radius: 12px;
+	background: #f6f1e8; font-family: inherit; font-size: .88rem; color: var(--ink);
+	min-height: 120px; resize: vertical; line-height: 1.7; margin-bottom: .9rem;
+}
+.op-modal-panel textarea:focus { outline: none; border-color: var(--orange); background: #fff; }
+.op-modal-panel p.field-label { font-size: .84rem; color: var(--ink); margin: 0 0 .4rem; }
+.op-modal-submit { width: 100%; height: 46px; display: inline-flex; align-items: center; justify-content: center; font-size: .92rem; border: none; cursor: pointer; border-radius: 999px; font-family: inherit; }
+
+@media (max-width: 900px) {
+	.table-card { overflow-x: auto; }
+	table { min-width: 1050px; }
+}
 </style>
 </head>
 <body>
 
-    <h1>問題回報管理</h1>
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
 
-    <p>Hello, <span sec:authentication="principal.admin.name"></span>!</p>
+	<main id="main-content">
+		<div class="wrap admin-wide" style="padding-top: clamp(1.25rem, 2vw, 1.75rem); padding-bottom: 4rem;">
 
-    <p th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;"></p>
-    <p th:if="${successMessage}" th:utext="${successMessage}" style="color:blue;"></p>
+			<div class="page-head">
+				<div>
+					<span class="page-kicker">Activity Management</span>
+					<h1>問題回報管理</h1>
+					<p>受理與回覆使用者針對活動提出的問題回報。</p>
+				</div>
+				<nav class="page-function-nav" aria-label="活動管理">
+					<a th:href="@{/admin/activity/listActivities_ByCompositeQuery}">活動列表</a>
+					<a th:href="@{/admin/activityCat/listAllActivityCat}">活動分類</a>
+					<a class="active" th:href="@{/admin/activity/report/list}">問題回報</a>
+				</nav>
+			</div>
 
-	<!-- 分頁籤 -->
-	<div>
-	    <a th:href="@{/admin/activity/report/list(tab='pending')}">
-	        <button type="button" th:style="${currentTab == 'pending'} ? 'font-weight:bold;' : ''">待處理</button>
-	    </a>
-	    <a th:href="@{/admin/activity/report/list(tab='processing')}">
-	        <button type="button" th:style="${currentTab == 'processing'} ? 'font-weight:bold;' : ''">處理中</button>
-	    </a>
-	    <a th:href="@{/admin/activity/report/list(tab='done')}">
-	        <button type="button" th:style="${currentTab == 'done'} ? 'font-weight:bold;' : ''">已處理</button>
-	    </a>
-	</div>
+			<p th:if="${errorMessage}" th:utext="${errorMessage}" class="msg-error"></p>
+			<p th:if="${successMessage}" th:utext="${successMessage}" class="msg-success"></p>
 
-    <table border="1" style="table-layout: fixed; width: 100%;">
-        <tr>
-            <th>回報人</th>
-            <th>活動名稱</th>
-            <th>回報內容</th>
-            <th>狀態</th>
-            <th>回報時間</th>
-            <th>處理人</th>
-            <th>回覆內容</th>
-            <th></th>
-        </tr>
-        <tr th:each="r : ${reportListData}">
-            <td th:text="${r.member.name}"></td>
-            <td th:text="${r.activity.activityName}"></td>
-            <td th:text="${r.reportContent}"></td>
-            <td th:text="${r.reportStatusText}"></td>
-            <td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
-            <td>
-                <span th:if="${r.admin != null}" th:text="${r.admin.name}"></span>
-                <span th:if="${r.admin == null}">—</span>
-            </td>
-            <td>
-                <span th:if="${r.replyContent != null}" th:text="${r.replyContent}"></span>
-                <span th:if="${r.replyContent == null}">—</span>
-            </td>
-            <td>
-                <!-- 狀態0:待處理 → 受理按鈕 -->
-                <form th:if="${r.reportStatus == 0}"
-                      th:action="@{/admin/activity/report/takeOver}" method="post" style="display:inline;">
-                    <input type="hidden" name="reportId" th:value="${r.reportId}">
-                    <button type="submit" onclick="return confirm('確定要受理此問題回報嗎？')">受理問題</button>
-                </form>
+			<!-- 統計卡片 -->
+			<section class="stats">
+				<div class="stat pending"><span>待處理</span><strong th:text="${countPending != null ? countPending : 0}">0</strong></div>
+				<div class="stat processing"><span>處理中</span><strong th:text="${countProcessing != null ? countProcessing : 0}">0</strong></div>
+				<div class="stat done"><span>已處理</span><strong th:text="${countDone != null ? countDone : 0}">0</strong></div>
+			</section>
 
-                <!-- 狀態1:處理中 且是自己受理的 → 回覆按鈕+展開表單 -->
-                <div th:if="${r.reportStatus == 1 && r.admin.adminId == currentAdminId}" style="display:inline;">
-                    <button type="button" th:id="'replyBtn' + ${r.reportId}"
-                            th:onclick="'toggleReplyForm(' + ${r.reportId} + ')'">回覆問題</button>
+			<!-- 分頁籤 -->
+			<div class="tab-nav">
+				<a th:href="@{/admin/activity/report/list(tab='pending')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'pending'} ? ' active' : ''">待處理</button>
+				</a>
+				<a th:href="@{/admin/activity/report/list(tab='processing')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'processing'} ? ' active' : ''">處理中</button>
+				</a>
+				<a th:href="@{/admin/activity/report/list(tab='done')}">
+					<button type="button" class="tab-btn" th:classappend="${currentTab == 'done'} ? ' active' : ''">已處理</button>
+				</a>
+			</div>
 
-                    <div th:id="'replyForm' + ${r.reportId}" style="display:none;">
-                        <form th:action="@{/admin/activity/report/reply}" method="post"
-                              onsubmit="return confirm('確定要送出回覆嗎？')">
-                            <input type="hidden" name="reportId" th:value="${r.reportId}">
-                            <textarea name="replyContent" rows="8" style="width: 100%; box-sizing: border-box;" 
-         						 placeholder="請輸入回覆內容" required></textarea>
-                            <button type="submit">送出回覆</button>
-                        </form>
-                    </div>
-                </div>
+			<!-- 標題 -->
+			<h2 class="list-head" style="font-family:var(--serif);font-size:1.2rem;color:var(--ink);margin:0;">回報列表</h2>
 
-                <!-- 狀態1:處理中 但不是自己受理的 → 純顯示 -->
-                <span th:if="${r.reportStatus == 1 && r.admin.adminId != currentAdminId}">處理中(其他管理員)</span>
+			<!-- 表格 -->
+			<div class="table-card" th:if="${!#lists.isEmpty(reportListData)}">
+				<table>
+					<thead>
+						<tr>
+							<th>活動名稱</th>
+							<th>回報者</th>
+							<th>回報內容</th>
+							<th>回報時間</th>
+							<th>處理管理員</th>
+							<th>管理員回覆</th>
+							<th th:unless="${currentTab == 'done'}"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="r : ${reportListData}">
+							<td class="text-left" th:text="${r.activity.activityName}"></td>
+							<td th:text="${#strings.isEmpty(r.member.nickname) ? r.member.name : r.member.nickname}"></td>
+							<td class="text-left" th:text="${r.reportContent}"></td>
+							<td th:text="${#temporals.format(r.createdAt, 'yyyy/MM/dd HH:mm')}"></td>
+							<td>
+								<span th:if="${r.admin != null}" th:text="${r.admin.name}"></span>
+								<span th:if="${r.admin == null}" class="reply-empty">尚未受理</span>
+							</td>
+							<td class="reply-box text-left">
+								<div th:if="${r.repliedAt != null}">
+									<span th:text="${r.replyContent}"></span>
+									<span class="reply-time" th:text="'回覆於 ' + ${#temporals.format(r.repliedAt, 'yyyy/MM/dd HH:mm')}"></span>
+								</div>
+								<span th:if="${r.repliedAt == null}" class="reply-empty">尚未回覆</span>
+							</td>
+							<td th:unless="${currentTab == 'done'}">
+								<div class="action-stack">
+									<form th:if="${r.reportStatus == 0}" th:action="@{/admin/activity/report/takeOver}" method="post"
+										  onsubmit="return confirm('確定要受理這則問題回報嗎？')">
+										<input type="hidden" name="reportId" th:value="${r.reportId}">
+										<input type="hidden" name="tab" th:value="${currentTab}">
+										<input type="hidden" name="page" th:value="${currentPage}">
+										<button type="submit" class="btn-mini info">受理</button>
+									</form>
 
-                <!-- 狀態2:已處理 → 純顯示 -->
-                <span th:if="${r.reportStatus == 2}">—</span>
-            </td>
-        </tr>
-    </table>
+									<button th:if="${r.reportStatus == 1}" type="button" class="btn-mini accent"
+											th:onclick="'openOpModal(\'replyModal' + ${r.reportId} + '\')'">回覆</button>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-    <p th:if="${#lists.isEmpty(reportListData)}">目前沒有任何問題回報紀錄。</p>
+			<!-- 查無結果 -->
+			<div class="empty-state" th:if="${#lists.isEmpty(reportListData)}">
+				<b>目前沒有相關的問題回報</b>
+			</div>
 
-	<div th:if="${totalPages > 1}">
-	    <a th:each="i : ${#numbers.sequence(1, totalPages)}"
-	       th:href="@{/admin/activity/report/list(tab=${currentTab}, currentPage=${i})}"
-	       th:text="${i}"
-	       th:style="${i == currentPage} ? 'font-weight:bold; margin:0 6px;' : 'margin:0 6px;'">
-	    </a>
-	</div>
+			<!-- 分頁 -->
+			<div th:if="${!#lists.isEmpty(reportListData)}"
+				 th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, @{/admin/activity/report/list}, ${qs})}"></div>
 
-    <br>
-    <a th:href="@{/admin/activity/activityAdminIndex}">回後台活動導覽頁</a>
+		</div>
+	</main>
 
-<script>
-function toggleReplyForm(reportId) {
-    const form = document.getElementById('replyForm' + reportId);
-    const button = document.getElementById('replyBtn' + reportId);
+	<!-- 回覆彈窗（每筆各一組） -->
+	<th:block th:each="r : ${reportListData}">
+		<div class="op-modal-overlay" th:if="${r.reportStatus == 1}" th:id="'replyModal' + ${r.reportId}" onclick="closeOpModalOutside(event, this)">
+			<div class="op-modal-panel">
+				<div class="op-modal-header">
+					<span>回覆問題</span>
+					<button type="button" class="op-modal-close" th:onclick="'closeOpModal(\'replyModal' + ${r.reportId} + '\')'">&times;</button>
+				</div>
+				<div class="report-quote" th:text="${r.reportContent}"></div>
+				<form th:action="@{/admin/activity/report/reply}" method="post"
+					  onsubmit="return confirm('確定要送出回覆嗎？')">
+					<input type="hidden" name="reportId" th:value="${r.reportId}">
+					<input type="hidden" name="tab" th:value="${currentTab}">
+					<input type="hidden" name="page" th:value="${currentPage}">
+					<p class="field-label">回覆內容</p>
+					<textarea name="replyContent" placeholder="請輸入回覆內容" required></textarea>
+					<button type="submit" class="op-modal-submit" style="background:var(--orange);color:#fff;">送出回覆</button>
+				</form>
+			</div>
+		</div>
+	</th:block>
 
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        button.style.backgroundColor = 'black';
-        button.style.color = 'white';
-    } else {
-        form.style.display = 'none';
-        button.style.backgroundColor = '';
-        button.style.color = '';
-    }
-}
-</script>
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<script>
+	function openOpModal(id) {
+		document.getElementById(id).classList.add('show');
+	}
+	function closeOpModal(id) {
+		document.getElementById(id).classList.remove('show');
+	}
+	function closeOpModalOutside(e, overlay) {
+		if (e.target === overlay) overlay.classList.remove('show');
+	}
+	</script>
 </body>
 </html>

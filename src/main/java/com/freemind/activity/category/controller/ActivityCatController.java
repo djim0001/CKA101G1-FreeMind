@@ -1,5 +1,6 @@
 package com.freemind.activity.category.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,7 @@ public class ActivityCatController {
 	    @Size(max = 50, message = "搜尋關鍵字: 長度不能超過{max}")
 	    @RequestParam("keyword") String keyword,
 	    RedirectAttributes redirectAttributes) {
-		String encodedKeyword = java.net.URLEncoder.encode(keyword, java.nio.charset.StandardCharsets.UTF_8);
+		String encodedKeyword = java.net.URLEncoder.encode(keyword, StandardCharsets.UTF_8);
 	    return "redirect:/admin/activityCat/listAllActivityCat?keyword=" + encodedKeyword;
 	}
 	
