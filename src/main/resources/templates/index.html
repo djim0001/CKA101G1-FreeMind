@@ -465,16 +465,25 @@
 		<div class="wrap">
 			<div class="articles-head">
 				<div>
-					<span class="script" style="font-size: 1.35rem;">慢慢讀，慢慢懂自己</span>
 					<h2>精選專欄</h2>
 				</div>
 				<a class="btn btn-outline" th:href="@{/article}" href="#">看更多文章</a>
 			</div>
 
 			<div class="art-row">
-				<a class="art-card" th:href="@{/article}" href="#">
-					<div class="photo-slot pink art-cover">
-						<div class="ps-inner">
+				<p class="course-empty"
+					th:if="${hotArticles == null or hotArticles.isEmpty()}">目前沒有可顯示的熱門文章。</p>
+
+				<a class="art-card"
+					th:each="article, articleStat : ${hotArticles}"
+					th:href="@{/article/{id}(id=${article.articleId})}"
+					href="#">
+					<div class="photo-slot art-cover"
+						th:classappend="${articleStat.index == 0} ? ' pink' : (${articleStat.index == 1} ? ' blue' : '')">
+						<img th:if="${article.coverImage != null}"
+							th:src="@{/article/{id}/cover(id=${article.articleId})}"
+							alt="文章封面" class="art-cover-img" />
+						<div class="ps-inner" th:if="${article.coverImage == null}">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
 								stroke-linecap="round" stroke-linejoin="round">
 								<rect x="3" y="6" width="18" height="14" rx="3" />
@@ -483,44 +492,10 @@
 						</div>
 					</div>
 					<div class="art-body">
-						<span class="art-tag">情緒照顧</span>
-						<h3>「我沒事」的背後，其實藏了很多事</h3>
-						<p>當我們習慣說沒事，情緒就默默累積。用三個練習，重新聽見自己的聲音。</p>
-						<span class="art-meta">6 分鐘閱讀 ・ 陳語安 心理師</span>
-					</div>
-				</a>
-				<a class="art-card" th:href="@{/article}" href="#">
-					<div class="photo-slot blue art-cover">
-						<div class="ps-inner">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
-								stroke-linecap="round" stroke-linejoin="round">
-								<rect x="3" y="6" width="18" height="14" rx="3" />
-								<circle cx="12" cy="13" r="3.2" /></svg>
-							<small>封面照片預留</small>
-						</div>
-					</div>
-					<div class="art-body">
-						<span class="art-tag">關係練習</span>
-						<h3>親密不是黏在一起，而是各自完整</h3>
-						<p>在關係裡失去自己，是很多人的隱痛。談談界線，如何讓愛更自在。</p>
-						<span class="art-meta">8 分鐘閱讀 ・ 林之默 心理師</span>
-					</div>
-				</a>
-				<a class="art-card" th:href="@{/article}" href="#">
-					<div class="photo-slot art-cover">
-						<div class="ps-inner">
-							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
-								stroke-linecap="round" stroke-linejoin="round">
-								<rect x="3" y="6" width="18" height="14" rx="3" />
-								<circle cx="12" cy="13" r="3.2" /></svg>
-							<small>封面照片預留</small>
-						</div>
-					</div>
-					<div class="art-body">
-						<span class="art-tag">日常正念</span>
-						<h3>給焦慮的你：3 分鐘就能做的呼吸法</h3>
-						<p>心跳很快、腦袋停不下來時，一組簡單的呼吸節奏，就能把自己輕輕接住。</p>
-						<span class="art-meta">4 分鐘閱讀 ・ 諮由自在編輯室</span>
+						<span class="art-tag" th:text="${article.articleCat.articleCatName}">分類</span>
+						<h3 th:text="${article.title}">文章標題</h3>
+						<p th:text="${#strings.abbreviate(article.content.replaceAll('<[^>]*>',''), 50)}">文章摘要</p>
+						<span class="art-meta">瀏覽 <b th:text="${article.viewCount}">0</b> ・ <span th:text="${article.psychologist.name}">心理師</span> 心理師</span>
 					</div>
 				</a>
 			</div>

@@ -96,6 +96,7 @@
 .meet { position: relative; background: var(--bg-soothing); padding: 1rem 0 3.4rem; }
 .meet-grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: 3.4rem; align-items: center; }
 .meet-photo { aspect-ratio: 1/1; border-radius: 40px; }
+.meet .detail-photo { width: 100%; max-height: 320px; object-fit: cover; border-radius: 24px; }
 .meet .eyebrow { color: var(--orange); }
 .meet h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(1.9rem, 3.3vw, 2.6rem); margin: .7rem 0 1.1rem; line-height: 1.35; }
 .meet h2 em { font-style: normal; color: var(--orange-deep); }
@@ -142,7 +143,8 @@
 	border: 1px solid var(--line); transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column;
 }
 .art-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
-.art-cover { height: 158px; }
+.art-cover { height: 158px; position: relative; }
+.art-cover-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .art-body { padding: 1.3rem 1.4rem 1.5rem; flex: 1; display: flex; flex-direction: column; }
 .art-tag { font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--orange); font-weight: 500; }
 .art-body h3 { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; margin: .4rem 0 .5rem; line-height: 1.45; }
