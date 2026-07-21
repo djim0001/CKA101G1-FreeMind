@@ -325,12 +325,16 @@
 					<section class="tab-panel" data-panel="completed" hidden>
 						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 4])}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>心得評論</th><th>操作</th></tr></thead>
+								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>心理師晤談筆記</th><th>心得評論</th><th>操作</th></tr></thead>
 								<tbody>
 									<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 4}">
 										<td th:text="${order.orderId}"></td>
 										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
+										<td class="note-cell">
+											<span th:if="${order.psychNote != null}" th:text="${order.psychNote}"></span>
+											<span th:if="${order.psychNote == null}" style="color:var(--ink-soft); font-style:italic;">尚無晤談筆記</span>
+										</td>
 										<td class="note-cell">
 											<span th:if="${order.reviewContent != null}">
 												<span class="review-stars" th:text="${'★'.repeat(order.rating != null ? order.rating : 0)}"></span>
