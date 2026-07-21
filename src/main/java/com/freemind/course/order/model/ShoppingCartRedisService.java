@@ -70,8 +70,8 @@ public class ShoppingCartRedisService {
                     ? BigDecimal.valueOf(course.getPrice())
                     : BigDecimal.ZERO;
 
-            BigDecimal discount = course.getPsychDiscount() != null
-                    ? course.getPsychDiscount()
+            BigDecimal discount = course.getValidPsychDiscount() != null
+                    ? course.getValidPsychDiscount()
                     : BigDecimal.ONE;
             
             item.setPsychDiscount(discount);
@@ -87,10 +87,16 @@ public class ShoppingCartRedisService {
     }
 	
 	public int calculateCartTotal(List<CartItemDTO> list) {
+	    if (list == null || list.isEmpty()) {
+	        return 0;
+	    }
+
 	    BigDecimal total = BigDecimal.ZERO;
 
 	    for (CartItemDTO item : list) {
-	        total = total.add(item.getSubtotal());
+	        if (item != null && item.getSubtotal() != null) {
+	            total = total.add(item.getSubtotal());
+	        }
 	    }
 
 	    return total.setScale(0, RoundingMode.HALF_UP).intValue();
