@@ -68,7 +68,9 @@ public class AdminSecurityConfig {
                       "/admin/listAdmins_ByCompositeQuery",
                       "/admin/DBGifReader",
                       // 權限 CRUD（PermissionController）
-                      "/admin/permissions/**"
+                      "/admin/permissions/**",
+                      // 會員查詢（AdminMemberController）：唯讀
+                      "/admin/member/**"
               ).hasRole("super_admin")
                 
                 
