@@ -54,8 +54,8 @@ public class ActivityService {
 	    if (activity.getCapacity() == null || activity.getCapacity() < 1) {
 	        throw new RuntimeException("正取名額不能小於1");
 	    }
-	    if (activity.getWaitlistCapacity() == null || activity.getWaitlistCapacity() < 1) {
-	        throw new RuntimeException("備取名額不能小於1");
+	    if (activity.getWaitlistCapacity() == null || activity.getWaitlistCapacity() < 0) {
+	        throw new RuntimeException("備取名額不能小於0");
 	    }
 	    
 		activity.setActivityStatus(0);  // 活動狀態預設為「待審核」

@@ -102,7 +102,7 @@ public class Activity implements Serializable{
 	
 	@Column(name="waitlist_capacity", nullable=false)
 	@NotNull(message = "備取名額: 請勿空白")
-	@Min(value = 1, message = "備取名額: 不能小於{value}")
+	@Min(value = 0, message = "備取名額: 不能小於{value}")
 	private Integer waitlistCapacity;
 
 	@Column(name = "waitlist_count", nullable = false)
