@@ -423,7 +423,7 @@
 						<span class="cat-tag"
 							  th:text="${article.articleCat != null ? article.articleCat.articleCatName : '未分類'}">情緒照顧</span>
 						<span th:if="${article.publishedAt != null}"
-							  th:text="${#temporals.format(article.publishedAt, 'yyyy.MM.dd')}">2026.07.19</span>
+							  th:text="${#temporals.format(article.publishedAt, 'yyyy-MM-dd HH:mm')}">2026-07-19 14:30</span>
 					</div>
 
 					<!-- 標題 -->
@@ -491,6 +491,15 @@
 					<h2 class="recommend-title">相關推薦</h2>
 				</div>
 				<div class="recommend-list" id="recommendList"></div>
+			</div>
+		</div>
+
+		<!-- 推薦課程：在推薦文章下面 -->
+		<div class="recommend-section" id="courseRecommendSection"
+			 th:attr="data-article-id=${article.articleId}"
+			 style="display:none; padding-top:0;">
+			<div class="wrap">
+				<div class="recommend-list" id="courseRecommendList"></div>
 			</div>
 		</div>
 
@@ -756,6 +765,36 @@
 	});
 
 	/* ============================================================
+	   心理師 Tab 不超過 Footer
+	   ============================================================ */
+	(function () {
+		var tab = document.getElementById('psychSideTab');
+		var footer = document.getElementById('siteFooter');
+		if (!tab || !footer) return;
+
+		function clampTab() {
+			var footerTop = footer.getBoundingClientRect().top;
+			var tabH = tab.offsetHeight;
+			var winH = window.innerHeight;
+			var limit = footerTop - tabH / 2;
+
+			if (limit < winH / 2) {
+				tab.style.position = 'fixed';
+				tab.style.top = limit + 'px';
+				tab.style.transform = 'none';
+			} else {
+				tab.style.position = '';
+				tab.style.top = '';
+				tab.style.transform = '';
+			}
+		}
+
+		window.addEventListener('scroll', clampTab, { passive: true });
+		window.addEventListener('resize', clampTab, { passive: true });
+		clampTab();
+	})();
+
+	/* ============================================================
 	   推薦文章 AJAX
 	   POST /article/{id}/recommend → { articleList: [...] }
 	   articleId 從 data-article-id 屬性取得，不依賴 inline JS
@@ -784,11 +823,12 @@
 		function formatDate(raw) {
 			if (!raw) return '';
 			if (Array.isArray(raw)) {
-				return raw[0] + '.' +
-					String(raw[1]).padStart(2,'0') + '.' +
-					String(raw[2]).padStart(2,'0');
+				var y = raw[0], mo = String(raw[1]).padStart(2,'0'), d = String(raw[2]).padStart(2,'0');
+				var h = raw.length > 3 ? String(raw[3]).padStart(2,'0') : '00';
+				var mi = raw.length > 4 ? String(raw[4]).padStart(2,'0') : '00';
+				return y + '-' + mo + '-' + d + ' ' + h + ':' + mi;
 			}
-			return String(raw).substring(0, 10).replace(/-/g, '.');
+			return String(raw).replace('T', ' ').substring(0, 16);
 		}
 
 		function skeleton() {
@@ -841,7 +881,7 @@
 
 		var headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, getCsrfHeaders());
 
-		fetch(DETAIL + articleId + '/recommend', {
+		fetch(DETAIL + articleId + '/recommend/article', {
 			method: 'POST', headers: headers, redirect: 'manual'
 		})
 		.then(function(res) {
@@ -857,6 +897,97 @@
 		})
 		.catch(function(err) {
 			console.error('[recommend]', err);
+			section.style.display = 'none';
+		});
+	})();
+
+	/* ============================================================
+	   推薦課程 AJAX
+	   POST /article/{id}/recommend/course → { courseList: [...] }
+	   ============================================================ */
+	(function () {
+		var section   = document.getElementById('courseRecommendSection');
+		var listEl    = document.getElementById('courseRecommendList');
+		var articleId = section.dataset.articleId;
+
+		function esc(s) {
+			return String(s == null ? '' : s)
+				.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+				.replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+		}
+
+		function strip(html) {
+			if (!html) return '';
+			var plain = html
+				.replace(/<[^>]*>/g, ' ')
+				.replace(/&[a-zA-Z#0-9]+;/g, ' ')
+				.replace(/\s+/g, ' ').trim();
+			return plain.length > 52 ? plain.substring(0, 52) + '…' : plain;
+		}
+
+		function skeleton() {
+			var h = '';
+			for (var i = 0; i < 3; i++) {
+				h += '<div class="rec-skeleton">' +
+				     '<div class="sk-img"></div>' +
+				     '<div class="sk-body">' +
+				     '<div class="sk-line xs"></div>' +
+				     '<div class="sk-line"></div>' +
+				     '<div class="sk-line s"></div>' +
+				     '</div></div>';
+			}
+			return h;
+		}
+
+		function renderCourseCards(list) {
+			if (!list || !list.length) { section.style.display = 'none'; return; }
+			var h = list.slice(0, 3).map(function (c) {
+				var id    = c.courseId;
+				var name  = esc(c.courseName || '');
+				var cat   = esc(c.courseCategory || '');
+				var psych = c.psych ? esc(c.psych) + ' 心理師' : '';
+				var desc  = strip(c.outline);
+				var price = c.price != null ? 'NT$ ' + c.price.toLocaleString() : '';
+
+				return '<a class="rec-card" href="/course/' + id + '">' +
+				       '<div class="photo-slot"><div class="ps-inner">' +
+				       '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+				       '<polygon points="5 3 19 12 5 21 5 3"/>' +
+				       '</svg></div></div>' +
+				       '<div class="rec-body">' +
+				       '<div class="rec-meta">' + cat + '</div>' +
+				       '<h3>' + name + '</h3>' +
+				       '<p>' + desc + '</p>' +
+				       '<div class="rec-foot">' +
+				       '<span>' + psych + '</span>' +
+				       '<span class="go">' + price + ' →</span>' +
+				       '</div></div></a>';
+			}).join('');
+			listEl.innerHTML = h;
+			section.style.display = '';
+		}
+
+		listEl.innerHTML = skeleton();
+		section.style.display = '';
+
+		var headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, getCsrfHeaders());
+
+		fetch('/article/' + articleId + '/recommend/course', {
+			method: 'POST', headers: headers, redirect: 'manual'
+		})
+		.then(function(res) {
+			if (res.type === 'opaqueredirect' || res.status === 0) {
+				section.style.display = 'none'; return null;
+			}
+			if (!res.ok) throw new Error('HTTP ' + res.status);
+			return res.json();
+		})
+		.then(function(dto) {
+			if (!dto) return;
+			renderCourseCards(dto.courseList);
+		})
+		.catch(function(err) {
+			console.error('[course-recommend]', err);
 			section.style.display = 'none';
 		});
 	})();

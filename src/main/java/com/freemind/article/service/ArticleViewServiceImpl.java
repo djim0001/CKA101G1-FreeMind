@@ -82,16 +82,16 @@ public class ArticleViewServiceImpl implements ArticleViewService{
 	@Override
 	public List<Integer> getHotArticleIds(int topN) {
 		Set<String> topArticleIds = redisTemplate.opsForZSet().reverseRange(HOT_KEY, 0, topN - 1); // ZREVRANGE
-		
+
 		List<Integer> result = new ArrayList<>();
-		
+
 		if (topArticleIds == null) return result;
-		
+
 		for (String id : topArticleIds) {
 			int articleId = Integer.parseInt(id);
 			result.add(articleId);
 		}
-		
+
 		return result;
 	}
 

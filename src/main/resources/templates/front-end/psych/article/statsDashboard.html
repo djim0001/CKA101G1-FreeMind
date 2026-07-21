@@ -111,7 +111,11 @@
 	align-items: center; gap: .8rem;
 	padding: .7rem 0; border-bottom: 1px solid var(--line);
 	font-size: .94rem; color: var(--ink);
+	transition: padding-left .18s, color .18s;
+	cursor: default;
 }
+.summary-list li:hover { padding-left: .5rem; }
+.summary-list li:hover .summary-label { color: var(--orange); }
 .summary-list li:last-child { border-bottom: none; }
 
 .summary-dot {

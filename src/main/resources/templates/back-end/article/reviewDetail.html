@@ -122,6 +122,10 @@
 			transform: translateY(-2px);
 		}
 		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1rem; }
+		.crumb a:hover { color: var(--orange); }
+		.crumb span { margin: 0 .45rem; opacity: .5; }
+		.crumb .current { opacity: 1; color: var(--ink); }
 		.admin-main {
 			width: 100%;
 			flex: 1;
@@ -159,6 +163,29 @@
 			color: var(--ink-soft);
 			font-size: .92rem;
 			text-align: right;
+		}
+		.admin-page-header-nav {
+			display: flex;
+			gap: .5rem;
+			align-items: center;
+		}
+		.admin-page-header-nav a {
+			display: inline-flex;
+			align-items: center;
+			padding: .45rem .95rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .85rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			white-space: nowrap;
+		}
+		.admin-page-header-nav a:hover {
+			color: var(--orange);
+			border-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -232,7 +259,39 @@
 			font: inherit;
 			font-size: .9rem;
 		}
-		.admin-field:focus { border-color: var(--orange); outline: 0; box-shadow: 0 0 0 3px rgba(245, 142, 107, .14); }
+		.admin-field:focus { border-color: var(--bg-soothing); outline: 0; box-shadow: 0 0 0 3px rgba(194, 217, 237, .3); }
+		.custom-select { position: relative; width: 100%; }
+		.custom-select-trigger {
+			display: flex; align-items: center;
+			width: 100%; min-height: 44px; padding: .7rem 2.2rem .7rem .85rem;
+			border: 1px solid var(--line); border-radius: 12px;
+			background: #fff; color: var(--ink);
+			font: inherit; font-size: .9rem;
+			cursor: pointer; user-select: none;
+			position: relative; transition: border-color .2s;
+		}
+		.custom-select-trigger::after {
+			content: ""; position: absolute; right: .85rem; top: 50%;
+			border: 4px solid transparent; border-top: 5px solid var(--ink-soft);
+			transform: translateY(-1px); transition: transform .2s;
+		}
+		.custom-select.open .custom-select-trigger::after { transform: translateY(-4px) rotate(180deg); }
+		.custom-select-trigger:hover { border-color: var(--bg-soothing); }
+		.custom-select.open .custom-select-trigger { border-color: var(--bg-soothing); box-shadow: 0 0 0 3px rgba(194, 217, 237, .3); }
+		.custom-select-panel {
+			display: none; position: absolute; top: calc(100% + 4px); left: 0;
+			width: 100%; max-height: 220px; overflow-y: auto;
+			background: #fff; border: 1px solid var(--line);
+			border-radius: 12px; box-shadow: var(--shadow-md);
+			z-index: 100; padding: .3rem 0;
+		}
+		.custom-select.open .custom-select-panel { display: block; }
+		.custom-select-option {
+			padding: .6rem .85rem; font-size: .9rem; color: var(--ink);
+			cursor: pointer; transition: background .15s;
+		}
+		.custom-select-option:hover { background: rgba(255, 250, 238, .72); }
+		.custom-select-option.selected { font-weight: 600; color: var(--orange); }
 		.admin-btn {
 			display: inline-flex;
 			align-items: center;
@@ -432,12 +491,20 @@
 
 	<main id="main-content" class="admin-main">
 		<div class="admin-wrap">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}">管理後台</a><span>/</span><a th:href="@{/admin/article/pending}">待審核文章</a><span>/</span><span class="current">審核文章詳情</span>
+			</div>
+
 			<section class="admin-page-header" aria-labelledby="page-title">
 				<div>
 					<span class="admin-kicker">Article Review</span>
 					<h1 id="page-title">審核文章詳情</h1>
 				</div>
-				<p>閱讀完整文章內容後，選擇審核通過或填寫退回原因。</p>
+				<nav class="admin-page-header-nav">
+					<a th:href="@{/admin/article}">文章管理</a>
+					<a th:href="@{/admin/article/categories}">文章分類</a>
+				</nav>
 			</section>
 
 			<div class="review-layout">
@@ -449,7 +516,7 @@
 					</div>
 					<div class="admin-panel-body">
 						<div class="article-meta">
-							<span>送審時間：<strong th:text="${article.submittedAt}">送審時間</strong></span>
+							<span>送審時間：<strong th:text="${#temporals.format(article.submittedAt,'yyyy-MM-dd HH:mm')}">送審時間</strong></span>
 							<span>文章分類：<strong th:text="${article.articleCat.articleCatName}">文章分類</strong></span>
 						</div>
 						<h2 id="review-article-title" class="article-title"
@@ -476,16 +543,18 @@
 							th:action="@{/admin/article/{id}/review(id=${article.articleId})}"
 							method="post" onsubmit="return validateForm(event)">
 							<div class="form-group">
-								<label for="rejectReason">退回原因</label>
-								<select class="admin-field" id="rejectReason"
-									name="rejectReason">
-									<option value="" disabled selected>請選擇</option>
-									<option value="0">內容品質</option>
-									<option value="1">違反專業法規</option>
-									<option value="2">版權問題</option>
-									<option value="3">違反平台規範</option>
-									<option value="4">其他</option>
-								</select>
+								<label>退回原因</label>
+								<div class="custom-select" id="rejectReasonWrap">
+									<div class="custom-select-trigger" id="rejectReasonTrigger">請選擇</div>
+									<div class="custom-select-panel">
+										<div class="custom-select-option" data-value="0">內容品質</div>
+										<div class="custom-select-option" data-value="1">違反專業法規</div>
+										<div class="custom-select-option" data-value="2">版權問題</div>
+										<div class="custom-select-option" data-value="3">違反平台規範</div>
+										<div class="custom-select-option" data-value="4">其他</div>
+									</div>
+									<input type="hidden" name="rejectReason" id="rejectReasonInput" value="" />
+								</div>
 							</div>
 
 							<div class="form-group">
@@ -515,11 +584,38 @@
 	<div th:replace="~{fragments/adminFooter :: footer}"></div>
 
 	<script>
+		(function() {
+			var wrap = document.getElementById('rejectReasonWrap');
+			var trigger = document.getElementById('rejectReasonTrigger');
+			var hidden = document.getElementById('rejectReasonInput');
+			var options = wrap.querySelectorAll('.custom-select-option');
+
+			trigger.addEventListener('click', function(e) {
+				e.stopPropagation();
+				wrap.classList.toggle('open');
+			});
+
+			options.forEach(function(opt) {
+				opt.addEventListener('click', function(e) {
+					e.stopPropagation();
+					options.forEach(function(o) { o.classList.remove('selected'); });
+					opt.classList.add('selected');
+					trigger.textContent = opt.textContent;
+					hidden.value = opt.getAttribute('data-value');
+					wrap.classList.remove('open');
+				});
+			});
+
+			document.addEventListener('click', function() {
+				wrap.classList.remove('open');
+			});
+		})();
+
 		function validateForm(event) {
-			const action = event.submitter.value;
+			var action = event.submitter.value;
 			if (action === 'reject') {
-				const reason = document.querySelector('select[name="rejectReason"]');
-				const note = document.querySelector('textarea[name="rejectNote"]');
+				var reason = document.getElementById('rejectReasonInput');
+				var note = document.querySelector('textarea[name="rejectNote"]');
 				if (!reason.value) {
 					alert('請選擇退回原因');
 					return false;

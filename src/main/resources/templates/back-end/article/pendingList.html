@@ -122,6 +122,10 @@
 			transform: translateY(-2px);
 		}
 		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1rem; }
+		.crumb a:hover { color: var(--orange); }
+		.crumb span { margin: 0 .45rem; opacity: .5; }
+		.crumb .current { opacity: 1; color: var(--ink); }
 		.admin-main {
 			width: 100%;
 			flex: 1;
@@ -159,6 +163,29 @@
 			color: var(--ink-soft);
 			font-size: .92rem;
 			text-align: right;
+		}
+		.admin-page-header-nav {
+			display: flex;
+			gap: .5rem;
+			align-items: center;
+		}
+		.admin-page-header-nav a {
+			display: inline-flex;
+			align-items: center;
+			padding: .45rem .95rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .85rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			white-space: nowrap;
+		}
+		.admin-page-header-nav a:hover {
+			color: var(--orange);
+			border-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -351,21 +378,34 @@
 
 	<main id="main-content" class="admin-main">
 		<div class="admin-wrap">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}">管理後台</a><span>/</span><a th:href="@{/admin/article}">文章總覽</a><span>/</span><span class="current">待審核文章</span>
+			</div>
+
 			<section class="admin-page-header" aria-labelledby="page-title">
 				<div>
 					<span class="admin-kicker">Pending Review</span>
 					<h1 id="page-title">待審核文章</h1>
 				</div>
-				<p>查看心理師已送審的文章，依序進入詳情完成內容審核。</p>
+				<nav class="admin-page-header-nav">
+					<a th:href="@{/admin/article}">文章管理</a>
+					<a th:href="@{/admin/article/categories}">文章分類</a>
+				</nav>
 			</section>
+
+			<nav class="article-admin-nav" aria-label="專欄文章管理功能">
+				<a th:href="@{/admin/article}">文章總覽</a>
+				<a th:href="@{/admin/article/pending}" class="active">待審核文章</a>
+				<a th:href="@{/admin/article/reviewed}">已審核文章</a>
+			</nav>
 
 			<section class="admin-panel" aria-labelledby="pending-list-title">
 				<div class="admin-panel-heading">
 					<h2 id="pending-list-title">待審核清單</h2>
-					<a class="admin-btn secondary" th:href="@{/admin/article}">返回文章管理</a>
 				</div>
 				<div class="admin-panel-body">
-					<div class="table-scroll">
+					<div class="table-scroll" th:if="${articlePage.totalElements > 0}">
 						<table class="admin-table">
 							<thead>
 								<tr>
@@ -383,8 +423,8 @@
 											th:text="${article.title}">文章標題</strong>
 									</td>
 									<td th:text="${article.articleCat.articleCatName}">文章分類</td>
-									<td th:text="${article.createdAt}">建立時間</td>
-									<td th:text="${article.submittedAt}">送審時間</td>
+									<td th:text="${#temporals.format(article.createdAt,'yyyy-MM-dd HH:mm')}">建立時間</td>
+									<td th:text="${#temporals.format(article.submittedAt,'yyyy-MM-dd HH:mm')}">送審時間</td>
 									<td>
 										<a class="admin-btn secondary"
 											th:href="@{/admin/article/{id}/review(id=${article.articleId})}">進入審核</a>
@@ -393,7 +433,14 @@
 							</tbody>
 						</table>
 					</div>
+					<div th:if="${articlePage.totalElements == 0}" class="empty-state">
+						<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:.8rem;">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg>
+						<div style="font-family:var(--serif); font-size:1.05rem; font-weight:600; color:var(--ink); margin-bottom:.35rem;">目前沒有待審核的文章</div>
+						<div style="font-size:.88rem;">所有文章皆已審核完畢，請稍後再回來查看。</div>
+					</div>
 				</div>
+					<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, '/admin/article/pending', '')}"></div>
 			</section>
 		</div>
 	</main>
