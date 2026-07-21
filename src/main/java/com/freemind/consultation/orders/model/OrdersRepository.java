@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface OrdersRepository extends JpaRepository<Orders, Integer>{
@@ -51,6 +52,12 @@ public interface OrdersRepository extends JpaRepository<Orders, Integer>{
 	
 	//心理師更新時間後處理已有預約訂單 
 		List<Orders> findByPsychologist_PsychIdAndOrderStatusInAndConsStartGreaterThanEqual(Integer psychId, List<Integer> orderStatuses, LocalDateTime consStart);
+		@Query("SELECT AVG(o.rating) FROM Orders o " +
+			       "WHERE o.psychologist.psychId = :psychId AND o.rating IS NOT NULL")
+			Double findAvgRatingByPsychId(@Param("psychId") Integer psychId);
 
+			@Query("SELECT COUNT(o) FROM Orders o " +
+			       "WHERE o.psychologist.psychId = :psychId AND o.rating IS NOT NULL")
+			long countRatedByPsychId(@Param("psychId") Integer psychId);
 }
 
