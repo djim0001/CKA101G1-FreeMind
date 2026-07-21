@@ -9,6 +9,7 @@ public class CourseRecommendDTO {
 	private Integer courseId;
 	private String courseCategory;
 	private String courseName;
+	private String videoSrcPre;
 	private String psych;
 	private String outline;
 	private Integer price;
@@ -20,6 +21,7 @@ public class CourseRecommendDTO {
 		this.courseId = course.getCourseId();
 		this.courseCategory = course.getCourseCategories().getCourseCatName();
 		this.courseName = course.getCourseName();
+		this.videoSrcPre = course.getVideoSrcPre();
 		this.psych = course.getPsychologist().getName();
 		this.outline = course.getOutline();
 		this.price = course.getPrice();

@@ -20,7 +20,7 @@ public interface ArticleService {
 	
 	Page<Article> getMyArticles(Integer psychId, Integer catId, Integer status, String sort, Integer page);
 	
-	Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort);
+	Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort, Integer excludeId);
 	
 	Page<Article> getSubmittedArticles(String keyword, Integer catId, Integer status, String sort, Integer page);
 	

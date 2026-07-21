@@ -46,11 +46,13 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	
 	// 合併成多條件查詢
 	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status " +
+	       "AND (:excludeId IS NULL OR a.articleId != :excludeId) " +
 	       "AND (:catId IS NULL OR a.articleCat.articleCatId = :catId) " +
 	       "AND (:keyword IS NULL OR a.title LIKE %:keyword% OR a.psychologist.name LIKE %:keyword%) " +
 	       "AND (:dateFrom IS NULL OR a.publishedAt >= :dateFrom) " +
 	       "AND (:dateTo IS NULL OR a.publishedAt < :dateTo)")
 	Page<Article> searchArticles(@Param("status") Integer status,
+	                             @Param("excludeId") Integer excludeId,
 	                             @Param("catId") Integer catId,
 	                             @Param("keyword") String keyword,
 	                             @Param("dateFrom") LocalDateTime dateFrom,

@@ -948,12 +948,16 @@
 				var psych = c.psych ? esc(c.psych) + ' 心理師' : '';
 				var desc  = strip(c.outline);
 				var price = c.price != null ? 'NT$ ' + c.price.toLocaleString() : '';
+				var videoUrl = c.videoSrcPre || '';
 
 				return '<a class="rec-card" href="/course/' + id + '">' +
 				       '<div class="photo-slot"><div class="ps-inner">' +
-				       '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
-				       '<polygon points="5 3 19 12 5 21 5 3"/>' +
-				       '</svg></div></div>' +
+				       (videoUrl
+				           ? '<video muted playsinline preload="metadata" src="' + esc(videoUrl) + '" onerror="this.outerHTML=\'<svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke-width=&quot;1.4&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><polygon points=&quot;5 3 19 12 5 21 5 3&quot;/></svg>\'"></video>'
+				           : '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+				             '<polygon points="5 3 19 12 5 21 5 3"/></svg>'
+				       ) +
+				       '</div></div>' +
 				       '<div class="rec-body">' +
 				       '<div class="rec-meta">' + cat + '</div>' +
 				       '<h3>' + name + '</h3>' +
