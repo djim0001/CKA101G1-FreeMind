@@ -226,4 +226,13 @@ public class OrdersService {
 		return !repository.findPendingBySlotAndConsStart(timeslotId, consStart).isEmpty();
 
 	}
+
+	public Double getAvgRating(Integer psychId) {
+	    return repository.findAvgRatingByPsychId(psychId);   // 沒人評價時回傳 null
+	}
+
+	public long getRatingCount(Integer psychId) {
+	    return repository.countRatedByPsychId(psychId);
+	}
+
 }

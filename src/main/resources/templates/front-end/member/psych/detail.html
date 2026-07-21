@@ -89,6 +89,19 @@
 					<p>證照:<span th:text="${psych.psychCertificate}"></span></p>
 					<p>地點:<span th:text="${psych.psychLoc}"></span></p>
 					<p>費用:$<span th:text="${psych.psychFee}"></span> / 次</p>
+					<p>滿意度：
+					    <span th:if="${avgRating != null}"
+					          th:with="rounded=${T(java.lang.Math).round(avgRating)}">
+					        <span th:each="i : ${#numbers.sequence(1,5)}"
+					              th:text="${i <= rounded ? '★' : '☆'}"
+					              style="color: var(--orange-deep); letter-spacing: 1px;"></span>
+					        <span th:text="${#numbers.formatDecimal(avgRating, 1, 1)}"
+					              style="margin-left: .3rem; font-weight: 500;">4.5</span>
+					        <span th:text="'(' + ${ratingCount} + ' 則評價)'"
+					              style="color: var(--ink-soft); font-size: .85rem;">(23 則評價)</span>
+					    </span>
+					    <span th:if="${avgRating == null}" style="color: var(--ink-soft);">尚無評價</span>
+					</p>
 					<p class="tags">
 						專長:
 						<span class="expertise-tag" th:each="e : ${psych.expertiseList}" th:text="${e}"></span>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.freemind.consultation.orders.model.OrdersService;
 import com.freemind.login.psychologist.dto.PsychologistProfileRes;
 import com.freemind.login.psychologist.service.ExpertiseService;
 import com.freemind.login.psychologist.service.PsychologistService;
@@ -24,11 +25,12 @@ public class PsychologistMemberController {
 
 	private final PsychologistService psychologistService;
 	private final ExpertiseService expertiseService;
-	
+	private final OrdersService ordersSvc;
 	public PsychologistMemberController(PsychologistService psychologistService,
-									ExpertiseService expertiseService) {
+									ExpertiseService expertiseService ,OrdersService ordersSvc) {
 		this.psychologistService = psychologistService;
 		this.expertiseService = expertiseService;
+		this.ordersSvc = ordersSvc;
 	}
 	
 	private String blankToNull(String s) {
@@ -96,6 +98,8 @@ public class PsychologistMemberController {
 	        PsychologistProfileRes psych = psychologistService.getProfile(id);
 	        System.out.println("1111111"+psych.getAvailableDates());
 	        model.addAttribute("psych", psych);
+	        model.addAttribute("avgRating", ordersSvc.getAvgRating(psych.getPsychId()));
+	        model.addAttribute("ratingCount", ordersSvc.getRatingCount(psych.getPsychId()));
 	    } catch (IllegalArgumentException e) {
 	        model.addAttribute("errorMessage", e.getMessage());
 	    }
