@@ -147,7 +147,8 @@ public class OrdersMemberController {
 			return "redirect:/front-end/login";
 		}
 		Integer memberId = prinUserDetails.getMember().getMemberId();
-		
+
+		// 沒選時段就送出
 		if (hourStr == null || hourStr.isBlank()) {
 			Slots slot0 = slotsSvc.getOneSlots(Integer.valueOf(timeslotId));
 			Psychologist psy0 = psychologistRepository.findById(Integer.valueOf(psychId)).orElse(null);
@@ -164,6 +165,7 @@ public class OrdersMemberController {
 
 		Slots slot = slotsSvc.getOneSlots(tid);
 		java.time.LocalDateTime consStart = slot.getSlotDate().atTime(hour, 0);
+		java.time.LocalDateTime consEnd = consStart.plusHours(1); // ★ 用開始時間+1小時，23點也不會超過
 
 		// 防線：送出前再確認這個時段還沒過去
 		if (consStart.isBefore(java.time.LocalDateTime.now())) {
@@ -203,7 +205,7 @@ public class OrdersMemberController {
 		orders.setMember(member);
 		orders.setPsychologist(psychologist);
 		orders.setConsStart(consStart);
-		orders.setConsEnd(slot.getSlotDate().atTime(hour + 1, 0));
+		orders.setConsEnd(consEnd); // ★ 修正後的結束時間
 		orders.setPsychLoc(psychLoc);
 		orders.setPsychFee(Integer.valueOf(psychFee));
 		orders.setVisitPurpose(visitPurpose);
@@ -213,6 +215,8 @@ public class OrdersMemberController {
 		orders.setGovSubsidy(false);
 
 		ordersSvc.addOrders(orders);
+
+		// 通知心理師有新的預約待確認（心理師端 1 = 預約通知）
 		noticeService.sendToPsych(pid, null,
 				"您有一筆新的預約（" + consStart + "），請至訂單管理確認。", (byte) 1);
 
