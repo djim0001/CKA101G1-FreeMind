@@ -82,7 +82,7 @@ mark.hl.b::after { background: var(--bg-soothing); }
 .photo-slot.pink { background: var(--pink-soft); }
 .photo-slot.blue { background: var(--bg-soothing); }
 .photo-slot::after {
-	content: ""; position: absolute; inset: 14px; border: 2px dashed rgba(58, 75, 83, .24);
+	content: ""; position: absolute; inset: 14px;
 	border-radius: inherit; pointer-events: none;
 }
 .ps-inner { text-align: center; color: var(--ink); opacity: .62; padding: 1rem; }
