@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.freemind.article.entity.Article;
+import com.freemind.article.service.ArticleService;
+import com.freemind.article.service.ArticleViewService;
 import com.freemind.course.course.model.Course;
 import com.freemind.course.course.model.CourseService;
 import com.freemind.login.admin.model.Admin;
@@ -33,6 +36,10 @@ public class IndexController {
     private PsychologistService psychSvc;
     @Autowired
     private CourseService courseSvc;
+    @Autowired
+    private ArticleViewService articleViewSvc;
+    @Autowired
+    private ArticleService articleSvc;
     
     @ModelAttribute("admin")
     public Admin currentAdmin(Authentication authentication) {
@@ -68,7 +75,11 @@ public class IndexController {
         List<Course> top3Courses =
         		courseSvc.findTop3PopularListedCourses().getContent();
         model.addAttribute("top3Courses", top3Courses);
-        
+        // 前三熱門的文章
+        List<Integer> hotIds = articleViewSvc.getHotArticleIds(3);
+        List<Article> hotArticles = articleSvc.getPublishedArticlesByIds(hotIds);
+        model.addAttribute("hotArticles", hotArticles);
+
         return "index";
     }
     
