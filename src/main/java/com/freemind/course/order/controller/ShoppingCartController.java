@@ -104,7 +104,7 @@ public class ShoppingCartController {
 		if (orderCoupon != null
 				&& orderCoupon.getMember().getMemberId() == member.getMemberId()) {
 			model.addAttribute("couponName", orderCoupon.getCoupon().getCouponName());
-			cartTotal = (Integer)session.getAttribute("discountLimitTotal");
+			cartTotal -= (Integer)session.getAttribute("discountLimitTotal");
 //			cartTotal = BigDecimal.valueOf(cartTotal)
 //						.multiply(orderCoupon.getCoupon().getDiscount())
 //						.intValue();
