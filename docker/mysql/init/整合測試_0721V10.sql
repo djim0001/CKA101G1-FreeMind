@@ -570,7 +570,7 @@ INSERT INTO articles (
 ) VALUES 
 -- 1. 大腦科學與心理學 (cat_id = 4)
 (
-NULL, 1, 4, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover1.png'), '找不到原因的身體不適？解密現代人的隱形危機「自律神經失調」',
+NULL, 1, 4, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover1.png'), '找不到原因的身體不適？解密現代人的隱形危機「自律神經失調」',
 '<h3 data-path-to-node="1">身體在抗議，心靈在呼救</h3>
 <p>你是否經常感到胸悶、心悸、莫名頭暈、失眠，或者腸胃不適，但跑遍了各大醫院做全身檢查，報告卻都顯示一切正常？醫生最後只能對你說：「這可能只是壓力太大。」 <br>在心理學與醫學交織的領域中，這種找不到器官實質病變、卻有一大堆痛苦症狀的現象，往往就是「自律神經失調」的典型表現。自律神經就像是身體的自動導航系統，當這套系統因長期壓力而全面失控，身體就會陷入停不下來的混亂中。</p>
 <p>&nbsp;</p>
@@ -588,7 +588,7 @@ NULL, 1, 4, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover1.p
 
 -- 2. 職場壓力與焦慮 (cat_id = 2)
 (
-NULL, 1, 2, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover2.png'), '總是覺得自己不夠好？擺脫「冒牌者症候群」的職場內耗',
+NULL, 1, 2, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover2.png'), '總是覺得自己不夠好？擺脫「冒牌者症候群」的職場內耗',
 '<h3 data-path-to-node="1">明明很努力，卻總害怕被拆穿？</h3>
 <p>在職場上，你是否常有這種感覺：當獲得主管稱讚或成功完成專案時，心裡第一時間想到的不是驕傲，而是「我只是運氣好罷了」、「下次可能就沒這麼幸運了」？ <br>這種無法將成功歸因於自身能力的心理現象，就是心理學上著名的「冒牌者症候群」（Impostor Syndrome）。這類人在外人眼中往往表現優秀、做事可靠，但內心卻無時無刻不被焦慮籠罩，深怕有一天別人會發現自己的「真面目」。</p>
 <p>&nbsp;</p>
@@ -606,7 +606,7 @@ NULL, 1, 2, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover2.p
 
 -- 3. 親密關係與溝通 (cat_id = 3)
 (
-NULL, 1, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover3.png'), '為什麼我們越愛越常吵架？談情侶溝通中的「非暴力溝通」',
+NULL, 1, 3, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover3.png'), '為什麼我們越愛越常吵架？談情侶溝通中的「非暴力溝通」',
 '<h3 data-path-to-node="1">我們是在溝通，還是在爭輸贏？</h3>
 <p>「你每次都不關心我！」、「你到底想怎樣？」這些對話是否聽起來很熟悉？在親密關係中，我們往往因為距離太近、期待太高，不小心用指責代替了表達需求，讓原本出於愛的關心，變成了傷人的武器。 <br>當爭執發生時，大腦中的防禦機制會被啟動，我們開始急於防衛自己或攻擊對方，結果溝通變成了對錯之爭。最終就算贏了道理，卻輸掉了彼此之間的信任與親密感。</p>
 <p>&nbsp;</p>
@@ -624,7 +624,7 @@ NULL, 1, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover3.p
 
 -- 4. 原生家庭與愛的分際 (cat_id = 5)
 (
-NULL, 1, 5, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover4.png'), '愛與控制的界線在哪裡？學會設立「健康的心理界線」',
+NULL, 1, 5, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover4.png'), '愛與控制的界線在哪裡？學會設立「健康的心理界線」',
 '<h3 data-path-to-node="1">拒絕父母，不等於我不孝順</h3>
 <p>「我們這都是為了你好！」、「你這樣做真的很讓我失望……」這些話語是否曾讓你感到無比沉重？許多人在成長過程中，常因為無法達到父母的期待而背負強烈的罪惡感，甚至在成年後，依然難以獨立決定自己的職涯或生活型態。 <br>這種現象往往源於原生家庭中界線模糊（Enmeshment）。當父母將自己的喜怒哀樂與孩子的選擇過度綑綁時，愛就漸漸演變成了無形的控制，讓孩子在追求自我與維護孝道之間陷入撕裂般的痛苦。</p>
 <p>&nbsp;</p>
@@ -642,7 +642,7 @@ NULL, 1, 5, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover4.p
 
 -- 5. 改善焦慮與自己和解 (cat_id = 6)
 (
-NULL, 1, 6, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover5.png'), '當焦慮海嘯襲來：3個能立刻著地的「正念接地法」',
+NULL, 1, 6, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover5.png'), '當焦慮海嘯襲來：3個能立刻著地的「正念接地法」',
 '<h3 data-path-to-node="1">大腦轉個不停，該如何讓自己停下來？</h3>
 <p>深夜裡，你是否也曾因為對未來的失控感而呼吸急促、胸口發緊，大腦不斷播放各種最壞的打算？焦慮是一種專注於「尚未發生的威脅」的心理預警機制。當我們過度沉溺於未來的恐懼時，大腦的神經系統會誤以為我們正面臨即刻的生命危險。 <br>要破解這種焦慮風暴，最有效的切斷機制就是將專注力從抽象的想像拉回當下的身體感受。這就是心理學上常說的著地（Grounding）過程。</p>
 <p>&nbsp;</p>
@@ -657,7 +657,7 @@ NULL, 1, 6, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover5.p
 
 -- 6. 自我探索與成長 (cat_id = 1)
 (
-NULL, 1, 1, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover6.png'), '擺脫迷惘與盲從：如何透過「價值觀澄清」找回人生方向？',
+NULL, 1, 1, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover6.png'), '擺脫迷惘與盲從：如何透過「價值觀澄清」找回人生方向？',
 '<h3 data-path-to-node="1">你現在過的生活，是自己想要的，還是社會期望的？</h3>
 <p>在忙碌的日常生活中，你是否偶爾會產生一種空虛感，覺得自己每天都在盲目地奔波，卻不知道自己究竟為了什麼而努力？ <br>這種迷惘感往往源於我們的「行為」與內心深處的「核心價值觀」產生了脫節。當我們習慣順應社會的期待、父母的期許或同儕的眼光時，就容易迷失自我，甚至在達成目標後依然感到失落。</p>
 <p>&nbsp;</p>
@@ -675,7 +675,7 @@ NULL, 1, 1, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover6.p
 
 -- 7. 自我探索與成長 (cat_id = 1) | Psych 3
 (
-NULL, 3, 1, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover7.png'), '允許自己「今天先這樣」：停止完美主義的自我批判與內耗',
+NULL, 3, 1, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover7.png'), '允許自己「今天先這樣」：停止完美主義的自我批判與內耗',
 '<h3 data-path-to-node="1">你是不是也習慣對自己太嚴苛？</h3>
 <p>「這件事我應該做得更好」、「我又搞砸了，我真的很沒用……」這些聲音是否經常在你腦海中輪播？許多長期受焦慮所苦的人，背後都有一個極度苛刻的內在審判官。我們常誤以為對自己嚴格才會進步，但事實上，過度的完美主義只會帶來拖延、恐懼與無休止的情緒消耗。 <br>當我們把自我價值完全建立在表現完美上時，任何微小的失誤都會被放大成對個人能力的全面否定，最終讓人精疲力竭。</p>
 <p>&nbsp;</p>
@@ -690,7 +690,7 @@ NULL, 3, 1, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover7.p
 
 -- 8. 職場壓力與焦慮 (cat_id = 2) | Psych 5
 (
-NULL, 5, 2, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover8.png'), '下班後依然靜不下心？建立「職場與生活」的心理防火牆',
+NULL, 5, 2, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover8.png'), '下班後依然靜不下心？建立「職場與生活」的心理防火牆',
 '<h3 data-path-to-node="1">明明已經離開辦公室，心卻還在加班？</h3>
 <p>現代人通訊軟體不離身，模糊了工作與生活的界線。你是否常在下班後，一看到社群訊息跳出就心跳加速，或是躺在床上依然在大腦裡演算明天的待辦事項？ <br>這種「永遠在線」的生理警戒狀態，會持續消耗大腦的神經資源，長期下來容易引發嚴重的職業倦怠（Burnout）與慢性疲勞。要保護自己的心靈健康，我們必須主動打造一套「心理儀式感」，強制大腦進行下班轉換。</p>
 <p>&nbsp;</p>
@@ -708,7 +708,7 @@ NULL, 5, 2, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover8.p
 
 -- 9. 親密關係與溝通 (cat_id = 3) | Psych 8
 (
-NULL, 8, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover9.png'), '解密「成人依附理論」：為什麼我在愛情裡總是缺乏安全感？',
+NULL, 8, 3, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover9.png'), '解密「成人依附理論」：為什麼我在愛情裡總是缺乏安全感？',
 '<h3 data-path-to-node="1">為什麼越在乎，越容易把對方推開？</h3>
 <p>在感情中，你是否常因為伴侶慢回訊息而感到鋪天蓋地的焦慮，忍不住狂發訊息？或者當兩人出現衝突時，你的第一反應是關閉心門、冷漠閃躲，覺得「我自己一個人處理就好」？ <br>這些在親密關係中展現的防衛機制，大多源於我們早年的依附經驗。心理學家約翰·鮑比（John Bowlby）提出的依附理論，揭示了我們如何在成年後的愛情中，複製童年與照顧者互動的心理模式。</p>
 <p>&nbsp;</p>
@@ -726,7 +726,7 @@ NULL, 8, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover9.p
 
 -- 10. 大腦科學與心理學 (cat_id = 4) | Psych 2
 (
-NULL, 2, 4, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover10.png'), '多巴胺與快樂的陷阱：為什麼我們總是滑手機滑到停不下來？',
+NULL, 2, 4, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover10.png'), '多巴胺與快樂的陷阱：為什麼我們總是滑手機滑到停不下來？',
 '<h3 data-path-to-node="1">無意識地刷社群，真的讓你放鬆了嗎？</h3>
 <p>結束了一整天疲憊的工作，你躺在沙發上打開手機，原本只想滑個五分鐘，卻不知不覺過了兩個小時。奇怪的是，關掉螢幕後，你並沒有感到精力充沛，反而覺得更加空虛與疲憊。 <br>這並不是因為你意志力薄弱，而是你的大腦陷入了現代科技精心設計的「多巴胺迴圈」（Dopamine Loop）中。</p>
 <p>&nbsp;</p>
@@ -744,7 +744,7 @@ NULL, 2, 4, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover10.
 
 -- 11. 大腦科學與心理學 (cat_id = 4) | Psych 7
 (
-NULL, 7, 4, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover11.png'), '慢性壓力如何重塑大腦？解析皮質醇對記憶與情緒的生理影響',
+NULL, 7, 4, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover11.png'), '慢性壓力如何重塑大腦？解析皮質醇對記憶與情緒的生理影響',
 '<h3 data-path-to-node="1">最近總是記性變差、容易發脾氣？</h3>
 <p>你是否覺得最近工作效率暴跌、經常剛講過的事情轉頭就忘，甚至對身邊的人失去了耐心？這可能不是你變笨了，而是大腦正在遭受慢性壓力荷爾蒙的侵蝕。 <br>當我們面對持續性壓力時，腎上腺皮質會大量分泌皮質醇（Cortisol）。短期分泌皮質醇能激發潛能應對危機，但若長期處於高濃度狀態，將對大腦結構造成不可逆的負面影響。</p>
 <p>&nbsp;</p>
@@ -762,7 +762,7 @@ NULL, 7, 4, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover11.
 
 -- 12. 原生家庭與愛的分際 (cat_id = 5) | Psych 10
 (
-NULL, 10, 5, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover12.png'), '走出「討好型人格」：不再為了成全他人而委屈自己',
+NULL, 10, 5, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover12.png'), '走出「討好型人格」：不再為了成全他人而委屈自己',
 '<h3 data-path-to-node="1">習慣性討好，其實是內心深處的生存策略</h3>
 <p>在團體中，你是否總扮演那個「好說話」的配合者？即使內心一萬個不願意，當別人提出要求時，嘴巴依然會自動回答「沒問題」；甚至當發生衝突時，不管誰對誰錯，你總是第一個道歉的人。 <br>這種「討好型人格」（People Pleaser）常源於童年時期缺乏無條件的接納。我們從小學會了「只有當我乖巧、聽話、不帶來麻煩時，我才是安全且值得被愛的」，進而在成年後將這種討好模式帶入所有際遇中。</p>
 <p>&nbsp;</p>
@@ -780,7 +780,7 @@ NULL, 10, 5, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover12
 
 -- 13. 親密關係與溝通 (cat_id = 3) | Psych 4
 (
-NULL, 4, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover13.png'), '接納脆弱的勇氣：自我關懷如何幫助我們走出感情低潮？',
+NULL, 4, 3, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover13.png'), '接納脆弱的勇氣：自我關懷如何幫助我們走出感情低潮？',
 '<h3 data-path-to-node="1">當感情跌入谷底，你選擇鞭策還是擁抱自己？</h3>
 <p>當面臨失戀、被背叛或關係破裂時，你腦海裡第一個出現的聲音是什麼？是「你真沒用，怎麼連這點感情都處理不好」，還是「這真的很艱難，但沒關係，我會陪著你」？ <br>大多數人習慣用嚴厲的批判來面對失敗，以為唯有對自己狠一點才能重新站起來。然而心理學研究發現，過度的自我鞭策只會激活大腦的威脅系統，引發更多焦慮與防禦行為。</p>
 <p>&nbsp;</p>
@@ -798,7 +798,7 @@ NULL, 4, 3, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover13.
 
 -- 14. 改善焦慮與自己和解 (cat_id = 6) | Psych 6
 (
-NULL, 6, 6, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover14.png'), '睡前總是想太多？給失眠焦慮者的夜間放鬆指南',
+NULL, 6, 6, 1, LOAD_FILE('/var/lib/mysql-files/covers/cover14.png'), '睡前總是想太多？給失眠焦慮者的夜間放鬆指南',
 '<h3 data-path-to-node="1">為什麼一關燈，大腦就開始播映反芻電影？</h3>
 <p>深夜裡，身體明明已經疲憊不堪，但只要一躺上床，大腦就開始瘋狂運轉：重複播放白天講錯的話、擔心明天的會議，甚至焦慮「如果我現在還睡著明天一定會完蛋」。 <br>這種對失眠的恐慌，會讓交感神經高度興奮，形成「越想睡越睡不著」的惡性循環。要把床從「焦慮戰場」重新變回「休息聖地」，我們需要對大腦進行睡眠衛生的重新設定。</p>
 <p>&nbsp;</p>
@@ -816,7 +816,7 @@ NULL, 6, 6, 1, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover14.
 
 -- 15. 職場壓力與焦慮 (cat_id = 2) | Psych 1 
 (
-NULL, 1, 2, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover15.png'), '轉職期的心理陣痛：如何面對不確定性帶來的未知焦慮？',
+NULL, 1, 2, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover15.png'), '轉職期的心理陣痛：如何面對不確定性帶來的未知焦慮？',
 '<h3 data-path-to-node="1">站在人生的十字路口，你是否感到恐懼與孤立？</h3>
 <p>無論是被動面臨產業變革，或是主動選擇跨出舒適圈，轉職期往往是人生中最充滿不安與挑戰的階段。離開了原本熟悉的職稱、團隊與薪資保障，我們常會產生一種「自我身分認同解體」的失落感。 <br>對未知未來的失控感，容易讓人陷入「萬一找不到更好的怎麼辦」的災難化思維。這種心理陣痛是每位求變者都會經歷的正常心理轉折。</p>
 <p>&nbsp;</p>
@@ -833,7 +833,7 @@ NULL, 1, 2, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover15.
 ),
 -- 16 已下架 --
 (
-    NULL, 1, 2, 2, LOAD_FILE('C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/cover16.png'), '慢性耗竭與高功能焦慮：當「完美主義」成為侵蝕身心的毒藥',
+    NULL, 1, 2, 2, LOAD_FILE('/var/lib/mysql-files/covers/cover16.png'), '慢性耗竭與高功能焦慮：當「完美主義」成為侵蝕身心的毒藥',
     '<h3 data-path-to-node="1">你也是外表堅強、內心卻早已不堪重負的「高功能焦慮者」嗎？</h3><p>在競爭激烈的現代職場中，我們經常讚賞那些工作表現卓越、按時交付任務且隨時保持冷靜的人。然而，在這層完美無瑕的外表下，許多人正承受著嚴重的「高功能焦慮」（High-Functioning Anxiety）。這類族群往往透過過度努力與完美主義來掩飾內心的不安與恐懼。</p><p>&nbsp;</p><h4 data-path-to-node="2">高功能焦慮的常見行為特徵：</h4><p data-path-to-node="2"><strong>1. 無法停止思考與工作：</strong>即使在休息時間，腦袋依然不斷盤旋著未完成的事項或未來的風險。<br><strong>2. 對「失敗」與「否定」有極度的恐懼：</strong>將個人價值完全建立在工作成就上，拒絕顯露任何脆弱。<br><strong>3. 身體發出慢性耗竭訊號：</strong>長期伴隨睡眠障礙、偏頭痛、肌肉緊繃或腸胃不適等官能症狀。</p><p data-path-to-node="2">&nbsp;</p><h4 data-path-to-node="3">從「自我要求」到「自我慈悲」的調適之道：</h4><p data-path-to-node="3">心理學家克莉絲汀·奈夫（Kristin Neff）提出的「自我慈悲」（Self-Compassion）是解開慢性耗竭的鑰匙。當你再次感到焦慮排山倒海而來時，嘗試運用以下三個步驟：</p><p data-path-to-node="3"><strong>• 正念覺察（Mindfulness）：</strong>接納當下的焦慮感受，承認「我現在確實感到很累與不安」，而不對自己進行批判。<br><strong>• 理解共通人性（Common Humanity）：</strong>提醒自己痛苦與不完美是人類經驗的一部分，你並不孤單，無須要求自己隨時無懈可擊。<br><strong>• 對自己展現善意（Self-Kindness）：</strong>用安慰好朋友的口吻對自己說話，允許自己適度休息與放下負擔。</p><h4 data-path-to-node="4">&nbsp;</h4><h4 data-path-to-node="4">學會放下接納不完美，才是真正強大的開始。</h4><p data-path-to-node="4">卸下完美的假面，給予自己喘息與修復的空間。如果你發現焦慮已嚴重影響生活，尋求專業心理諮商的協助將是你重獲內心平靜的重要一步。</p>',
     '2026-06-08 09:30:00', '2026-06-08 16:30:00', '2026-06-08 17:0:00', '2026-06-08 18:00:00', '2026-06-09 12:00:00', '2026-07-10 16:05:00',
     4, NULL, NULL, 185, 24
