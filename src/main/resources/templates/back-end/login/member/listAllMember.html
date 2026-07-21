@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>會員列表｜諮由自在後台</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
+</head>
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('member-list')}"></aside>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<span class="current">會員列表</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>會員<em>列表</em></h1>
+					<p>檢視全部會員資料。本頁僅供檢視，不提供修改或刪除。</p>
+				</div>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/member/select_page}" href="#">依編號查詢</a>
+				</div>
+			</div>
+
+			<div class="table-wrap" th:if="${memberListData != null and !memberListData.isEmpty()}">
+				<table>
+					<thead>
+						<tr>
+							<th>編號</th>
+							<th>帳號</th>
+							<th>姓名</th>
+							<th>狀態</th>
+							<th>性別</th>
+							<th>手機</th>
+							<th>信箱</th>
+							<th>加入時間</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="memberVO : ${memberListData}">
+							<td th:text="${memberVO.memberId}"></td>
+							<td th:text="${memberVO.memberAccount}"></td>
+							<td th:text="${memberVO.name}"></td>
+							<td>
+								<span th:if="${memberVO.accountStatus == null}">—</span>
+								<span th:unless="${memberVO.accountStatus == null}" class="status"
+									th:classappend="${memberVO.accountStatus == 1} ? 'green' : (${memberVO.accountStatus == 2} ? 'red' : 'amber')"
+									th:text="${accountStatusMap.get(memberVO.accountStatus)}"></span>
+							</td>
+							<td th:text="${memberVO.gender}"></td>
+							<td th:text="${memberVO.phoneNumber}"></td>
+							<td th:text="${memberVO.email}"></td>
+							<td class="nowrap" th:text="${memberVO.regisAt != null ? memberVO.regisAt : '—'}"></td>
+							<td>
+								<div class="actions">
+									<!-- 重用單一查詢的既有端點：帶 memberId 過去顯示完整資料 -->
+									<form class="inline-form" method="post" th:action="@{/admin/member/getOne_For_Display}">
+										<input type="hidden" name="memberId" th:value="${memberVO.memberId}">
+										<button class="btn btn-ghost btn-sm" type="submit">查看詳細</button>
+									</form>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="empty-state" th:if="${memberListData == null or memberListData.isEmpty()}">
+				<h3>目前沒有會員資料</h3>
+				<p>尚未有任何會員註冊。</p>
+			</div>
+
+		</main>
+	</div>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+</body>
+</html>
