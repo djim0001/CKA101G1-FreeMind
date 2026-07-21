@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>查詢會員｜諮由自在後台</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/admin-page.css}" href="/css/admin-page.css" />
+</head>
+
+<body>
+
+	<!-- ================= 頁首 ================= -->
+	<div th:replace="~{fragments/adminHeader :: header}"></div>
+
+	<div class="admin-shell">
+
+		<!-- ================= 側欄 ================= -->
+		<aside th:replace="~{fragments/admin/adminSidebar :: sidebar('member-query')}"></aside>
+
+		<!-- ================= 主內容 ================= -->
+		<main id="main-content" class="admin-main">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}" href="#">管理後台</a><span>/</span>
+				<span class="current">查詢會員</span>
+			</div>
+
+			<div class="page-head">
+				<div>
+					<h1>查詢<em>會員</em></h1>
+					<p>依編號查詢單一會員資料。本頁僅供檢視，不提供修改或刪除。</p>
+				</div>
+				<div class="page-actions">
+					<a class="btn btn-ghost" th:href="@{/admin/member/listAllMember}" href="#">回會員列表</a>
+				</div>
+			</div>
+
+			<div class="notice" th:if="${errorMessage != null}" th:utext="${errorMessage}"></div>
+
+			<div class="panel">
+				<h2>依編號查詢</h2>
+
+				<form class="form-grid" method="post" th:action="@{/admin/member/getOne_For_Display}">
+					<div class="form-group full">
+						<label for="queryMemberId">會員編號</label>
+						<input class="field" type="text" id="queryMemberId" name="memberId" placeholder="輸入會員編號…">
+					</div>
+					<div class="form-group full page-actions">
+						<button class="btn btn-primary" type="submit">查詢</button>
+					</div>
+				</form>
+
+				<div th:if="${memberVO != null}">
+					<h2 style="margin-top:1.6rem;">查詢結果</h2>
+					<dl class="summary-list">
+						<div>
+							<dt>編號</dt>
+							<dd th:text="${memberVO.memberId}"></dd>
+						</div>
+						<div>
+							<dt>帳號</dt>
+							<dd th:text="${memberVO.memberAccount}"></dd>
+						</div>
+						<div>
+							<dt>帳號狀態</dt>
+							<dd>
+								<span th:if="${memberVO.accountStatus == null}">—</span>
+								<span th:unless="${memberVO.accountStatus == null}" class="status"
+									th:classappend="${memberVO.accountStatus == 1} ? 'green' : (${memberVO.accountStatus == 2} ? 'red' : 'amber')"
+									th:text="${accountStatusMap.get(memberVO.accountStatus)}"></span>
+							</dd>
+						</div>
+						<div>
+							<dt>姓名</dt>
+							<dd th:text="${memberVO.name}"></dd>
+						</div>
+						<div>
+							<dt>暱稱</dt>
+							<dd th:text="${memberVO.nickname != null ? memberVO.nickname : '—'}"></dd>
+						</div>
+						<div>
+							<dt>性別</dt>
+							<dd th:text="${memberVO.gender}"></dd>
+						</div>
+						<div>
+							<dt>生日</dt>
+							<dd th:text="${memberVO.birthday != null ? memberVO.birthday : '—'}"></dd>
+						</div>
+						<div>
+							<dt>手機號碼</dt>
+							<dd th:text="${memberVO.phoneNumber}"></dd>
+						</div>
+						<div>
+							<dt>信箱</dt>
+							<dd th:text="${memberVO.email}"></dd>
+						</div>
+						<div>
+							<dt>地址</dt>
+							<dd
+								th:with="addr=${(memberVO.city != null ? memberVO.city : '') + (memberVO.dist != null ? memberVO.dist : '') + (memberVO.address != null ? memberVO.address : '')}"
+								th:text="${#strings.isEmpty(addr)} ? '—' : ${addr}"></dd>
+						</div>
+						<div>
+							<dt>加入時間</dt>
+							<dd th:text="${memberVO.regisAt != null ? memberVO.regisAt : '—'}"></dd>
+						</div>
+					</dl>
+				</div>
+			</div>
+
+		</main>
+	</div>
+
+	<!-- ================= 頁尾 ================= -->
+	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+</body>
+</html>
