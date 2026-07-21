@@ -96,7 +96,7 @@
 .meet { position: relative; background: var(--bg-soothing); padding: 1rem 0 3.4rem; }
 .meet-grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: 3.4rem; align-items: center; }
 .meet-photo { aspect-ratio: 1/1; border-radius: 40px; }
-.meet .detail-photo { width: 100%; max-height: 320px; object-fit: cover; border-radius: 24px; }
+.meet .detail-photo { width: 100%; max-height: 460px; object-fit: cover; border-radius: 24px; }
 .meet .eyebrow { color: var(--orange); }
 .meet h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(1.9rem, 3.3vw, 2.6rem); margin: .7rem 0 1.1rem; line-height: 1.35; }
 .meet h2 em { font-style: normal; color: var(--orange-deep); }

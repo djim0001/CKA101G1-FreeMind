@@ -135,6 +135,8 @@
 	color: var(--ink); line-height: 1.95;
 }
 .art-detail-content p { margin-bottom: .9rem; }
+.art-detail-content p:empty,
+.art-detail-content p.is-blank { margin-bottom: .15rem; line-height: .3; }
 .art-detail-content img { display: inline-block; max-width: 100%; height: auto; border-radius: 12px; margin: .3rem; vertical-align: top; }
 .art-detail-content h2 {
 	font-family: var(--sans) !important;
@@ -615,6 +617,14 @@
 
 	<script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
 	<script>
+	/* 將 TinyMCE 產生的空段落（&nbsp; / <br>）標記為 is-blank 以縮小間距 */
+	document.querySelectorAll('.art-detail-content p').forEach(function(p) {
+		var t = p.textContent.replace(/ /g, '').trim();
+		if (t === '' && !p.querySelector('img, video, iframe, table')) {
+			p.classList.add('is-blank');
+		}
+	});
+
 	/* ============================================================
 	   CSRF
 	   ============================================================ */

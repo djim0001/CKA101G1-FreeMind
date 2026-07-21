@@ -255,8 +255,8 @@
 	const bubbles = Array.from(area.querySelectorAll('.bubble'));
 	if (!bubbles.length) return;
 
-	const PAD = { top: 10, bottom: 30, left: 60, right: 60 };
-	const CENTER_PULL = 0.0004;
+	const PAD = { top: 20, bottom: 40, left: 20, right: 20 };
+	const CENTER_PULL = 0.0006;
 
 	const state = bubbles.map(b => {
 		const r = Math.round(b.offsetWidth / 2);
@@ -318,7 +318,7 @@
 				const a = state[i], b = state[j];
 				const dx = b.x - a.x, dy = b.y - a.y;
 				const dist = Math.sqrt(dx * dx + dy * dy);
-				const minD = a.r + b.r + 4;
+				const minD = a.r + b.r + 18;
 				if (dist < minD && dist > 0) {
 					const nx = dx / dist, ny = dy / dist;
 					const overlap = (minD - dist) / 2;
