@@ -29,6 +29,8 @@ import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
 import com.freemind.article.service.ArticleViewService;
 import com.freemind.article.service.RecommendationService;
+import com.freemind.course.course.model.Course;
+import com.freemind.course.dto.CourseListRecommendDTO;
 import com.freemind.login.psychologist.dto.PsychologistProfileRes;
 import com.freemind.login.psychologist.service.PsychologistService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
@@ -153,9 +155,9 @@ public class ArticleController {
 	}
 	
 	@ResponseBody
-	@PostMapping("/{articleId}/recommend")
+	@PostMapping("/{articleId}/recommend/article")
 	public ResponseEntity<ArticleListRecommendDTO> getRecommendatedArticles(@PathVariable Integer articleId,
-																		@AuthenticationPrincipal MemberUserDetails prinMemberUser) {
+																		    @AuthenticationPrincipal MemberUserDetails prinMemberUser) {
 		List<Article> articleList;
 		if (prinMemberUser != null) {
 			articleList = recommendationService.getArticleRecommendation(prinMemberUser.getMember(), articleId);
@@ -164,6 +166,15 @@ public class ArticleController {
 		}
 		
 		ArticleListRecommendDTO dto = new ArticleListRecommendDTO(articleList);
+		return ResponseEntity.ok().body(dto);
+	}
+	
+	@ResponseBody
+	@PostMapping("/{articleId}/recommend/course")
+	public ResponseEntity<CourseListRecommendDTO> getRecommendatedCourses(@PathVariable Integer articleId) {
+		List<Course> courseList = recommendationService.getCourseRecommendation(articleId);
+		
+		CourseListRecommendDTO dto = new CourseListRecommendDTO(courseList);
 		return ResponseEntity.ok().body(dto);
 	}
 	

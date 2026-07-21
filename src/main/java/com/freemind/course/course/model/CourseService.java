@@ -321,5 +321,9 @@ public class CourseService {
 
 		return repository.searchBookmarkCourses(courseIds, keyword, pageable);
 	}
+	
+	public List<Course> getPopularCoursesByCat(Integer courseCatId) {
+		return repository.findPopularCoursesByCat(courseCatId);
+	}
 
 }

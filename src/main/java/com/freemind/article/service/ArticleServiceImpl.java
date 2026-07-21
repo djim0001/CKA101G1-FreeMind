@@ -124,13 +124,15 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 
 	@Override
-	public Page<Article> getMyArticles(Integer psychId, Integer page) {
+	public Page<Article> getMyArticles(Integer psychId, Integer catId, Integer status, String sort, Integer page) {
 		if (psychId == null) {
 			throw new IllegalArgumentException("心理師資訊未帶入，請確認登入狀態");
 		}
 		
-		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("createdAt").descending());
-		return articleRepository.findArticlesByPsychId(psychId, pageable);
+		Sort sortBy = "oldest".equals(sort) ? Sort.by("createdAt").ascending() : Sort.by("createdAt").descending();
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, sortBy);
+		
+		return articleRepository.findMyArticlesWithFilters(psychId, catId, status, pageable);
 	}
 	
 	@Override
@@ -376,6 +378,26 @@ public class ArticleServiceImpl implements ArticleService{
 		
 		articleRepository.delete(article);
 	}
+	
+	@Override
+	@Transactional
+	public void batchDeleteDrafts(List<Integer> articleIds, Integer psychId) {
+	    for (Integer articleId : articleIds) {
+	        Article article = articleRepository.findById(articleId)
+	                .orElseThrow(() -> new IllegalArgumentException("文章不存在: " + articleId));
+
+	        if (!article.getPsychologist().getPsychId().equals(psychId)) {
+	            throw new IllegalArgumentException("無權限刪除文章: " + articleId);
+	        }
+
+	        int status = article.getArticleStatus();
+	        if (status != 0 && status != 3) {
+	            throw new IllegalStateException("此文章狀態無法刪除: " + article.getTitle());
+	        }
+
+	        articleRepository.delete(article);
+	    }
+	}
 
 	@Override
 	public void unPublishMyArticle(Integer articleId, Integer psychId) {
@@ -390,16 +412,14 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 	
 	@Override
-	public Page<Article> getSubmittedArticles(Integer page) {
-		Pageable pageable = PageRequest.of(page - 1, artPageSize, Sort.by("submittedAt").ascending());
+	public Page<Article> getSubmittedArticles(String keyword, Integer catId, Integer status, String sort, Integer page) {
+		Sort sortBy = "oldest".equals(sort) ? Sort.by("submittedAt").ascending() : Sort.by("submittedAt").descending();
+		Pageable pageable = PageRequest.of(page - 1, artPageSize, sortBy);
 		
-		List<Integer> articleStatuses = new ArrayList<Integer>();
-		articleStatuses.add(1);
-		articleStatuses.add(2);
-		articleStatuses.add(3);
-		articleStatuses.add(4);
+		List<Integer> articleStatuses = List.of(1, 2, 3, 4);
+		String kw = (keyword != null && !keyword.isBlank()) ? keyword : null;
 		
-		return articleRepository.findByStatuses(articleStatuses, pageable);
+		return articleRepository.findSubmittedArticlesWithFilters(articleStatuses,  catId, kw, status, pageable);
 	}
 	
 	@Override

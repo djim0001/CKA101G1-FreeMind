@@ -169,9 +169,9 @@
 			<span style="opacity:1;color:var(--ink)">收藏文章</span>
 		</div>
 		<p class="eyebrow">My collection</p>
-		<span class="script" style="font-size:1.3rem;">那些觸動你的文字</span>
+		<span class="script" style="font-size:1.3rem;"></span>
 		<h1>收藏<em>文章</em></h1>
-		<p>你按過讚、收藏過、讀過的文章，都在這裡等你回來。</p>
+		<p>那些觸動你的文字。你按過讚、收藏過、讀過的文章，都在這裡等你回來。</p>
 	</div>
 </section>
 
@@ -232,7 +232,7 @@
 					<h3 th:text="${article.title}">文章標題</h3>
 					<div class="art-foot">
 						<span th:if="${article.publishedAt != null}"
-							  th:text="${#temporals.format(article.publishedAt, 'yyyy.MM.dd')}">2026.07.20</span>
+							  th:text="${#temporals.format(article.publishedAt, 'yyyy-MM-dd HH:mm')}">2026-07-20 14:30</span>
 						<span th:if="${article.publishedAt == null}"></span>
 						<span class="go">閱讀 →</span>
 					</div>

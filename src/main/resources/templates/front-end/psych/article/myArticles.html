@@ -13,7 +13,6 @@
 <link rel="stylesheet" type="text/css" th:href="@{/css/styles.css}" href="/css/styles.css" />
 
 <style>
-/* ---------- 頁首標題區 ---------- */
 .my-head { background: var(--bg-warm); padding: 2.6rem 0 1.6rem; }
 .my-head .crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; }
 .my-head .crumb a:hover { color: var(--orange); }
@@ -25,7 +24,6 @@
 .my-head h1 em { font-style: normal; color: var(--orange); }
 .my-head p { color: var(--ink-soft); margin: 0; max-width: 34rem; }
 
-/* ---------- 頂部動作列 ---------- */
 .my-toolbar {
 	display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
 	margin-bottom: 1.6rem;
@@ -33,14 +31,12 @@
 .my-toolbar .btn { padding: .68rem 1.4rem; font-size: .9rem; }
 .my-toolbar .btn-spacer { margin-left: auto; }
 
-/* ---------- 版面 ---------- */
 .my-page { background: var(--bg-warm); padding: .6rem 0 3.4rem; }
 
-/* ---------- 表格 ---------- */
 .my-table-wrap {
 	background: #fff; border: 1px solid var(--line);
 	border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
-	overflow: hidden;
+	overflow: visible;
 }
 .my-table {
 	width: 100%; border-collapse: collapse; table-layout: fixed;
@@ -48,11 +44,13 @@
 .my-table th, .my-table td {
 	padding: .9rem 1rem; text-align: left; font-size: .92rem; vertical-align: middle;
 }
-.my-table th:nth-child(1), .my-table td:nth-child(1) { width: 34%; }
-.my-table th:nth-child(2), .my-table td:nth-child(2) { width: 15%; white-space: nowrap; }
-.my-table th:nth-child(3), .my-table td:nth-child(3) { width: 10%; }
-.my-table th:nth-child(4), .my-table td:nth-child(4) { width: 13%; }
-.my-table th:nth-child(5), .my-table td:nth-child(5) { width: 28%; }
+.my-table th:nth-child(1), .my-table td:nth-child(1) { width: 45px; padding-left: 1.2rem; }
+.my-table th:nth-child(2), .my-table td:nth-child(2) { width: 36%; }
+.my-table th:nth-child(3), .my-table td:nth-child(3) { width: 16%; }
+.my-table th:nth-child(4), .my-table td:nth-child(4) { width: 11%; white-space: nowrap; }
+.my-table th:nth-child(5), .my-table td:nth-child(5) { width: 15%; white-space: nowrap; }
+.my-table th:nth-child(6), .my-table td:nth-child(6) { width: 14%; }
+.my-table th:last-child, .my-table td:last-child { padding-right: 1.5rem; }
 
 .my-table thead th {
 	background: var(--pink-soft); color: var(--ink);
@@ -66,28 +64,18 @@
 .my-table tbody tr:last-child td { border-bottom: none; }
 .my-table tbody tr:hover td { background: rgba(255, 250, 238, .6); }
 
-/* ---------- 狀態標籤 ---------- */
 .status-badge {
-	display: inline-flex; align-items: center; gap: .3rem;
-	font-size: .78rem; font-weight: 500; letter-spacing: .06em;
-	padding: .25rem .7rem; border-radius: 999px;
-}
-.status-badge::before {
-	content: ""; width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+	display: inline-flex; align-items: center; justify-content: center; gap: .3rem;
+	font-size: .84rem; font-weight: 600; letter-spacing: .06em;
+	padding: .3rem .85rem; border-radius: 999px; white-space: nowrap;
 }
 .status-draft { background: #f0ebe3; color: var(--ink-soft); }
-.status-draft::before { background: var(--ink-soft); }
 .status-pending { background: var(--blue-soft); color: #4F7B96; }
-.status-pending::before { background: #4F7B96; }
 .status-published { background: #e2f0de; color: #5A7A57; }
-.status-published::before { background: #5A7A57; }
 .status-rejected { background: #fde6e6; color: #c0392b; }
-.status-rejected::before { background: #c0392b; }
 .status-unpublished { background: #f0ebe3; color: #8c7e71; }
-.status-unpublished::before { background: #8c7e71; }
 
-/* ---------- 操作按鈕 ---------- */
-.action-cell { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+.action-cell { display: flex; align-items: center; gap: .6rem; }
 .action-cell form { display: flex; align-items: center; }
 
 .act-btn {
@@ -103,21 +91,52 @@
 	background: var(--orange); color: #fff; border-color: var(--orange);
 	transform: translateY(-1px);
 }
-.act-btn.act-danger:hover {
-	background: #e74c3c; color: #fff; border-color: #e74c3c;
-}
 .act-btn.act-view:hover {
 	background: var(--bg-soothing); color: var(--ink); border-color: var(--bg-soothing);
+}
+.act-btn.act-reject {
+	border-color: #e8b4b4; color: #c0392b; background: #fdf0f0;
+}
+.act-btn.act-reject:hover {
+	background: #c0392b; color: #fff; border-color: #c0392b;
 }
 .act-btn.disabled {
 	opacity: .35; pointer-events: none; cursor: default;
 }
 
-/* ---------- 分頁 ---------- */
+.dot-menu { position: relative; }
+.dot-trigger {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 34px; height: 34px;
+	font-size: 1.3rem; line-height: 1;
+	border: 1.4px solid var(--line); border-radius: 50%;
+	background: #fff; color: var(--ink-soft);
+	cursor: pointer; transition: all .2s;
+}
+.dot-trigger:hover { background: var(--bg-warm); border-color: var(--orange); color: var(--orange); }
+.dot-menu.open .dot-trigger { border-color: var(--orange); color: var(--orange); box-shadow: 0 0 0 2px rgba(232,135,37,.15); }
+.dot-panel {
+	display: none; position: absolute; top: calc(100% + 6px); right: 0;
+	min-width: 110px; background: #fff;
+	border: 1.4px solid var(--line); border-radius: 12px;
+	box-shadow: var(--shadow-md); z-index: 9999; padding: .3rem 0;
+}
+.dot-menu.open .dot-panel { display: block; }
+.dot-item {
+	display: block; width: 100%; padding: .55rem 1rem;
+	font-size: .86rem; color: var(--ink); font-family: inherit;
+	cursor: pointer; text-align: left; text-decoration: none;
+	background: none; border: none;
+	transition: background .15s; white-space: nowrap;
+}
+.dot-item:hover { background: #f6f1e8; }
+.dot-item.dot-disabled { color: #ccc; pointer-events: none; }
+.dot-item.dot-danger { color: #e74c3c; }
+.dot-item.dot-danger:hover { background: #fef2f2; }
+
 .my-bottom { border-top: 1px solid var(--line); margin-top: 2.6rem; padding-top: .6rem; }
 .my-bottom .pager { margin-top: 1.6rem; }
 
-/* ---------- 查無結果 ---------- */
 .empty-state {
 	background: #fff; border: 1px dashed var(--line);
 	border-radius: var(--radius-md); padding: 3.4rem 1.5rem; text-align: center;
@@ -126,7 +145,6 @@
 .empty-state b { display: block; font-family: var(--serif); font-size: 1.15rem; margin-bottom: .3rem; }
 .empty-state p { color: var(--ink-soft); font-size: .92rem; margin: 0 0 1.4rem; }
 
-/* ---------- Modal ---------- */
 .modal-overlay {
 	display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
 	background: rgba(0,0,0,0.35); z-index: 200;
@@ -156,7 +174,67 @@
 }
 .modal-close:hover { background: var(--orange-deep); }
 
-/* ---------- RWD ---------- */
+.custom-select { position: relative; display: inline-block; }
+.custom-select-trigger {
+	display: inline-flex; align-items: center; gap: .4rem;
+	height: 38px; padding: 0 2rem 0 .9rem;
+	font-size: .88rem; font-family: inherit; color: var(--ink);
+	border: 1.4px solid var(--line); border-radius: 999px;
+	background: #fff; cursor: pointer; white-space: nowrap;
+	transition: border-color .2s;
+	user-select: none; position: relative;
+}
+.custom-select-trigger::after {
+	content: ""; position: absolute; right: .7rem; top: 50%;
+	border: 4px solid transparent; border-top: 5px solid var(--ink-soft);
+	transform: translateY(-1px);
+	transition: transform .2s;
+}
+.custom-select.open .custom-select-trigger::after {
+	transform: translateY(-4px) rotate(180deg);
+}
+.custom-select-trigger:hover { border-color: var(--orange); }
+.custom-select.open .custom-select-trigger {
+	border-color: var(--orange); box-shadow: 0 0 0 2px rgba(232,135,37,.15);
+}
+.custom-select-panel {
+	display: none; position: absolute; top: calc(100% + 4px); left: 0;
+	min-width: 100%; max-height: 220px; overflow-y: auto;
+	background: #fff; border: 1.4px solid var(--line);
+	border-radius: 12px; box-shadow: var(--shadow-md);
+	z-index: 100; padding: .3rem 0;
+}
+.custom-select.open .custom-select-panel { display: block; }
+.custom-select-option {
+	padding: .55rem 1rem; font-size: .88rem; color: var(--ink);
+	cursor: pointer; transition: background .15s;
+	white-space: nowrap;
+}
+.custom-select-option:hover { background: #f6f1e8; }
+.custom-select-option.selected {
+	font-weight: 600; color: var(--orange);
+}
+
+.chk-col { width: 45px !important; text-align: left !important; }
+.chk-col input[type="checkbox"] {
+	width: 17px; height: 17px; cursor: pointer; accent-color: var(--orange); vertical-align: middle;
+}
+.batch-bar {
+	display: none; align-items: center; gap: .8rem;
+	margin-bottom: 1rem; padding: .7rem 1.2rem;
+	background: #fff8ef; border: 1.4px solid var(--orange);
+	border-radius: var(--radius-md); font-size: .9rem; color: var(--ink);
+}
+.batch-bar.show { display: flex; }
+.batch-bar .batch-count { font-weight: 600; color: var(--orange); }
+.batch-bar .batch-delete-btn {
+	margin-left: auto; padding: .5rem 1.2rem;
+	font-size: .86rem; font-weight: 500; font-family: inherit;
+	background: #e74c3c; color: #fff; border: none;
+	border-radius: 999px; cursor: pointer; transition: background .2s;
+}
+.batch-bar .batch-delete-btn:hover { background: #c0392b; }
+
 @media (max-width: 900px) {
 	.my-table-wrap { overflow-x: auto; }
 	.my-table { min-width: 700px; table-layout: auto; }
@@ -170,10 +248,8 @@
 
 <body>
 
-<!-- ================= 導覽列 ================= -->
 <div th:replace="~{fragments/header :: header}"></div>
 
-<!-- ================= 頁首標題 ================= -->
 <section class="my-head">
 	<div class="wrap">
 		<div class="crumb">
@@ -185,24 +261,64 @@
 	</div>
 </section>
 
-<!-- ================= 主體 ================= -->
 <section class="my-page">
 	<div class="wrap">
 
-		<!-- 頂部動作列 -->
 		<div class="my-toolbar">
 			<a class="btn btn-primary" th:href="@{/psych/article/create}">
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
 				新增文章
 			</a>
 			<a class="btn btn-outline" th:href="@{/psych/article/myArticles/statsDashboard}">數據總覽</a>
+
+			<div class="btn-spacer"></div>
+
+			<div class="custom-select" id="filterCatWrap">
+				<div class="custom-select-trigger" id="filterCatTrigger">全部分類</div>
+				<div class="custom-select-panel">
+					<div class="custom-select-option" data-value="">全部分類</div>
+					<div th:each="cat : ${articleCats}"
+						 class="custom-select-option"
+						 th:data-value="${cat.articleCatId}"
+						 th:text="${cat.articleCatName}"
+						 th:classappend="${selectedCatId != null and selectedCatId == cat.articleCatId} ? ' selected'"></div>
+				</div>
+				<input type="hidden" id="filterCat" th:value="${selectedCatId}" />
+			</div>
+
+			<div class="custom-select" id="filterStatusWrap">
+				<div class="custom-select-trigger" id="filterStatusTrigger">全部狀態</div>
+				<div class="custom-select-panel">
+					<div class="custom-select-option" data-value="">全部狀態</div>
+					<div class="custom-select-option" data-value="0" th:classappend="${selectedStatus != null and selectedStatus == 0} ? ' selected'">草稿</div>
+					<div class="custom-select-option" data-value="1" th:classappend="${selectedStatus != null and selectedStatus == 1} ? ' selected'">送審中</div>
+					<div class="custom-select-option" data-value="2" th:classappend="${selectedStatus != null and selectedStatus == 2} ? ' selected'">已上架</div>
+					<div class="custom-select-option" data-value="3" th:classappend="${selectedStatus != null and selectedStatus == 3} ? ' selected'">審核未過</div>
+					<div class="custom-select-option" data-value="4" th:classappend="${selectedStatus != null and selectedStatus == 4} ? ' selected'">已下架</div>
+				</div>
+				<input type="hidden" id="filterStatus" th:value="${selectedStatus}" />
+			</div>
+
+			<div class="custom-select" id="filterSortWrap">
+				<div class="custom-select-trigger" id="filterSortTrigger">最新優先</div>
+				<div class="custom-select-panel">
+					<div class="custom-select-option" data-value="newest" th:classappend="${selectedSort == null or selectedSort == 'newest'} ? ' selected'">最新優先</div>
+					<div class="custom-select-option" data-value="oldest" th:classappend="${selectedSort == 'oldest'} ? ' selected'">最舊優先</div>
+				</div>
+				<input type="hidden" id="filterSort" th:value="${selectedSort}" />
+			</div>
 		</div>
 
-		<!-- 表格 -->
+		<div class="batch-bar" id="batchBar">
+			已選取 <span class="batch-count" id="batchCount">0</span> 篇草稿
+			<button type="button" class="batch-delete-btn" id="batchDeleteBtn">批次刪除</button>
+		</div>
+
 		<div class="my-table-wrap" th:if="${articleList != null and !articleList.isEmpty()}">
 			<table class="my-table">
 			<thead>
 				<tr>
+					<th class="chk-col"><input type="checkbox" id="checkAll" title="全選" /></th>
 					<th>標題</th>
 					<th>文章分類</th>
 					<th>狀態</th>
@@ -212,6 +328,11 @@
 			</thead>
 			<tbody>
 				<tr th:each="item : ${articleList}">
+					<td class="chk-col">
+						<input th:if="${item.article.articleStatus == 0 or item.article.articleStatus == 3}"
+							   type="checkbox" class="row-chk"
+							   th:value="${item.article.articleId}" />
+					</td>
 					<td style="color:var(--ink); font-weight:500;" th:text="${item.article.title}"></td>
 					<td th:text="${item.article.articleCat != null ? item.article.articleCat.articleCatName : '未分類'}"></td>
 					<td th:switch="${item.article.articleStatus}">
@@ -222,68 +343,54 @@
 						<span th:case="4" class="status-badge status-unpublished">已下架</span>
 						<span th:case="*" class="status-badge status-draft">未知</span>
 					</td>
-					<td th:text="${item.article.createdAt}"></td>
+					<td th:text="${#temporals.format(item.article.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
 					<td>
 					<div class="action-cell">
-					<!-- 草稿+已發布：編輯 已發布：送審, 刪除 -->
-				    <a th:if="${item.article.articleStatus == 0 || item.article.articleStatus == 2}"
-				       th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
-				       class="act-btn">編輯</a>
-				
-				    <form th:if="${item.article.articleStatus == 0}"
-				          th:action="@{/psych/article/{id}/submit(id=${item.article.articleId})}"
-				          method="post">
-				        <button type="submit" class="act-btn">送審</button>
-				    </form>
-				
-				    <form th:if="${item.article.articleStatus == 0}"
-				          th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
-				          method="post"
-				          onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原');">
-				        <button type="submit" class="act-btn act-danger">刪除</button>
-				    </form>
-				
-				    <!-- 審核中 -->
-				    <span th:if="${item.article.articleStatus == 1}"
-				       class="act-btn disabled">審核中</span>
-				
-				    <!-- 已發布：查看, 下架 -->
-					<a th:if="${item.article.articleStatus == 2}"
+					<a th:if="${item.article.articleStatus == 2 or item.article.articleStatus == 4}"
 					   th:href="@{/article/{id}(id=${item.article.articleId})}"
-					   target="_blank"
-					   class="act-btn act-view">查看</a>
-				    <form th:if="${item.article.articleStatus == 2}"
-				          th:action="@{/psych/article/{id}/unpublish(id=${item.article.articleId})}"
-				          method="post"
-				          onsubmit="return confirm('確定要下架此文章嗎？');">
-				        <button type="submit" class="act-btn act-danger">下架</button>
-				    </form>
-				
-				    <!-- 審核未通過：編輯, 查看退回原因, 刪除 -->
-				    <a th:if="${item.article.articleStatus == 3}"
-					   th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
-					   class="act-btn">編輯</a>
-
+					   target="_blank" class="act-btn act-view">查看</a>
 					<button th:if="${item.article.articleStatus == 3}"
-					        class="act-btn act-view"
+					        class="act-btn act-reject"
 					        th:data-reason="${item.article.rejectReason}"
 					        th:data-note="${item.article.rejectNote}"
 					        onclick="showRejectDetail(this)">查看</button>
-				
-					<form th:if="${item.article.articleStatus == 3}"
-					      th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
-					      method="post"
-					      onsubmit="return confirm('確定要刪除此草稿嗎？刪除後無法復原。');">
-					    <button type="submit" class="act-btn act-danger">刪除</button>
-					</form>
+					<span th:if="${item.article.articleStatus == 0 or item.article.articleStatus == 1}"
+					      class="act-btn disabled">查看</span>
 
-				    <!-- 已下架：編輯(disabled), 查看(active), 下架(disabled) -->
-				    <span th:if="${item.article.articleStatus == 4}" class="act-btn disabled">編輯</span>
-					<a th:if="${item.article.articleStatus == 4}"
-					   th:href="@{/article/{id}(id=${item.article.articleId})}"
-					   target="_blank"
-					   class="act-btn act-view">查看</a>
-					<span th:if="${item.article.articleStatus == 4}" class="act-btn disabled">下架</span>
+					<div class="dot-menu">
+						<button type="button" class="dot-trigger" onclick="toggleDotMenu(this)">&#8942;</button>
+						<div class="dot-panel">
+							<a th:if="${item.article.articleStatus == 0 or item.article.articleStatus == 2 or item.article.articleStatus == 3}"
+							   th:href="@{/psych/article/{id}/edit(id=${item.article.articleId}, page=${currentPage})}"
+							   class="dot-item">編輯</a>
+							<span th:if="${item.article.articleStatus != 0 and item.article.articleStatus != 2 and item.article.articleStatus != 3}"
+							      class="dot-item dot-disabled">編輯</span>
+
+							<form th:if="${item.article.articleStatus == 0}"
+							      th:action="@{/psych/article/{id}/submit(id=${item.article.articleId})}"
+							      method="post" style="margin:0">
+								<button type="submit" class="dot-item">送審</button>
+							</form>
+							<span th:if="${item.article.articleStatus != 0}" class="dot-item dot-disabled">送審</span>
+
+							<form th:if="${item.article.articleStatus == 2}"
+							      th:action="@{/psych/article/{id}/unpublish(id=${item.article.articleId})}"
+							      method="post" style="margin:0"
+							      onsubmit="return confirm('確定要下架此文章嗎？');">
+								<button type="submit" class="dot-item dot-danger">下架</button>
+							</form>
+							<span th:if="${item.article.articleStatus != 2}" class="dot-item dot-disabled">下架</span>
+
+							<form th:if="${item.article.articleStatus == 0 or item.article.articleStatus == 3}"
+							      th:action="@{/psych/article/{id}/delete(id=${item.article.articleId})}"
+							      method="post" style="margin:0"
+							      onsubmit="return confirm('確定要刪除嗎？刪除後無法復原。');">
+								<button type="submit" class="dot-item dot-danger">刪除</button>
+							</form>
+							<span th:if="${item.article.articleStatus != 0 and item.article.articleStatus != 3}"
+							      class="dot-item dot-disabled">刪除</span>
+						</div>
+					</div>
 					</div>
 					</td>
 
@@ -292,19 +399,17 @@
 			</table>
 		</div>
 
-		<!-- 查無結果 -->
 		<div class="empty-state" th:if="${articleList == null or articleList.isEmpty()}">
 			<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
 				<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
 				<path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>
-			<b>還沒有文章</b>
-			<p>點擊「新增文章」開始撰寫你的第一篇吧。</p>
+			<b>目前沒有符合條件的文章</b>
+			<p>試試調整篩選條件，或撰寫一篇新文章吧。</p>
 			<a class="btn btn-primary" th:href="@{/psych/article/create}">新增文章</a>
 		</div>
 
-		<!-- 分頁 -->
 		<div class="my-bottom" th:if="${articlePage != null and articlePage.totalPages > 1}">
-			<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, @{/psych/article/myArticles}, '')}"></div>
+			<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, @{/psych/article/myArticles}, ${filterQueryString})}"></div>
 		</div>
 
 	</div>
@@ -313,11 +418,9 @@
 <svg class="wave" viewBox="0 0 1440 64" preserveAspectRatio="none" aria-hidden="true">
 	<path d="M0 34C180-8 360-8 540 20s360 44 540 8 360-40 360-40v40H0Z" fill="#FFFFFF" /></svg>
 
-<!-- ================= Footer ================= -->
 <div th:replace="~{fragments/footer :: footer}"></div>
 <div th:replace="~{fragments/footer :: backToTop}"></div>
 
-<!-- 退回原因 Modal -->
 <div id="rejectModal" class="modal-overlay" onclick="closeModal(event)">
     <div class="modal-box">
         <h3>退回原因</h3>
@@ -335,6 +438,75 @@
 
 <script th:src="@{/js/nav.js}" src="/js/nav.js"></script>
 <script>
+	function initCustomSelect(wrapId, triggerId, hiddenId, onChange) {
+		var wrap = document.getElementById(wrapId);
+		var trigger = document.getElementById(triggerId);
+		var hidden = document.getElementById(hiddenId);
+		var options = wrap.querySelectorAll('.custom-select-option');
+
+		var selectedOpt = wrap.querySelector('.custom-select-option.selected');
+		if (selectedOpt) {
+			trigger.textContent = selectedOpt.textContent;
+		}
+
+		trigger.addEventListener('click', function(e) {
+			e.stopPropagation();
+			document.querySelectorAll('.custom-select.open').forEach(function(el) {
+				if (el !== wrap) el.classList.remove('open');
+			});
+			wrap.classList.toggle('open');
+		});
+
+		options.forEach(function(opt) {
+			opt.addEventListener('click', function(e) {
+				e.stopPropagation();
+				options.forEach(function(o) { o.classList.remove('selected'); });
+				opt.classList.add('selected');
+				trigger.textContent = opt.textContent;
+				hidden.value = opt.getAttribute('data-value');
+				wrap.classList.remove('open');
+				if (onChange) onChange();
+			});
+		});
+	}
+
+	document.addEventListener('click', function() {
+		document.querySelectorAll('.custom-select.open').forEach(function(el) {
+			el.classList.remove('open');
+		});
+	});
+
+	function applyFilters() {
+		var catId = document.getElementById('filterCat').value;
+		var status = document.getElementById('filterStatus').value;
+		var sort = document.getElementById('filterSort').value;
+		var params = new URLSearchParams();
+		if (catId) params.set('catId', catId);
+		if (status) params.set('status', status);
+		if (sort && sort !== 'newest') params.set('sort', sort);
+		var qs = params.toString();
+		window.location.href = '/psych/article/myArticles' + (qs ? '?' + qs : '');
+	}
+
+	initCustomSelect('filterCatWrap', 'filterCatTrigger', 'filterCat', applyFilters);
+	initCustomSelect('filterStatusWrap', 'filterStatusTrigger', 'filterStatus', applyFilters);
+	initCustomSelect('filterSortWrap', 'filterSortTrigger', 'filterSort', applyFilters);
+</script>
+<script>
+	function toggleDotMenu(btn) {
+		var menu = btn.closest('.dot-menu');
+		var isOpen = menu.classList.contains('open');
+		document.querySelectorAll('.dot-menu.open').forEach(function(el) { el.classList.remove('open'); });
+		if (!isOpen) {
+			menu.classList.add('open');
+		}
+	}
+	document.addEventListener('click', function(e) {
+		if (!e.target.closest('.dot-menu')) {
+			document.querySelectorAll('.dot-menu.open').forEach(function(el) { el.classList.remove('open'); });
+		}
+	});
+
 	function showRejectDetail(btn) {
 		const reasonMap = {
 	            '0': '內容品質',
@@ -357,6 +529,68 @@
 	            document.getElementById('rejectModal').classList.remove('active');
 	        }
 	    }
+</script>
+
+<script>
+(function() {
+	var checkAll = document.getElementById('checkAll');
+	var batchBar = document.getElementById('batchBar');
+	var batchCount = document.getElementById('batchCount');
+	var batchDeleteBtn = document.getElementById('batchDeleteBtn');
+
+	if (!checkAll) return;
+
+	var rowChks = document.querySelectorAll('.row-chk');
+
+	function updateBatchBar() {
+		var checked = document.querySelectorAll('.row-chk:checked');
+		var count = checked.length;
+		batchCount.textContent = count;
+		if (count > 0) {
+			batchBar.classList.add('show');
+		} else {
+			batchBar.classList.remove('show');
+		}
+	}
+
+	checkAll.addEventListener('change', function() {
+		var isChecked = checkAll.checked;
+		rowChks.forEach(function(chk) { chk.checked = isChecked; });
+		updateBatchBar();
+	});
+
+	rowChks.forEach(function(chk) {
+		chk.addEventListener('change', function() {
+			var allChecked = rowChks.length > 0 &&
+				document.querySelectorAll('.row-chk:checked').length === rowChks.length;
+			checkAll.checked = allChecked;
+			updateBatchBar();
+		});
+	});
+
+	batchDeleteBtn.addEventListener('click', function() {
+		var checked = document.querySelectorAll('.row-chk:checked');
+		if (checked.length === 0) return;
+
+		if (!confirm('確定要刪除選取的 ' + checked.length + ' 篇草稿嗎？刪除後無法復原。')) return;
+
+		var ids = [];
+		checked.forEach(function(chk) { ids.push(chk.value); });
+
+		var form = document.createElement('form');
+		form.method = 'POST';
+		form.action = '/psych/article/batchDelete';
+		ids.forEach(function(id) {
+			var input = document.createElement('input');
+			input.type = 'hidden';
+			input.name = 'articleIds';
+			input.value = id;
+			form.appendChild(input);
+		});
+		document.body.appendChild(form);
+		form.submit();
+	});
+})();
 </script>
 
 </body>

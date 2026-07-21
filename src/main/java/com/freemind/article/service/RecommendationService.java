@@ -12,5 +12,6 @@ public interface RecommendationService {
 	
 	List<Article> getArticleRecommendation(Member member, Integer articleId);
 	
-	List<Course> getCourseRecommendation(Member member);
+	List<Course> getCourseRecommendation(Integer articleId);       
+	
 }

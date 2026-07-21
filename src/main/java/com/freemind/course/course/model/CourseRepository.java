@@ -92,5 +92,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer>, JpaSpe
 
 	Page<Course> findByCourseStatusAndCourseCategories_CourseCatId(Byte courseStatus, Integer courseCatId,
 			Pageable pageable);
+	
+	@Query("SELECT c FROM Course c " + 
+	       "WHERE c.courseStatus = 4 AND c.courseCategories.courseCatId = :catId " +
+	       "ORDER BY c.saveCount DESC, c.reviewCount DESC, c.starCount DESC, c.courseId DESC " +
+	       "LIMIT 3")
+	List<Course> findPopularCoursesByCat(@Param("catId")Integer catId);
 
 }
