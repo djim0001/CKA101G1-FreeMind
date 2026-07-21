@@ -229,6 +229,28 @@
 
 	textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
 
+	/* 範本套用列:放在通知內容的 textarea 上方 */
+	.tpl-row {
+		display: flex;
+		align-items: center;
+		gap: .75rem;
+		margin-bottom: .9rem;
+	}
+
+	.tpl-row select { flex: 1; min-width: 0; }
+
+	.tpl-link {
+		flex: 0 0 auto;
+		font-size: .82rem;
+		font-weight: 700;
+		color: var(--ink-soft);
+		white-space: nowrap;
+		border-bottom: 1px solid transparent;
+		transition: color .16s ease, border-color .16s ease;
+	}
+
+	.tpl-link:hover { color: var(--orange-deep); border-bottom-color: var(--orange); }
+
 	.char-count {
 		display: block;
 		margin-top: .4rem;
@@ -413,7 +435,18 @@
 						<span class="step-num">4</span>
 						<p class="field-label">通知內容</p>
 					</div>
-					<textarea name="content" maxlength="1000" placeholder="最多1000字" id="contentInput"></textarea>
+					<!-- 套用通知範本:select 刻意不給 name,純前端輔助,不會送出 -->
+					<div class="tpl-row" th:if="${templateOptions != null and !templateOptions.isEmpty()}">
+						<select id="tplSelect" aria-label="套用通知範本">
+							<option value="">— 不套用範本(自行輸入)—</option>
+							<option th:each="t : ${templateOptions}"
+								th:value="${t.templateContent}"
+								th:text="'#' + ${t.templateId} + '　' + ${#strings.abbreviate(t.templateContent, 40)}">#1 範本內容</option>
+						</select>
+						<a class="tpl-link" th:href="@{/admin/notice/listAllNoticeTemplate}">管理範本</a>
+					</div>
+
+					<textarea name="content" maxlength="1000" placeholder="最多1000字,或從上方選用範本" id="contentInput"></textarea>
 					<span class="char-count"><span id="charNow">0</span> / 1000</span>
 				</div>
 
@@ -468,6 +501,26 @@
 	contentInput.addEventListener('input', () => {
 		charNow.textContent = contentInput.value.length;
 	});
-	</script>
+
+	// 套用通知範本:選了就把內容填進 textarea(仍可再手動編輯)
+	const tplSelect = document.getElementById('tplSelect');
+	if (tplSelect) {
+		tplSelect.addEventListener('change', () => {
+			const tpl = tplSelect.value;
+			if (!tpl) return; // 選回「不套用範本」:保留已輸入的內容,不清空
+
+			// 已經打了字才確認,避免辛苦寫好的內容被無聲覆蓋
+			if (contentInput.value.trim() &&
+				!confirm('目前已輸入的內容將被範本取代,確定嗎?')) {
+				tplSelect.value = ''; // 取消:下拉還原,內容不動
+				return;
+			}
+
+			contentInput.value = tpl;
+			// 手動觸發 input 事件,讓上面的字數計數同步更新
+			contentInput.dispatchEvent(new Event('input'));
+		});
+	}
+</script>
 </body>
 </html>

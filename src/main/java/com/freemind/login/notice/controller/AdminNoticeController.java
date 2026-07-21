@@ -18,6 +18,7 @@ import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberRepository;
 import com.freemind.login.notice.dto.PersonOption;
 import com.freemind.login.notice.service.NoticeService;
+import com.freemind.login.notice.service.NoticeTemplateService;
 import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.repository.PsychologistRepository;
 
@@ -29,13 +30,16 @@ public class AdminNoticeController {
 	private final MemberRepository memberRepository;
 	private final PsychologistRepository psychologistRepository;
 	private final AdminService adminSvc;
+	private final NoticeTemplateService noticeTemplateService;
 	public AdminNoticeController(NoticeService noticeService,
 			MemberRepository memberRepository, AdminService adminSvc,
-			PsychologistRepository psychologistRepository) {
+			PsychologistRepository psychologistRepository,
+			NoticeTemplateService noticeTemplateService) {
 		this.noticeService = noticeService;
 		this.memberRepository = memberRepository;
 		this.adminSvc = adminSvc;
 		this.psychologistRepository = psychologistRepository;
+		this.noticeTemplateService = noticeTemplateService;
 	}
 	@ModelAttribute("admin")
     public Admin currentAdmin(Authentication authentication) {
@@ -113,7 +117,9 @@ public class AdminNoticeController {
 	public String sendPage(Model model) {
 		model.addAttribute("memberOptions", memberRepository.findAll());
 		model.addAttribute("psychOptions", psychologistRepository.findAll());
-		return "back-end/login/notice/adminSendNotice"; 
+		// 通知範本：供發送頁的下拉選單套用，選了就把內容填進 content 欄位
+		model.addAttribute("templateOptions", noticeTemplateService.getAll());
+		return "back-end/login/notice/adminSendNotice";
 	}
 
 	private Integer getLoginAdminId(Authentication auth) {
