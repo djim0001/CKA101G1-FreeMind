@@ -90,7 +90,11 @@ public class ArticleController {
 			dateTo = null;
 		}
 
-		Page<Article> articlePage = articleService.getPublishedArticles(catId, keyword, dateFrom, dateTo, page, sort);
+		Article featuredArticle = articleInteractionService.getMostSavedArticle();
+		model.addAttribute("featuredArticle", featuredArticle);
+
+		Integer excludeId = (featuredArticle != null) ? featuredArticle.getArticleId() : null;
+		Page<Article> articlePage = articleService.getPublishedArticles(catId, keyword, dateFrom, dateTo, page, sort, excludeId);
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("currentPage", page);
 		model.addAttribute("selectedCatId", catId);
@@ -99,13 +103,10 @@ public class ArticleController {
 		model.addAttribute("dateFrom", dateFrom);
 		model.addAttribute("dateTo", dateTo);
 		model.addAttribute("dateError", dateError);
-		
+
 		List<Integer> hotIds = articleViewService.getHotArticleIds(3);
 		List<Article> hotArticles = articleService.getPublishedArticlesByIds(hotIds);
 		model.addAttribute("hotArticles", hotArticles);
-		
-		Article featuredArticle = articleInteractionService.getMostSavedArticle();
-		model.addAttribute("featuredArticle", featuredArticle);
 		
 		return "front-end/member/article/articleList";
 	}

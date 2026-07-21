@@ -263,12 +263,6 @@
 
 <body>
 
-<!--
-  Model 屬性（ArticleController 未更動）
-    articleCats / articlePage / currentPage / selectedCatId / keyword / hotArticles
-  ★ ArticleCat getter：articleCatId / articleCatName（共 4 處）
-  ★ 精選 = 第 1 頁第一篇；下方格線用 th:unless 跳過不重複
--->
 <th:block th:with="
 	kw           = ${keyword == null ? '' : keyword},
 	qs           = ${(selectedCatId == null ? '' : 'catId=' + selectedCatId)
@@ -276,7 +270,7 @@
 	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))
 	                 + (dateFrom == null ? '' : '&amp;dateFrom=' + dateFrom)
 	                 + (dateTo == null ? '' : '&amp;dateTo=' + dateTo)},
-	showFeatured = ${featuredArticle != null and currentPage == 1}">
+	showFeatured = ${featuredArticle != null}">
 
 	<!-- ================= 導覽列 ================= -->
 	<div th:replace="~{fragments/header :: header}"></div>
@@ -437,7 +431,7 @@
 					<!-- 文章卡片列表 -->
 					<div class="art-list" th:if="${articlePage != null and articlePage.hasContent()}">
 						<th:block th:each="art, st : ${articlePage.content}">
-							<a class="art-card" th:unless="${showFeatured and art.articleId == featuredArticle.articleId}"
+							<a class="art-card"
 							   th:href="@{'/article/' + ${art.articleId}(page=${currentPage}, catId=${selectedCatId})}" href="#"
 							   th:with="plain=${art.content == null ? '' :
 							                   art.content.replaceAll('\x3C[^\x3E]*\x3E',' ')

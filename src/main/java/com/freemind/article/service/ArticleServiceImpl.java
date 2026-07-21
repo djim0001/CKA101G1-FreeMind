@@ -136,18 +136,17 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 	
 	@Override
-	public Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort) {
+	public Page<Article> getPublishedArticles(Integer catId, String keyword, 
+			   								  LocalDate dateFrom, LocalDate dateTo, 
+											  Integer page, String sort, Integer excludeId) {
 		Sort orderBy = "oldest".equals(sort) ? Sort.by("publishedAt").ascending() : Sort.by("publishedAt").descending();
 		Pageable pageable = PageRequest.of(page - 1, artPageSize, orderBy);
-		
-//		if (catId != null ) return articleRepository.findByStatusAndCatId(2, catId, pageable);
-//		if (keyword != null && !keyword.isEmpty()) return articleRepository.findByStatusAndTitleOrAuthor(2, keyword, pageable);
-	
+
 		String kw = (keyword != null && !keyword.isBlank()) ? keyword : null;
 	    LocalDateTime from = (dateFrom != null) ? dateFrom.atStartOfDay() : null;
 	    LocalDateTime to   = (dateTo != null)   ? dateTo.plusDays(1).atStartOfDay() : null;
 
-	    return articleRepository.searchArticles(2, catId, kw, from, to, pageable);
+	    return articleRepository.searchArticles(2, excludeId, catId, kw, from, to, pageable);
 	}
 	
 	@Override
