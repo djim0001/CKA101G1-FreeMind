@@ -76,7 +76,7 @@ INSERT INTO member VALUES
 (5, 'user05', '5555', 1, '上上億', '女', '0945678901', '2000-02-29', '新北市', '板橋區', '縣民大道二段7號', '2025-12-01 09:00:00', NULL, NULL, NULL, '1000million@example.com', NULL),
 (6, 'user06', '6666', 1, '上上上億', '男', '0945678901', '2000-02-29', '新北市', '板橋區', '縣民大道二段7號', '2025-12-01 09:00:00', NULL, NULL, NULL, '10000million@example.com', NULL),
 (7, 'user07', '7777', 1, '上上上上億', '女', '0945678901', '2000-02-29', '新北市', '板橋區', '縣民大道二段7號', '2025-12-01 09:00:00', NULL, NULL, NULL, '100000million@example.com', NULL),
-(8, 'user08', '8888', 2, '上上上上上億', '女', '0945678901', '2000-02-29', '新北市', '板橋區', '縣民大道二段7號', '2025-12-01 09:00:00', NULL, NULL, NULL, '1000000million@example.com', NULL),
+(8, 'user08', '8888', 0, '上上上上上億', '女', '0945678901', '2000-02-29', '新北市', '板橋區', '縣民大道二段7號', '2025-12-01 09:00:00', NULL, NULL, NULL, '1000000million@example.com', NULL),
 (9, 'user09', '9999', 1, 'user09', '男', '0900000000', NULL, NULL, NULL, NULL, '2026-01-01 10:00:00', NULL, NULL, 'user09', 'user09@example.com', NULL),
 (10, 'user10', '1010', 1, 'user10', '男', '0900000000', NULL, NULL, NULL, NULL, '2026-01-01 10:00:00', NULL, NULL, 'user10', 'user10@example.com', NULL),
 (11, 'user11', '1111', 1, 'user11', '男', '0900000000', NULL, NULL, NULL, NULL, '2026-01-01 10:00:00', NULL, NULL, 'user11', 'user11@example.com', NULL),
