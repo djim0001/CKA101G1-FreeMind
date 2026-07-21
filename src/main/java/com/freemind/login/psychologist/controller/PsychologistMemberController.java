@@ -17,6 +17,7 @@ import com.freemind.login.psychologist.dto.PsychologistProfileRes;
 import com.freemind.login.psychologist.service.ExpertiseService;
 import com.freemind.login.psychologist.service.PsychologistService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
+import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 
 @Controller
@@ -48,7 +49,7 @@ public class PsychologistMemberController {
 	        @RequestParam(required = false)
 	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate slotDate,
 	        @RequestParam(required = false) String orderBy,
-	        @AuthenticationPrincipal MemberUserDetails memberDetails,
+	        @AuthenticationPrincipal PsychUserDetails memberDetails,
 	        Model model) {
 		
 		name = blankToNull(name);
@@ -85,7 +86,7 @@ public class PsychologistMemberController {
 	    model.addAttribute("orderBy", orderBy);
 	    model.addAttribute("expertiseOptions", expertiseService.getAllExpertiseNames());
 	    if (memberDetails != null) {
-	        model.addAttribute("member", memberDetails.getMember());
+	        model.addAttribute("psych", memberDetails.getPsychologist());
 	    }
 	    
 
