@@ -1,235 +1,992 @@
 <!DOCTYPE html>
 <html lang="zh-Hant" xmlns:th="http://www.thymeleaf.org">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>我的預約紀錄｜諮由自在 Free Mind</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link
-		href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
-		rel="stylesheet" />
-	<style>
-	@font-face {
-		font-family: 'OpenHuninn';
-		src:
-			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff') format('woff'),
-			url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf') format('truetype');
-		font-weight: 400;
-		font-style: normal;
-		font-display: swap;
-	}
-	:root {
-		--bg-warm: #FFFAEE; --bg-soothing: #C2D9ED; --blue-soft: #DCEAF5;
-		--orange: #F58E6B; --orange-deep: #E5764F; --pink: #FBD0BE; --pink-soft: #FDE6DB;
-		--ink: #3A4B53; --ink-soft: #6b7981; --white: #FFFFFF; --line: #ecdfce;
-		--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07); --shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
-		--radius-lg: 34px; --radius-md: 22px;
-		--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
-		--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
-		--sans: "Noto Sans TC", system-ui, sans-serif;
-		--script: "Caveat", "OpenHuninn", cursive;
-		--display-en: "Baloo 2", sans-serif;
-	}
-	* { box-sizing: border-box; }
-	html { scroll-behavior: smooth; }
-	body { margin: 0; font-family: var(--sans); color: var(--ink); background: var(--bg-warm); line-height: 1.78; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-	a { color: inherit; text-decoration: none; }
-	img, svg { display: block; max-width: 100%; }
-	button, input, select { font: inherit; }
-	button { cursor: pointer; border: none; background: none; color: inherit; }
-	.wrap { width: min(1160px, 92vw); margin-inline: auto; }
-	.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>我的預約紀錄｜諮由自在 Free Mind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+	href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@500;600;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap"
+	rel="stylesheet" />
+<style>
+@font-face {
+	font-family: 'OpenHuninn';
+	src:
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.woff')
+		format('woff'),
+		url('https://cdn.jsdelivr.net/gh/marsnow/open-huninn-font@1.1/font/jf-openhuninn.ttf')
+		format('truetype');
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
 
-	header.nav { position: sticky; top: 0; z-index: 100; background: rgba(253, 246, 237, .85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(236, 223, 206, .7); }
-	.nav-inner { display: flex; align-items: center; gap: 1.4rem; height: 74px; }
-	.brand { display: flex; align-items: center; gap: .8rem; }
-	.logo-mind { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-start; line-height: 1; user-select: none; }
-	.logo-mind .word { display: flex; align-items: flex-end; }
-	.logo-mind .word span { display: inline-block; font-family: var(--display-en); font-weight: 700; font-size: 1.5rem; letter-spacing: -.03em; text-align: center; }
-	.logo-mind .word .m { width: 24px; color: #EFB65E; } .logo-mind .word .i { width: 9px; color: #DB93A9; }
-	.logo-mind .word .n { width: 17px; color: #8FB2C9; } .logo-mind .word .d { width: 17px; color: #9BB893; }
-	.logo-mind .faces { display: flex; align-items: flex-start; margin-top: -1px; }
-	.logo-mind .faces svg { display: block; }
-	.logo-mind .faces .fm { width: 24px; height: 11px; } .logo-mind .faces .fi { width: 9px; height: 11px; }
-	.logo-mind .faces .fn { width: 17px; height: 11px; } .logo-mind .faces .fd { width: 17px; height: 11px; }
-	.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-	.brand-text .logo { font-family: var(--zen-maru); font-weight: 700; font-size: 1.18rem; color: var(--ink); letter-spacing: .02em; }
-	.brand-text .en { margin-top: .15em; font-family: var(--display-en); font-size: .85rem; font-weight: 700; color: var(--ink-soft); letter-spacing: .24em; text-transform: uppercase; }
-	.nav-menu { display: flex; gap: .25rem; margin-left: .5rem; }
-	.nav-menu a { padding: .5rem .95rem; border-radius: 999px; font-size: .96rem; font-weight: 500; color: var(--ink-soft); white-space: nowrap; transition: background .2s, color .2s; }
-	.nav-menu a:hover, .nav-menu a.active { background: rgba(194, 217, 237, .4); color: var(--ink); }
-	.nav-right { display: flex; align-items: center; gap: .55rem; margin-left: auto; }
-	.icon-btn { position: relative; display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: transform .2s; }
-	.icon-btn:hover { transform: translateY(-2px); }
-	.icon-btn svg { width: 20px; height: 20px; stroke: var(--ink); }
-	.avatar-btn { display: grid; width: 44px; height: 44px; place-items: center; overflow: hidden; border: 2px solid #fff; border-radius: 50%; background: linear-gradient(135deg, var(--pink), var(--bg-soothing)); box-shadow: var(--shadow-sm); transition: transform .2s; }
-	.avatar-btn:hover { transform: translateY(-2px); }
-	.avatar-btn svg { width: 26px; height: 26px; }
-	.dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border: 2px solid #fff; border-radius: 50%; background: var(--orange); }
-	.pop-holder { position: relative; }
-	.pop { position: absolute; top: calc(100% + 12px); right: 0; width: 266px; padding: .6rem; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .22s ease; }
-	.pop.open { opacity: 1; visibility: visible; transform: translateY(0); }
-	.pop-head { padding: .85rem 1rem .4rem; }
-	.pop-head b { font-family: var(--serif); font-size: 1.02rem; }
-	.pop-head p { margin: .15rem 0 0; font-size: .82rem; color: var(--ink-soft); }
-	.pop-item { display: flex; align-items: center; gap: .7rem; padding: .7rem 1rem; border-radius: 13px; font-size: .93rem; color: var(--ink); transition: background .16s; }
-	.pop-item:hover, .pop-item.active { background: var(--bg-warm); }
-	.pop-item svg { flex: 0 0 auto; width: 18px; height: 18px; stroke: var(--orange); }
-	.pop-divider { height: 1px; margin: .4rem .6rem; background: var(--line); }
-	.pop-label { padding: .5rem 1rem .2rem; font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
-	.notice-summary { margin: .3rem 0; padding: .8rem 1rem; border-radius: 13px; background: var(--bg-warm); font-size: .9rem; color: var(--ink-soft); }
-	.hamburger { display: none; }
-	.mobile-menu { display: none; flex-direction: column; gap: .2rem; padding: .6rem 4vw 1.2rem; border-bottom: 1px solid var(--line); background: var(--bg-warm); }
-	.mobile-menu.open { display: flex; }
-	.mobile-menu a { padding: .7rem .4rem; border-radius: 10px; font-weight: 500; color: var(--ink); }
-	.mobile-menu a:hover, .mobile-menu a.active { background: rgba(194, 217, 237, .4); }
+:root {
+	--bg-warm: #FFFAEE;
+	--bg-soothing: #C2D9ED;
+	--blue-soft: #DCEAF5;
+	--orange: #F58E6B;
+	--orange-deep: #E5764F;
+	--pink: #FBD0BE;
+	--pink-soft: #FDE6DB;
+	--ink: #3A4B53;
+	--ink-soft: #6b7981;
+	--white: #FFFFFF;
+	--line: #ecdfce;
+	--shadow-sm: 0 4px 18px rgba(58, 75, 83, .07);
+	--shadow-md: 0 16px 44px rgba(58, 75, 83, .13);
+	--radius-lg: 34px;
+	--radius-md: 22px;
+	--serif: "OpenHuninn", "Noto Sans TC", sans-serif;
+	--zen-maru: "Zen Maru Gothic", "OpenHuninn", "Noto Sans TC", sans-serif;
+	--sans: "Noto Sans TC", system-ui, sans-serif;
+	--script: "Caveat", "OpenHuninn", cursive;
+	--display-en: "Baloo 2", sans-serif;
+}
 
-	.page-main { padding: 2.6rem 0 4.5rem; }
-	.page-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 1.6rem; padding: 0 .3rem 1.5rem; border-bottom: 1px solid var(--line); }
-	.eyebrow { display: inline-block; margin-bottom: .35rem; font-size: .8rem; font-weight: 500; letter-spacing: .22em; color: var(--orange); }
-	.page-intro h1 { margin: 0; font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.1rem); line-height: 1.2; letter-spacing: .02em; }
-	.page-intro p { max-width: 42rem; margin: .55rem 0 0; color: var(--ink-soft); font-size: 1rem; }
-	.btn { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; min-height: 40px; padding: .6rem 1.2rem; border: 1px solid transparent; border-radius: 999px; font-weight: 500; font-size: .88rem; letter-spacing: .02em; white-space: nowrap; transition: transform .2s, box-shadow .2s, background .2s, color .2s; }
-	.btn-primary { background: var(--orange); color: #fff; box-shadow: 0 8px 20px rgba(245, 142, 107, .32); }
-	.btn-primary:hover { background: var(--orange-deep); transform: translateY(-2px); }
-	.btn-secondary { border-color: var(--line); background: #fff; color: var(--ink); }
-	.btn-secondary:hover { border-color: var(--bg-soothing); background: var(--blue-soft); }
-	.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.25rem; }
-	.stat { position: relative; overflow: hidden; min-height: 118px; padding: 1.35rem 1.45rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--white); box-shadow: var(--shadow-sm); }
-	.stat::after { content: ""; position: absolute; right: -28px; bottom: -38px; width: 92px; height: 92px; border-radius: 50%; background: var(--pink-soft); }
-	.stat:nth-child(even)::after { background: var(--blue-soft); }
-	.stat span { position: relative; z-index: 1; color: var(--ink-soft); font-size: .9rem; }
-	.stat strong { position: relative; z-index: 1; display: block; margin-top: .2rem; font-family: var(--serif); font-size: 2rem; line-height: 1.2; }
-	.workspace { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--white); box-shadow: var(--shadow-md); }
-	.tabs { display: flex; gap: .35rem; padding: 1rem 1.2rem 0; border-bottom: 1px solid var(--line); background: rgba(220, 234, 245, .22); flex-wrap: wrap; }
-	.tabs button { position: relative; padding: .8rem 1.25rem .95rem; font-weight: 500; color: var(--ink-soft); }
-	.tabs button::after { content: ""; position: absolute; right: 1rem; bottom: -1px; left: 1rem; height: 3px; border-radius: 999px 999px 0 0; background: transparent; }
-	.tabs button:hover, .tabs button.active { color: var(--ink); }
-	.tabs button.active::after { background: var(--orange); }
-	.tabs .count { margin-left: .35rem; padding: .05rem .55rem; border-radius: 999px; background: var(--pink-soft); color: var(--orange-deep); font-size: .74rem; font-weight: 600; }
-	.tabs button.active .count { background: var(--orange); color: #fff; }
-	.tab-panel { padding: 1.5rem; }
-	.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 18px; }
-	table { width: 100%; border-collapse: collapse; min-width: 720px; }
-	th, td { padding: 1rem 1.05rem; text-align: left; vertical-align: middle; }
-	th { border-bottom: 1px solid var(--line); background: var(--bg-warm); font-size: .84rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
-	td { border-bottom: 1px solid rgba(236, 223, 206, .72); font-size: .9rem; }
-	tbody tr:last-child td { border-bottom: 0; }
-	tbody tr:hover { background: rgba(220, 234, 245, .16); }
-	.status { display: inline-flex; align-items: center; min-height: 28px; padding: .22rem .7rem; border-radius: 999px; background: var(--blue-soft); color: var(--ink); font-size: .8rem; font-weight: 500; white-space: nowrap; }
-	.status.pending { background: #fdf3e2; color: #b8860b; }
-	.status.success { background: #e7f4e9; color: #1a7a1a; }
-	.status.warning { background: #fff0c8; color: #8a6800; }
-	.status.danger { background: var(--pink-soft); color: var(--orange-deep); }
-	.empty-state { padding: 3.4rem 1rem; text-align: center; color: var(--ink-soft); }
-	.inline-form { display: inline-flex; margin: 0; }
-	.action-stack { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
-	.review-stars { color: #F2B01E; letter-spacing: 1px; }
-	.note-cell { max-width: 220px; white-space: normal; color: var(--ink-soft); font-size: .84rem; }
-	.tab-panel[hidden] { display: none; }
+* {
+	box-sizing: border-box;
+}
 
-	footer.ft { padding: 3.2rem 0 2rem; border-top: 1px solid var(--line); background: var(--white); }
-	.ft-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 2rem; }
-	.ft .brand { margin-bottom: 1rem; }
-	.ft-about { max-width: 22rem; color: var(--ink-soft); font-size: .9rem; }
-	.ft-col h4 { margin: .2rem 0 1rem; font-family: var(--serif); font-weight: 700; font-size: 1rem; }
-	.ft-col a { display: block; padding: .3rem 0; color: var(--ink-soft); font-size: .9rem; transition: color .16s; }
-	.ft-col a:hover { color: var(--orange); }
-	.ft-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .6rem; margin-top: 2.4rem; padding-top: 1.4rem; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: .82rem; }
-	#backToTop { position: fixed; right: 24px; bottom: 24px; z-index: 90; display: grid; width: 48px; height: 48px; place-items: center; border-radius: 50%; background: var(--orange); color: #fff; box-shadow: var(--shadow-md); opacity: 0; visibility: hidden; transform: translateY(10px); transition: opacity .25s, transform .25s, background .2s; }
-	#backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
-	#backToTop:hover { background: var(--orange-deep); }
-	#backToTop svg { width: 22px; height: 22px; }
-	:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; border-radius: 6px; }
+html {
+	scroll-behavior: smooth;
+}
 
-	@media (max-width: 1080px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-	@media (max-width: 940px) { .nav-menu { display: none; } .hamburger { display: grid; } .ft-grid { grid-template-columns: 1fr 1fr; } }
-	@media (max-width: 700px) {
-		.page-main { padding-top: 1.8rem; }
-		.page-intro { align-items: flex-start; flex-direction: column; gap: 1rem; }
-		.stats { grid-template-columns: 1fr; }
-		.tab-panel { padding: 1rem; }
+body {
+	margin: 0;
+	font-family: var(--sans);
+	color: var(--ink);
+	background: var(--bg-warm);
+	line-height: 1.78;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+img, svg {
+	display: block;
+	max-width: 100%;
+}
+
+button, input, select {
+	font: inherit;
+}
+
+button {
+	cursor: pointer;
+	border: none;
+	background: none;
+	color: inherit;
+}
+
+.wrap {
+	width: min(1160px, 92vw);
+	margin-inline: auto;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+header.nav {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	background: rgba(253, 246, 237, .85);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid rgba(236, 223, 206, .7);
+}
+
+.nav-inner {
+	display: flex;
+	align-items: center;
+	gap: 1.4rem;
+	height: 74px;
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: .8rem;
+}
+
+.logo-mind {
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	line-height: 1;
+	user-select: none;
+}
+
+.logo-mind .word {
+	display: flex;
+	align-items: flex-end;
+}
+
+.logo-mind .word span {
+	display: inline-block;
+	font-family: var(--display-en);
+	font-weight: 700;
+	font-size: 1.5rem;
+	letter-spacing: -.03em;
+	text-align: center;
+}
+
+.logo-mind .word .m {
+	width: 24px;
+	color: #EFB65E;
+}
+
+.logo-mind .word .i {
+	width: 9px;
+	color: #DB93A9;
+}
+
+.logo-mind .word .n {
+	width: 17px;
+	color: #8FB2C9;
+}
+
+.logo-mind .word .d {
+	width: 17px;
+	color: #9BB893;
+}
+
+.logo-mind .faces {
+	display: flex;
+	align-items: flex-start;
+	margin-top: -1px;
+}
+
+.logo-mind .faces svg {
+	display: block;
+}
+
+.logo-mind .faces .fm {
+	width: 24px;
+	height: 11px;
+}
+
+.logo-mind .faces .fi {
+	width: 9px;
+	height: 11px;
+}
+
+.logo-mind .faces .fn {
+	width: 17px;
+	height: 11px;
+}
+
+.logo-mind .faces .fd {
+	width: 17px;
+	height: 11px;
+}
+
+.brand-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1.15;
+}
+
+.brand-text .logo {
+	font-family: var(--zen-maru);
+	font-weight: 700;
+	font-size: 1.18rem;
+	color: var(--ink);
+	letter-spacing: .02em;
+}
+
+.brand-text .en {
+	margin-top: .15em;
+	font-family: var(--display-en);
+	font-size: .85rem;
+	font-weight: 700;
+	color: var(--ink-soft);
+	letter-spacing: .24em;
+	text-transform: uppercase;
+}
+
+.nav-menu {
+	display: flex;
+	gap: .25rem;
+	margin-left: .5rem;
+}
+
+.nav-menu a {
+	padding: .5rem .95rem;
+	border-radius: 999px;
+	font-size: .96rem;
+	font-weight: 500;
+	color: var(--ink-soft);
+	white-space: nowrap;
+	transition: background .2s, color .2s;
+}
+
+.nav-menu a:hover, .nav-menu a.active {
+	background: rgba(194, 217, 237, .4);
+	color: var(--ink);
+}
+
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	margin-left: auto;
+}
+
+.icon-btn {
+	position: relative;
+	display: grid;
+	width: 44px;
+	height: 44px;
+	place-items: center;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: var(--shadow-sm);
+	transition: transform .2s;
+}
+
+.icon-btn:hover {
+	transform: translateY(-2px);
+}
+
+.icon-btn svg {
+	width: 20px;
+	height: 20px;
+	stroke: var(--ink);
+}
+
+.avatar-btn {
+	display: grid;
+	width: 44px;
+	height: 44px;
+	place-items: center;
+	overflow: hidden;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--pink), var(--bg-soothing));
+	box-shadow: var(--shadow-sm);
+	transition: transform .2s;
+}
+
+.avatar-btn:hover {
+	transform: translateY(-2px);
+}
+
+.avatar-btn svg {
+	width: 26px;
+	height: 26px;
+}
+
+.dot {
+	position: absolute;
+	top: 9px;
+	right: 10px;
+	width: 8px;
+	height: 8px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	background: var(--orange);
+}
+
+.pop-holder {
+	position: relative;
+}
+
+.pop {
+	position: absolute;
+	top: calc(100% + 12px);
+	right: 0;
+	width: 266px;
+	padding: .6rem;
+	border: 1px solid var(--line);
+	border-radius: 20px;
+	background: #fff;
+	box-shadow: var(--shadow-md);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-8px);
+	transition: .22s ease;
+}
+
+.pop.open {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.pop-head {
+	padding: .85rem 1rem .4rem;
+}
+
+.pop-head b {
+	font-family: var(--serif);
+	font-size: 1.02rem;
+}
+
+.pop-head p {
+	margin: .15rem 0 0;
+	font-size: .82rem;
+	color: var(--ink-soft);
+}
+
+.pop-item {
+	display: flex;
+	align-items: center;
+	gap: .7rem;
+	padding: .7rem 1rem;
+	border-radius: 13px;
+	font-size: .93rem;
+	color: var(--ink);
+	transition: background .16s;
+}
+
+.pop-item:hover, .pop-item.active {
+	background: var(--bg-warm);
+}
+
+.pop-item svg {
+	flex: 0 0 auto;
+	width: 18px;
+	height: 18px;
+	stroke: var(--orange);
+}
+
+.pop-divider {
+	height: 1px;
+	margin: .4rem .6rem;
+	background: var(--line);
+}
+
+.pop-label {
+	padding: .5rem 1rem .2rem;
+	font-size: .72rem;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+	color: var(--ink-soft);
+}
+
+.notice-summary {
+	margin: .3rem 0;
+	padding: .8rem 1rem;
+	border-radius: 13px;
+	background: var(--bg-warm);
+	font-size: .9rem;
+	color: var(--ink-soft);
+}
+
+.hamburger {
+	display: none;
+}
+
+.mobile-menu {
+	display: none;
+	flex-direction: column;
+	gap: .2rem;
+	padding: .6rem 4vw 1.2rem;
+	border-bottom: 1px solid var(--line);
+	background: var(--bg-warm);
+}
+
+.mobile-menu.open {
+	display: flex;
+}
+
+.mobile-menu a {
+	padding: .7rem .4rem;
+	border-radius: 10px;
+	font-weight: 500;
+	color: var(--ink);
+}
+
+.mobile-menu a:hover, .mobile-menu a.active {
+	background: rgba(194, 217, 237, .4);
+}
+
+.page-main {
+	padding: 2.6rem 0 4.5rem;
+}
+
+.page-intro {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 2rem;
+	margin-bottom: 1.6rem;
+	padding: 0 .3rem 1.5rem;
+	border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+	display: inline-block;
+	margin-bottom: .35rem;
+	font-size: .8rem;
+	font-weight: 500;
+	letter-spacing: .22em;
+	color: var(--orange);
+}
+
+.page-intro h1 {
+	margin: 0;
+	font-family: var(--serif);
+	font-size: clamp(2rem, 4vw, 3.1rem);
+	line-height: 1.2;
+	letter-spacing: .02em;
+}
+
+.page-intro p {
+	max-width: 42rem;
+	margin: .55rem 0 0;
+	color: var(--ink-soft);
+	font-size: 1rem;
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .45rem;
+	min-height: 40px;
+	padding: .6rem 1.2rem;
+	border: 1px solid transparent;
+	border-radius: 999px;
+	font-weight: 500;
+	font-size: .88rem;
+	letter-spacing: .02em;
+	white-space: nowrap;
+	transition: transform .2s, box-shadow .2s, background .2s, color .2s;
+}
+
+.btn-primary {
+	background: var(--orange);
+	color: #fff;
+	box-shadow: 0 8px 20px rgba(245, 142, 107, .32);
+}
+
+.btn-primary:hover {
+	background: var(--orange-deep);
+	transform: translateY(-2px);
+}
+
+.btn-secondary {
+	border-color: var(--line);
+	background: #fff;
+	color: var(--ink);
+}
+
+.btn-secondary:hover {
+	border-color: var(--bg-soothing);
+	background: var(--blue-soft);
+}
+
+.stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1rem;
+	margin-bottom: 1.25rem;
+}
+
+.stat {
+	position: relative;
+	overflow: hidden;
+	min-height: 118px;
+	padding: 1.35rem 1.45rem;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-md);
+	background: var(--white);
+	box-shadow: var(--shadow-sm);
+}
+
+.stat::after {
+	content: "";
+	position: absolute;
+	right: -28px;
+	bottom: -38px;
+	width: 92px;
+	height: 92px;
+	border-radius: 50%;
+	background: var(--pink-soft);
+}
+
+.stat:nth-child(even)::after {
+	background: var(--blue-soft);
+}
+
+.stat span {
+	position: relative;
+	z-index: 1;
+	color: var(--ink-soft);
+	font-size: .9rem;
+}
+
+.stat strong {
+	position: relative;
+	z-index: 1;
+	display: block;
+	margin-top: .2rem;
+	font-family: var(--serif);
+	font-size: 2rem;
+	line-height: 1.2;
+}
+
+.workspace {
+	overflow: hidden;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-lg);
+	background: var(--white);
+	box-shadow: var(--shadow-md);
+}
+
+.tabs {
+	display: flex;
+	gap: .35rem;
+	padding: 1rem 1.2rem 0;
+	border-bottom: 1px solid var(--line);
+	background: rgba(220, 234, 245, .22);
+	flex-wrap: wrap;
+}
+
+.tabs button {
+	position: relative;
+	padding: .8rem 1.25rem .95rem;
+	font-weight: 500;
+	color: var(--ink-soft);
+}
+
+.tabs button::after {
+	content: "";
+	position: absolute;
+	right: 1rem;
+	bottom: -1px;
+	left: 1rem;
+	height: 3px;
+	border-radius: 999px 999px 0 0;
+	background: transparent;
+}
+
+.tabs button:hover, .tabs button.active {
+	color: var(--ink);
+}
+
+.tabs button.active::after {
+	background: var(--orange);
+}
+
+.tabs .count {
+	margin-left: .35rem;
+	padding: .05rem .55rem;
+	border-radius: 999px;
+	background: var(--pink-soft);
+	color: var(--orange-deep);
+	font-size: .74rem;
+	font-weight: 600;
+}
+
+.tabs button.active .count {
+	background: var(--orange);
+	color: #fff;
+}
+
+.tab-panel {
+	padding: 1.5rem;
+}
+
+.table-wrap {
+	overflow-x: auto;
+	border: 1px solid var(--line);
+	border-radius: 18px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	min-width: 720px;
+}
+
+th, td {
+	padding: 1rem 1.05rem;
+	text-align: left;
+	vertical-align: middle;
+}
+
+th {
+	border-bottom: 1px solid var(--line);
+	background: var(--bg-warm);
+	font-size: .84rem;
+	font-weight: 700;
+	color: var(--ink-soft);
+	white-space: nowrap;
+}
+
+td {
+	border-bottom: 1px solid rgba(236, 223, 206, .72);
+	font-size: .9rem;
+}
+
+tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+tbody tr:hover {
+	background: rgba(220, 234, 245, .16);
+}
+
+.status {
+	display: inline-flex;
+	align-items: center;
+	min-height: 28px;
+	padding: .22rem .7rem;
+	border-radius: 999px;
+	background: var(--blue-soft);
+	color: var(--ink);
+	font-size: .8rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.status.pending {
+	background: #fdf3e2;
+	color: #b8860b;
+}
+
+.status.success {
+	background: #e7f4e9;
+	color: #1a7a1a;
+}
+
+.status.warning {
+	background: #fff0c8;
+	color: #8a6800;
+}
+
+.status.danger {
+	background: var(--pink-soft);
+	color: var(--orange-deep);
+}
+
+.empty-state {
+	padding: 3.4rem 1rem;
+	text-align: center;
+	color: var(--ink-soft);
+}
+
+.inline-form {
+	display: inline-flex;
+	margin: 0;
+}
+
+.action-stack {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	align-items: center;
+}
+
+.review-stars {
+	color: #F2B01E;
+	letter-spacing: 1px;
+}
+
+.note-cell {
+	max-width: 220px;
+	white-space: normal;
+	color: var(--ink-soft);
+	font-size: .84rem;
+}
+
+.tab-panel[hidden] {
+	display: none;
+}
+
+footer.ft {
+	padding: 3.2rem 0 2rem;
+	border-top: 1px solid var(--line);
+	background: var(--white);
+}
+
+.ft-grid {
+	display: grid;
+	grid-template-columns: 1.6fr 1fr 1fr 1fr;
+	gap: 2rem;
+}
+
+.ft .brand {
+	margin-bottom: 1rem;
+}
+
+.ft-about {
+	max-width: 22rem;
+	color: var(--ink-soft);
+	font-size: .9rem;
+}
+
+.ft-col h4 {
+	margin: .2rem 0 1rem;
+	font-family: var(--serif);
+	font-weight: 700;
+	font-size: 1rem;
+}
+
+.ft-col a {
+	display: block;
+	padding: .3rem 0;
+	color: var(--ink-soft);
+	font-size: .9rem;
+	transition: color .16s;
+}
+
+.ft-col a:hover {
+	color: var(--orange);
+}
+
+.ft-bottom {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: .6rem;
+	margin-top: 2.4rem;
+	padding-top: 1.4rem;
+	border-top: 1px solid var(--line);
+	color: var(--ink-soft);
+	font-size: .82rem;
+}
+
+#backToTop {
+	position: fixed;
+	right: 24px;
+	bottom: 24px;
+	z-index: 90;
+	display: grid;
+	width: 48px;
+	height: 48px;
+	place-items: center;
+	border-radius: 50%;
+	background: var(--orange);
+	color: #fff;
+	box-shadow: var(--shadow-md);
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(10px);
+	transition: opacity .25s, transform .25s, background .2s;
+}
+
+#backToTop.show {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+#backToTop:hover {
+	background: var(--orange-deep);
+}
+
+#backToTop svg {
+	width: 22px;
+	height: 22px;
+}
+
+:focus-visible {
+	outline: 2px solid var(--orange);
+	outline-offset: 3px;
+	border-radius: 6px;
+}
+
+@media ( max-width : 1080px) {
+	.stats {
+		grid-template-columns: repeat(2, 1fr);
 	}
-	@media (max-width: 520px) {
-		.ft-grid { grid-template-columns: 1fr; }
-		#backToTop { right: 16px; bottom: 16px; width: 42px; height: 42px; }
-		.pop { position: fixed; top: 82px; right: 4vw; left: 4vw; width: auto; }
+}
+
+@media ( max-width : 940px) {
+	.nav-menu {
+		display: none;
 	}
-	@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
-	</style>
+	.hamburger {
+		display: grid;
+	}
+	.ft-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media ( max-width : 700px) {
+	.page-main {
+		padding-top: 1.8rem;
+	}
+	.page-intro {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	.stats {
+		grid-template-columns: 1fr;
+	}
+	.tab-panel {
+		padding: 1rem;
+	}
+}
+
+@media ( max-width : 520px) {
+	.ft-grid {
+		grid-template-columns: 1fr;
+	}
+	#backToTop {
+		right: 16px;
+		bottom: 16px;
+		width: 42px;
+		height: 42px;
+	}
+	.pop {
+		position: fixed;
+		top: 82px;
+		right: 4vw;
+		left: 4vw;
+		width: auto;
+	}
+}
+
+@media ( prefers-reduced-motion : reduce) {
+	* {
+		scroll-behavior: auto !important;
+		transition: none !important;
+	}
+}
+</style>
 </head>
 <body>
 	<header class="nav">
 		<div class="wrap nav-inner">
-			<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁">
-				<span class="logo-mind" aria-hidden="true">
-					<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
-					<span class="faces">
-						<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-						<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-						<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-						<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-					</span>
+			<a class="brand" th:href="@{/}" href="/" aria-label="諮由自在首頁"> <span
+				class="logo-mind" aria-hidden="true"> <span class="word"><span
+						class="m">m</span><span class="i">i</span><span class="n">n</span><span
+						class="d">d</span></span> <span class="faces"> <svg class="fm"
+							viewBox="0 0 24 11">
+							<g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+							<path d="M8 7 c2.4 2.4 5.6 2.4 8 0" /></g></svg> <svg class="fi"
+							viewBox="0 0 9 11">
+							<g stroke="#A85974" stroke-width="1.5" stroke-linecap="round"
+								fill="none">
+							<circle cx="4.5" cy="8" r="1.6" /></g></svg> <svg class="fn"
+							viewBox="0 0 17 11">
+							<g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M5.5 7.5 l6 0" /></g></svg> <svg class="fd" viewBox="0 0 17 11">
+							<g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round"
+								fill="none">
+							<path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0" />
+							<path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0" /></g></svg>
 				</span>
-				<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+			</span> <span class="brand-text"><span class="logo">諮由自在</span><span
+					class="en">Free&nbsp;Mind</span></span>
 			</a>
 
 			<nav class="nav-menu" aria-label="會員諮商功能">
-				<a th:href="@{/search}" href="/search">諮商預約</a>
-				<a class="active" th:href="@{/member/orders/myOrders}" href="/member/orders/myOrders" aria-current="page">我的預約紀錄</a>
-				<a th:href="@{/member/orders/reviewForm}" href="/member/orders/reviewForm">撰寫心得評論</a>
-				<a th:href="@{/member/reports/reportLookupForm}" href="/member/reports/reportLookupForm">問題回報</a>
-				<a th:href="@{/member/reports/consultationFeedbackHome}" href="/member/reports/consultationFeedbackHome">服務反饋</a>
+				<a th:href="@{/search}" href="/search">諮商預約</a> <a class="active"
+					th:href="@{/member/orders/myOrders}" href="/member/orders/myOrders"
+					aria-current="page">我的預約紀錄</a> <a
+					th:href="@{/member/orders/reviewForm}"
+					href="/member/orders/reviewForm">撰寫心得評論</a> <a
+					th:href="@{/member/reports/reportLookupForm}"
+					href="/member/reports/reportLookupForm">問題回報</a> <a
+					th:href="@{/member/reports/consultationFeedbackHome}"
+					href="/member/reports/consultationFeedbackHome">服務反饋</a>
 			</nav>
 
 			<div class="nav-right">
 				<div class="pop-holder">
-					<button class="icon-btn" id="bellBtn" type="button" aria-label="會員通知" aria-haspopup="true" aria-expanded="false" aria-controls="bellPop">
-						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-						<span class="dot" th:if="${unreadCount != null and unreadCount > 0}" aria-hidden="true"></span>
+					<button class="icon-btn" id="bellBtn" type="button"
+						aria-label="會員通知" aria-haspopup="true" aria-expanded="false"
+						aria-controls="bellPop">
+						<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"
+							stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+							<path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+						<span class="dot"
+							th:if="${unreadCount != null and unreadCount > 0}"
+							aria-hidden="true"></span>
 					</button>
 					<div class="pop" id="bellPop" role="menu">
 						<div class="pop-head">
 							<b>通知</b>
-							<p th:if="${unreadCount != null and unreadCount > 0}" th:text="${'你有 ' + unreadCount + ' 則未讀通知'}">你有未讀通知</p>
+							<p th:if="${unreadCount != null and unreadCount > 0}"
+								th:text="${'你有 ' + unreadCount + ' 則未讀通知'}">你有未讀通知</p>
 							<p th:unless="${unreadCount != null and unreadCount > 0}">目前沒有未讀通知</p>
 						</div>
 						<div class="pop-divider"></div>
-						<a class="pop-item" th:href="@{/member/notice}" href="/member/notice" role="menuitem" style="justify-content: center; color: var(--orange); font-weight: 500;">查看全部通知</a>
+						<a class="pop-item" th:href="@{/member/notice}"
+							href="/member/notice" role="menuitem"
+							style="justify-content: center; color: var(--orange); font-weight: 500;">查看全部通知</a>
 					</div>
 				</div>
 
 				<div class="pop-holder">
-					<button class="avatar-btn" id="avatarBtn" type="button" aria-label="會員選單" aria-haspopup="true" aria-expanded="false" aria-controls="avatarPop">
-						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="9" r="3.4" fill="#3A4B53" /><path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19" stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
+					<button class="avatar-btn" id="avatarBtn" type="button"
+						aria-label="會員選單" aria-haspopup="true" aria-expanded="false"
+						aria-controls="avatarPop">
+						<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+							<circle cx="12" cy="9" r="3.4" fill="#3A4B53" />
+							<path d="M5.5 19c.7-3.2 3.3-4.6 6.5-4.6S17.8 15.8 18.5 19"
+								stroke="#3A4B53" stroke-width="1.8" stroke-linecap="round" /></svg>
 					</button>
 					<div class="pop" id="avatarPop" role="menu">
-						<div class="pop-head"><b>歡迎回來</b><p>這是你的會員專區</p></div>
+						<div class="pop-head">
+							<b th:text="${member != null ? member.name + ' 歡迎回來！' : '歡迎回來'}">歡迎回來</b>
+							<p>這是你的會員專區</p>
+						</div>
 						<div class="pop-divider"></div>
 						<div class="pop-label">我的專區</div>
-						<a class="pop-item active" th:href="@{/member/orders/myOrders}" href="/member/orders/myOrders" role="menuitem" aria-current="page">我的預約紀錄</a>
-						<a class="pop-item" th:href="@{/member/profile}" href="/member/profile" role="menuitem">個人檔案</a>
-						<a class="pop-item" th:href="@{/member/dashboard}" href="/member/dashboard" role="menuitem">我的療癒足跡</a>
-						<a class="pop-item" th:href="@{/member/course/my_course_order}" href="/member/course/my_course_order" role="menuitem">課程訂單紀錄</a>
-						<a class="pop-item" th:href="@{/member/coupon}" href="/member/coupon" role="menuitem">我的優惠券</a>
+						<a class="pop-item active" th:href="@{/member/orders/myOrders}"
+							href="/member/orders/myOrders" role="menuitem"
+							aria-current="page">我的預約紀錄</a> <a class="pop-item"
+							th:href="@{/member/profile}" href="/member/profile"
+							role="menuitem">個人檔案</a> <a class="pop-item"
+							th:href="@{/member/dashboard}" href="/member/dashboard"
+							role="menuitem">我的療癒足跡</a> <a class="pop-item"
+							th:href="@{/member/course/my_course_order}"
+							href="/member/course/my_course_order" role="menuitem">課程訂單紀錄</a>
+						<a class="pop-item" th:href="@{/member/coupon}"
+							href="/member/coupon" role="menuitem">我的優惠券</a>
 						<div class="pop-divider"></div>
-						<a class="pop-item" th:href="@{/support}" href="/support" role="menuitem">聯繫客服</a>
+						<a class="pop-item" th:href="@{/support}" href="/support"
+							role="menuitem">聯繫客服</a>
 					</div>
 				</div>
 
-				<button class="icon-btn hamburger" id="hambBtn" type="button" aria-label="開啟選單" aria-controls="mobileMenu" aria-expanded="false">
-					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+				<button class="icon-btn hamburger" id="hambBtn" type="button"
+					aria-label="開啟選單" aria-controls="mobileMenu" aria-expanded="false">
+					<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"
+						stroke-linecap="round" aria-hidden="true">
+						<path d="M4 7h16M4 12h16M4 17h16" /></svg>
 				</button>
 			</div>
 		</div>
 
 		<nav class="mobile-menu" id="mobileMenu" aria-label="行動選單">
-			<a th:href="@{/search}" href="/search">諮商預約</a>
-			<a class="active" th:href="@{/member/orders/myOrders}" href="/member/orders/myOrders">我的預約紀錄</a>
-			<a th:href="@{/member/orders/reviewForm}" href="/member/orders/reviewForm">撰寫心得評論</a>
-			<a th:href="@{/member/reports/reportLookupForm}" href="/member/reports/reportLookupForm">問題回報</a>
-			<a th:href="@{/member/reports/consultationFeedbackHome}" href="/member/reports/consultationFeedbackHome">服務反饋</a>
+			<a th:href="@{/search}" href="/search">諮商預約</a> <a class="active"
+				th:href="@{/member/orders/myOrders}" href="/member/orders/myOrders">我的預約紀錄</a>
+			<a th:href="@{/member/orders/reviewForm}"
+				href="/member/orders/reviewForm">撰寫心得評論</a> <a
+				th:href="@{/member/reports/reportLookupForm}"
+				href="/member/reports/reportLookupForm">問題回報</a> <a
+				th:href="@{/member/reports/consultationFeedbackHome}"
+				href="/member/reports/consultationFeedbackHome">服務反饋</a>
 		</nav>
 	</header>
 
@@ -248,39 +1005,48 @@
 			<div th:unless="${#lists.isEmpty(ordersListData)}">
 				<section class="stats" aria-label="預約統計">
 					<article class="stat">
-						<span>待確認</span>
-						<strong th:text="${#lists.size(ordersListData.?[orderStatus == 0])}">0</strong>
+						<span>待確認</span> <strong
+							th:text="${#lists.size(ordersListData.?[orderStatus == 0])}">0</strong>
 					</article>
 					<article class="stat">
-						<span>已確認</span>
-						<strong th:text="${#lists.size(ordersListData.?[orderStatus == 1])}">0</strong>
+						<span>已確認</span> <strong
+							th:text="${#lists.size(ordersListData.?[orderStatus == 1])}">0</strong>
 					</article>
 					<article class="stat">
-						<span>已完成</span>
-						<strong th:text="${#lists.size(ordersListData.?[orderStatus == 4])}">0</strong>
+						<span>已完成</span> <strong
+							th:text="${#lists.size(ordersListData.?[orderStatus == 4])}">0</strong>
 					</article>
 					<article class="stat">
-						<span>未成立</span>
-						<strong th:text="${#lists.size(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">0</strong>
+						<span>未成立</span> <strong
+							th:text="${#lists.size(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">0</strong>
 					</article>
 				</section>
 
 				<section class="workspace" aria-label="預約紀錄工作區">
 					<div class="tabs" data-tabs role="tablist" aria-label="預約分類">
-						<button class="active" type="button" data-tab="all" role="tab" aria-selected="true">
+						<button class="active" type="button" data-tab="all" role="tab"
+							aria-selected="true">
 							全部 <span class="count" th:text="${#lists.size(ordersListData)}"></span>
 						</button>
-						<button type="button" data-tab="pending" role="tab" aria-selected="false">
-							待確認 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 0])}"></span>
+						<button type="button" data-tab="pending" role="tab"
+							aria-selected="false">
+							待確認 <span class="count"
+								th:text="${#lists.size(ordersListData.?[orderStatus == 0])}"></span>
 						</button>
-						<button type="button" data-tab="confirmed" role="tab" aria-selected="false">
-							已確認 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 1])}"></span>
+						<button type="button" data-tab="confirmed" role="tab"
+							aria-selected="false">
+							已確認 <span class="count"
+								th:text="${#lists.size(ordersListData.?[orderStatus == 1])}"></span>
 						</button>
-						<button type="button" data-tab="completed" role="tab" aria-selected="false">
-							已完成 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 4])}"></span>
+						<button type="button" data-tab="completed" role="tab"
+							aria-selected="false">
+							已完成 <span class="count"
+								th:text="${#lists.size(ordersListData.?[orderStatus == 4])}"></span>
 						</button>
-						<button type="button" data-tab="closed" role="tab" aria-selected="false">
-							未成立 <span class="count" th:text="${#lists.size(ordersListData.?[orderStatus == 2 or orderStatus == 3])}"></span>
+						<button type="button" data-tab="closed" role="tab"
+							aria-selected="false">
+							未成立 <span class="count"
+								th:text="${#lists.size(ordersListData.?[orderStatus == 2 or orderStatus == 3])}"></span>
 						</button>
 					</div>
 
@@ -288,19 +1054,26 @@
 					<section class="tab-panel" data-panel="all">
 						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData)}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>狀態</th></tr></thead>
+								<thead>
+									<tr>
+										<th>諮商編號</th>
+										<th>諮商日期</th>
+										<th>心理師</th>
+										<th>狀態</th>
+									</tr>
+								</thead>
 								<tbody>
 									<tr th:each="order : ${ordersListData}">
 										<td th:text="${order.orderId}"></td>
-										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td
+											th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
-										<td th:switch="${order.orderStatus}">
-											<span th:case="0" class="status pending">待確認</span>
-											<span th:case="1" class="status">已確認</span>
-											<span th:case="4" class="status success">已完成</span>
-											<span th:case="2" class="status danger">已取消</span>
-											<span th:case="3" class="status danger">未出席</span>
-										</td>
+										<td th:switch="${order.orderStatus}"><span th:case="0"
+											class="status pending">待確認</span> <span th:case="1"
+											class="status">已確認</span> <span th:case="4"
+											class="status success">已完成</span> <span th:case="2"
+											class="status danger">已取消</span> <span th:case="3"
+											class="status danger">未出席</span></td>
 									</tr>
 								</tbody>
 							</table>
@@ -310,117 +1083,181 @@
 
 					<!-- 待確認 -->
 					<section class="tab-panel" data-panel="pending" hidden>
-						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 0])}">
+						<div class="table-wrap"
+							th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 0])}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>狀態</th></tr></thead>
+								<thead>
+									<tr>
+										<th>諮商編號</th>
+										<th>諮商日期</th>
+										<th>心理師</th>
+										<th>狀態</th>
+									</tr>
+								</thead>
 								<tbody>
-									<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 0}">
+									<tr th:each="order : ${ordersListData}"
+										th:if="${order.orderStatus == 0}">
 										<td th:text="${order.orderId}"></td>
-										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td
+											th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
 										<td><span class="status pending">待確認</span></td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 0])}">此分類目前沒有紀錄。</p>
+						<p class="empty-state"
+							th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 0])}">此分類目前沒有紀錄。</p>
 					</section>
 
 					<!-- 已確認 -->
 					<section class="tab-panel" data-panel="confirmed" hidden>
-						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 1])}">
+						<div class="table-wrap"
+							th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 1])}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>晤談筆記</th><th>狀態</th></tr></thead>
+								<thead>
+									<tr>
+										<th>諮商編號</th>
+										<th>諮商日期</th>
+										<th>心理師</th>
+										<th>晤談筆記</th>
+										<th>狀態</th>
+									</tr>
+								</thead>
 								<tbody>
-									<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 1}">
+									<tr th:each="order : ${ordersListData}"
+										th:if="${order.orderStatus == 1}">
 										<td th:text="${order.orderId}"></td>
-										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td
+											th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
-										<td class="note-cell">
-											<span th:if="${order.psychNote != null}" th:text="${order.psychNote}"></span>
-											<span th:if="${order.psychNote == null}" style="color:var(--ink-soft); font-style:italic;">尚無晤談筆記</span>
+										<td class="note-cell"><span
+											th:if="${order.psychNote != null}"
+											th:text="${order.psychNote}"></span> <span
+											th:if="${order.psychNote == null}"
+											style="color: var(--ink-soft); font-style: italic;">尚無晤談筆記</span>
 										</td>
 										<td><span class="status">已確認</span></td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 1])}">此分類目前沒有紀錄。</p>
+						<p class="empty-state"
+							th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 1])}">此分類目前沒有紀錄。</p>
 					</section>
 
 					<!-- 已完成 -->
 					<section class="tab-panel" data-panel="completed" hidden>
-						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 4])}">
+						<div class="table-wrap"
+							th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 4])}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>心理師晤談筆記</th><th>心得評論</th><th>操作</th></tr></thead>
+								<thead>
+									<tr>
+										<th>諮商編號</th>
+										<th>諮商日期</th>
+										<th>心理師</th>
+										<th>心理師晤談筆記</th>
+										<th>心得評論</th>
+										<th>操作</th>
+									</tr>
+								</thead>
 								<tbody>
-									<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 4}">
+									<tr th:each="order : ${ordersListData}"
+										th:if="${order.orderStatus == 4}">
 										<td th:text="${order.orderId}"></td>
-										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td
+											th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
-										<td class="note-cell">
-											<span th:if="${order.psychNote != null}" th:text="${order.psychNote}"></span>
-											<span th:if="${order.psychNote == null}" style="color:var(--ink-soft); font-style:italic;">尚無晤談筆記</span>
+										<td class="note-cell"><span
+											th:if="${order.psychNote != null}"
+											th:text="${order.psychNote}"></span> <span
+											th:if="${order.psychNote == null}"
+											style="color: var(--ink-soft); font-style: italic;">尚無晤談筆記</span>
 										</td>
-										<td class="note-cell">
-											<span th:if="${order.reviewContent != null}">
-												<span class="review-stars" th:text="${'★'.repeat(order.rating != null ? order.rating : 0)}"></span>
+										<td class="note-cell"><span
+											th:if="${order.reviewContent != null}"> <span
+												class="review-stars"
+												th:text="${'★'.repeat(order.rating != null ? order.rating : 0)}"></span>
 												<span th:text="${order.reviewContent}"></span>
-											</span>
-											<span th:if="${order.reviewContent == null}" style="color:var(--ink-soft);">尚未評論</span>
-										</td>
+										</span> <span th:if="${order.reviewContent == null}"
+											style="color: var(--ink-soft);">尚未評論</span></td>
 										<td>
 											<div class="action-stack">
-												<span th:if="${reportStatusMap.containsKey(order.orderId)}" th:switch="${reportStatusMap.get(order.orderId)}">
-													<span th:case="0" class="status pending">回報待處理</span>
-													<span th:case="1" class="status">回報處理中</span>
-													<span th:case="2" class="status success">問題已解決</span>
+												<span th:if="${reportStatusMap.containsKey(order.orderId)}"
+													th:switch="${reportStatusMap.get(order.orderId)}"> <span
+													th:case="0" class="status pending">回報待處理</span> <span
+													th:case="1" class="status">回報處理中</span> <span th:case="2"
+													class="status success">問題已解決</span>
 												</span>
-												<form class="inline-form" th:unless="${reportStatusMap.containsKey(order.orderId)}" method="post" th:action="@{/member/reports/reportSelect}">
-													<input type="hidden" name="orderId" th:value="${order.orderId}">
+												<form class="inline-form"
+													th:unless="${reportStatusMap.containsKey(order.orderId)}"
+													method="post" th:action="@{/member/reports/reportSelect}">
+													<input type="hidden" name="orderId"
+														th:value="${order.orderId}">
 													<button type="submit" class="btn btn-secondary">問題回報</button>
 												</form>
 
-												<form class="inline-form" th:if="${canWriteReview.contains(order.orderId)}" method="post" th:action="@{/member/orders/reviewSelect}">
-													<input type="hidden" name="orderId" th:value="${order.orderId}">
+												<form class="inline-form"
+													th:if="${canWriteReview.contains(order.orderId)}"
+													method="post" th:action="@{/member/orders/reviewSelect}">
+													<input type="hidden" name="orderId"
+														th:value="${order.orderId}">
 													<button type="submit" class="btn btn-primary">撰寫心得評論</button>
 												</form>
-												<span class="note-cell" th:if="${order.reviewContent == null and !canWriteReview.contains(order.orderId)}">已超過評論期限</span>
+												<span class="note-cell"
+													th:if="${order.reviewContent == null and !canWriteReview.contains(order.orderId)}">已超過評論期限</span>
 
-												<form class="inline-form" th:if="${canEditReview.contains(order.orderId)}" method="post" th:action="@{/member/orders/reviewSelect}">
-													<input type="hidden" name="orderId" th:value="${order.orderId}">
+												<form class="inline-form"
+													th:if="${canEditReview.contains(order.orderId)}"
+													method="post" th:action="@{/member/orders/reviewSelect}">
+													<input type="hidden" name="orderId"
+														th:value="${order.orderId}">
 													<button type="submit" class="btn btn-secondary">修改評論</button>
 												</form>
-												<span class="note-cell" th:if="${order.reviewContent != null and !canEditReview.contains(order.orderId)}">評論已鎖定</span>
+												<span class="note-cell"
+													th:if="${order.reviewContent != null and !canEditReview.contains(order.orderId)}">評論已鎖定</span>
 											</div>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 4])}">此分類目前沒有紀錄。</p>
+						<p class="empty-state"
+							th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 4])}">此分類目前沒有紀錄。</p>
 					</section>
 
 					<!-- 未成立 -->
 					<section class="tab-panel" data-panel="closed" hidden>
-						<div class="table-wrap" th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">
+						<div class="table-wrap"
+							th:if="${!#lists.isEmpty(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">
 							<table>
-								<thead><tr><th>諮商編號</th><th>諮商日期</th><th>心理師</th><th>狀態</th><th>備註</th></tr></thead>
+								<thead>
+									<tr>
+										<th>諮商編號</th>
+										<th>諮商日期</th>
+										<th>心理師</th>
+										<th>狀態</th>
+										<th>備註</th>
+									</tr>
+								</thead>
 								<tbody>
-									<tr th:each="order : ${ordersListData}" th:if="${order.orderStatus == 2 or order.orderStatus == 3}">
+									<tr th:each="order : ${ordersListData}"
+										th:if="${order.orderStatus == 2 or order.orderStatus == 3}">
 										<td th:text="${order.orderId}"></td>
-										<td th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
+										<td
+											th:text="${#temporals.format(order.consStart, 'yyyy-MM-dd HH:mm')}"></td>
 										<td th:text="${order.psychologist.name}"></td>
-										<td><span class="status danger" th:text="${order.orderStatus == 2} ? '已取消' : '未出席'"></span></td>
-										<td class="note-cell">
-											<span th:if="${order.orderStatus == 2 and cancelReasonMap != null and cancelReasonMap.containsKey(order.orderId)}"
-												th:text="${cancelReasonMap.get(order.orderId)}"></span>
-										</td>
+										<td><span class="status danger"
+											th:text="${order.orderStatus == 2} ? '已取消' : '未出席'"></span></td>
+										<td class="note-cell"><span
+											th:if="${order.orderStatus == 2 and cancelReasonMap != null and cancelReasonMap.containsKey(order.orderId)}"
+											th:text="${cancelReasonMap.get(order.orderId)}"></span></td>
 									</tr>
 								</tbody>
 							</table>
 						</div>
-						<p class="empty-state" th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">此分類目前沒有紀錄。</p>
+						<p class="empty-state"
+							th:if="${#lists.isEmpty(ordersListData.?[orderStatus == 2 or orderStatus == 3])}">此分類目前沒有紀錄。</p>
 					</section>
 				</section>
 			</div>
@@ -431,50 +1268,71 @@
 		<div class="wrap">
 			<div class="ft-grid">
 				<div>
-					<a class="brand" th:href="@{/}" href="/">
-						<span class="logo-mind" aria-hidden="true">
-							<span class="word"><span class="m">m</span><span class="i">i</span><span class="n">n</span><span class="d">d</span></span>
-							<span class="faces">
-								<svg class="fm" viewBox="0 0 24 11"><g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none"/><circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none"/><path d="M8 7 c2.4 2.4 5.6 2.4 8 0"/></g></svg>
-								<svg class="fi" viewBox="0 0 9 11"><g stroke="#A85974" stroke-width="1.5" stroke-linecap="round" fill="none"><circle cx="4.5" cy="8" r="1.6"/></g></svg>
-								<svg class="fn" viewBox="0 0 17 11"><g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M5.5 7.5 l6 0"/></g></svg>
-								<svg class="fd" viewBox="0 0 17 11"><g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round" fill="none"><path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0"/><path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0"/></g></svg>
-							</span>
+					<a class="brand" th:href="@{/}" href="/"> <span
+						class="logo-mind" aria-hidden="true"> <span class="word"><span
+								class="m">m</span><span class="i">i</span><span class="n">n</span><span
+								class="d">d</span></span> <span class="faces"> <svg class="fm"
+									viewBox="0 0 24 11">
+									<g stroke="#B8813A" stroke-width="1.6" stroke-linecap="round"
+										fill="none">
+									<circle cx="8" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+									<circle cx="16" cy="3.5" r="1" fill="#B8813A" stroke="none" />
+									<path d="M8 7 c2.4 2.4 5.6 2.4 8 0" /></g></svg> <svg class="fi"
+									viewBox="0 0 9 11">
+									<g stroke="#A85974" stroke-width="1.5" stroke-linecap="round"
+										fill="none">
+									<circle cx="4.5" cy="8" r="1.6" /></g></svg> <svg class="fn"
+									viewBox="0 0 17 11">
+									<g stroke="#4F7B96" stroke-width="1.6" stroke-linecap="round"
+										fill="none">
+									<path d="M5.5 7.5 l6 0" /></g></svg> <svg class="fd" viewBox="0 0 17 11">
+									<g stroke="#5A7A57" stroke-width="1.6" stroke-linecap="round"
+										fill="none">
+									<path d="M4 4 c1 -1.6 2.6 -1.6 3.6 0" />
+									<path d="M9.4 4 c1 -1.6 2.6 -1.6 3.6 0" /></g></svg>
 						</span>
-						<span class="brand-text"><span class="logo">諮由自在</span><span class="en">Free&nbsp;Mind</span></span>
+					</span> <span class="brand-text"><span class="logo">諮由自在</span><span
+							class="en">Free&nbsp;Mind</span></span>
 					</a>
 					<p class="ft-about">一個把心理諮商、課程、專欄與陪伴社群整合在一起的地方。願你在這裡，能慢慢地、安心地，成為更自在的自己。</p>
 				</div>
 				<div class="ft-col">
 					<h4>探索</h4>
-					<a th:href="@{/search}" href="/search">諮商預約</a>
-					<a th:href="@{/member/course/select_course}" href="/member/course/select_course">課程商城</a>
-					<a th:href="@{/article}" href="/article">專欄文章</a>
-					<a th:href="@{/member/activity/activityIndex}" href="/member/activity/activityIndex">揪團活動</a>
+					<a th:href="@{/search}" href="/search">諮商預約</a> <a
+						th:href="@{/member/course/select_course}"
+						href="/member/course/select_course">課程商城</a> <a
+						th:href="@{/article}" href="/article">專欄文章</a> <a
+						th:href="@{/member/activity/activityIndex}"
+						href="/member/activity/activityIndex">揪團活動</a>
 				</div>
 				<div class="ft-col">
 					<h4>會員專區</h4>
-					<a th:href="@{/member/profile}" href="/member/profile">個人檔案</a>
-					<a th:href="@{/member/dashboard}" href="/member/dashboard">我的療癒足跡</a>
-					<a th:href="@{/member/course/my_course_order}" href="/member/course/my_course_order">課程訂單紀錄</a>
-					<a th:href="@{/member/coupon}" href="/member/coupon">我的優惠券</a>
+					<a th:href="@{/member/profile}" href="/member/profile">個人檔案</a> <a
+						th:href="@{/member/dashboard}" href="/member/dashboard">我的療癒足跡</a>
+					<a th:href="@{/member/course/my_course_order}"
+						href="/member/course/my_course_order">課程訂單紀錄</a> <a
+						th:href="@{/member/coupon}" href="/member/coupon">我的優惠券</a>
 				</div>
 				<div class="ft-col">
 					<h4>帳號</h4>
-					<a th:href="@{/front-end/login}" href="/front-end/login">會員登入</a>
-					<a th:href="@{/psych/psychologistLogin}" href="/psych/psychologistLogin">心理師登入</a>
-					<a th:href="@{/support}" href="/support">聯繫客服</a>
+					<a th:href="@{/front-end/login}" href="/front-end/login">會員登入</a> <a
+						th:href="@{/psych/psychologistLogin}"
+						href="/psych/psychologistLogin">心理師登入</a> <a th:href="@{/support}"
+						href="/support">聯繫客服</a>
 				</div>
 			</div>
 			<div class="ft-bottom">
-				<span>© 2026 諮由自在 FreeMind｜CKA101G1</span>
-				<span>本平台不提供緊急危機處理，若有立即危險請撥打 1995 安心專線。</span>
+				<span>© 2026 諮由自在 FreeMind｜CKA101G1</span> <span>本平台不提供緊急危機處理，若有立即危險請撥打
+					1995 安心專線。</span>
 			</div>
 		</div>
 	</footer>
 
 	<button id="backToTop" type="button" aria-label="回到頂部">
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+			stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+			aria-hidden="true">
+			<path d="M12 19V5M5 12l7-7 7 7" /></svg>
 	</button>
 
 	<script th:inline="none">
