@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +26,7 @@ import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.activity.report.model.ActivityReportService;
 import com.freemind.activity.util.PageUtils;
 import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 import jakarta.validation.ConstraintViolationException;
@@ -41,6 +45,18 @@ public class RegistrationController {
     private ActivityReportService reportSvc;
     
     private static final int PAGE_SIZE = 3;
+    
+    @Autowired
+    private MemberService memberSvc;
+    
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        // 訪客（未登入或匿名）時不放 member 進 model
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return memberSvc.findByAccount(authentication.getName());
+    }
 
     // 一、我的報名清單
     @GetMapping("myRegistrations")

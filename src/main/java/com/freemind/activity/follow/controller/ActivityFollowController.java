@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.freemind.activity.activity.model.Activity;
 import com.freemind.activity.follow.model.ActivityFollowService;
 import com.freemind.activity.util.PageUtils;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 
 @Controller
@@ -26,6 +31,18 @@ public class ActivityFollowController {
     private ActivityFollowService followSvc;
     
     private static final int PAGE_SIZE = 3;
+    
+    @Autowired
+    private MemberService memberSvc;
+    
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        // 訪客（未登入或匿名）時不放 member 進 model
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return memberSvc.findByAccount(authentication.getName());
+    }
 
     @PostMapping("follow")
     public String follow(@RequestParam("activityId") Integer activityId,

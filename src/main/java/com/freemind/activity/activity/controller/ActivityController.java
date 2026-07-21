@@ -13,6 +13,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -34,6 +36,8 @@ import com.freemind.activity.follow.model.ActivityFollowService;
 import com.freemind.activity.registration.model.Registration;
 import com.freemind.activity.registration.model.RegistrationService;
 import com.freemind.activity.util.PageUtils;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 import com.freemind.util.ImageUploadValidator;
 
@@ -56,11 +60,23 @@ public class ActivityController {
     @Autowired
     private ActivityFollowService followSvc;
     
+    @Autowired
+    private MemberService memberSvc;
+    
     private static final int PAGE_SIZE = 3;
     
     @Value("${app.activity.image.max-size}")
     private DataSize maxImageSize;
 
+    
+    @ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+        // 訪客（未登入或匿名）時不放 member 進 model
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return memberSvc.findByAccount(authentication.getName());
+    }
     
  // 查詢表單送出：只負責把條件組成query string，轉址到下面的GET方法
     @PostMapping("listActivities_ByCompositeQuery")

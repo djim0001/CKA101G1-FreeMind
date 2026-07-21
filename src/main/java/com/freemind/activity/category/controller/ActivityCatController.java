@@ -4,12 +4,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +22,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.activity.category.model.ActivityCat;
 import com.freemind.activity.category.model.ActivityCatService;
+import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
@@ -31,6 +36,18 @@ public class ActivityCatController {
 
 	@Autowired
 	private ActivityCatService activityCatSvc;
+	
+	@Autowired
+	private AdminService adminSvc;
+	
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+	    // 訪客（未登入或匿名）時不放 admin 進 model
+	    if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+	        return null;
+	    }
+	    return adminSvc.findByAccount(authentication.getName());
+	}
 	
 	@GetMapping("listAllActivityCat")
 	public String listAllActivityCat(@RequestParam(value = "keyword", required = false) String keyword, ModelMap model) {
