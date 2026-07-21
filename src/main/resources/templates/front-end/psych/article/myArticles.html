@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="_csrf" th:content="${_csrf.token}" />
+<meta name="_csrf_paramName" th:content="${_csrf.parameterName}" />
 <title>我的文章｜諮由自在 Free Mind</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,6 +59,8 @@
 	font-family: var(--serif); font-weight: 600; font-size: .84rem;
 	letter-spacing: .08em; border-bottom: 2px solid var(--line);
 }
+.my-table thead th:first-child { border-radius: var(--radius-md) 0 0 0; }
+.my-table thead th:last-child  { border-radius: 0 var(--radius-md) 0 0; }
 .my-table tbody td {
 	color: var(--ink-soft); border-bottom: 1px solid var(--line);
 	word-break: break-all;
@@ -580,6 +584,13 @@
 		var form = document.createElement('form');
 		form.method = 'POST';
 		form.action = '/psych/article/batchDelete';
+
+		var csrfInput = document.createElement('input');
+		csrfInput.type = 'hidden';
+		csrfInput.name = document.querySelector('meta[name="_csrf_paramName"]').content;
+		csrfInput.value = document.querySelector('meta[name="_csrf"]').content;
+		form.appendChild(csrfInput);
+
 		ids.forEach(function(id) {
 			var input = document.createElement('input');
 			input.type = 'hidden';

@@ -267,6 +267,7 @@ public class PsychArticleController {
 			model.addAttribute("articleId", articleId);
 			model.addAttribute("currentPage", page);
 			model.addAttribute("hasCoverImage", article.getCoverImage() != null);
+			model.addAttribute("isEditCopy", article.getParentArticleId() != null);
 			return "front-end/psych/article/editForm";
 		} catch (IllegalArgumentException | IllegalStateException e) {
 			redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
