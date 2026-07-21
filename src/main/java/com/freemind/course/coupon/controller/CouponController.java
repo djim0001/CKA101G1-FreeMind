@@ -93,8 +93,11 @@ public class CouponController {
 	public String insertCoupon(@Valid Coupon coupon, BindingResult result, ModelMap model) {
 
 		if (result.hasErrors()) {
+			System.out.println("error");
 			return "back-end/course/course/selectCourse";
+//			return "redirect:/admin/course/select_coupon";
 		}
+		System.out.println("y");
 
 		couponSvc.addCoupon(coupon);
 		return "redirect:/admin/coupon/select_coupon";
@@ -115,7 +118,7 @@ public class CouponController {
 			List<Integer> memberIds = allMember.stream()
 			        .map(Member::getMemberId)
 			        .toList();
-			noticeSvc.sendToMembers(memberIds, 0, "有新的優惠券發放了喔~~", (byte)1);
+			noticeSvc.sendToMembers(memberIds, null, "有新的優惠券發放了喔~~", (byte)1);
 
 		} catch (IllegalArgumentException e) {
 

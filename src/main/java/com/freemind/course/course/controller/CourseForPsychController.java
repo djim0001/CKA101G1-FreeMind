@@ -206,13 +206,15 @@ public class CourseForPsychController {
 
 		// 將課程路徑存入
 		if (video != null && !video.isEmpty())
-			course.setVideoSrc(uploadVideo(video));
+//			course.setVideoSrc(uploadVideo(video));
+course.setVideoSrc(uploadVideoEx(video));
 		else {
 			String videoSrc = course.getVideoSrc();
 			course.setVideoSrc(videoSrc);
 		}
 		if (videoPre != null && !videoPre.isEmpty())
-			course.setVideoSrcPre(uploadVideo(videoPre));
+//			course.setVideoSrcPre(uploadVideo(videoPre));
+course.setVideoSrcPre(uploadVideoEx(videoPre));
 		else {
 			String videoSrcPre = course.getVideoSrcPre();
 			course.setVideoSrcPre(videoSrcPre);
@@ -297,7 +299,6 @@ public class CourseForPsychController {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
 		String newFileName = LocalDateTime.now().format(formatter) + extension;
 
-//		String uploadDir = videoUploadPath;
 		String uploadDir = videoUploadDir;
 		String urlPath = videoUrlPath;
 
@@ -312,6 +313,31 @@ public class CourseForPsychController {
 			return basePath + newFileName;
 		} catch (Exception e) {
 			return newFileName; // 500
+		}
+	}
+	
+	public String uploadVideoEx(MultipartFile video) throws IOException {
+		String originalFilename = video.getOriginalFilename();
+		
+		String extension = "";
+		if (originalFilename != null && originalFilename.contains(".")) {
+			extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+		}
+		
+		String uploadDir = videoUploadDir;
+		String urlPath = videoUrlPath;
+		
+		try {
+			File dir = new File(uploadDir);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			File dest = new File(dir, originalFilename);
+			video.transferTo(dest.toPath());
+			String basePath = urlPath.replace("**", "");
+			return basePath + originalFilename;
+		} catch (Exception e) {
+			return originalFilename; // 500
 		}
 	}
 

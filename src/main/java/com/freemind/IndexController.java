@@ -17,6 +17,8 @@ import com.freemind.login.admin.model.AdminService;
 import com.freemind.login.member.model.Member;
 import com.freemind.login.member.model.MemberService;
 import com.freemind.login.notice.service.NotificationService;
+import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.service.PsychologistService;
 
 @Controller
 public class IndexController {
@@ -27,6 +29,8 @@ public class IndexController {
     private AdminService adminSvc;
     @Autowired
     private MemberService memberSvc;
+    @Autowired
+    private PsychologistService psychSvc;
     @Autowired
     private CourseService courseSvc;
     
@@ -45,6 +49,15 @@ public class IndexController {
     		return null;
     	}
     	return memberSvc.findByAccount(authentication.getName());
+    }
+    
+    @ModelAttribute("psych")
+    public Psychologist currentPsych(Authentication authentication) {
+    	// 訪客（未登入或匿名）時不放 member 進 model
+    	if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+    		return null;
+    	}
+    	return psychSvc.findByAccount(authentication.getName());
     }
 
     @GetMapping("/")

@@ -196,7 +196,7 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 	    }
 	    List<CartItemDTO> cartList = ShoppingCartRedisSvc.getCartCartItemDTOs(member.getMemberId());
 	    Integer cartTotal = ShoppingCartRedisSvc.calculateCartTotal(cartList);
-	    if (memberCoupon.getCoupon().getTriggerThreshold() > cartTotal ) {
+	    if (memberCoupon.getCoupon().getTriggerThreshold() != null && memberCoupon.getCoupon().getTriggerThreshold() > cartTotal) {
 	    		redirectAttributes.addFlashAttribute("couponError", "此次消費未達優惠券使用門檻");
 	        return "redirect:/member/course/goto_checkout";
 	    }

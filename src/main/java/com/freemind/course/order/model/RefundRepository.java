@@ -16,9 +16,6 @@ public interface RefundRepository extends JpaRepository<Refund, CompositeRefund>
 	List<Refund> findByRefundStatus(Integer refundStatus);
 	
 	
-	
-	
-	
 }
 
 

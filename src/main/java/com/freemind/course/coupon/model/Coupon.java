@@ -27,8 +27,8 @@ public class Coupon {
 	private Integer couponId;
 	@Column(name = "coupon_name")
 	@NotEmpty(message="優惠券名稱：請勿空白")
-	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", 
-		message = "優惠券名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到10之間")
+//	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", 
+//		message = "優惠券名稱: 只能是中、英文字母、數字和_ , 且長度必需在2到10之間")
 	private String couponName;
 	@Column(name = "discount_duration")
 	@NotNull(message="優惠券效期：請勿空白")
