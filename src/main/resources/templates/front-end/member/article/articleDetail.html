@@ -501,6 +501,10 @@
 			 th:attr="data-article-id=${article.articleId}"
 			 style="display:none; padding-top:0;">
 			<div class="wrap">
+				<div class="recommend-head" id="courseRecommendHead" style="display:none;">
+					<span class="script" style="font-family:var(--serif);font-weight:700;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;">You might also like</span>
+					<h2 class="recommend-title">相關推薦</h2>
+				</div>
 				<div class="recommend-list" id="courseRecommendList"></div>
 			</div>
 		</div>
@@ -855,8 +859,9 @@
 			return h;
 		}
 
+		window.__articleRecEmpty = false;
 		function renderCards(list) {
-			if (!list || !list.length) { section.style.display = 'none'; return; }
+			if (!list || !list.length) { section.style.display = 'none'; window.__articleRecEmpty = true; return; }
 			var h = list.slice(0, 3).map(function (art) {
 				var id      = art.articleId;
 				var title   = esc(art.title || '');
@@ -891,12 +896,12 @@
 
 		var headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, getCsrfHeaders());
 
-		fetch(DETAIL + articleId + '/recommend/article', {
+		window.__articleRecDone = fetch(DETAIL + articleId + '/recommend/article', {
 			method: 'POST', headers: headers, redirect: 'manual'
 		})
 		.then(function(res) {
 			if (res.type === 'opaqueredirect' || res.status === 0) {
-				section.style.display = 'none'; return null;
+				section.style.display = 'none'; window.__articleRecEmpty = true; return null;
 			}
 			if (!res.ok) throw new Error('HTTP ' + res.status);
 			return res.json();
@@ -908,6 +913,7 @@
 		.catch(function(err) {
 			console.error('[recommend]', err);
 			section.style.display = 'none';
+			window.__articleRecEmpty = true;
 		});
 	})();
 
@@ -951,6 +957,10 @@
 
 		function renderCourseCards(list) {
 			if (!list || !list.length) { section.style.display = 'none'; return; }
+			if (window.__articleRecEmpty) {
+				document.getElementById('courseRecommendHead').style.display = '';
+				section.style.paddingTop = '';
+			}
 			var h = list.slice(0, 3).map(function (c) {
 				var id    = c.courseId;
 				var name  = esc(c.courseName || '');
@@ -958,16 +968,15 @@
 				var psych = c.psych ? esc(c.psych) + ' 心理師' : '';
 				var desc  = strip(c.outline);
 				var price = c.price != null ? 'NT$ ' + c.price.toLocaleString() : '';
-				var videoUrl = c.videoSrcPre || '';
-
-				return '<a class="rec-card" href="/course/' + id + '">' +
-				       '<div class="photo-slot"><div class="ps-inner">' +
-				       (videoUrl
-				           ? '<video muted playsinline preload="metadata" src="' + esc(videoUrl) + '" onerror="this.outerHTML=\'<svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke-width=&quot;1.4&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;><polygon points=&quot;5 3 19 12 5 21 5 3&quot;/></svg>\'"></video>'
-				           : '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
-				             '<polygon points="5 3 19 12 5 21 5 3"/></svg>'
-				       ) +
-				       '</div></div>' +
+				var videoUrl = c.videoSrcPre || c.videoSrc || '';
+				var coverHtml = videoUrl
+					? '<video class="rec-cover" muted playsinline preload="metadata" src="' + esc(videoUrl) + '"></video>'
+					: '<div class="photo-slot"><div class="ps-inner">' +
+					  '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
+					  '<polygon points="5 3 19 12 5 21 5 3"/></svg>' +
+					  '</div></div>';
+				return '<a class="rec-card" href="/member/course/get_one_course/' + id + '">' +
+				       coverHtml +
 				       '<div class="rec-body">' +
 				       '<div class="rec-meta">' + cat + '</div>' +
 				       '<h3>' + name + '</h3>' +
@@ -986,7 +995,8 @@
 
 		var headers = Object.assign({ 'X-Requested-With': 'XMLHttpRequest' }, getCsrfHeaders());
 
-		fetch('/article/' + articleId + '/recommend/course', {
+		var articleDone = window.__articleRecDone || Promise.resolve();
+		var courseFetch = fetch('/article/' + articleId + '/recommend/course', {
 			method: 'POST', headers: headers, redirect: 'manual'
 		})
 		.then(function(res) {
@@ -995,8 +1005,11 @@
 			}
 			if (!res.ok) throw new Error('HTTP ' + res.status);
 			return res.json();
-		})
-		.then(function(dto) {
+		});
+
+		Promise.all([articleDone, courseFetch])
+		.then(function(results) {
+			var dto = results[1];
 			if (!dto) return;
 			renderCourseCards(dto.courseList);
 		})

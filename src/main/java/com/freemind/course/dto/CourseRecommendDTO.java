@@ -9,24 +9,26 @@ public class CourseRecommendDTO {
 	private Integer courseId;
 	private String courseCategory;
 	private String courseName;
-	private String videoSrcPre;
 	private String psych;
 	private String outline;
 	private Integer price;
 	private Integer saveCount;
 	private Integer reviewCount;
 	private Integer starCount;
+	private String videoSrcPre;
+	private String videoSrc;
 
 	public CourseRecommendDTO(Course course) {
 		this.courseId = course.getCourseId();
 		this.courseCategory = course.getCourseCategories().getCourseCatName();
 		this.courseName = course.getCourseName();
-		this.videoSrcPre = course.getVideoSrcPre();
 		this.psych = course.getPsychologist().getName();
 		this.outline = course.getOutline();
 		this.price = course.getPrice();
 		this.saveCount = course.getSaveCount();
 		this.reviewCount = course.getReviewCount();
 		this.starCount = course.getStarCount();
+		this.videoSrcPre = course.getVideoSrcPre();
+		this.videoSrc = course.getVideoSrc();
 	}
 }

@@ -191,7 +191,8 @@
 		<!-- 表單 -->
 		<div class="form-card">
 			<form th:action="@{/psych/article/{id}/edit(id=${articleId}, page=${currentPage})}"
-				method="post" enctype="multipart/form-data" id="mainForm">
+				method="post" enctype="multipart/form-data" id="mainForm"
+				th:data-edit-copy="${isEditCopy != null and isEditCopy}">
 
 				<div class="field">
 					<label>標題</label>
@@ -315,6 +316,7 @@
 
 	// 編輯過, 點擊返回按鈕確認離開
 	var formChanged = false;
+	var isEditCopy = document.getElementById('mainForm').dataset.editCopy === 'true';
 	document.getElementById('mainForm').addEventListener('input', function() { formChanged = true; });
 	document.getElementById('mainForm').addEventListener('change', function() { formChanged = true; });
 
@@ -323,6 +325,19 @@
 	    e.preventDefault();
 	    if (confirm('尚未儲存草稿，確定要離開嗎？')) {
 	        window.location.href = this.href;
+	    }
+	});
+
+	document.getElementById('mainForm').addEventListener('submit', function(e) {
+	    if (isEditCopy && !formChanged) {
+	        var editor = tinymce.get('content');
+	        if (editor && editor.isDirty()) {
+	            formChanged = true;
+	        }
+	    }
+	    if (isEditCopy && !formChanged) {
+	        e.preventDefault();
+	        alert('內容尚未修改，無法儲存或送審');
 	    }
 	});
 
