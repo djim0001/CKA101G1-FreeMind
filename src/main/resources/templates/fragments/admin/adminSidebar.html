@@ -27,7 +27,7 @@
 			<a sec:authorize="hasAnyRole('super_admin','consultation')" th:href="@{/admin/psych}" th:classappend="${active == 'psych'} ? 'active'">心理師管理</a>
 			<a sec:authorize="hasAnyRole('super_admin','courses')" th:href="@{/admin/course/select_course}" th:classappend="${active == 'course'} ? 'active'">課程管理</a>
 			<a sec:authorize="hasAnyRole('super_admin','articles')" th:href="@{/admin/article}" th:classappend="${active == 'article'} ? 'active'">文章管理</a>
-			<a sec:authorize="hasAnyRole('super_admin','activities')" th:href="@{/admin/activity/activityAdminIndex}" th:classappend="${active == 'activity'} ? 'active'">活動管理</a>
+			<a sec:authorize="hasAnyRole('super_admin','activities')" th:href="@{/admin/activity/listActivities_ByCompositeQuery}" th:classappend="${active == 'activity'} ? 'active'">活動管理</a>
 		</nav>
 
 		<p class="nav-label">訊息與公告</p>

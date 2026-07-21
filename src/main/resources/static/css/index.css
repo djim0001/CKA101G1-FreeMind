@@ -173,6 +173,16 @@
 .cta-box p { color: var(--ink); opacity: .85; margin: 0 0 1.6rem; max-width: 30rem; }
 .cta-photo { position: relative; z-index: 1; aspect-ratio: 4/3; border-radius: 24px; background: rgba(255, 255, 255, .55); }
 
+
+
+.cta-band .cta-photo.photo-slot.pink {border: none;   display: flex; justify-content: center; align-items: center; padding: 0;}
+
+/* 徹底移除全局預留區樣式的 ::after 虛擬元素虚線框  */
+.cta-band .photo-slot::after {display: none !important;}
+
+.cta-band .cta-photo .ps-inner {border: none; padding: 0; opacity: 1; background: transparent; width: 100%;}
+.cta-band .activity-photo {width: 100%; max-width: 320px; margin: 0 auto; border-radius: 20px; padding: 5px; display: block; overflow: hidden;}
+.cta-band .activity-photo img {width: 100%; height: auto; display: block; border-radius: 15px; object-fit: cover;}
 /* ============================================================ RWD（首頁專屬） ============================================================ */
 @media (max-width: 940px) {
 	.hero-grid, .meet-grid { grid-template-columns: 1fr; }

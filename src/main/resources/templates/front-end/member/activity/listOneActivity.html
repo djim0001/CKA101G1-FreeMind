@@ -76,6 +76,13 @@
 .status-pending { color: #b8860b; border-color: #b8860b; background-color: #fff8e6; }
 .status-confirmed { color: #5A7A57; border-color: #5A7A57; background-color: #eef4ec; }
 
+.reject-note-box {
+	background: #fdecea; border-radius: 12px; padding: .9rem 1.1rem;
+	font-size: .86rem; color: #c0392b; line-height: 1.8; margin: 1rem 0;
+}
+.reject-note-box b { display: block; margin-bottom: .3rem; }
+.reject-note-box p { margin: 0; }
+
 /* 報名狀態文字對應色（依 registrationStatusText 內容分色） */
 .status-open   { color: #5A7A57; border-color: #5A7A57; background-color: #eef4ec; }
 .status-notyet { color: #b8860b; border-color: #b8860b; background-color: #fff8e6; }
@@ -246,7 +253,10 @@
 					<div class="info-card">
 						<span class="info-cat" th:text="${activity.activityCat.activityCatName}">活動分類</span>
 						<h1 th:text="${activity.activityName}">活動名稱</h1>
-
+						<div class="info-row">
+							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>
+							<span>發起人：<span th:text="${#strings.isEmpty(activity.member.nickname) ? activity.member.name : activity.member.nickname}"></span></span>
+						</div>
 						<div class="info-row">
 							<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
 							<span th:text="${activity.activityCity} + ${activity.activityDist} + ${activity.activityLoc}">地點</span>
@@ -280,6 +290,16 @@
 								                   : (${activity.registrationStatusText == '已額滿' or activity.registrationStatusText == '候補中'} ? ' status-full'
 								                   : ' status-closed'))"
 								  th:text="${activity.registrationStatusText}">報名狀態</span>
+						</div>
+						
+						<div class="reject-note-box"
+						     sec:authorize="hasRole('MEMBER')"
+						     th:if="${activity.activityStatus == 3 and activity.member.memberId == #authentication.principal.member.memberId}">
+							<b>此活動申請已被退回</b>
+							<p>
+								退回原因：<span th:text="${activity.rejectReasonText}"></span>
+								<span th:if="${!#strings.isEmpty(activity.rejectNote)}"> — <span th:text="${activity.rejectNote}"></span></span>
+							</p>
 						</div>
 
 						<!-- 報名功能 -->
