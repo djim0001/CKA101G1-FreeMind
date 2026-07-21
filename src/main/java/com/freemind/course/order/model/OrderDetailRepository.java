@@ -184,4 +184,21 @@ public interface OrderDetailRepository
                 @Param("startAt") LocalDateTime startAt,
                 @Param("endAt") LocalDateTime endAt
         );
+    
+    @Query("""
+            SELECT COALESCE(SUM(od.discountedPrice), 0)
+            FROM OrderDetail od
+            JOIN od.courseOrder co
+            JOIN od.course c
+            JOIN c.psychologist p
+            WHERE p.psychId = :psychId
+              AND co.paymentStatus = 1
+              AND co.orderedAt >= :startDate
+              AND co.orderedAt < :endDate
+            """)
+        Long sumMonthlyRevenueByPsychologist(
+            @Param("psychId") Integer psychId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+        );
 }

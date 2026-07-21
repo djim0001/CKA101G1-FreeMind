@@ -1,20 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
   const toast = document.querySelector('.toast') || Object.assign(document.body.appendChild(document.createElement('div')), { className: 'toast' });
+  const cartMessageDuration = 1000;
   let toastTimer;
-  const notify = message => {
+  let cartMessageTimer;
+  const notify = (message, duration = 4200) => {
     if (!message) return;
     toast.textContent = message;
     toast.setAttribute('role', 'status');
     toast.setAttribute('aria-live', 'polite');
+    toast.hidden = false;
     toast.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+      toast.hidden = true;
+    }, duration);
+  };
+
+  const showCartMessage = message => {
+    if (!message) return;
+
+    const cartMessage = document.querySelector('[data-cart-message]');
+    if (!cartMessage) {
+      notify(message, cartMessageDuration);
+      return;
+    }
+
+    cartMessage.textContent = message;
+    cartMessage.hidden = false;
+    clearTimeout(cartMessageTimer);
+    cartMessageTimer = setTimeout(() => {
+      cartMessage.hidden = true;
+    }, cartMessageDuration);
   };
 
   document.querySelectorAll('[data-toast]').forEach(element => element.addEventListener('click', () => notify(element.dataset.toast)));
   const serverCartMessage = document.querySelector('[data-cart-message]');
   if (serverCartMessage?.textContent.trim()) {
-    window.setTimeout(() => notify(serverCartMessage.textContent.trim()), 80);
+    showCartMessage(serverCartMessage.textContent.trim());
   }
 
   const syncMemberUnreadCount = () => {
@@ -101,13 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!countUpdated) {
           if (response.redirected && /login/i.test(response.url)) {
             window.location.assign(response.url);
+          } else if (responseMessage) {
+            showCartMessage(responseMessage);
+            window.setTimeout(() => window.location.reload(), cartMessageDuration);
           } else {
             window.location.reload();
           }
           return;
         }
 
-        if (responseMessage) notify(responseMessage);
+        if (responseMessage) showCartMessage(responseMessage);
       } catch (error) {
         console.error('更新購物車數量失敗', error);
         window.location.reload();

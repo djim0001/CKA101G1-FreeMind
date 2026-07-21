@@ -157,6 +157,49 @@
 		background: var(--pink-soft);
 	}
 
+	body.thy2-member .cart-message-popup {
+		position: fixed;
+		top: 94px;
+		right: max(16px, calc((100vw - min(1160px, 92vw)) / 2));
+		z-index: 250;
+		width: min(360px, calc(100vw - 32px));
+		margin: 0;
+		padding: .9rem 1.1rem;
+		border: 1px solid rgba(245, 142, 107, .45);
+		border-left: 5px solid var(--orange);
+		border-radius: 16px;
+		color: var(--ink);
+		background: var(--white);
+		box-shadow: var(--shadow-md);
+		font-size: .9rem;
+		font-weight: 700;
+		line-height: 1.6;
+		animation: cart-message-pop .18s ease-out both;
+	}
+
+	body.thy2-member .cart-message-popup::before {
+		content: "✓";
+		display: inline-grid;
+		place-items: center;
+		width: 1.6rem;
+		height: 1.6rem;
+		margin-right: .55rem;
+		border-radius: 50%;
+		color: var(--orange-deep);
+		background: var(--pink-soft);
+	}
+
+	@keyframes cart-message-pop {
+		from {
+			opacity: 0;
+			transform: translateY(-8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
 	body.thy2-member .empty-state {
 		padding: clamp(2rem, 6vw, 4rem);
 		border: 1px dashed var(--line);
@@ -936,12 +979,13 @@
     </div>
     <div class="healing-header-actions">
       <a class="btn secondary" th:href="@{/member/coupon/my_coupon}">我的優惠券</a>
+      <a class="btn secondary" th:href="@{/member/course/my_review}">我的評價</a>
       <a class="btn" th:href="@{/member/course/my_course_order}">訂單紀錄</a>
     </div>
   </div>
 
-  <div data-cart-message hidden th:if="${cartMsg != null}"
-    th:text="${cartMsg}"></div>
+  <div class="member-message cart-message-popup" data-cart-message hidden role="status"
+    aria-live="polite" th:text="${cartMsg}"></div>
 
   <div class="empty-state" th:if="${myCoursePage == null || myCoursePage.isEmpty()}">
     <h3>尚未開始任何課程</h3>

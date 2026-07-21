@@ -16,4 +16,9 @@ public interface PayoutRepository extends JpaRepository<Payout, Integer> {
             Integer psychId,
             Integer payoutStatus
     );
+    
+    boolean existsByPsychologistPsychIdAndBillingMonth(
+	        Integer psychId,
+	        String billingMonth
+	    );
 }

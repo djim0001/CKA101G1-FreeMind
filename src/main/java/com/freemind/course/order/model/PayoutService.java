@@ -1,16 +1,28 @@
 package com.freemind.course.order.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.freemind.login.psychologist.entity.Psychologist;
+import com.freemind.login.psychologist.repository.PsychologistRepository;
 
 @Service
 public class PayoutService {
 
 	@Autowired
 	private PayoutRepository repository;
+    private PsychologistRepository psychologistRepository;
+    private OrderDetailRepository orderDetailRepository;
+	
+    private static final int PAYOUT_STATUS_PENDING = 0;
+	private static final BigDecimal COMMISSION_RATE =
+            new BigDecimal("0.10");
 
 	// 查詢全部
 	public List<Payout> getAll() {
@@ -85,6 +97,95 @@ public class PayoutService {
                         psychId,
                         0
                 );
+    }
+	// 每月自動撥款
+	 /**
+     * 建立指定月份所有心理師的結算資料。
+     *
+     * @param billingYearMonth 結算月份，例如 2026-06
+     */
+    public int createMonthlyPayouts(YearMonth billingYearMonth) {
+
+        String billingMonth = billingYearMonth.toString();
+
+        LocalDateTime startDate = billingYearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime endDate = billingYearMonth
+                .plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+        List<Psychologist> psychologists =
+                psychologistRepository.findAll();
+
+        int createdCount = 0;
+
+        for (Psychologist psychologist : psychologists) {
+
+            Integer psychId = psychologist.getPsychId();
+
+            boolean payoutExists =
+            		repository
+                        .existsByPsychologistPsychIdAndBillingMonth(
+                            psychId,
+                            billingMonth
+                        );
+
+            if (payoutExists) {
+                continue;
+            }
+
+            Long grossAmountLong =
+                    orderDetailRepository
+                        .sumMonthlyRevenueByPsychologist(
+                            psychId,
+                            startDate,
+                            endDate
+                        );
+
+            int grossAmount = grossAmountLong == null
+                    ? 0
+                    : Math.toIntExact(grossAmountLong);
+
+            int platformCommission =
+                    BigDecimal.valueOf(grossAmount)
+                        .multiply(COMMISSION_RATE)
+                        .setScale(0, RoundingMode.HALF_UP)
+                        .intValueExact();
+
+            // 其他抵扣，目前先設為 0
+            int billingOffset = 0;
+
+            int netAmount =
+                    grossAmount
+                    - platformCommission
+                    - billingOffset;
+
+            Payout payout = new Payout();
+
+            payout.setBillingMonth(billingMonth);
+            payout.setPsychologist(psychologist);
+
+            // 尚未人工處理，所以可以先不指定 admin
+            payout.setAdmin(null);
+
+            payout.setGrossPayoutAmount(grossAmount);
+            payout.setPlatformCommission(platformCommission);
+            payout.setBillingOffset(billingOffset);
+            payout.setNetPayoutAmount(Math.max(netAmount, 0));
+
+            // 尚未付款
+            payout.setPaidAt(null);
+            payout.setPayoutStatus(PAYOUT_STATUS_PENDING);
+
+            repository.save(payout);
+
+            createdCount++;
+        }
+
+        return createdCount;
     }
 
 }
