@@ -52,7 +52,7 @@ table { width: 100%; border-collapse: collapse; }
 th:nth-child(1) { width: 13%; }  /* 活動名稱 */
 th:nth-child(2) { width: 12%; }  /* 活動時間 */
 th:nth-child(3) { width: 10%; }  /* 報名時間 */
-th:nth-child(4) { width: 21%; }  /* 報名動機 */
+th:nth-child(4) { width: 16%; }  /* 報名動機 */
 th:nth-child(5) { width: 11%; }  /* 報名狀態 */
 th:nth-child(6) { width: 8%; }   /* 活動狀態 */
 th:nth-child(7) { width: 8%; }   /* 我的評價 */
@@ -206,7 +206,7 @@ tbody tr:hover { background-color: var(--bg-warm); }
 							<td th:text="${#temporals.format(r.activity.activityStart, 'MM/dd(E) HH:mm')} + ' ~ ' + ${#temporals.format(r.activity.activityEnd, 'MM/dd(E) HH:mm')}"></td>
 							<td th:text="${#temporals.format(r.regisAt, 'yyyy/MM/dd HH:mm')}"></td>
 							<td class="text-left" th:text="${r.motivation}"></td>
-							<td class="no-wrap">
+							<td>
 								<span th:text="${r.regisStatusText}"></span>
 								<span th:if="${r.regisStatus == 2 && r.rejectReason != null}">
 									<br><small>（<span th:text="${r.rejectReasonText}"></span><span th:if="${!#strings.isEmpty(r.rejectNote)}">：<span th:text="${r.rejectNote}"></span></span>）</small>
