@@ -18,8 +18,13 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("SELECT a FROM Article a WHERE a.psychologist.psychId = :psychId")
 	List<Article> findArticlesByPsychId(Integer psychId);
 
-	@Query("SELECT a FROM Article a WHERE a.psychologist.psychId = :psychId")
-	Page<Article> findArticlesByPsychId(@Param("psychId") Integer psychId, Pageable pageable);
+	@Query("SELECT a FROM Article a WHERE a.psychologist.psychId = :psychId " +
+		   "AND (a.articleCat.articleCatId = :catId OR :catId IS NULL) " +
+		   "AND (a.articleStatus = :status OR :status IS NULL) ")
+	Page<Article> findMyArticlesWithFilters(@Param("psychId")Integer psychId, 
+			                                @Param("catId")Integer catId, 
+											@Param("status")Integer status, 
+											Pageable pageable);
 	
 	@Query("SELECT a FROM Article a WHERE a.articleStatus = :status")
 	List<Article> findByStatus(@Param("status")Integer articleStatus);
@@ -52,6 +57,16 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	                             @Param("dateTo") LocalDateTime dateTo,
 	                             Pageable pageable);
 
+	@Query("SELECT a FROM Article a WHERE a.articleStatus IN :statuses " +
+		       "AND (:catId IS NULL OR a.articleCat.articleCatId = :catId) " +
+		       "AND (:keyword IS NULL OR a.title LIKE %:keyword% OR a.psychologist.name LIKE %:keyword%) " +
+		       "AND (:status IS NULL OR a.articleStatus = :status)")
+	Page<Article> findSubmittedArticlesWithFilters(@Param("statuses") List<Integer> statuses,
+	                                      @Param("catId") Integer catId,
+	                                      @Param("keyword") String keyword,
+	                                      @Param("status") Integer status,
+	                                      Pageable pageable);
+	
 	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
 	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);
 

@@ -122,6 +122,10 @@
 			transform: translateY(-2px);
 		}
 		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1rem; }
+		.crumb a:hover { color: var(--orange); }
+		.crumb span { margin: 0 .45rem; opacity: .5; }
+		.crumb .current { opacity: 1; color: var(--ink); }
 		.admin-main {
 			width: 100%;
 			flex: 1;
@@ -159,6 +163,29 @@
 			color: var(--ink-soft);
 			font-size: .92rem;
 			text-align: right;
+		}
+		.admin-page-header-nav {
+			display: flex;
+			gap: .5rem;
+			align-items: center;
+		}
+		.admin-page-header-nav a {
+			display: inline-flex;
+			align-items: center;
+			padding: .45rem .95rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .85rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			white-space: nowrap;
+		}
+		.admin-page-header-nav a:hover {
+			color: var(--orange);
+			border-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -410,19 +437,27 @@
 
 	<main id="main-content" class="admin-main">
 		<div class="admin-wrap">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}">管理後台</a><span>/</span><a th:href="@{/admin/article/categories}">文章分類管理</a><span>/</span><span class="current">新增分類</span>
+			</div>
+
 			<section class="admin-page-header" aria-labelledby="page-title">
 				<div>
 					<span class="admin-kicker">Create Category</span>
 					<h1 id="page-title">新增文章分類</h1>
 				</div>
-				<p>建立清楚且不重複的分類名稱，讓文章更容易被管理與查找。</p>
+				<nav class="admin-page-header-nav">
+					<a th:href="@{/admin/article}">文章管理</a>
+					<a th:href="@{/admin/article/categories}">文章分類</a>
+				</nav>
 			</section>
 
 			<section class="admin-panel create-panel" aria-labelledby="create-category-title">
 				<div class="admin-panel-heading">
 					<h2 id="create-category-title">分類資料</h2>
 					<a class="admin-btn secondary"
-						th:href="@{/admin/article/categories}">返回分類搜尋</a>
+						th:href="@{/admin/article/categories}">返回分類管理</a>
 				</div>
 				<div class="admin-panel-body">
 					<form class="create-form"
@@ -441,7 +476,7 @@
 							<ul id="similarList" class="similar-list"></ul>
 						</div>
 
-						<p class="form-hint">分類名稱最多 50 個字；輸入時會自動檢查完全相同或相似的既有名稱。</p>
+						<p class="form-hint">分類名稱最多 50 個字</p>
 
 						<span id="alertMsg" class="alert-message"
 							th:if="${alertMessage}"

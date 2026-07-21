@@ -276,7 +276,7 @@
 	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))
 	                 + (dateFrom == null ? '' : '&amp;dateFrom=' + dateFrom)
 	                 + (dateTo == null ? '' : '&amp;dateTo=' + dateTo)},
-	showFeatured = ${featuredArticle != null and currentPage != null and currentPage == 1}">
+	showFeatured = ${featuredArticle != null and currentPage == 1}">
 
 	<!-- ================= 導覽列 ================= -->
 	<div th:replace="~{fragments/header :: header}"></div>
@@ -406,7 +406,7 @@
 							<span class="featured-meta-top">
 								<span th:if="${top.articleCat != null}" th:text="${top.articleCat.articleCatName}">情緒照顧</span>
 								<span th:if="${top.publishedAt != null}"
-									  th:text="'・' + ${#temporals.format(top.publishedAt, 'yyyy.MM.dd')}">・2026.07.19</span>
+									  th:text="'・' + ${#temporals.format(top.publishedAt, 'yyyy-MM-dd HH:mm')}">・2026-07-19 14:30</span>
 							</span>
 							<h2 th:text="${top.title}">「我沒事」的背後，其實藏了很多事</h2>
 							<p th:text="${#strings.length(plain) > 90 ? #strings.substring(plain,0,90) + '…' : plain}"></p>
@@ -461,7 +461,7 @@
 									<span class="art-meta-top">
 										<span th:if="${art.articleCat != null}" th:text="${art.articleCat.articleCatName}">情緒照顧</span>
 										<span th:if="${art.publishedAt != null}"
-											  th:text="'・' + ${#temporals.format(art.publishedAt, 'yyyy.MM.dd')}">・2026.07.19</span>
+											  th:text="'・' + ${#temporals.format(art.publishedAt, 'yyyy-MM-dd HH:mm')}">・2026-07-19 14:30</span>
 									</span>
 									<h3 th:text="${art.title}">「我沒事」的背後，其實藏了很多事</h3>
 									<p th:text="${#strings.length(plain) > 52 ? #strings.substring(plain,0,52) + '…' : plain}"></p>

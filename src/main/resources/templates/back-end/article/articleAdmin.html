@@ -122,6 +122,10 @@
 			transform: translateY(-2px);
 		}
 		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1rem; }
+		.crumb a:hover { color: var(--orange); }
+		.crumb span { margin: 0 .45rem; opacity: .5; }
+		.crumb .current { opacity: 1; color: var(--ink); }
 		.admin-main {
 			width: 100%;
 			flex: 1;
@@ -159,6 +163,30 @@
 			color: var(--ink-soft);
 			font-size: .92rem;
 			text-align: right;
+		}
+		.admin-page-header-nav {
+			display: flex;
+			gap: .5rem;
+			align-items: center;
+		}
+		.admin-page-header-nav a {
+			display: inline-flex;
+			align-items: center;
+			padding: .35rem .15rem;
+			border: none;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
+			color: var(--ink-soft);
+			background: transparent;
+			font-size: .95rem;
+			font-weight: 500;
+			letter-spacing: .03em;
+			transition: color .18s ease, border-color .18s ease;
+			white-space: nowrap;
+		}
+		.admin-page-header-nav a:hover {
+			color: var(--orange);
+			border-bottom-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -232,7 +260,39 @@
 			font: inherit;
 			font-size: .9rem;
 		}
-		.admin-field:focus { border-color: var(--orange); outline: 0; box-shadow: 0 0 0 3px rgba(245, 142, 107, .14); }
+		.admin-field:focus { border-color: var(--bg-soothing); outline: 0; box-shadow: 0 0 0 3px rgba(194, 217, 237, .3); }
+		.custom-select { position: relative; width: 100%; }
+		.custom-select-trigger {
+			display: flex; align-items: center;
+			width: 100%; min-height: 44px; padding: .7rem 2.2rem .7rem .85rem;
+			border: 1px solid var(--line); border-radius: 12px;
+			background: #fff; color: var(--ink);
+			font: inherit; font-size: .9rem;
+			cursor: pointer; user-select: none;
+			position: relative; transition: border-color .2s;
+		}
+		.custom-select-trigger::after {
+			content: ""; position: absolute; right: .85rem; top: 50%;
+			border: 4px solid transparent; border-top: 5px solid var(--ink-soft);
+			transform: translateY(-1px); transition: transform .2s;
+		}
+		.custom-select.open .custom-select-trigger::after { transform: translateY(-4px) rotate(180deg); }
+		.custom-select-trigger:hover { border-color: var(--bg-soothing); }
+		.custom-select.open .custom-select-trigger { border-color: var(--bg-soothing); box-shadow: 0 0 0 3px rgba(194, 217, 237, .3); }
+		.custom-select-panel {
+			display: none; position: absolute; top: calc(100% + 4px); left: 0;
+			width: 100%; max-height: 220px; overflow-y: auto;
+			background: #fff; border: 1px solid var(--line);
+			border-radius: 12px; box-shadow: var(--shadow-md);
+			z-index: 100; padding: .3rem 0;
+		}
+		.custom-select.open .custom-select-panel { display: block; }
+		.custom-select-option {
+			padding: .6rem .85rem; font-size: .9rem; color: var(--ink);
+			cursor: pointer; transition: background .15s;
+		}
+		.custom-select-option:hover { background: rgba(255, 250, 238, .72); }
+		.custom-select-option.selected { font-weight: 600; color: var(--orange); }
 		.admin-btn {
 			display: inline-flex;
 			align-items: center;
@@ -351,49 +411,75 @@
 
 	<main id="main-content" class="admin-main">
 		<div class="admin-wrap">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}">管理後台</a><span>/</span><span class="current">專欄文章管理</span>
+			</div>
+
 			<section class="admin-page-header" aria-labelledby="page-title">
 				<div>
 					<span class="admin-kicker">Article Administration</span>
 					<h1 id="page-title">專欄文章管理</h1>
 				</div>
-				<p>集中查看文章送審狀態、心理師資料與目前可執行的審核操作。</p>
+				<nav class="admin-page-header-nav">
+					<a th:href="@{/admin/article}">文章管理</a>
+					<a th:href="@{/admin/article/categories}">文章分類</a>
+				</nav>
 			</section>
 
 			<nav class="article-admin-nav" aria-label="專欄文章管理功能">
 				<a class="active" th:href="@{/admin/article}">文章總覽</a>
 				<a th:href="@{/admin/article/pending}">待審核文章</a>
 				<a th:href="@{/admin/article/reviewed}">已審核文章</a>
-				<a th:href="@{/admin/article/categories}">文章分類管理</a>
-				<a th:href="@{/admin/home}">返回後台管理</a>
 			</nav>
 
 			<section class="admin-panel" aria-labelledby="article-list-title">
 				<div class="admin-panel-heading">
 					<h2 id="article-list-title">文章資料一覽</h2>
-					<p>審核與上下架操作依文章目前狀態顯示。</p>
 				</div>
 				<div class="admin-panel-body">
-					<div class="admin-toolbar" aria-label="文章篩選工具">
-						<input class="admin-field" type="search" placeholder="搜尋文章或心理師……" aria-label="搜尋文章或心理師" />
-						<select class="admin-field" aria-label="依文章分類篩選">
-							<option>全部分類</option>
-							<option th:each="cat : ${articleCats}"
-								th:value="${cat.articleCatId}"
-								th:text="${cat.articleCatName}">分類名稱</option>
-						</select>
-						<select class="admin-field" aria-label="依文章狀態篩選">
-							<option>全部狀態</option>
-							<option th:each="entry : ${articleStatuses}"
-								th:value="${entry.key}"
-								th:text="${entry.value}">文章狀態</option>
-						</select>
-						<select class="admin-field" aria-label="文章排序">
-							<option>申請時間新至舊</option>
-							<option>申請時間舊至新</option>
-						</select>
-						<button class="admin-btn secondary" type="button"
-							data-toast="篩選功能開發中">篩選</button>
-					</div>
+					<form method="get" th:action="@{/admin/article}" class="admin-toolbar" aria-label="文章篩選工具">
+						<input class="admin-field" type="search" name="keyword"
+							th:value="${currentKeyword}"
+							placeholder="搜尋文章或心理師……" aria-label="搜尋文章或心理師" />
+
+						<div class="custom-select" id="filterCatWrap">
+							<div class="custom-select-trigger" id="filterCatTrigger">全部分類</div>
+							<div class="custom-select-panel">
+								<div class="custom-select-option" data-value="">全部分類</div>
+								<div th:each="cat : ${articleCats}"
+									class="custom-select-option"
+									th:data-value="${cat.articleCatId}"
+									th:text="${cat.articleCatName}"
+									th:classappend="${currentCatId != null and currentCatId == cat.articleCatId} ? ' selected'"></div>
+							</div>
+							<input type="hidden" name="catId" id="filterCat" th:value="${currentCatId}" />
+						</div>
+
+						<div class="custom-select" id="filterStatusWrap">
+							<div class="custom-select-trigger" id="filterStatusTrigger">全部狀態</div>
+							<div class="custom-select-panel">
+								<div class="custom-select-option" data-value="">全部狀態</div>
+								<div th:each="entry : ${articleStatuses}"
+									class="custom-select-option"
+									th:data-value="${entry.key}"
+									th:text="${entry.value}"
+									th:classappend="${currentStatus != null and currentStatus == entry.key} ? ' selected'"></div>
+							</div>
+							<input type="hidden" name="status" id="filterStatus" th:value="${currentStatus}" />
+						</div>
+
+						<div class="custom-select" id="filterSortWrap">
+							<div class="custom-select-trigger" id="filterSortTrigger">申請時間新至舊</div>
+							<div class="custom-select-panel">
+								<div class="custom-select-option" data-value="newest" th:classappend="${currentSort == null or currentSort == 'newest'} ? ' selected'">申請時間新至舊</div>
+								<div class="custom-select-option" data-value="oldest" th:classappend="${currentSort == 'oldest'} ? ' selected'">申請時間舊至新</div>
+							</div>
+							<input type="hidden" name="sort" id="filterSort" th:value="${currentSort}" />
+						</div>
+
+						<button class="admin-btn secondary" type="submit">篩選</button>
+					</form>
 
 					<div class="table-scroll">
 						<table class="admin-table">
@@ -418,7 +504,7 @@
 									</td>
 									<td>
 										<span th:if="${article.submittedAt != null}"
-											th:text="${#temporals.format(article.submittedAt,'yyyy/MM/dd HH:mm')}">申請時間</span>
+											th:text="${#temporals.format(article.submittedAt,'yyyy-MM-dd HH:mm')}">申請時間</span>
 										<span th:unless="${article.submittedAt != null}">—</span>
 									</td>
 									<td>
@@ -449,13 +535,53 @@
 						</table>
 					</div>
 
-					<div
-						th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, '/admin/article', '')}"></div>
+					<div th:replace="~{fragments/pagination :: pagination(${currentPage}, ${articlePage.totalPages}, '/admin/article', ${filterQueryString})}"></div>
 				</div>
 			</section>
 		</div>
 	</main>
 
 	<div th:replace="~{fragments/adminFooter :: footer}"></div>
+
+	<script>
+		function initCustomSelect(wrapId, triggerId, hiddenId) {
+			var wrap = document.getElementById(wrapId);
+			var trigger = document.getElementById(triggerId);
+			var hidden = document.getElementById(hiddenId);
+			var options = wrap.querySelectorAll('.custom-select-option');
+
+			var selectedOpt = wrap.querySelector('.custom-select-option.selected');
+			if (selectedOpt) trigger.textContent = selectedOpt.textContent;
+
+			trigger.addEventListener('click', function(e) {
+				e.stopPropagation();
+				document.querySelectorAll('.custom-select.open').forEach(function(el) {
+					if (el !== wrap) el.classList.remove('open');
+				});
+				wrap.classList.toggle('open');
+			});
+
+			options.forEach(function(opt) {
+				opt.addEventListener('click', function(e) {
+					e.stopPropagation();
+					options.forEach(function(o) { o.classList.remove('selected'); });
+					opt.classList.add('selected');
+					trigger.textContent = opt.textContent;
+					hidden.value = opt.getAttribute('data-value');
+					wrap.classList.remove('open');
+				});
+			});
+		}
+
+		document.addEventListener('click', function() {
+			document.querySelectorAll('.custom-select.open').forEach(function(el) {
+				el.classList.remove('open');
+			});
+		});
+
+		initCustomSelect('filterCatWrap', 'filterCatTrigger', 'filterCat');
+		initCustomSelect('filterStatusWrap', 'filterStatusTrigger', 'filterStatus');
+		initCustomSelect('filterSortWrap', 'filterSortTrigger', 'filterSort');
+	</script>
 </body>
 </html>

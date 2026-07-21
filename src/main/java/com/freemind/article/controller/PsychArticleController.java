@@ -70,10 +70,12 @@ public class PsychArticleController {
 	@GetMapping("/myArticles")
 	public String myArticles(Model model, 
 			@AuthenticationPrincipal PsychUserDetails prinPsychUser,
-			@RequestParam(name = "page", defaultValue = "1") Integer page) {
-
+			@RequestParam(name = "page", defaultValue = "1") Integer page,
+			@RequestParam(name = "catId", required = false) Integer catId,
+	        @RequestParam(name = "status", required = false) Integer status,
+	        @RequestParam(name = "sort", defaultValue = "newest") String sort) {
 		Integer psychId = prinPsychUser.getPsychologist().getPsychId();
-		Page<Article> articlePage = articleService.getMyArticles(psychId, page);
+		Page<Article> articlePage = articleService.getMyArticles(psychId, catId, status, sort, page);
 
 		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
 		for (Article article : articlePage.getContent()) {
@@ -83,6 +85,16 @@ public class PsychArticleController {
 		model.addAttribute("articlePage", articlePage);
 		model.addAttribute("articleList", articleList);
 		model.addAttribute("currentPage", page);
+		model.addAttribute("selectedCatId", catId);
+	    model.addAttribute("selectedStatus", status);
+	    model.addAttribute("selectedSort", sort);
+	    
+	    StringBuilder qs = new StringBuilder();
+	    if (catId != null) qs.append("&catId=").append(catId);
+	    if (status != null) qs.append("&status=").append(status);
+	    if (!"newest".equals(sort)) qs.append("&sort=").append(sort);
+	    model.addAttribute("filterQueryString", qs.toString());
+	    
 		return "front-end/psych/article/myArticles";
 	}
 	
@@ -334,6 +346,24 @@ public class PsychArticleController {
         return "redirect:/psych/article/myArticles";
 	}
 	
+	@PostMapping("/batchDelete")
+	public String batchDelete(Model model,
+	        @RequestParam("articleIds") List<Integer> articleIds,
+	        @AuthenticationPrincipal PsychUserDetails prinPsychUser,
+	        RedirectAttributes redirectAttributes) {
+		 Integer psychId = prinPsychUser.getPsychologist().getPsychId();
+		 
+		 try {
+				articleService.batchDeleteDrafts(articleIds, psychId);
+		        redirectAttributes.addFlashAttribute("alertMessage", "已刪除 " + articleIds.size() + " 篇文章");
+			} catch (IllegalArgumentException | IllegalStateException e) {
+		        redirectAttributes.addFlashAttribute("alertMessage", e.getMessage());
+			}
+		 
+		 return "redirect:/psych/article/myArticles";
+	}
+	
+		
 	// saving <img src=""> to backend from TinyMCE
 	@ResponseBody
 	@PostMapping("/uploadImage") 

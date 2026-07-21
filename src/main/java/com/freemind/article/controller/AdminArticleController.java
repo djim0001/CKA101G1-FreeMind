@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +26,11 @@ import com.freemind.article.entity.ArticleCat;
 import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
+import com.freemind.login.admin.model.Admin;
 import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
+
+import org.springframework.security.core.Authentication;
 
 
 @Controller
@@ -35,23 +39,40 @@ public class AdminArticleController {
 
 	@Autowired
 	private ArticleService articleService;
-	
+
 	@Autowired
 	private ArticleCatService articleCatService;
-	
+
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
-	
+
 	@Autowired
 	private NoticeService noticeService;
-	
+
+	@ModelAttribute("admin")
+	public Admin currentAdmin(Authentication authentication) {
+		if (authentication == null || 
+		    !(authentication.getPrincipal() instanceof AdminUserDetails adminUser)) {
+			return null;
+		}
+		return adminUser.getAdmin();
+	}
+
 	@GetMapping
     public String articleAdmin(Model model,
-    		@RequestParam(name = "page", defaultValue = "1") Integer page) {
-		Page<Article> articlePage = articleService.getSubmittedArticles(page);
+    		@RequestParam(name = "page", defaultValue = "1") Integer page,
+    		@RequestParam(name = "keyword", required = false) String keyword,
+	        @RequestParam(name = "catId", required = false) Integer catId,
+	        @RequestParam(name = "status", required = false) Integer status,
+	        @RequestParam(name = "sort", defaultValue = "newest") String sort) {
+		Page<Article> articlePage = articleService.getSubmittedArticles(keyword, catId, status, sort, page);
 	    model.addAttribute("articlePage", articlePage);
 	    model.addAttribute("currentPage", page);
 	    model.addAttribute("articleCats", articleCatService.getAllCats());
+	    model.addAttribute("currentKeyword", keyword);
+	    model.addAttribute("currentCatId", catId);
+	    model.addAttribute("currentStatus", status);
+	    model.addAttribute("currentSort", sort);
 	    
 	    Map<Integer, String> articleStatuses = new LinkedHashMap<>();
 	    articleStatuses.put(1, "待審核");
@@ -59,6 +80,15 @@ public class AdminArticleController {
 	    articleStatuses.put(3, "已退回");
 	    articleStatuses.put(4, "已下架");
 	    model.addAttribute("articleStatuses", articleStatuses);
+	    
+	    StringBuilder qs = new StringBuilder();
+	    if (keyword != null && !keyword.isEmpty()) qs.append("keyword=").append(keyword).append("&");
+	    if (catId != null) qs.append("catId=").append(catId).append("&");
+	    if (status != null) qs.append("status=").append(status).append("&");
+	    if (sort != null && !"newest".equals(sort)) qs.append("sort=").append(sort).append("&");
+	    if (qs.length() > 0) qs.setLength(qs.length() - 1);
+	    model.addAttribute("filterQueryString", qs.toString());
+	    
 		return "back-end/article/articleAdmin";
     }
 	
@@ -79,13 +109,16 @@ public class AdminArticleController {
 		Page<Article> articlePage = articleService.getReviewedArticles(status, page);
 		
 		List<ArticleWithStatsDTO> articleList = new ArrayList<>();
+		
 		for (Article article : articlePage.getContent()) {
-			ArticleWithStatsDTO stats = null;
-			
+			ArticleWithStatsDTO stats;
+
 			if (article.getArticleStatus() == 2 || article.getArticleStatus() == 4) {
 				stats = articleInteractionService.getArticleStatistics(article);
+			} else {
+				stats = ArticleWithStatsDTO.builder().article(article).build();
 			}
-			
+
 			articleList.add(stats);
 		}
 		

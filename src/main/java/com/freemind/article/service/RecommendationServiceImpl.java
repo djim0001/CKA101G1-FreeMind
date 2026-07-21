@@ -1,11 +1,14 @@
 package com.freemind.article.service;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import com.freemind.article.entity.ArticleViewHistory;
 import com.freemind.article.repository.ArticleRepository;
 import com.freemind.article.repository.ArticleViewHistoryRepository;
 import com.freemind.course.course.model.Course;
+import com.freemind.course.course.model.CourseService;
 import com.freemind.login.member.model.Member;
 
 import jakarta.transaction.Transactional;
@@ -28,6 +32,9 @@ public class RecommendationServiceImpl implements RecommendationService{
 	
 	@Autowired
 	private ArticleViewHistoryRepository articleViewHistoryRepository;
+	
+	@Autowired
+	private CourseService courseService;
 	
 	@Override
 	@Transactional
@@ -73,9 +80,24 @@ public class RecommendationServiceImpl implements RecommendationService{
 	}
 	
 	@Override
-	public List<Course> getCourseRecommendation(Member member) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Course> getCourseRecommendation(Integer articleId) {
+		Article article = articleRepository.findById(articleId)
+				                           .orElseThrow(() -> new IllegalArgumentException("查無此文章"));
+		Set<Course> courses = article.getPsychologist().getCourses();
+		List<Course> courselist = new ArrayList<>(courses);
+		
+		if (!courses.isEmpty()) {
+			Collections.shuffle(courselist);
+		}
+		
+		if (courselist.size() < 3) {
+			List<Course> courseListByCat = courseService.getPopularCoursesByCat(article.getArticleCat().getArticleCatId());
+			courselist = Stream.concat(courselist.stream(), courseListByCat.stream())
+																	        .limit(3)
+																	        .collect(Collectors.toList());
+		}
+		
+		return courselist.stream().limit(3).collect(Collectors.toList());
 	}
-
+	
 }

@@ -18,11 +18,11 @@ public interface ArticleService {
 	
 	List<Article> getMyArticles(Integer psychId);
 	
-	Page<Article> getMyArticles(Integer psychId, Integer page);
+	Page<Article> getMyArticles(Integer psychId, Integer catId, Integer status, String sort, Integer page);
 	
 	Page<Article> getPublishedArticles(Integer catId, String keyword, LocalDate dateFrom, LocalDate dateTo, Integer page, String sort);
 	
-	Page<Article> getSubmittedArticles(Integer page);
+	Page<Article> getSubmittedArticles(String keyword, Integer catId, Integer status, String sort, Integer page);
 	
 	Page<Article> getPendingArticles(Integer page);
 	
@@ -43,6 +43,8 @@ public interface ArticleService {
 	Article updateAndSubmit(Integer articleId, ArticleCreateForm form, Integer psychId);
 	
 	void deleteDraft(Integer articleId, Integer psychId);
+	
+	void batchDeleteDrafts(List<Integer> articleIds, Integer psychId);
 	
 	void unPublishMyArticle(Integer articleId, Integer psychId);
 	

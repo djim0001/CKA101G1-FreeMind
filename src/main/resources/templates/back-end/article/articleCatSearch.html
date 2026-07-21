@@ -122,6 +122,10 @@
 			transform: translateY(-2px);
 		}
 		.logout-button svg { width: 17px; height: 17px; stroke: currentColor; }
+		.crumb { font-size: .84rem; color: var(--ink-soft); letter-spacing: .04em; margin-bottom: 1rem; }
+		.crumb a:hover { color: var(--orange); }
+		.crumb span { margin: 0 .45rem; opacity: .5; }
+		.crumb .current { opacity: 1; color: var(--ink); }
 		.admin-main {
 			width: 100%;
 			flex: 1;
@@ -159,6 +163,29 @@
 			color: var(--ink-soft);
 			font-size: .92rem;
 			text-align: right;
+		}
+		.admin-page-header-nav {
+			display: flex;
+			gap: .5rem;
+			align-items: center;
+		}
+		.admin-page-header-nav a {
+			display: inline-flex;
+			align-items: center;
+			padding: .45rem .95rem;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			color: var(--ink-soft);
+			background: var(--white);
+			box-shadow: var(--shadow-sm);
+			font-size: .85rem;
+			font-weight: 700;
+			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			white-space: nowrap;
+		}
+		.admin-page-header-nav a:hover {
+			color: var(--orange);
+			border-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -410,14 +437,6 @@
 		.dropdown-item + .dropdown-item { border-top: 1px solid var(--line); }
 		.dropdown-item:hover { background: var(--bg-warm); }
 		.category-create-action { margin-top: 1rem; }
-		.category-tip {
-			margin: 1rem 0 0;
-			padding: .85rem 1rem;
-			border-radius: 14px;
-			color: var(--ink-soft);
-			background: var(--blue-soft);
-			font-size: .82rem;
-		}
 		@media (max-width: 820px) {
 			.category-layout { grid-template-columns: 1fr; }
 		}
@@ -446,20 +465,25 @@
 
 	<main id="main-content" class="admin-main">
 		<div class="admin-wrap">
+
+			<div class="crumb">
+				<a th:href="@{/admin/home}">管理後台</a><span>/</span><a th:href="@{/admin/article}">文章總覽</a><span>/</span><span class="current">文章分類管理</span>
+			</div>
+
 			<section class="admin-page-header" aria-labelledby="page-title">
 				<div>
 					<span class="admin-kicker">Article Categories</span>
 					<h1 id="page-title">文章分類管理</h1>
 				</div>
-				<p>搜尋、查看與新增文章分類，維持專欄內容架構清楚一致。</p>
+				<nav class="admin-page-header-nav">
+					<a th:href="@{/admin/article}">文章管理</a>
+					<a th:href="@{/admin/article/categories}">文章分類</a>
+				</nav>
 			</section>
 
 			<nav class="article-admin-nav" aria-label="專欄文章管理功能">
 				<a th:href="@{/admin/article}">文章總覽</a>
-				<a th:href="@{/admin/article/pending}">待審核文章</a>
-				<a th:href="@{/admin/article/reviewed}">已審核文章</a>
 				<a class="active" th:href="@{/admin/article/categories}">文章分類管理</a>
-				<a th:href="@{/admin/home}">返回後台管理</a>
 			</nav>
 
 			<div class="category-layout">
@@ -480,14 +504,12 @@
 						</div>
 						<a class="admin-btn category-create-action"
 							th:href="@{/admin/article/categories/create}">新增文章分類</a>
-						<p class="category-tip">輸入關鍵字後，可直接從搜尋結果前往分類詳情。</p>
 					</div>
 				</section>
 
 				<section class="admin-panel" aria-labelledby="category-list-title">
 					<div class="admin-panel-heading">
 						<h2 id="category-list-title">文章分類一覽</h2>
-						<p>依分類編號查看詳細資料。</p>
 					</div>
 					<div class="admin-panel-body">
 						<div class="table-scroll">
