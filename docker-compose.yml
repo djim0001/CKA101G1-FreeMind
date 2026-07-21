@@ -54,6 +54,21 @@ services:
     volumes:
       - redis-data:/data
 
+  # 一次性服務：灌入 Redis 假資料（hot:alltime）後即結束，Exited (0) 為正常
+  redis-seed:
+    image: redis:5.0.14
+    container_name: freemind-redis-seed
+    depends_on:
+      redis:
+        condition: service_started
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    volumes:
+      - ./docker/redis/seed-redis.sh:/seed.sh:ro
+    entrypoint: ["sh", "/seed.sh"]
+    restart: "no"
+
 volumes:
   mysql-data:
   redis-data:
