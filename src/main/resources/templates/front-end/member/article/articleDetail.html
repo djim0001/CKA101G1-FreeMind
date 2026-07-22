@@ -177,9 +177,9 @@
 }
 .rec-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 .rec-cover {
-	width: 100%; height: 120px; object-fit: cover; display: block;
+	width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block;
 }
-.rec-card .photo-slot { width: 100%; height: 120px; }
+.rec-card .photo-slot { width: 100%; aspect-ratio: 16/9; }
 .rec-card .photo-slot::after { content: none; }
 .rec-body { padding: .9rem 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
 .rec-meta {
@@ -358,7 +358,7 @@
 }
 @media (max-width: 720px) {
 	.recommend-list { grid-template-columns: 1fr 1fr; gap: .8rem; }
-	.rec-cover, .rec-cover-empty { height: 90px; }
+	.rec-cover, .rec-cover-empty { aspect-ratio: 16/9; }
 }
 @media (max-width: 640px) {
 	.art-detail-wrap { padding: 0 .5rem; }
@@ -970,7 +970,7 @@
 				var price = c.price != null ? 'NT$ ' + c.price.toLocaleString() : '';
 				var videoUrl = c.videoSrcPre || c.videoSrc || '';
 				var coverHtml = videoUrl
-					? '<video class="rec-cover" muted playsinline preload="metadata" src="' + esc(videoUrl) + '"></video>'
+					? '<video class="rec-cover" muted playsinline preload="metadata" data-course-thumbnail src="' + esc(videoUrl) + '"></video>'
 					: '<div class="photo-slot"><div class="ps-inner">' +
 					  '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
 					  '<polygon points="5 3 19 12 5 21 5 3"/></svg>' +
@@ -988,6 +988,20 @@
 			}).join('');
 			listEl.innerHTML = h;
 			section.style.display = '';
+			initThumbnails();
+		}
+
+		/* 與課程列表相同：跳到 duration/10 秒，避免停在開頭模糊的淡入畫格 */
+		function initThumbnails() {
+			listEl.querySelectorAll('[data-course-thumbnail]').forEach(function (video) {
+				var showPreviewFrame = function () {
+					if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+					video.currentTime = Math.min(1, Math.max(0.05, video.duration / 10));
+				};
+				if (video.readyState >= 1) showPreviewFrame();
+				else video.addEventListener('loadedmetadata', showPreviewFrame, { once: true });
+				video.addEventListener('seeked', function () { video.pause(); }, { once: true });
+			});
 		}
 
 		listEl.innerHTML = skeleton();
