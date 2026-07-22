@@ -49,7 +49,9 @@ public class PsychologistMemberController {
 	        @RequestParam(required = false)
 	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate slotDate,
 	        @RequestParam(required = false) String orderBy,
-	        @AuthenticationPrincipal PsychUserDetails memberDetails,
+	        
+	        @AuthenticationPrincipal PsychUserDetails psychDetails,
+	        @AuthenticationPrincipal MemberUserDetails memberDetails,
 	        Model model) {
 		
 		name = blankToNull(name);
@@ -85,10 +87,12 @@ public class PsychologistMemberController {
 	    model.addAttribute("slotDate", slotDate);
 	    model.addAttribute("orderBy", orderBy);
 	    model.addAttribute("expertiseOptions", expertiseService.getAllExpertiseNames());
-	    if (memberDetails != null) {
-	        model.addAttribute("psych", memberDetails.getPsychologist());
+	    if (psychDetails != null) {
+	        model.addAttribute("psych", psychDetails.getPsychologist());
 	    }
-	    
+	    if (memberDetails != null) {
+	        model.addAttribute("member", memberDetails.getMember());
+	    }
 
 	    return "front-end/member/psych/search";
 	    
@@ -96,7 +100,7 @@ public class PsychologistMemberController {
 
 	
 	@GetMapping("/detail/{id}")
-	public String detailPage(@PathVariable Integer id, Model model) {
+	public String detailPage(@PathVariable Integer id, Model model, @AuthenticationPrincipal MemberUserDetails memberDetails) {
 	    try {
 	        PsychologistProfileRes psych = psychologistService.getProfile(id);
 	        System.out.println("1111111"+psych.getAvailableDates());
@@ -105,6 +109,9 @@ public class PsychologistMemberController {
 	        model.addAttribute("ratingCount", ordersSvc.getRatingCount(psych.getPsychId()));
 	    } catch (IllegalArgumentException e) {
 	        model.addAttribute("errorMessage", e.getMessage());
+	    }
+	    if (memberDetails != null) {
+	        model.addAttribute("member", memberDetails.getMember());
 	    }
 	    return "front-end/member/psych/detail";
 	}
