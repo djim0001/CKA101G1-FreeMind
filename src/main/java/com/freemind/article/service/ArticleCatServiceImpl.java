@@ -68,8 +68,12 @@ public class ArticleCatServiceImpl implements ArticleCatService{
 		if (catName == null || catName.isBlank()) {
 			throw new IllegalArgumentException("請填寫分類名稱");
 		}
-		
-		articleCat.setArticleCatName(catName);
+
+		if (articleCatRepository.existsCatNameExcludingId(catName.trim(), catId)) {
+			throw new IllegalArgumentException("此分類已存在");
+		}
+
+		articleCat.setArticleCatName(catName.trim());
 		articleCatRepository.save(articleCat);
 	}
 

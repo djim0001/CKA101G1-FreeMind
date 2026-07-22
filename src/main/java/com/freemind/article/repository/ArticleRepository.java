@@ -69,8 +69,8 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	                                      @Param("status") Integer status,
 	                                      Pageable pageable);
 	
-	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus IN :statuses")
-	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("statuses")List<Integer> statuses);
+	@Query("SELECT a FROM Article a WHERE a.parentArticleId = :parentId AND a.articleStatus = :status")
+	Article findEditCopy(@Param("parentId")Integer parentArticleId, @Param("status")Integer status);
 
 	boolean existsByArticleCat(ArticleCat articleCat);
 
