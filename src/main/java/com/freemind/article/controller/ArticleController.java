@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,7 +33,10 @@ import com.freemind.article.service.ArticleViewService;
 import com.freemind.article.service.RecommendationService;
 import com.freemind.course.course.model.Course;
 import com.freemind.course.dto.CourseListRecommendDTO;
+import com.freemind.login.member.model.Member;
+import com.freemind.login.member.model.MemberService;
 import com.freemind.login.psychologist.dto.PsychologistProfileRes;
+import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.service.PsychologistService;
 import com.freemind.login.security.membersecurity.MemberUserDetails;
 import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
@@ -60,6 +65,25 @@ public class ArticleController {
 	@Autowired
 	private PsychologistService psychologistService;
 	
+	@Autowired
+    private MemberService memberService;
+
+	@ModelAttribute("member")
+    public Member currentMember(Authentication authentication) {
+    	if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+    		return null;
+    	}
+    	return memberService.findByAccount(authentication.getName());
+    }
+
+	@ModelAttribute("psych")
+    public Psychologist currentPsych(Authentication authentication) {
+    	if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+    		return null;
+    	}
+    	return psychologistService.findByAccount(authentication.getName());
+    }
+
 	@ModelAttribute("articleCats")
 	public List<ArticleCat> articleCatList() {
 		return articleCatService.getActiveCats();

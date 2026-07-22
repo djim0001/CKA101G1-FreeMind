@@ -67,7 +67,7 @@ public class PsychArticleController {
 	private ArticleInteractionService articleInteractionService;
 	
 	@Autowired
-    private PsychologistService psychService;
+    private PsychologistService psychologistService;
 
 	
 	@ModelAttribute("psych")
@@ -75,7 +75,7 @@ public class PsychArticleController {
     	if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
     		return null;
     	}
-    	return psychService.findByAccount(authentication.getName());
+    	return psychologistService.findByAccount(authentication.getName());
     }
 
 	@ModelAttribute("articleCats")

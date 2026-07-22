@@ -33,6 +33,7 @@ build/
 .vscode/
 
 ### Upload settings ###
+uploads/**
 !uploads/activity-images/
 !uploads/activity-images/**	
 
