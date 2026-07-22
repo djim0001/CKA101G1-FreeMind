@@ -225,12 +225,7 @@ public class ArticleServiceImpl implements ArticleService{
 		}
 		
 		// 已發布文章, 建立可編輯的副本
-		
-		List<Integer> statuses = new ArrayList<>();
-		statuses.add(0); // 副本狀態: 編輯中
-		statuses.add(1); // 副本狀態: 送審中
-		
-		Article existingCopy = articleRepository.findEditCopy(articleId, statuses);
+		Article existingCopy = articleRepository.findEditCopy(articleId, 0);
 		if (existingCopy != null) {
 			return existingCopy;
 		}

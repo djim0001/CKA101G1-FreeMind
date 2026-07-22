@@ -27,9 +27,11 @@ import com.freemind.article.service.ArticleCatService;
 import com.freemind.article.service.ArticleInteractionService;
 import com.freemind.article.service.ArticleService;
 import com.freemind.login.admin.model.Admin;
+import com.freemind.login.admin.model.AdminService;
 import com.freemind.login.notice.service.NoticeService;
 import com.freemind.login.security.adminsecurity.AdminUserDetails;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 
@@ -45,17 +47,19 @@ public class AdminArticleController {
 
 	@Autowired
 	private ArticleInteractionService articleInteractionService;
+	
+	@Autowired
+    private AdminService adminService;
 
 	@Autowired
 	private NoticeService noticeService;
 
 	@ModelAttribute("admin")
 	public Admin currentAdmin(Authentication authentication) {
-		if (authentication == null || 
-		    !(authentication.getPrincipal() instanceof AdminUserDetails adminUser)) {
-			return null;
-		}
-		return adminUser.getAdmin();
+		if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+        return adminService.findByAccount(authentication.getName());
 	}
 
 	@GetMapping
