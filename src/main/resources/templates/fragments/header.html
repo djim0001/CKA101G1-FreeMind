@@ -89,11 +89,9 @@
 				<div class="pop" id="avatarPop" role="menu">
 					<div class="pop-head" sec:authorize="hasRole('ROLE_MEMBER')">
 						<b th:text="${member != null ? member.name + ' 歡迎回來！': '尚未登入'}"></b>
-						<p >登入後，開始你的療癒足跡</p>
 					</div>
 					<div class="pop-head" sec:authorize="hasRole('ROLE_PSYCH')">
 						<b th:text="${psych != null ? psych.name + ' 歡迎回來！': '尚未登入'}"></b>
-						<p >登入後，開始你的療癒足跡</p>
 					</div>
 
 					<!-- 登入入口：未登入、或以管理員身分瀏覽前台時皆顯示（可直接切換身分） -->
