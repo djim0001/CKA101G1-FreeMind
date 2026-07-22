@@ -204,7 +204,9 @@ private final ShoppingCartRedisService ShoppingCartRedisSvc;
 				.multiply(memberCoupon.getCoupon().getDiscount())
 				.intValue();
 	    Integer discountLimit = memberCoupon.getCoupon().getDiscountLimit();
-	    if (discountLimit < (cartTotal - total)) {
+	    discountLimit = 
+	    		discountLimit == null ? 0 : discountLimit;
+	    if (discountLimit != 0 && (discountLimit < (cartTotal - total))) {
 		    	redirectAttributes.addFlashAttribute("couponError", 
 		    						"此次消費已達折扣上限，最多折扣:" + discountLimit + "元");
 		    	session.setAttribute("discountLimitTotal", (cartTotal-discountLimit));

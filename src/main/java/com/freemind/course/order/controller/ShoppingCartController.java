@@ -196,9 +196,11 @@ public class ShoppingCartController {
 			Integer discountLimit = orderCoupon.getCoupon().getDiscountLimit();
 			total = BigDecimal.valueOf(cartTotal)
 					.multiply(orderCoupon.getCoupon().getDiscount())
-					.intValue();
-			discountAmount = discountLimit > (cartTotal - total) 
-								? (cartTotal - total) : discountLimit;
+					.intValue(); 
+			if(discountLimit != null && discountLimit != 0)
+				discountAmount = discountLimit > (cartTotal - total) ? (cartTotal - total) : discountLimit;
+			else
+				discountAmount = cartTotal - total;
 			orderCoupon.setCouponStatus((byte)1);
 			memberCouponSvc.updateCoupon(orderCoupon);
 			session.removeAttribute("orderCoupon");

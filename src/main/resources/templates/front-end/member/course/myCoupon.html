@@ -1028,6 +1028,9 @@
 			th:attr="data-cart-count-value=${countMemberCartCount != null ? countMemberCartCount : ''},aria-label=${countMemberCartCount != null and countMemberCartCount > 0 ? '購物車內有 ' + countMemberCartCount + ' 門課程' : '購物車目前沒有課程'}"
 			aria-live="polite" aria-atomic="true">0</span>
 	</a>
+	<div
+			th:replace="~{fragments/pagination :: pagination(${currentPage}, ${totalPages}, '/member/coupon/my_coupon', ${orderBy})}"></div>
+	
 	<div th:replace="~{fragments/footer :: footer}"></div>
 	<div th:replace="~{fragments/footer :: backToTop}"></div>
 	<script th:src="@{/js/nav.js}"></script>
