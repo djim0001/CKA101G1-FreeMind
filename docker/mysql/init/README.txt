@@ -14,6 +14,9 @@ docker compose up -d --build
 docker compose ps
 docker compose logs -f app        # Ctrl+C 離開
 
+docker compose logs redis-seed
+# 應看到：Redis 假資料灌入完成：hot:alltime（15 筆）
+
 
 VM 重新開機後（手動）
 
@@ -24,3 +27,6 @@ docker compose ps
 docker compose logs -f app
 
 docker compose exec mysql mysql -uroot -p123456 dbtest -e "SHOW TABLES;" #看My SQL table
+
+/var/lib/mysql-files/covers/                        ←→  Linux（Docker）
+C:/ProgramData/MySQL/MySQL Server 8.4/Uploads/      ←→  Windows（本機）

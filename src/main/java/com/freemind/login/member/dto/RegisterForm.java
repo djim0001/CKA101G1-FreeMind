@@ -18,11 +18,10 @@ import jakarta.validation.constraints.Size;
 public class RegisterForm {
 
 	/**
-	 * 密碼強度規則（註冊與重設密碼共用）：
-	 * (?=.*[a-z]) 至少一個小寫、(?=.*[A-Z]) 至少一個大寫、(?=.*\d) 至少一個數字，長度 8~20
+	 * 密碼規則（註冊與重設密碼共用）：非空、長度 6~20 字（比照心理師規則）
 	 */
-	public static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,20}$";
-	public static final String PASSWORD_MESSAGE = "密碼: 長度需8到20字元，且必須包含英文大寫、小寫與數字";
+	public static final String PASSWORD_PATTERN = "^.{6,20}$";
+	public static final String PASSWORD_MESSAGE = "密碼長度須為6~20字";
 
 	@NotEmpty(message = "會員帳號: 請勿空白")
 	@Size(max = 20, message = "會員帳號: 長度不可超過20字元")
@@ -30,7 +29,7 @@ public class RegisterForm {
 	private String memberAccount;
 
 	@NotEmpty(message = "會員密碼: 請勿空白")
-	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,20}$", message = "密碼: 長度需8到20字元，且必須包含英文大寫、小寫與數字")
+	@Size(min = 6, max = 20, message = "密碼長度須為6~20字")
 	private String memberPassword;
 	
 	@NotEmpty(message = "確認密碼: 請勿空白")
