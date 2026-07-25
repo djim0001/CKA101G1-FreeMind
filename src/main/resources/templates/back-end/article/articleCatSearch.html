@@ -172,20 +172,21 @@
 		.admin-page-header-nav a {
 			display: inline-flex;
 			align-items: center;
-			padding: .45rem .95rem;
-			border: 1px solid var(--line);
-			border-radius: 999px;
+			padding: .35rem .15rem;
+			border: none;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
 			color: var(--ink-soft);
-			background: var(--white);
-			box-shadow: var(--shadow-sm);
-			font-size: .85rem;
-			font-weight: 700;
-			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			background: transparent;
+			font-size: .95rem;
+			font-weight: 500;
+			letter-spacing: .03em;
+			transition: color .18s ease, border-color .18s ease;
 			white-space: nowrap;
 		}
 		.admin-page-header-nav a:hover {
 			color: var(--orange);
-			border-color: var(--orange);
+			border-bottom-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
@@ -405,6 +406,12 @@
 			white-space: nowrap;
 			text-overflow: ellipsis;
 		}
+		/* 搜尋面板需讓 dropdown 溢出顯示，故不沿用 .admin-panel 的 overflow: hidden */
+		.category-search-panel { overflow: visible; }
+		.category-search-panel .admin-panel-heading {
+			border-top-left-radius: inherit;
+			border-top-right-radius: inherit;
+		}
 		.form-group { margin: 0; }
 		.form-group label {
 			display: block;
@@ -487,7 +494,7 @@
 			</nav>
 
 			<div class="category-layout">
-				<section class="admin-panel" aria-labelledby="category-search-title">
+				<section class="admin-panel category-search-panel" aria-labelledby="category-search-title">
 					<div class="admin-panel-heading">
 						<h2 id="category-search-title">搜尋／新增分類</h2>
 					</div>

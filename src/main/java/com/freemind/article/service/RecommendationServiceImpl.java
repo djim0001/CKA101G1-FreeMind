@@ -38,7 +38,7 @@ public class RecommendationServiceImpl implements RecommendationService{
 	@Override
 	@Transactional
 	public List<Article> getArticleRecommendation(Integer articleId) {
-		List<ArticleCat> catList = articleRepository.getPopularCats(6);
+		List<ArticleCat> catList = articleRepository.getPopularCats(3);
 		Collections.shuffle(catList);
 		
 		List<ArticleCat> random3 = new ArrayList<>();
