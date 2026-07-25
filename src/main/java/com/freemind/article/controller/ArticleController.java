@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.freemind.article.dto.ArticleListRecommendDTO;
 import com.freemind.article.dto.ArticleWithStatsDTO;
@@ -42,11 +43,16 @@ import com.freemind.login.security.membersecurity.MemberUserDetails;
 import com.freemind.login.security.psychologistsecurity.PsychUserDetails;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/article")
 public class ArticleController {
-	
+
+	// 日期區間只存 session，不進網址
+	private static final String SESSION_DATE_FROM = "articleDateFrom";
+	private static final String SESSION_DATE_TO = "articleDateTo";
+
 	@Autowired
 	private ArticleService articleService;
 	
@@ -89,17 +95,42 @@ public class ArticleController {
 		return articleCatService.getActiveCats();
 	}
 
-	@GetMapping
-	public String getPublishedArticles(Model model, 
-						@RequestParam(name = "page", defaultValue = "1") Integer page,
+	// 套用日期篩選：只寫進 session 後導回 /article，日期不會出現在網址上
+	@PostMapping("/search")
+	public String applyFilters(HttpSession session, RedirectAttributes ra,
 						@RequestParam(name = "catId", required = false) Integer catId,
 						@RequestParam(name = "keyword", required = false) String keyword,
 						@RequestParam(name = "sort", defaultValue = "newest") String sort,
-						@RequestParam(name = "dateFrom", required = false) 
+						@RequestParam(name = "dateFrom", required = false)
 						@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
-						@RequestParam(name = "dateTo", required = false) 
+						@RequestParam(name = "dateTo", required = false)
 						@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo) {
-		// query param: &dateFrom=2030-01-02&dateTo=2030-01-01
+		// 日期留白送出即代表取消日期篩選
+		session.setAttribute(SESSION_DATE_FROM, dateFrom);
+		session.setAttribute(SESSION_DATE_TO, dateTo);
+
+		if (catId != null) ra.addAttribute("catId", catId);
+		if (keyword != null && !keyword.isBlank()) ra.addAttribute("keyword", keyword);
+		if (!"newest".equals(sort)) ra.addAttribute("sort", sort);
+		return "redirect:/article";
+	}
+
+	// 清除所有篩選條件(含 session 中的日期區間)
+	@GetMapping("/reset")
+	public String resetFilters(HttpSession session) {
+		clearDateFilter(session);
+		return "redirect:/article";
+	}
+
+	@GetMapping
+	public String getPublishedArticles(Model model, HttpSession session,
+						@RequestParam(name = "page", defaultValue = "1") Integer page,
+						@RequestParam(name = "catId", required = false) Integer catId,
+						@RequestParam(name = "keyword", required = false) String keyword,
+						@RequestParam(name = "sort", defaultValue = "newest") String sort) {
+		LocalDate dateFrom = (LocalDate) session.getAttribute(SESSION_DATE_FROM);
+		LocalDate dateTo = (LocalDate) session.getAttribute(SESSION_DATE_TO);
+
 		String dateError = null;
 		LocalDate today = LocalDate.now();
 		if ((dateFrom != null && dateFrom.isAfter(today)) || (dateTo != null && dateTo.isAfter(today))) {
@@ -112,6 +143,7 @@ public class ArticleController {
 		if (dateError != null) {
 			dateFrom = null;
 			dateTo = null;
+			clearDateFilter(session);
 		}
 
 		Article featuredArticle = articleInteractionService.getMostSavedArticle();
@@ -134,7 +166,12 @@ public class ArticleController {
 		
 		return "front-end/member/article/articleList";
 	}
-	
+
+	private void clearDateFilter(HttpSession session) {
+		session.removeAttribute(SESSION_DATE_FROM);
+		session.removeAttribute(SESSION_DATE_TO);
+	}
+
 	@GetMapping("/{articleId}")
 	public String getArticleDetail(Model model,
 						@PathVariable Integer articleId, 

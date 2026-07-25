@@ -267,9 +267,7 @@
 	kw           = ${keyword == null ? '' : keyword},
 	qs           = ${(selectedCatId == null ? '' : 'catId=' + selectedCatId)
 	                 + ((keyword == null or #strings.isEmpty(keyword)) ? ''
-	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))
-	                 + (dateFrom == null ? '' : '&amp;dateFrom=' + dateFrom)
-	                 + (dateTo == null ? '' : '&amp;dateTo=' + dateTo)},
+	                    : ((selectedCatId == null ? '' : '&amp;') + 'keyword=' + #uris.escapeQueryParam(keyword)))},
 	showFeatured = ${featuredArticle != null}">
 
 	<!-- ================= 導覽列 ================= -->
@@ -297,7 +295,7 @@
 
 					<!-- 搜尋 + 進階篩選 -->
 					<div class="side-card">
-						<form th:action="@{/article}" method="get" role="search" autocomplete="off">
+						<form th:action="@{/article/search}" method="post" role="search" autocomplete="off">
 							<input type="hidden" name="catId" th:if="${selectedCatId != null}" th:value="${selectedCatId}" />
 
 							<div class="side-search">
@@ -324,7 +322,7 @@
 								</div>
 								<div class="filter-actions">
 									<button type="submit" class="btn btn-primary">套用條件</button>
-									<a class="btn btn-outline" th:href="@{/article}" href="#">清除</a>
+									<a class="btn btn-outline" th:href="@{/article/reset}" href="#">清除</a>
 								</div>
 							</div>
 						</form>
@@ -475,7 +473,7 @@
 							<circle cx="11" cy="11" r="7" /><path d="M20 20l-3.6-3.6" /></svg>
 						<b>沒有符合條件的文章</b>
 						<p>換個關鍵字，或選別的分類，再找找看。</p>
-						<a class="btn btn-primary" th:href="@{/article}" href="#">看全部文章</a>
+						<a class="btn btn-primary" th:href="@{/article/reset}" href="#">看全部文章</a>
 					</div>
 				</main>
 			</div>

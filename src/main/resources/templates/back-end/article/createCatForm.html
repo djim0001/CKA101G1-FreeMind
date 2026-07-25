@@ -172,20 +172,21 @@
 		.admin-page-header-nav a {
 			display: inline-flex;
 			align-items: center;
-			padding: .45rem .95rem;
-			border: 1px solid var(--line);
-			border-radius: 999px;
+			padding: .35rem .15rem;
+			border: none;
+			border-bottom: 2px solid transparent;
+			border-radius: 0;
 			color: var(--ink-soft);
-			background: var(--white);
-			box-shadow: var(--shadow-sm);
-			font-size: .85rem;
-			font-weight: 700;
-			transition: border-color .18s ease, color .18s ease, background .18s ease;
+			background: transparent;
+			font-size: .95rem;
+			font-weight: 500;
+			letter-spacing: .03em;
+			transition: color .18s ease, border-color .18s ease;
 			white-space: nowrap;
 		}
 		.admin-page-header-nav a:hover {
 			color: var(--orange);
-			border-color: var(--orange);
+			border-bottom-color: var(--orange);
 		}
 		.article-admin-nav {
 			display: flex;
