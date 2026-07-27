@@ -94,4 +94,7 @@ public class Article implements Serializable {
 	
 	@Column(name = "share_count", nullable = false)
 	private Integer shareCount = 0;
+	
+	@Column(name = "hot_score", nullable = false)
+	private Double hotScore = 0.0;
 }

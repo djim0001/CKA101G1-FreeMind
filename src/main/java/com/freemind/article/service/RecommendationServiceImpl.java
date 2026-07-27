@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.freemind.article.entity.Article;
@@ -26,6 +27,9 @@ import jakarta.transaction.Transactional;
 @Service
 public class RecommendationServiceImpl implements RecommendationService{
 	
+	@Value("${app.article.recommend.cat-pool:4}")
+	private int catPoolSize;
+	
 	@Autowired
 	private ArticleRepository articleRepository;
 	
@@ -38,13 +42,10 @@ public class RecommendationServiceImpl implements RecommendationService{
 	@Override
 	@Transactional
 	public List<Article> getArticleRecommendation(Integer articleId) {
-		List<ArticleCat> catList = articleRepository.getPopularCats(3);
+		List<ArticleCat> catList = articleRepository.getPopularCats(catPoolSize);
 		Collections.shuffle(catList);
 		
-		List<ArticleCat> random3 = new ArrayList<>();
-		random3.add(catList.get(0));
-		random3.add(catList.get(1));
-		random3.add(catList.get(2));
+		List<ArticleCat> random3 = catList.stream().limit(3).toList(); // to avoid IndexOutOfBoundsException
 		
 	    List<Article> articles = articleRepository.getPopularFromCats(random3, List.of(articleId));
 

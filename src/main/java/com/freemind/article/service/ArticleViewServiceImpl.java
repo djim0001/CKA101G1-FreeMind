@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,8 @@ public class ArticleViewServiceImpl implements ArticleViewService{
 	
 	private static final Duration DEDUP_TTL = Duration.ofHours(24); // De-duplication Time To Live 
 	private static final String HOT_KEY = "hot:alltime";
+	private static final String HOT_DIRTY_KEY = "hot:dirty";
+
 	
 	@Override
 	public boolean recordViewCount(Integer articleId, String visitorKey) {
@@ -57,24 +61,35 @@ public class ArticleViewServiceImpl implements ArticleViewService{
 	@Override
 	@Scheduled(fixedRateString = "${view.sync.fixed-rate:120000}") // 2min
     @Transactional
-	public void syncViewCountsToDb() {
-		Set<String> dirtyIds = redisTemplate.opsForSet().members("view:dirty_articles"); // SMEMBERS
+	public void syncCountAndScoreToDb() {
+		Set<String> viewDirtyIds = redisTemplate.opsForSet().members("view:dirty_articles"); // SMEMBERS
+		Set<String> hotDirtyIds = redisTemplate.opsForSet().members(HOT_DIRTY_KEY);
+		Set<String> dirtyIds = Stream.concat(viewDirtyIds.stream(), hotDirtyIds.stream())
+								     .collect(Collectors.toSet());
+
+
 		if (dirtyIds == null || dirtyIds.isEmpty()) return;
 		
 		for (String idStr : dirtyIds) {
-			String pendingKey = "view:pending:" + idStr;
-//			String pendingValue = redisTemplate.opsForValue().getAndDelete(pendingKey); // GETDEL(Redis 6.2.0)
-			String pendingValue = redisTemplate.opsForValue().get(pendingKey);
-			if (pendingValue != null) {
-			    redisTemplate.delete(pendingKey);
+			String viewKey = "view:pending:" + idStr;
+//			String viewCount = redisTemplate.opsForValue().getAndDelete(pendingKey); // GETDEL(Redis 6.2.0)
+			String viewCount = redisTemplate.opsForValue().get(viewKey);
+			if (viewCount != null) {
+			    redisTemplate.delete(viewKey);
 			}
-		
-			if (pendingValue != null) {
-				long count = Long.parseLong(pendingValue);
-				articleRepository.incrementViewCount(Integer.valueOf(idStr), count);
+			
+		    Double hotScore = redisTemplate.opsForZSet().score(HOT_KEY, idStr); // ZSCORE
+			    
+			if (hotScore != null) {
+				long count = (viewCount != null) ? Long.parseLong(viewCount) : 0L;
+				articleRepository.updateViewCountAndHotScore(Integer.valueOf(idStr), count, hotScore);
 			}
+		    
 			redisTemplate.opsForSet().remove("view:dirty_articles", idStr); // SREM
+			redisTemplate.opsForSet().remove(HOT_DIRTY_KEY, idStr);
 		}
+			
+		
 		
 		log.info("Completed sync of {} articles.", dirtyIds.size());
 	}
@@ -98,6 +113,8 @@ public class ArticleViewServiceImpl implements ArticleViewService{
 	@Override
 	public void adjustHotScore(Integer articleId, double delta) {
 		redisTemplate.opsForZSet().incrementScore(HOT_KEY, articleId.toString(), delta); // ZINCRBY
+		redisTemplate.opsForSet().add(HOT_DIRTY_KEY, articleId.toString());	// SADD, the articleIds to be updated
+		
 	}
 	
 }
