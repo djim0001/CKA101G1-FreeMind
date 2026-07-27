@@ -553,6 +553,7 @@ CREATE TABLE articles(
     reject_note VARCHAR(200),
     view_count INT UNSIGNED NOT NULL DEFAULT 0,
     share_count INT UNSIGNED NOT NULL DEFAULT 0,
+    hot_score DOUBLE NOT NULL DEFAULT 0,
     CONSTRAINT fk_articles_psychologist
 		FOREIGN KEY (psych_id) REFERENCES psychologist(psych_id),
     CONSTRAINT fk_articles_article_categories

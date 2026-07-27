@@ -6,7 +6,7 @@ public interface ArticleViewService {
 	
 	boolean recordViewCount(Integer articleId, String visitorKey);
 	
-	void syncViewCountsToDb();
+	void syncCountAndScoreToDb();
 	
 	List<Integer> getHotArticleIds(int topN);
 	

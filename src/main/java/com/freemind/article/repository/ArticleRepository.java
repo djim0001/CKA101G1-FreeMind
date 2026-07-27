@@ -78,13 +78,18 @@ public interface ArticleRepository extends JpaRepository<Article, Integer>{
 	@Query("UPDATE Article a SET a.shareCount = a.shareCount + 1 WHERE a.articleId = :articleId")
 	void incrementShareCount(@Param("articleId")Integer articleId);
 	
+//	@Modifying
+//	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count WHERE a.articleId = :articleId")
+//	void incrementViewCount(@Param("articleId")Integer articleId, @Param("count")long count);
+	
 	@Modifying
-	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count WHERE a.articleId = :articleId")
-	void incrementViewCount(@Param("articleId")Integer articleId, long count);
+	@Query("UPDATE Article a SET a.viewCount = a.viewCount + :count, " +
+	       "a.hotScore = :score WHERE a.articleId = :articleId")
+	void updateViewCountAndHotScore(@Param("articleId")Integer articleId, @Param("count")long count, @Param("score")double score);
 
 	@Query("SELECT a FROM Article a WHERE a.articleCat IN :cats " +
 	       "AND a.articleStatus = 2 AND a.articleId NOT IN :articleIds " +
-		   "ORDER BY a.viewCount DESC LIMIT 3")
+		   "ORDER BY a.hotScore DESC LIMIT 3")
 	List<Article> getPopularFromCats(@Param("cats")List<ArticleCat> cats, @Param("articleIds")List<Integer> viewedArticleIds);
 	
 	@Query("SELECT a.articleCat FROM Article a " +
