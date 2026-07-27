@@ -507,8 +507,8 @@ public class PsychologistService {
 	
 	//把專長刪了重設定
 	private void replaceExpertises(Psychologist p , List<Integer> expertiseIds) {
-		psychologistExpertiseRepository.deleteByCompositeExpertiseDetail_PsychId(p.getPsychId());
-		psychologistExpertiseRepository.flush();
+		psychologistExpertiseRepository.deleteByPsychId(p.getPsychId());
+	    psychologistExpertiseRepository.flush(); 
 		List<PsychologistExpertise> newLinks = new ArrayList<>();
 		for(Integer expertiseId : expertiseIds) {
 			Expertise e = expertiseRepository.findById(expertiseId).
