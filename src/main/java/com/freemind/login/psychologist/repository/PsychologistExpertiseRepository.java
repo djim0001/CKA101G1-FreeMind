@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import com.freemind.login.psychologist.entity.Expertise;
-import com.freemind.login.psychologist.entity.Psychologist;
 import com.freemind.login.psychologist.entity.PsychologistExpertise;
 
 public interface PsychologistExpertiseRepository extends JpaRepository<PsychologistExpertise, PsychologistExpertise.CompositeExpertiseDetail>{
@@ -19,6 +20,9 @@ public interface PsychologistExpertiseRepository extends JpaRepository<Psycholog
 	@EntityGraph(attributePaths = "psychologist")
     List<PsychologistExpertise> findByExpertiseExpertiseId(Integer expertiseId);
 	
-	void deleteByCompositeExpertiseDetail_PsychId(Integer psychId);
-
+//	void deleteByCompositeExpertiseDetail_PsychId(Integer psychId);
+	
+	@Modifying
+	@Query("DELETE FROM PsychologistExpertise pe WHERE pe.compositeExpertiseDetail.psychId = :psychId")
+	void deleteByPsychId(@Param("psychId") Integer psychId);
 }
